@@ -8,6 +8,19 @@ const config = {
   framework: { name: '@storybook/react-vite', options: {} },
   docs: { defaultName: 'Docs' },
   core: { allowedHosts: ['localhost', '127.0.0.1'], disableTelemetry: true },
+  viteFinal: async (config) => {
+    const allowedHosts = config.server?.allowedHosts === true
+      ? true
+      : Array.from(new Set([...(config.server?.allowedHosts || []), 'localhost', '127.0.0.1']));
+
+    return {
+      ...config,
+      server: {
+        ...config.server,
+        allowedHosts,
+      },
+    };
+  },
 };
 
 export default config;
