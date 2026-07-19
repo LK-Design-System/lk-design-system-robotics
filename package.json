@@ -1,6 +1,6 @@
 {
   "name": "@lk-robotics/lds-robotics-ui",
-  "version": "0.1.0-rc.0",
+  "version": "0.1.0-rc.1",
   "description": "Robotics DOM, SVG, and 2D UI presentation layer for LDS.",
   "type": "module",
   "main": "./dist/index.js",
@@ -15,6 +15,13 @@
     "*.css",
     "tokens/*.css"
   ],
+  "scripts": {
+    "build": "tsup --config tsup.config.ts && node scripts/copy-types.mjs",
+    "check:types": "tsc --noEmit",
+    "check:pack": "npm pack --dry-run --ignore-scripts",
+    "check": "npm run build && npm run check:types && npm run check:pack",
+    "prepublishOnly": "npm run check"
+  },
   "dependencies": {
     "@lk-robotics/lds-core": "0.1.0-rc.0",
     "@lk-robotics/lds-product": "0.1.0-rc.0"
@@ -22,6 +29,13 @@
   "peerDependencies": {
     "react": ">=18 <20",
     "react-dom": ">=18 <20"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.3",
+    "@types/react-dom": "^19.2.3",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
