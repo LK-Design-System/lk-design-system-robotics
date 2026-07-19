@@ -10,7 +10,10 @@ import { PNG } from 'pngjs';
 const root = process.cwd();
 const staticDir = path.join(root, 'storybook-static');
 const outDir = path.join(root, 'visual-artifacts', 'smoke');
-const baselineDir = path.join(root, 'visual-baselines', 'smoke');
+// Keep the migrated Windows baselines stable while CI compares screenshots
+// against captures produced by the same Linux rendering stack.
+const baselineSet = process.platform === 'linux' ? 'smoke-linux' : 'smoke';
+const baselineDir = path.join(root, 'visual-baselines', baselineSet);
 const diffDir = path.join(root, 'visual-artifacts', 'smoke-diff');
 const updateBaseline = process.argv.includes('--update-baseline');
 const checkBaseline = process.argv.includes('--check');

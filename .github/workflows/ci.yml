@@ -5,6 +5,12 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      update_visual_baseline:
+        description: Regenerate and upload Ubuntu visual baselines
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -39,4 +45,16 @@ jobs:
       - run: npm run check
       - name: Install Playwright Chromium
         run: npm exec -- playwright install --with-deps chromium
-      - run: npm run check:storybook
+      - name: Check Storybook and visual regression
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.update_visual_baseline != true }}
+        run: npm run check:storybook
+      - name: Generate Ubuntu visual baselines
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.update_visual_baseline == true }}
+        run: npm run update:visual-baseline
+      - name: Upload Ubuntu visual baselines
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.update_visual_baseline == true }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: robotics-linux-visual-baselines
+          path: visual-baselines/smoke-linux
+          if-no-files-found: error

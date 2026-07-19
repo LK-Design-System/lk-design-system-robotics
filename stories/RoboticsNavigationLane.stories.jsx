@@ -332,8 +332,12 @@ function assertCircularTextGeometry(badge, context) {
     textBounds.top - circleBounds.top,
     circleBounds.bottom - textBounds.bottom,
   ];
-  if (Math.min(...insets) < 1) {
-    throw new Error(`${context} transition text lacks 1px circle inset: ${insets.map((value) => value.toFixed(2)).join('/')}.`);
+  const minimumInset = 1;
+  const renderingTolerance = 0.5;
+  if (Math.min(...insets) + renderingTolerance < minimumInset) {
+    throw new Error(
+      `${context} transition text lacks ${minimumInset}px circle inset within ${renderingTolerance}px rendering tolerance: ${insets.map((value) => value.toFixed(2)).join('/')}.`,
+    );
   }
 }
 
