@@ -21,3 +21,7 @@ npm run check
 ```
 
 The package is released to `https://npm.pkg.github.com` as a restricted package.
+
+## Ownership
+
+`@jinhyuk2me` owns package release, dependency updates, and security response.
