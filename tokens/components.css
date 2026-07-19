@@ -1,0 +1,14 @@
+:root {
+  --component-viewer-surface: color-mix(in srgb, var(--color-semantic-static-black) 88%, var(--color-semantic-primary-normal));
+  --component-viewer-surface-elevated: color-mix(in srgb, var(--color-semantic-static-black) 78%, var(--color-semantic-primary-normal));
+  --component-viewer-foreground: var(--color-semantic-static-white);
+  --component-viewer-muted: color-mix(in srgb, var(--color-semantic-static-white) 72%, transparent);
+  --component-viewer-subtle: color-mix(in srgb, var(--color-semantic-static-white) 52%, transparent);
+  --component-viewer-border: color-mix(in srgb, var(--color-semantic-static-white) 18%, transparent);
+  --component-viewer-overlay: color-mix(in srgb, var(--color-semantic-static-black) 68%, transparent);
+  --component-viewer-light-surface: var(--color-semantic-static-white);
+  --component-viewer-light-surface-elevated: color-mix(in srgb, var(--color-semantic-static-black) 4%, var(--color-semantic-static-white));
+  --component-viewer-light-foreground: color-mix(in srgb, var(--color-semantic-static-black) 90%, transparent);
+  --component-viewer-light-muted: color-mix(in srgb, var(--color-semantic-static-black) 68%, transparent);
+  --component-viewer-light-border: color-mix(in srgb, var(--color-semantic-static-black) 16%, transparent);
+}

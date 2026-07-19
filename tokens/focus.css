@@ -1,0 +1,15 @@
+/* Map geometry focus slice from tokens/focus.css. */
+/* Map geometry owns a shape-following focus indicator inside the SVG. Keep the
+   global rectangular outline from duplicating that ring or enclosing labels. */
+:where(
+  [data-waypoint-marker],
+  [data-lk-lane-overlay],
+  [data-lk-route-overlay],
+  [data-route-segment],
+  [data-lk-trajectory-overlay],
+  [data-lds-spatial-region],
+  [data-lds-facility-transition]
+):focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+}
