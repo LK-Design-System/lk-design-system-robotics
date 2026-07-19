@@ -13,7 +13,7 @@ export function FloorSelector({ floors = [], value, defaultValue, onChange, styl
   const pick = (v) => { if (!controlled) setInternal(v); onChange && onChange(v); };
   return (
     <div role="listbox" aria-label="층 선택" style={{ display: 'inline-flex', flexDirection: 'column', gap: 3, padding: 4,
-      background: 'var(--color-semantic-background-elevated-normal)', border: '1px solid var(--color-semantic-line-normal-normal)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-1)', fontFamily: 'var(--font-sans)', ...style }} {...rest}>
+      background: 'var(--color-semantic-background-elevated-normal)', border: '1px solid var(--color-semantic-line-normal-normal)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-sm)', fontFamily: 'var(--font-sans)', ...style }} {...rest}>
       {norm.map((f) => {
         const on = f.value === cur;
         return (

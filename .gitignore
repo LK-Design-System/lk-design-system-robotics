@@ -1,4 +1,6 @@
 node_modules/
 dist/
 storybook-static/
+visual-artifacts/
+.lds-conformance/
 *.tgz

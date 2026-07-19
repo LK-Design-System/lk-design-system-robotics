@@ -17,9 +17,26 @@ jobs:
       NODE_AUTH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v7
+      - name: Run pinned LDS conformance
+        id: lds_conformance
+        uses: LK-ROBOTICS/lk-design-system/.github/actions/lds-conformance@b06aef7c605c47bd11ca2bfdc371d25bf7c9ba92
+        with:
+          profile: robotics-ui
+          root: .
+      - name: Export pinned LDS conformance paths
+        shell: pwsh
+        env:
+          CONFORMANCE_CLI: ${{ steps.lds_conformance.outputs.cli }}
+          CONFORMANCE_ROOT: ${{ steps.lds_conformance.outputs.lds_root }}
+        run: |
+          "LDS_CONFORMANCE_CLI=$env:CONFORMANCE_CLI" >> $env:GITHUB_ENV
+          "LDS_CONFORMANCE_ROOT=$env:CONFORMANCE_ROOT" >> $env:GITHUB_ENV
       - uses: actions/setup-node@v6
         with:
           node-version: 22.17.1
           cache: npm
       - run: npm ci
       - run: npm run check
+      - name: Install Playwright Chromium
+        run: npm exec -- playwright install --with-deps chromium
+      - run: npm run check:storybook
