@@ -3,7 +3,7 @@ import { isFocusVisibleTarget } from './_NavigationFocus.js';
 import { NavigationStateGlyph } from './_NavigationStateGlyph.js';
 import { ANNOTATION_CODE as ANNOTATION_CODES, ROLE_CODE as ROLE_CODES } from './_navigationEncoding.js';
 import { NavigationAnnotationBlock, annotationPriority, useNavigationObstacles } from './_navigationAnnotations.js';
-import { navStateOpacity, NAV_DASH, NAV_HIT, NAV_STATE_BADGE, NAV_LABEL_HALO, NAV_FOCUS } from './_navigationVocabulary.js';
+import { navStateOpacity, NAV_DASH, NAV_NODE, NAV_HIT, NAV_STATE_BADGE, NAV_LABEL_HALO, NAV_FOCUS } from './_navigationVocabulary.js';
 
 // Accessible-name copy is Korean to match every sibling navigation overlay
 // (Lane / Region / Route / Trajectory / Facility). A Korean-first product must
@@ -119,17 +119,17 @@ export function WaypointMarker({
   const foreground = 'var(--viewer-foreground, var(--color-semantic-label-strong))';
   const muted = 'var(--viewer-muted, var(--color-semantic-label-neutral))';
   const surface = 'var(--viewer-surface-elevated, var(--color-semantic-background-elevated-normal))';
-  const stateColor = invalid || availability === 'unavailable'
+  // Color hierarchy: danger red is reserved for DATA errors (invalid), not
+  // operational unavailability. "Can't use right now" desaturates to muted —
+  // the same greyed-out convention as a blocked lane — and the slash shape
+  // carries the "unavailable" meaning without competing with real alarms.
+  const stateColor = invalid
     ? 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))'
-    : availability === 'unknown'
-      ? 'var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))'
-      : foreground;
-  // When the point is filled solid (selected), any mark drawn DIRECTLY on it —
-  // the unavailable slash and a lone unknown/invalid state glyph — knocks out to a
-  // light ink so it stays legible on the accent fill. Compound state glyphs sit on
-  // their own surface chips, so they keep the neutral foreground.
-  const selectedGlyphInk = 'var(--color-semantic-static-white)';
-
+    : availability === 'unavailable'
+      ? muted
+      : availability === 'unknown'
+        ? 'var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))'
+        : foreground;
   const activate = (event) => {
     if (disabled || !interactive) return;
     onActivate(waypoint.id, event);
@@ -197,8 +197,9 @@ export function WaypointMarker({
           never the measured `data-waypoint-point`, so the 24px hit target and
           the glyph-in-circle geometry contracts are untouched. The cast shadow
           lifts every marker off the facility grid; the attention ring gives
-          alarm states (invalid / unavailable) visual weight so an emergency is
-          not painted at the same hairline salience as routine state.
+          the invalid alarm state visual weight so a DATA error is not painted at
+          the same hairline salience as routine state. Operational
+          unavailability is not an alarm — it desaturates instead of glowing.
         */}
         <polygon
           data-waypoint-shadow=""
@@ -208,12 +209,12 @@ export function WaypointMarker({
           opacity="0.16"
           pointerEvents="none"
         />
-        {(invalid || availability === 'unavailable') && (
+        {invalid && (
           <circle
             data-waypoint-attention=""
             r="10.5"
             fill="none"
-            stroke={stateColor}
+            stroke="var(--viewer-danger, var(--color-semantic-status-negative-foreground))"
             strokeWidth="2.5"
             opacity="0.4"
             vectorEffect="non-scaling-stroke"
@@ -267,30 +268,43 @@ export function WaypointMarker({
         )}
 
         {/*
-          Selection fills the diamond solid in the accent colour rather than
-          wrapping it in a round ring — a circular ring around a diamond reads as
-          a shape mismatch, and a solid node is the stronger "this one is
-          selected" cue. The role stays in the label and alarm states keep their
-          own attention/state indicators, so no encoding is lost.
+          The point keeps its surface fill and availability-colored stroke in
+          every state, so selection never overrides the availability channel.
+          Selection is an accent ring that traces the SAME diamond silhouette
+          (like the focus shell) rather than a circular ring around a diamond —
+          matching the pin markers' silhouette-ring selection grammar so every
+          marker class reads "selected" the same way.
         */}
         <polygon
           {...obstacle(`waypoint:${waypoint.id}:point`)}
           data-waypoint-point=""
-          data-waypoint-selected-indicator={selected ? '' : undefined}
-          points="0,-7 7,0 0,7 -7,0"
-          fill={selected ? 'var(--viewer-accent, var(--color-semantic-primary-normal))' : surface}
-          stroke={selected ? 'var(--viewer-accent, var(--color-semantic-primary-normal))' : stateColor}
+          points={NAV_NODE.points(NAV_NODE.radius)}
+          fill={surface}
+          stroke={stateColor}
           strokeWidth="2.25"
           strokeLinejoin="round"
           vectorEffect="non-scaling-stroke"
         />
+        {selected && (
+          <polygon
+            data-waypoint-selected-indicator=""
+            points={NAV_NODE.points(NAV_NODE.radius)}
+            transform={`scale(${NAV_NODE.selectionRingScale})`}
+            fill="none"
+            stroke="var(--viewer-accent, var(--color-semantic-primary-normal))"
+            strokeWidth="2.25"
+            strokeLinejoin="round"
+            vectorEffect="non-scaling-stroke"
+            pointerEvents="none"
+          />
+        )}
 
         {availability === 'unavailable' && (
           <path
             data-waypoint-unavailable-indicator=""
             d="M-4.5 4.5 L4.5 -4.5"
             fill="none"
-            stroke={selected ? selectedGlyphInk : 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))'}
+            stroke={foreground}
             strokeWidth="2"
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
@@ -318,7 +332,7 @@ export function WaypointMarker({
             <NavigationStateGlyph
               kind="unknown"
               size={10}
-              color={selected && !compoundUnknownInvalid ? selectedGlyphInk : foreground}
+              color={foreground}
               data-waypoint-state-glyph-geometry="unknown"
             />
           </g>
@@ -345,7 +359,7 @@ export function WaypointMarker({
             <NavigationStateGlyph
               kind="invalid"
               size={10}
-              color={selected && !compoundUnknownInvalid ? selectedGlyphInk : foreground}
+              color={foreground}
               data-waypoint-state-glyph-geometry="invalid"
             />
           </g>

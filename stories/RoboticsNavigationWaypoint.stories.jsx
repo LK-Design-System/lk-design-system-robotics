@@ -635,7 +635,7 @@ export const CompoundRolesAndStates = {
       if (!log.textContent.includes('wp-unavailable')) throw new Error('Unavailable waypoint must remain inspectable.');
     });
 
-    if (!canvasElement.querySelector('[data-waypoint-selected-indicator]')) throw new Error('Selected waypoint lost its solid fill.');
+    if (!canvasElement.querySelector('[data-waypoint-selected-indicator]')) throw new Error('Selected waypoint lost its silhouette selection ring.');
     if (!canvasElement.querySelector('[data-waypoint-focus-indicator]')) throw new Error('Focused waypoint lost its focus indicator.');
     if (!canvasElement.querySelector('[data-waypoint-stale-indicator]')) throw new Error('Stale waypoint lost its dashed halo.');
     if (!canvasElement.querySelector('[data-waypoint-invalid-indicator]')) throw new Error('Invalid waypoint lost its exclamation geometry.');

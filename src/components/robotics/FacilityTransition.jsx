@@ -10,9 +10,13 @@ const AVAILABILITY_PRESENTATION = {
     label: '사용 가능',
     stroke: 'var(--viewer-accent, var(--color-semantic-primary-normal))',
   },
+  // "Can't use right now" desaturates to muted (greyed-out convention) rather
+  // than danger red — red is reserved for DATA errors (invalid). The slash
+  // shape carries "unavailable"; the white knockout stays legible on the
+  // muted pin.
   unavailable: {
     label: '사용 불가',
-    stroke: 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))',
+    stroke: 'var(--viewer-muted, var(--color-semantic-label-alternative))',
   },
   unknown: {
     label: '가용성 미확인',
