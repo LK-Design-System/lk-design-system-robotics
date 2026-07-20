@@ -4,9 +4,12 @@ import { NavigationStateGlyph } from './_NavigationStateGlyph.js';
 import { NavigationAnnotationBlock, annotationPriority, useNavigationObstacles } from './_navigationAnnotations.js';
 import { navStateOpacity, NAV_DASH, NAV_STATE_BADGE, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION } from './_navigationVocabulary.js';
 
+// facility uses a DOT field rather than a grid: the map canvas already draws a
+// square grid, so a region grid pattern reads as "empty map", not "facility
+// area". Dots stay legibly distinct from the canvas lines.
 const CATEGORY_PATTERNS = {
   behavior: 'diagonal',
-  facility: 'grid',
+  facility: 'dot',
   terrain: 'contour',
 };
 
@@ -163,6 +166,18 @@ function RegionShape({ shape, ...props }) {
 }
 
 function patternContent(pattern, stroke) {
+  if (pattern === 'dot') {
+    return (
+      <circle
+        cx="4"
+        cy="4"
+        r="1.35"
+        fill={stroke}
+        fillOpacity="0.5"
+      />
+    );
+  }
+
   if (pattern === 'grid') {
     return (
       <path
@@ -324,7 +339,7 @@ export function SpatialRegion({
     activate(event);
   };
 
-  const patternSize = pattern === 'grid' ? 10 : pattern === 'contour' ? 12 : 9;
+  const patternSize = pattern === 'dot' ? 8 : pattern === 'grid' ? 10 : pattern === 'contour' ? 12 : 9;
 
   return (
     <g
@@ -382,6 +397,17 @@ export function SpatialRegion({
         </pattern>
       </defs>
 
+      {/* Faint base tint under the hatch, so the area reads as a filled REGION —
+          not just a few stray lines — when zoomed out or laid over the map's own
+          grid. The pattern hatch rides on top; its gaps reveal the tint. */}
+      <RegionShape
+        shape={region.shape}
+        fill={stroke}
+        fillOpacity="0.1"
+        stroke="none"
+        pointerEvents="none"
+        data-region-tint=""
+      />
       {activeFocus && (
         <RegionShape
           shape={region.shape}

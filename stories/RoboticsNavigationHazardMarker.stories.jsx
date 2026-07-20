@@ -102,7 +102,7 @@ const meta = {
       eyebrow: 'Navigation / Hazard Marker',
       title: 'Hazard 마커는 AGV가 피해야 하는 지점 위험물을 severity 색 핀으로 표시합니다',
       description:
-        'FacilityTransition과 같은 map-pin 실루엣을 공유해 한 지도의 marker가 하나의 패밀리로 읽히되, "여기는 피한다"는 severity 색(주의=cautionary, 위험=negative)과 위험물 knockout 글리프, 접근성 이름이 전달합니다. 계단·경사로·단차(낙하)·충돌 위험물 같은 지점 위험물을 제품이 분류한 severity 그대로 보여 주며, 회피 경로를 계획하거나 명령을 내리지 않습니다. 충돌 위험물은 정적으로 등록된 지점(기둥·저고도 배관·상시 적치)만 뜻하고, 센서가 실시간으로 잡는 동적 장애물은 제품의 live 레이어 소관입니다. 같은 경사로도 fleet에 따라 통과 설비(FacilityTransition)일 수도, 회피 대상(Hazard)일 수도 있으며 그 분류는 제품 소유입니다. 넓은 keep-out 구역은 SpatialRegion 소관입니다.',
+        'FacilityTransition과 같은 map-pin 실루엣을 공유해 한 지도의 marker가 하나의 패밀리로 읽히되, "여기는 피한다"는 severity 색(주의=cautionary, 위험=negative)과 위험물 knockout 글리프, 접근성 이름이 전달합니다. severity는 색에만 기대지 않습니다 — 위험(danger) 마커는 핀 실루엣을 따라가는 상시 alarm halo를 두르고 주의(caution)는 두르지 않아, 탈채도·적록색약에서도 두 등급이 구분됩니다. 계단·경사로·단차(낙하)·충돌 위험물 같은 지점 위험물을 제품이 분류한 severity 그대로 보여 주며, 회피 경로를 계획하거나 명령을 내리지 않습니다. 충돌 위험물은 정적으로 등록된 지점(기둥·저고도 배관·상시 적치)만 뜻하고, 센서가 실시간으로 잡는 동적 장애물은 제품의 live 레이어 소관입니다. 같은 경사로도 fleet에 따라 통과 설비(FacilityTransition)일 수도, 회피 대상(Hazard)일 수도 있으며 그 분류는 제품 소유입니다. 넓은 keep-out 구역은 SpatialRegion 소관입니다.',
     },
     docs: {
       description: {
@@ -140,7 +140,7 @@ function HazardTile({ hazard, label, props }) {
 export const Overview = {
   name: '개요',
   parameters: storyDescription(
-    '계단·경사로·단차(낙하)·충돌 위험물을 주의·위험 severity로 비교합니다. severity 색이 설비 핀의 accent와 뚜렷이 구분되고, 핀 안 위험물 글리프가 작은 크기에서도 서로 구분되는지 확인하세요.',
+    '계단·경사로·단차(낙하)·충돌 위험물을 주의·위험 severity로 비교합니다. severity 색이 설비 핀의 accent와 뚜렷이 구분되고, 핀 안 위험물 글리프가 작은 크기에서도 서로 구분되는지, 위험(danger) 등급이 상시 alarm halo라는 색과 독립된 채널로도 주의와 구분되는지 확인하세요.',
   ),
   render: () => (
     <main style={{ width: 'min(560px, 100%)', display: 'grid', gap: 20 }}>
@@ -171,6 +171,14 @@ export const Overview = {
       }
       if (!marker.querySelector('[data-hazard-sign]') || !marker.querySelector('[data-hazard-glyph]')) {
         throw new Error('Each marker must render its severity pin badge and knockout glyph.');
+      }
+      // Severity must not rest on hue alone: a danger hazard wears a persistent
+      // alarm halo that a caution hazard does not, so the two stay distinct
+      // under desaturation / red-green CVD.
+      const isDanger = marker.getAttribute('data-hazard-severity') === 'danger';
+      const hasAlarm = Boolean(marker.querySelector('[data-hazard-alarm-ring]'));
+      if (isDanger !== hasAlarm) {
+        throw new Error('Danger hazards must render an alarm halo and caution hazards must not — severity needs a non-color channel.');
       }
     }
   },

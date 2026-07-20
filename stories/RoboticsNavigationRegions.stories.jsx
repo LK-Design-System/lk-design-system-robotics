@@ -166,7 +166,7 @@ export const SpatialRegionOverview = {
     if (regions.length !== 3) throw new Error(`Expected three region categories, received ${regions.length}.`);
 
     const patterns = new Map(regions.map((region) => [region.dataset.regionCategory, region.dataset.regionPattern]));
-    if (patterns.get('behavior') !== 'diagonal' || patterns.get('facility') !== 'grid' || patterns.get('terrain') !== 'contour') {
+    if (patterns.get('behavior') !== 'diagonal' || patterns.get('facility') !== 'dot' || patterns.get('terrain') !== 'contour') {
       throw new Error(`Region category patterns are incomplete: ${JSON.stringify(Object.fromEntries(patterns))}`);
     }
 

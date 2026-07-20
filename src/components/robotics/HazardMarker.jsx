@@ -164,6 +164,24 @@ export function HazardMarker({
             silhouette (shared with FacilityTransition), so every state reads as
             one marker instead of a pin ringed by a mismatched circle. */}
         <path d={PIN_PATH} transform={NAV_PIN.shadow.transform} fill={NAV_PIN.shadow.fill} opacity={NAV_PIN.shadow.opacity} pointerEvents="none" data-hazard-shadow="" />
+        {/* Severity carries a SECOND channel beyond hue: a danger hazard wears a
+            persistent alarm halo tracing its own pin silhouette (outside the
+            focus/selection rings), so danger vs caution survives desaturation
+            and red/green color-vision deficiency — not fill color alone. */}
+        {hazard.severity === 'danger' && (
+          <path
+            d={PIN_PATH}
+            transform={`scale(${NAV_PIN.alarmRing.scale})`}
+            fill="none"
+            stroke={severity.fill}
+            strokeWidth={NAV_PIN.alarmRing.strokeWidth}
+            strokeLinejoin="round"
+            opacity={NAV_PIN.alarmRing.opacity}
+            vectorEffect="non-scaling-stroke"
+            pointerEvents="none"
+            data-hazard-alarm-ring=""
+          />
+        )}
         {focusVisible && (
           <path d={PIN_PATH} transform={`scale(${NAV_PIN.focusRing.scale})`} fill="none" stroke="var(--color-semantic-focus-indicator)" strokeWidth={NAV_PIN.focusRing.strokeWidth} strokeLinejoin="round" vectorEffect="non-scaling-stroke" pointerEvents="none" data-hazard-focus-ring="" />
         )}
