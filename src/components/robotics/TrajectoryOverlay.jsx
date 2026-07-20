@@ -8,7 +8,8 @@ import {
   trajectoryProgressGeometry,
 } from './_navigationProgressHead.js';
 import { NavigationAnnotationBlock, annotationPriority, useNavigationObstacles } from './_navigationAnnotations.js';
-import { navStateOpacity, NAV_DASH, NAV_HIT, NAV_STATE_BADGE, NAV_PROGRESS_HEAD, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION } from './_navigationVocabulary.js';
+import { NAVIGATION_DIRECTION_PATH } from './_navigationVectorGlyph.js';
+import { navStateOpacity, NAV_DASH, NAV_PATH_DASH, NAV_HIT, NAV_STATE_BADGE, NAV_PROGRESS_HEAD, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION } from './_navigationVocabulary.js';
 
 const STATUS_LABEL = {
   planned: '계획됨',
@@ -19,15 +20,6 @@ const STATUS_LABEL = {
   completed: '완료됨',
 };
 
-const STATUS_GLYPH_KIND = {
-  planned: 'planned',
-  active: 'active',
-  waiting: 'waiting',
-  blocked: 'blocked',
-  rerouting: 'rerouting',
-  completed: 'completed',
-};
-
 const MARKER_GAP_PX = 4;
 const MARKER_ROW_CLEARANCE_PX = 8;
 const LABEL_ROW_GAP_PX = 12;
@@ -36,7 +28,6 @@ const LABEL_ROW_GAP_PX = 12;
 // the layout can never underestimate what the circles actually paint.
 const STATE_BADGE_FOOTPRINT_PX = NAV_STATE_BADGE.radius + NAV_STATE_BADGE.strokeWidth / 2;
 const MARKER_RADIUS_PX = {
-  status: STATE_BADGE_FOOTPRINT_PX,
   invalid: STATE_BADGE_FOOTPRINT_PX,
   stale: STATE_BADGE_FOOTPRINT_PX,
 };
@@ -145,6 +136,26 @@ function pointAlong(points, ratio) {
   return { ...points[points.length - 1], angle: 0 };
 }
 
+// Midpoint (+heading) of the longest polyline segment. The direction chevron
+// anchors here instead of at a fixed path fraction: a fraction can land on a
+// bend vertex, where the rotated chevron juts off the corner and reads as
+// detached from its own line.
+function longestSegmentMidpoint(points) {
+  let best;
+  for (let index = 1; index < points.length; index += 1) {
+    const start = points[index - 1];
+    const end = points[index];
+    const length = Math.hypot(end.x - start.x, end.y - start.y);
+    if (!best || length > best.length) best = { start, end, length };
+  }
+  if (!best || best.length === 0) return undefined;
+  return {
+    x: (best.start.x + best.end.x) / 2,
+    y: (best.start.y + best.end.y) / 2,
+    angle: Math.atan2(best.end.y - best.start.y, best.end.x - best.start.x) * 180 / Math.PI,
+  };
+}
+
 function statusTone(status, invalid) {
   if (invalid || status === 'blocked') return 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))';
   if (status === 'waiting' || status === 'rerouting') return 'var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))';
@@ -154,11 +165,11 @@ function statusTone(status, invalid) {
 }
 
 function statusDash(status) {
-  if (status === 'planned') return '3 5';
-  if (status === 'waiting') return '9 3 2 3';
-  if (status === 'blocked') return '1 5';
-  if (status === 'rerouting') return '6 4';
-  if (status === 'completed') return '8 4';
+  if (status === 'planned') return NAV_PATH_DASH.pending;
+  if (status === 'waiting') return NAV_PATH_DASH.waiting;
+  if (status === 'blocked') return NAV_PATH_DASH.blocked;
+  if (status === 'rerouting') return NAV_PATH_DASH.rerouting;
+  if (status === 'completed') return NAV_PATH_DASH.completed;
   return undefined;
 }
 
@@ -243,6 +254,10 @@ export function TrajectoryOverlay({
     ? progressCarrierPath(currentProgress.point, currentProgress.angle, inverseScale)
     : '';
   const statePoint = pointAlong(points, 0.12);
+  // Heading chevron anchor — longest-segment midpoint, so a trajectory without
+  // a progress head still reads a travel direction, matching the Route/Lane
+  // direction chevron.
+  const directionPoint = longestSegmentMidpoint(points);
   const tone = statusTone(trajectory?.status, invalid);
   const dash = statusDash(trajectory?.status);
   const foreground = 'var(--viewer-foreground, var(--color-semantic-label-strong))';
@@ -261,14 +276,16 @@ export function TrajectoryOverlay({
       tone: 'var(--viewer-muted, var(--color-semantic-label-alternative))',
     } : null,
   ].filter(Boolean);
-  const naturalMarkers = [
-    { name: 'status', point: statePoint, radius: MARKER_RADIUS_PX.status },
-    ...trajectoryStateMarkers.map((item) => ({
-      name: item.state,
-      point: item.point,
-      radius: MARKER_RADIUS_PX[item.state],
-    })),
-  ].filter(Boolean);
+  // Lifecycle status lives on the LINE itself — tone plus the shared
+  // NAV_PATH_DASH patterns (and the progress head for the current position).
+  // Badges are point-vocabulary; the only glyph badges a trajectory keeps are
+  // the data-quality flags (invalid/stale), whose one non-color channel is the
+  // badge because the dash channel is already spent on status.
+  const naturalMarkers = trajectoryStateMarkers.map((item) => ({
+    name: item.state,
+    point: item.point,
+    radius: MARKER_RADIUS_PX[item.state],
+  }));
   const fixedProgressMarkers = currentProgress ? [{
     name: 'current',
     point: currentProgress.point,
@@ -505,6 +522,22 @@ export function TrajectoryOverlay({
           />
         </>
       )}
+      {/* The progress head already points the travel direction — one arrow per
+          line, so the chevron renders only on head-less trajectories. */}
+      {pathData && !currentProgress && directionPoint && (
+        <path
+          data-trajectory-direction=""
+          data-navigation-vector-glyph="direction"
+          d={NAVIGATION_DIRECTION_PATH}
+          transform={`translate(${directionPoint.x} ${directionPoint.y}) rotate(${directionPoint.angle}) scale(${inverseScale})`}
+          fill={tone}
+          stroke={surface}
+          strokeWidth="1"
+          strokeLinejoin="round"
+          vectorEffect="non-scaling-stroke"
+          pointerEvents="none"
+        />
+      )}
       {currentProgress && (
         <ProgressHeadObstacle
           obstacle={obstacle}
@@ -514,34 +547,6 @@ export function TrajectoryOverlay({
           inverseScale={inverseScale}
           dataPrefix="trajectory"
         />
-      )}
-      {pathData && (
-        <g
-          data-trajectory-status-marker=""
-          data-trajectory-status-glyph={trajectory?.status}
-          data-trajectory-screen-slot={markerLayout ? 'status' : undefined}
-          data-trajectory-anchor-x={statePoint.x}
-          data-trajectory-anchor-y={statePoint.y}
-          transform={markerTransform(statePoint, inverseScale, trajectoryMarkerSlot('status'))}
-          aria-hidden="true"
-          pointerEvents="none"
-        >
-          <circle
-            {...obstacle(`trajectory:${trajectory.id}:status`)}
-            data-trajectory-marker-badge="status"
-            data-navigation-marker-circle=""
-            r={NAV_STATE_BADGE.radius}
-            fill={surface}
-            stroke={tone}
-            strokeWidth={NAV_STATE_BADGE.strokeWidth}
-            vectorEffect="non-scaling-stroke"
-          />
-          <NavigationStateGlyph
-            kind={STATUS_GLYPH_KIND[trajectory?.status] ?? 'unknown'}
-            size={10}
-            color={foreground}
-          />
-        </g>
       )}
       {pathData && trajectoryStateMarkers.map((item) => {
         const point = item.point;

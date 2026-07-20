@@ -140,11 +140,11 @@ export function PathMap({ appearance = 'light', label, children, height = 270, s
   );
 }
 
+// Route/Trajectory lifecycle status and segment condition now live on the LINE
+// (tone + NAV_PATH_DASH), not in glyph badges. The only glyph badges left are
+// the data-quality flags, exposed as [data-*-overlay-state] (invalid / stale).
 export const NAVIGATION_STATE_BADGE_SELECTOR = [
-  '[data-route-condition-glyph]',
-  '[data-route-status-marker]',
   '[data-route-overlay-state]',
-  '[data-trajectory-status-marker]',
   '[data-trajectory-overlay-state]',
 ].join(',');
 
@@ -216,16 +216,16 @@ export function pathAreaCentroid(path) {
 }
 
 export function expectedNavigationStateKind(group) {
-  return group.getAttribute('data-route-condition-glyph')
-    ?? group.getAttribute('data-route-overlay-state')
-    ?? group.getAttribute('data-trajectory-overlay-state')
-    ?? group.getAttribute('data-trajectory-status-glyph')
-    ?? group.closest('[data-lk-route-overlay]')?.getAttribute('data-route-status');
+  return group.getAttribute('data-route-overlay-state')
+    ?? group.getAttribute('data-trajectory-overlay-state');
 }
 
 export function assertNavigationStateGlyphGeometry(root, label) {
+  // Verifies the optical geometry of every state badge that IS present. Whether
+  // a story renders any badge at all is asserted per-story (explicit invalid /
+  // stale existence checks), so a badge-less overlay (a plain active route/
+  // trajectory) is a valid no-op here rather than a failure.
   const groups = Array.from(root.querySelectorAll(NAVIGATION_STATE_BADGE_SELECTOR));
-  if (groups.length === 0) throw new Error(`${label} has no navigation state glyph evidence.`);
   groups.forEach((group) => {
     const glyph = group.querySelector(':scope > [data-navigation-state-glyph]');
     const circle = group.querySelector(':scope > [data-navigation-marker-circle]');

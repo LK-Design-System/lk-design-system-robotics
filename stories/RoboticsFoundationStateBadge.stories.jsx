@@ -34,14 +34,14 @@ const meta = {
     storyGuide: {
       storyId: 'lds-robotics-foundation-state-badge--overview',
       eyebrow: 'Foundation / State Badge',
-      title: '상태 글리프는 마커 배지 안에서 진행·오류·가용성을 하나의 도형으로 압축합니다',
+      title: '상태 글리프는 내비게이션 상태 어휘의 표준 도형이며, 점 요소는 배지로·선 요소는 대시로 표현합니다',
       description:
-        '설비·경로·궤적·차선·웨이포인트·구역 마커의 모서리 배지에 들어가는 작은 상태 지시자입니다. 내부 모듈 NavigationStateGlyph가 Material Symbols(Apache 2.0)에서 가져온 11종의 상태 글리프를 렌더하며 FacilityTransition·RouteOverlay·TrajectoryOverlay·LaneOverlay·WaypointMarker·SpatialRegion이 공유합니다. 공유 상태 글리프의 선택과 복합 상태 스택 규칙을 검토할 때 사용합니다. 독립적인 상태 라벨이나 완성된 마커를 이 배지로 대신하는 용도에는 사용하지 마세요. 이 페이지는 그 글리프 자산을 그대로(배지 원은 마커가 그리므로 여기선 생략) 나열해 도형 세트를 검토·회귀하고, 한 개체에 여러 상태가 겹칠 때 배지가 오프셋 스택되는 복합 상태 규칙과 렌더러별 스택 축도 함께 보여줍니다. 배지 컨텍스트의 실제 합성은 Facility Glyph의 상태 표기 스토리를 참고하세요. 배지 원 기하는 내부 모듈 _navigationVocabulary의 NAV_STATE_BADGE(r=7)가 소유합니다. 공개 API가 아닌 내부 모듈입니다.',
+        '내부 모듈 NavigationStateGlyph가 Material Symbols(Apache 2.0)에서 가져온 11종의 상태 도형을 렌더합니다. 이 도형들은 두 채널로 나뉘어 실제 지도에 나타납니다. (1) 점 요소 — 웨이포인트·설비 핀·구역 마커 — 는 unknown·invalid·stale를 모서리 배지로 그립니다(WaypointMarker·FacilityTransition·SpatialRegion). (2) 선 요소 — 경로·차선·궤적 — 는 수명주기·가용성·조건 상태(planned·active·waiting·rerouting·completed·blocked·closed·conflict)를 배지가 아니라 선의 톤과 NAV_PATH_DASH 대시 패턴으로 표현하고, invalid·stale 데이터 품질만 점 배지로 남깁니다. 즉 이 페이지의 도형은 선에서 대시로 인코딩되는 상태의 의미 기준이자, 점 배지가 실제로 그리는 자산입니다. 독립적인 상태 라벨이나 완성된 마커를 이 배지로 대신하지 마세요. 이 페이지는 도형 세트를 검토·회귀하고, 한 점 요소에 여러 상태가 겹칠 때 배지가 오프셋 스택되는 복합 상태 규칙과 렌더러별 스택 축도 함께 보여줍니다. 선의 대시 어휘는 State Badge가 아니라 각 선 렌더러의 상태 스토리를, 배지 컨텍스트의 실제 합성은 Facility Glyph의 상태 표기 스토리를 참고하세요. 배지 원 기하는 내부 모듈 _navigationVocabulary의 NAV_STATE_BADGE(r=7)가 소유합니다. 공개 API가 아닌 내부 모듈입니다.',
     },
     docs: {
       description: {
         component:
-          'NavigationStateGlyph의 상태 글리프 11종을 실제 컴포넌트로 나열합니다. 설비 전이·경로·궤적·차선·웨이포인트·공간 구역 렌더러가 공유하는 내부 자산이며 공개 API가 아닙니다. 배지 원·톤은 마커가 합성하므로 여기서는 글리프 도형만 보여줍니다.',
+          'NavigationStateGlyph의 상태 도형 11종을 실제 컴포넌트로 나열합니다. 점 요소(웨이포인트·설비 핀·구역)는 unknown·invalid·stale를 배지로 그리고, 선 요소(경로·차선·궤적)는 나머지 수명주기·가용성·조건 상태를 배지가 아니라 NAV_PATH_DASH 대시로 표현합니다. 이 페이지는 그 도형 어휘의 기준입니다. 공개 API가 아닌 내부 자산이며, 배지 원·톤은 마커가 합성하므로 여기서는 도형만 보여줍니다.',
       },
     },
   },

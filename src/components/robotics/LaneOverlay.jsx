@@ -1,9 +1,9 @@
 import React from 'react';
 import { isFocusVisibleTarget } from './_NavigationFocus.js';
 import { NavigationStateGlyph } from './_NavigationStateGlyph.js';
-import { NAVIGATION_DIRECTION_PATH } from './_navigationVectorGlyph.js';
+import { NAVIGATION_DIRECTION_PATH, NAVIGATION_ENDPOINT_ORIENTATION_PATH } from './_navigationVectorGlyph.js';
 import { NavigationAnnotationBlock, annotationPriority, useNavigationObstacles } from './_navigationAnnotations.js';
-import { navStateOpacity, NAV_HIT, NAV_STATE_BADGE, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION } from './_navigationVocabulary.js';
+import { navStateOpacity, NAV_PATH_DASH, NAV_NODE, NAV_HIT, NAV_STATE_BADGE, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION } from './_navigationVocabulary.js';
 
 const VIEWER_FOREGROUND = 'var(--viewer-foreground, var(--color-semantic-label-strong))';
 const VIEWER_MUTED = 'var(--viewer-muted, var(--color-semantic-label-neutral))';
@@ -22,6 +22,26 @@ function finitePoint(point) {
 function pathFromPoints(points) {
   if (points.length < 2) return '';
   return points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`).join(' ');
+}
+
+// Midpoint (+heading) of the longest polyline segment. The direction chevron
+// anchors here instead of at a fixed path fraction: a fraction can land on a
+// bend vertex, where the rotated chevron juts off the corner and reads as
+// detached from its own line.
+function longestSegmentMidpoint(points) {
+  let best;
+  for (let index = 1; index < points.length; index += 1) {
+    const start = points[index - 1];
+    const end = points[index];
+    const length = Math.hypot(end.x - start.x, end.y - start.y);
+    if (!best || length > best.length) best = { start, end, length };
+  }
+  if (!best || best.length === 0) return undefined;
+  return {
+    x: (best.start.x + best.end.x) / 2,
+    y: (best.start.y + best.end.y) / 2,
+    angle: Math.atan2(best.end.y - best.start.y, best.end.x - best.start.x) * 180 / Math.PI,
+  };
 }
 
 function pointAlong(points, ratio) {
@@ -122,12 +142,13 @@ function endpointMarker(point, endpoint, kind, fallbackAngle, inverseScale) {
       aria-hidden="true"
       pointerEvents="none"
     >
-      <circle
+      <polygon
         data-lane-endpoint-point={kind}
-        r="4"
+        points={NAV_NODE.points(NAV_NODE.endpointRadius)}
         fill={VIEWER_SURFACE}
         stroke={VIEWER_MUTED}
         strokeWidth="1.5"
+        strokeLinejoin="round"
         vectorEffect="non-scaling-stroke"
       />
       <text
@@ -178,7 +199,7 @@ function endpointMarker(point, endpoint, kind, fallbackAngle, inverseScale) {
       {orientation != null && (
         <path
           data-lane-orientation={endpoint.orientation}
-          d="M -5 0 H 5 M 2 -3 L 5 0 L 2 3"
+          d={NAVIGATION_ENDPOINT_ORIENTATION_PATH}
           transform={`rotate(${orientation}) translate(10 0)`}
           fill="none"
           stroke={VIEWER_FOREGROUND}
@@ -205,6 +226,7 @@ export function LaneOverlay({
   stale = false,
   showLabel = true,
   showEndpoints = true,
+  showDirection = true,
   onActivate,
   role,
   'aria-label': ariaLabel,
@@ -230,7 +252,7 @@ export function LaneOverlay({
 
   const pathData = pathFromPoints(points);
   const midpoint = pointAlong(points, 0.5);
-  const directionPoint = pointAlong(points, 0.64);
+  const directionPoint = longestSegmentMidpoint(points) ?? midpoint;
   const entryDirection = pointAlong(points.slice(0, 2), 0.5).angle;
   const exitDirection = pointAlong(points.slice(-2), 0.5).angle;
   const interactive = typeof onActivate === 'function';
@@ -238,19 +260,21 @@ export function LaneOverlay({
   const relation = lane?.relation?.kind === 'paired' ? 'paired' : 'single';
 
   const availabilityDash = resolvedAvailability === 'closed'
-    ? '8 5'
+    ? NAV_PATH_DASH.blocked
     : resolvedAvailability === 'unknown'
-      ? '2 5'
+      ? NAV_PATH_DASH.unknown
       : undefined;
   const baseColor = invalid
     ? 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))'
     : resolvedAvailability === 'available'
       ? 'var(--viewer-accent, var(--color-semantic-primary-normal))'
       : 'var(--viewer-muted, var(--color-semantic-label-alternative))';
+  // Availability and conflict live on the LINE itself — the NAV_PATH_DASH
+  // availability dashes, the muted tone, and the danger conflict pattern.
+  // Badges are point-vocabulary; the only glyph badges a lane keeps are the
+  // data-quality flags (invalid/stale), whose one non-color channel is the
+  // badge because the dash channel is already spent on availability.
   const stateGlyphs = [
-    resolvedAvailability === 'closed' ? { state: 'closed', tone: VIEWER_FOREGROUND } : null,
-    resolvedAvailability === 'unknown' ? { state: 'unknown', tone: 'var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))' } : null,
-    hasConflict ? { state: 'conflict', tone: 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))' } : null,
     invalid ? { state: 'invalid', tone: 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))' } : null,
     stale ? { state: 'stale', tone: VIEWER_MUTED } : null,
   ].filter(Boolean);
@@ -449,7 +473,11 @@ export function LaneOverlay({
           />
         </>
       )}
-      {pathData && (
+      {/* One direction arrow per corridor: a composed viewer whose route or
+          trajectory rides this lane already points the travel direction on a
+          HIGHER layer, so the composer turns this chevron off rather than
+          leaving it half-buried under the overlay painted above. */}
+      {pathData && showDirection && (
         <path
           data-lane-direction="entry-to-exit"
           data-lane-direction-anchor-x={directionPoint.x}

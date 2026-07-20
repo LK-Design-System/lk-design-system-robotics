@@ -131,7 +131,7 @@ function routeForState(status, phase, condition, y) {
 export const RouteAndTrajectoryStates = {
   name: '변형·상태 · 구간 조건과 궤적 수명주기',
   parameters: storyDescription(
-    'route status, segment phase, segment condition을 독립 조합합니다. 각 행은 색뿐 아니라 다른 line pattern과 glyph를 사용하며 rerouting trajectory도 별도 dense layer로 유지합니다.',
+    'route status, segment phase, segment condition을 독립 조합합니다. 상태는 선 위에서 톤과 NAV_PATH_DASH 대시 패턴으로 전달하며(뱃지가 아니라), invalid·stale 데이터 품질만 점 뱃지로 남습니다. rerouting trajectory도 별도 dense layer로 유지합니다.',
   ),
   render: () => (
     <StoryPage
@@ -188,17 +188,28 @@ export const RouteAndTrajectoryStates = {
     </StoryPage>
   ),
   play: async ({ canvasElement }) => {
-    for (const condition of ['waiting', 'blocked', 'conflict']) {
+    // Segment condition lives on the LINE now: tone + a specific NAV_PATH_DASH
+    // pattern, no on-line glyph badge. The exact dash carries the meaning, so
+    // assert the exact pattern rather than merely "some dash".
+    const CONDITION_DASH = { waiting: '10 3 2 3', blocked: '1 5', conflict: '5 3 1 3' };
+    for (const [condition, dash] of Object.entries(CONDITION_DASH)) {
       const segment = canvasElement.querySelector(`[data-condition="${condition}"]`);
       const path = segment?.querySelector('[data-route-path]');
-      if (!path?.getAttribute('stroke-dasharray')) throw new Error(`${condition} segment needs a non-color line pattern.`);
-      if (!segment.querySelector(`[data-route-condition-glyph="${condition}"]`)) {
-        throw new Error(`${condition} segment needs a matching glyph.`);
+      if (path?.getAttribute('stroke-dasharray') !== dash) {
+        throw new Error(`${condition} segment must encode its state with the ${dash} dash pattern, not a badge.`);
+      }
+      if (segment.querySelector('[data-route-condition-glyph]')) {
+        throw new Error(`${condition} segment must not paint an on-line condition badge.`);
       }
     }
     const trajectory = canvasElement.querySelector('[data-trajectory-status="rerouting"]');
     if (!trajectory?.querySelector('[data-trajectory-path]')?.getAttribute('stroke-dasharray')) {
       throw new Error('Rerouting trajectory needs a non-color dash pattern.');
+    }
+    // A route/trajectory carries no lifecycle status badge — the head and dash
+    // already say it. Only the data-quality flags survive as point badges.
+    if (canvasElement.querySelector('[data-route-status-marker], [data-trajectory-status-marker]')) {
+      throw new Error('Lifecycle status must live on the line, not a status badge.');
     }
     const compoundRoute = canvasElement.querySelector('[data-route-id="route-invalid-stale"]');
     if (!compoundRoute?.querySelector('[data-route-overlay-state="invalid"]') || !compoundRoute.querySelector('[data-route-overlay-state="stale"]')) {
@@ -212,9 +223,10 @@ export const RouteAndTrajectoryStates = {
     }
     assertNavigationStateGlyphGeometry(canvasElement, 'Route/Trajectory states');
     assertNavigationVectorGeometry(canvasElement, 'Route/Trajectory states');
+    // The only glyph badges left on lines are the data-quality flags.
     const renderedKinds = new Set(Array.from(canvasElement.querySelectorAll('[data-navigation-state-glyph]'))
       .map((glyph) => glyph.getAttribute('data-navigation-state-glyph')));
-    for (const kind of ['planned', 'active', 'waiting', 'blocked', 'rerouting', 'completed', 'conflict', 'invalid', 'stale']) {
+    for (const kind of ['invalid', 'stale']) {
       if (!renderedKinds.has(kind)) throw new Error(`State glyph mapping is missing ${kind}.`);
     }
   },
@@ -260,7 +272,10 @@ const MID_LENGTH_EXACT_COLLISION_ROUTE = {
     phase: 'current',
     condition: 'conflict',
   }],
-  progress: { segmentId: 'segment-mid-exact-collision', fraction: 0.5 },
+  // Progress anchored on the invalid data-quality badge's fraction (0.82) so
+  // the progress marker and the invalid point badge share an EXACT anchor —
+  // the same natural collision the retired condition badge used to provide.
+  progress: { segmentId: 'segment-mid-exact-collision', fraction: 0.82 },
 };
 
 const NORMAL_PROGRESS_ROUTE = {
@@ -349,7 +364,7 @@ function assertProgressTextSpacing(route, label) {
 export const ShortPathCompoundMarkers = {
   name: '변형·상태 · 기준점 충돌 복합 표식',
   parameters: storyDescription(
-    '자연 marker anchor의 실제 CSS 거리가 outline 포함 반지름과 gap보다 작을 때 Route·Trajectory badge를 compact screen-space row로 분리합니다. 경로 길이와 무관한 exact-anchor 충돌도 포함합니다.',
+    '점 뱃지(invalid·stale 데이터 품질)의 자연 anchor가 outline 포함 반지름과 gap보다 가까울 때 compact screen-space row로 분리합니다. 진행 마커와 정확히 같은 anchor를 공유하는 exact-anchor 충돌도 포함합니다.',
   ),
   render: () => (
     <div data-testid="short-path-stress" style={{ width: 320, maxWidth: '100%', minWidth: 0 }}>
@@ -480,11 +495,17 @@ export const ShortPathCompoundMarkers = {
         }
       }
 
+      // Lifecycle status and segment condition no longer paint badges — they
+      // live on the line (tone + NAV_PATH_DASH). The only point badges left are
+      // the two data-quality flags (invalid + stale) per entity.
       const routeMarkers = Array.from(route.querySelectorAll('[data-route-marker-badge]'));
       const trajectoryMarkers = Array.from(trajectory.querySelectorAll('[data-trajectory-marker-badge]'));
       const midRouteMarkers = Array.from(midRoute.querySelectorAll('[data-route-marker-badge]'));
-      if (routeMarkers.length !== 4 || trajectoryMarkers.length !== 3 || midRouteMarkers.length !== 4) {
-        throw new Error('Short-path compound state is missing a Route or Trajectory marker.');
+      if (routeMarkers.length !== 2 || trajectoryMarkers.length !== 2 || midRouteMarkers.length !== 2) {
+        throw new Error('Short-path compound state must render exactly the invalid + stale data-quality badges.');
+      }
+      if (route.querySelector('[data-route-marker-badge="status"], [data-route-marker-badge="condition"]')) {
+        throw new Error('Route must not paint status or condition badges on the line.');
       }
       const anchoredMarkerGroups = [
         ...route.querySelectorAll('[data-route-anchor-x]'),
@@ -512,14 +533,14 @@ export const ShortPathCompoundMarkers = {
         throw new Error(`Collision rows are not compact diameter+gap layouts: ${routeRowWidth}/${trajectoryRowWidth}.`);
       }
       const routeStateGlyphs = Array.from(route.querySelectorAll('[data-navigation-state-glyph]'));
-      if (routeStateGlyphs.length < 4 || routeStateGlyphs.some((glyph) => !glyph.style.color)) {
-        throw new Error('Route marker outlines must retain status hue while internal SVG glyphs use viewer foreground.');
+      if (routeStateGlyphs.length < 2 || routeStateGlyphs.some((glyph) => !glyph.style.color)) {
+        throw new Error('Route data-quality badge outlines must retain their hue while internal SVG glyphs use viewer foreground.');
       }
       const midPathRect = midRoute.querySelector('[data-route-path]')?.getBoundingClientRect();
-      const midConditionAnchor = Number(midRoute.querySelector('[data-route-condition-glyph]')?.getAttribute('data-route-anchor-x'));
+      const midInvalidAnchor = Number(midRoute.querySelector('[data-route-overlay-state="invalid"]')?.getAttribute('data-route-anchor-x'));
       const midProgressAnchor = Number(midRoute.querySelector('[data-route-progress-marker]')?.getAttribute('data-route-anchor-x'));
-      if (!midPathRect || midPathRect.width < 180 || midConditionAnchor !== midProgressAnchor) {
-        throw new Error('Medium-length route did not preserve the exact natural condition/progress anchor collision.');
+      if (!midPathRect || midPathRect.width < 180 || !Number.isFinite(midInvalidAnchor) || midInvalidAnchor !== midProgressAnchor) {
+        throw new Error('Medium-length route did not preserve the exact natural invalid-badge/progress anchor collision.');
       }
       assertProgressTextSpacing(route, 'Short Route');
       assertProgressTextSpacing(midRoute, 'Mid-length Route');

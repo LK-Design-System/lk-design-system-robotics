@@ -191,12 +191,12 @@ const STATE_LANES = [
 export const LaneStatesAndConstraints = {
   name: '변형·상태 · 폐쇄, 충돌, 전환 참조',
   parameters: storyDescription(
-    'available/closed/unknown과 conflict를 독립 조합하고 entry/exit 전환 참조를 중립 T/count로 표시합니다. 색을 가려도 dash와 close/question/exclamation SVG geometry로 상태를 구분할 수 있어야 합니다.',
+    'available/closed/unknown과 conflict를 독립 조합하고 entry/exit 전환 참조를 중립 T/count로 표시합니다. 색을 가려도 availability는 선의 NAV_PATH_DASH 대시(closed 1 5 · unknown 4 8)로, conflict는 별도 danger 2 7 패턴으로 구분할 수 있어야 합니다.',
   ),
   render: () => (
     <StoryPage
       title="폐쇄와 충돌은 같은 상태가 아니며 시설 전환은 중립 참조로만 남깁니다"
-      description="문이나 엘리베이터의 실시간 상태는 Facility Transition이 소유합니다. 레인은 해당 경계에 전환이 있다는 사실과 개수만 표시하고 종류를 ID에서 추론하지 않습니다."
+      description="availability는 선의 톤과 대시가 전달하고 conflict는 그 위에 겹치는 별도 패턴입니다(점 뱃지가 아니라). 문이나 엘리베이터의 실시간 상태는 Facility Transition이 소유하며, 레인은 해당 경계에 전환이 있다는 사실과 개수만 표시하고 종류를 ID에서 추론하지 않습니다."
       maxWidth={780}
     >
       <LaneMap label="레인 복합 상태 지도" height={360} svgHeight={340}>
@@ -209,8 +209,18 @@ export const LaneStatesAndConstraints = {
   play: async ({ canvasElement }) => {
     const closed = canvasElement.querySelector('[data-lane-id="lane-closed"]');
     const unknownConflict = canvasElement.querySelector('[data-lane-id="lane-unknown-conflict"]');
-    if (!closed?.querySelector('[data-lane-path]')?.getAttribute('stroke-dasharray')) {
-      throw new Error('Closed lane needs a non-color dash pattern.');
+    // Availability lives on the line as a specific NAV_PATH_DASH pattern, not a
+    // point badge. Closed shares the blocked "1 5" dash (same meaning as a
+    // blocked route/trajectory); unknown uses the "4 8" dash.
+    if (closed?.querySelector('[data-lane-path]')?.getAttribute('stroke-dasharray') !== '1 5') {
+      throw new Error('Closed lane must encode availability with the 1 5 dash, not a badge.');
+    }
+    if (unknownConflict?.querySelector('[data-lane-path]')?.getAttribute('stroke-dasharray') !== '4 8') {
+      throw new Error('Unknown lane must encode availability with the 4 8 dash, not a badge.');
+    }
+    // Availability/conflict must NOT restore their retired glyph badges.
+    if (canvasElement.querySelector('[data-lane-state-glyph="closed"], [data-lane-state-glyph="unknown"], [data-lane-state-glyph="conflict"]')) {
+      throw new Error('Availability and conflict must live on the line, not as point badges.');
     }
     if (closed.querySelectorAll('[data-lane-transition-count]').length !== 2) {
       throw new Error('Entry and exit transition counts must stay independently visible.');
@@ -221,24 +231,12 @@ export const LaneStatesAndConstraints = {
         assertCircularTextGeometry(badge, `Transition count ${index + 1}`);
       });
     });
+    // Conflict stays an independent pattern layered over the availability dash.
     if (!unknownConflict?.querySelector('[data-lane-conflict-pattern]')) {
       throw new Error('Conflict must remain an independent pattern over unknown availability.');
     }
-    const glyphs = Array.from(unknownConflict.querySelectorAll('[data-lane-state-glyph]'))
-      .map((element) => element.getAttribute('data-lane-state-glyph'));
-    if (!glyphs.includes('unknown') || !glyphs.includes('conflict')) {
-      throw new Error(`Unknown + conflict needs both geometry kinds: ${glyphs.join(',')}`);
-    }
-    for (const [lane, states, context] of [
-      [closed, ['closed'], 'Closed lane'],
-      [unknownConflict, ['unknown', 'conflict'], 'Unknown/conflict lane'],
-    ]) {
-      states.forEach((state) => {
-        const container = lane.querySelector(`[data-lane-state="${state}"]`);
-        assertCircularStateGeometry(container, container?.querySelector('[data-lane-state-circle]'), `${context} ${state}`);
-      });
-      assertDirectionGeometry(lane, context);
-    }
+    assertDirectionGeometry(closed, 'Closed lane');
+    assertDirectionGeometry(unknownConflict, 'Unknown/conflict lane');
   },
 };
 
@@ -496,7 +494,18 @@ export const LaneDarkCompoundStates = {
     for (const stateName of ['상태 미확인', '충돌 있음', '선택됨', '데이터 오류']) {
       if (!compoundName.includes(stateName)) throw new Error(`Compound lane accessible name lost ${stateName}: ${compoundName}`);
     }
-    for (const state of ['unknown', 'conflict', 'invalid']) {
+    // unknown availability and conflict now live on the line (dash + pattern),
+    // not point badges; only the invalid data-quality flag stays a glyph badge.
+    if (compound.querySelector('[data-lane-path]')?.getAttribute('stroke-dasharray') !== '4 8') {
+      throw new Error('Unknown availability must encode as the 4 8 dash on the compound lane.');
+    }
+    if (!compound.querySelector('[data-lane-conflict-pattern]')) {
+      throw new Error('Conflict must remain an independent pattern over the compound lane.');
+    }
+    if (compound.querySelector('[data-lane-state-glyph="unknown"], [data-lane-state-glyph="conflict"]')) {
+      throw new Error('Availability and conflict must not restore their retired point badges.');
+    }
+    for (const state of ['invalid']) {
       const marker = compound.querySelector(`[data-lane-state="${state}"]`);
       const glyph = marker?.querySelector('[data-navigation-state-glyph]');
       const surface = marker?.querySelector('circle');
@@ -529,7 +538,7 @@ const SHORT_PATH_COMPOUND_LANE = {
 export const LaneShortPathCompoundStates = {
   name: '변형·상태 · 짧은 경로 복합 상태 표식',
   parameters: storyDescription(
-    '경로가 상태 marker 행보다 짧고 SVG가 CSS layout에서 축소되어도 unknown·invalid·stale glyph가 direction·endpoint·label·metadata와 분리된 screen-space hierarchy를 유지하는지 확인합니다.',
+    '경로가 상태 marker 행보다 짧고 SVG가 CSS layout에서 축소되어도 invalid·stale 데이터 품질 glyph가 direction·endpoint·label·metadata와 분리된 screen-space hierarchy를 유지하는지 확인합니다. availability(unknown)는 선의 대시로만 표시됩니다.',
   ),
   render: () => (
     <StoryPage
@@ -554,10 +563,15 @@ export const LaneShortPathCompoundStates = {
   play: async ({ canvasElement }) => {
     const lane = canvasElement.querySelector('[data-lane-id="lane-short-compound"]');
     const svg = canvasElement.querySelector('[data-testid="lane-short-compound-frame"] svg');
-    const states = ['unknown', 'invalid', 'stale'];
+    // Availability (unknown) is a line dash now; the offset-stacking row is the
+    // two data-quality badges (invalid + stale).
+    const states = ['invalid', 'stale'];
     const markers = states.map((state) => lane?.querySelector(`[data-lane-state="${state}"]`));
     if (!lane || !svg || markers.some((marker) => !marker)) {
       throw new Error('Short-path compound lane is missing a required state glyph.');
+    }
+    if (lane.querySelector('[data-lane-state-glyph="unknown"]')) {
+      throw new Error('Unknown availability must live on the line, not a stacked point badge.');
     }
     if (!lane.querySelector('[data-lane-selection-halo]')) {
       throw new Error('Short-path selected state must retain the established path halo.');
@@ -908,10 +922,17 @@ export const LaneNarrow320 = {
     await waitFor(() => {
       if (!lane.querySelector('[data-lane-focus-ring]')) throw new Error('Narrow lane focus path is missing.');
       assertLaneFocusTextClearance(lane, '320px lane');
-      assertLaneFocusStateClearance(lane, '320px lane');
-      for (const state of ['closed', 'conflict']) {
-        const container = lane.querySelector(`[data-lane-state="${state}"]`);
-        assertCircularStateGeometry(container, container?.querySelector('[data-lane-state-circle]'), `320px lane ${state}`);
+      // closed + conflict are line-encoded now (dash + pattern), so this lane
+      // carries no point state badges — focus clears only the label/metadata
+      // (asserted above), and state lives on the line.
+      if (lane.querySelector('[data-lane-path]')?.getAttribute('stroke-dasharray') !== '1 5') {
+        throw new Error('Narrow closed lane must encode availability with the 1 5 dash.');
+      }
+      if (!lane.querySelector('[data-lane-conflict-pattern]')) {
+        throw new Error('Narrow lane conflict pattern must persist under clipping.');
+      }
+      if (lane.querySelector('[data-lane-state-glyph]')) {
+        throw new Error('A closed/conflict lane must not paint point state badges.');
       }
       assertDirectionGeometry(lane, '320px lane');
     });

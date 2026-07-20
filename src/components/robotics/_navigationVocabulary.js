@@ -12,13 +12,15 @@
 // on COMPARABLE geometry live here. Component-specific *encodings* deliberately
 // stay in their own component, because forcing one dash onto unrelated stroke
 // geometries reads wrong:
-//   - lane availability/unknown path dashes (`8 5` / `2 5`) and the conflict
-//     hatch (`2 7`) — LaneOverlay
-//   - route segment condition/phase dashes (`10 3 2 3`, `1 5`, `7 4`, …) — RouteOverlay
-//   - trajectory status dashes (`3 5`, `9 3 2 3`, `8 4`, …) — TrajectoryOverlay
-//   - the availability-unavailable dash, which is a 3-way drift across a pin
-//     ring (`6 3`), a lane path (`8 5`) and a route segment (`1 5`); unifying it
-//     needs a design decision, not a mechanical hoist.
+//   - the paired-relation hatch (`2 7`) — LaneOverlay, a relation cue rather
+//     than a state, whose stroke geometry (offset twin line) has no analogue in
+//     the other renderers.
+// Long path-following STATE dashes used to be a per-renderer drift under this
+// rule (`8 5`/`2 5` on lanes, `10 3 2 3`/`7 4`/… on route segments,
+// `3 5`/`9 3 2 3`/`8 4`/… on trajectories); they are now the shared
+// `NAV_PATH_DASH` scale below — that unification is the design decision the
+// previous note deferred. The pin-ring availability dash (`6 3`) stays a
+// small-ring encoding (NAV_DASH scope), not a path dash.
 // See docs/NAVIGATION_ATOMIZATION_PLAN.md.
 
 /**
@@ -89,6 +91,31 @@ export const NAV_DASH = {
 };
 
 /**
+ * Long path-following state dashes shared by RouteOverlay (segment
+ * phase/condition), TrajectoryOverlay (status) and LaneOverlay (availability).
+ * One scale so the same meaning dashes the same on every path, and states that
+ * can co-occur on one map stay distinguishable at the 2.5–4px path strokes:
+ *
+ * - `pending`   — sparse dots: not yet traversed (route upcoming · trajectory planned).
+ * - `completed` — long dash: already traversed.
+ * - `waiting`   — long dash + dot: paused, will resume.
+ * - `conflict`  — short dash + dot: contested by another entity.
+ * - `blocked`   — dense dots: cannot traverse (route/trajectory blocked · lane
+ *                 closed — the same pairing that shares the `×` state glyph).
+ * - `rerouting` — dense short dash: being recalculated.
+ * - `unknown`   — sparse dash: traversability unknown (lane availability).
+ */
+export const NAV_PATH_DASH = {
+  pending: '2 6',
+  completed: '7 4',
+  waiting: '10 3 2 3',
+  conflict: '5 3 1 3',
+  blocked: '1 5',
+  rerouting: '3 3',
+  unknown: '4 8',
+};
+
+/**
  * Map-pin marker geometry, shared by FacilityTransition and HazardMarker so a
  * facility pin and a hazard pin read as one marker family — severity fill and
  * knockout glyph (not a different shape) distinguish them. The shadow and the
@@ -100,6 +127,27 @@ export const NAV_PIN = {
   shadow: { transform: 'translate(0 0.8)', fill: 'var(--color-semantic-static-black)', opacity: 0.16 },
   focusRing: { scale: 1.34, strokeWidth: 2.5 },
   selectionRing: { scale: 1.16, strokeWidth: 2 },
+  // Persistent severity/alarm halo tracing the pin silhouette, sized OUTSIDE the
+  // focus ring so the two nest concentrically. A second, hue-independent channel
+  // for the highest-severity state (e.g. a danger hazard).
+  alarmRing: { scale: 1.5, strokeWidth: 3.5, opacity: 0.45 },
+};
+
+/**
+ * Graph-node diamond silhouette. A navigation-graph point renders as this
+ * diamond wherever it appears, so the SAME graph node reads as the SAME symbol
+ * across layers: WaypointMarker draws it at the full `radius`, and a lane
+ * endpoint — which references a waypoint by id — draws the same shape at the
+ * smaller `endpointRadius`. `points(r)` returns the polygon vertices for a
+ * given half-diagonal.
+ */
+export const NAV_NODE = {
+  radius: 7,
+  endpointRadius: 4,
+  // Selection ring scale — traces the diamond just outside the point edge, and
+  // inside the focus shell (NAV_FOCUS.waypointShellScale 1.5) so the two nest.
+  selectionRingScale: 1.28,
+  points: (r) => `0,${-r} ${r},0 0,${r} ${-r},0`,
 };
 
 /**

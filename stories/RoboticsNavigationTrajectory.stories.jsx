@@ -105,12 +105,12 @@ const INVALID_STALE_TRAJECTORY = {
 export const Statuses = {
   name: '변형·상태 · 궤적 수명주기와 데이터 상태',
   parameters: storyDescription(
-    'trajectory status별 dense layer를 나란히 비교합니다. 각 상태는 색뿐 아니라 다른 dash pattern과 state glyph를 사용하며, invalid·stale는 서로 독립적으로 겹쳐 표시됩니다.',
+    'trajectory status별 dense layer를 나란히 비교합니다. 수명주기 상태는 선 위에서 톤과 NAV_PATH_DASH 대시 패턴으로 전달하며(뱃지가 아니라), invalid·stale 데이터 품질만 점 뱃지로 독립적으로 겹쳐 표시됩니다.',
   ),
   render: () => (
     <StoryPage
-      title="Trajectory status는 색이 아니라 dash pattern과 glyph로도 구분됩니다"
-      description="한 지도의 조밀한 궤적도 계획됨·대기·차단·재계산·완료의 수명주기 상태를 가지며, 데이터 오류(invalid)와 오래됨(stale)은 상태와 무관하게 독립적으로 표시됩니다."
+      title="Trajectory status는 색이 아니라 선의 dash pattern으로 구분됩니다"
+      description="한 지도의 조밀한 궤적도 계획됨·대기·차단·재계산·완료의 수명주기 상태를 선의 톤과 대시로 전달하며, 데이터 오류(invalid)와 오래됨(stale)만 점 뱃지로 상태와 무관하게 독립 표시됩니다."
       maxWidth={1120}
     >
       <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', gap: 'var(--space-4)', minWidth: 0 }}>
@@ -128,14 +128,17 @@ export const Statuses = {
     </StoryPage>
   ),
   play: async ({ canvasElement }) => {
-    for (const status of ['planned', 'waiting', 'blocked', 'rerouting', 'completed']) {
+    // Lifecycle status lives on the LINE: tone + a specific NAV_PATH_DASH
+    // pattern, no on-line status glyph badge. Assert the exact dash per status.
+    const STATUS_DASH = { planned: '2 6', waiting: '10 3 2 3', blocked: '1 5', rerouting: '3 3', completed: '7 4' };
+    for (const [status, dash] of Object.entries(STATUS_DASH)) {
       const trajectory = canvasElement.querySelector(`[data-trajectory-status="${status}"]`);
       if (!trajectory) throw new Error(`${status} trajectory did not render.`);
-      if (!trajectory.querySelector(`[data-navigation-state-glyph="${status}"]`)) {
-        throw new Error(`${status} trajectory needs a matching state glyph.`);
+      if (trajectory.querySelector('[data-trajectory-status-marker]')) {
+        throw new Error(`${status} trajectory must not paint a lifecycle status badge — the line carries it.`);
       }
-      if (!trajectory.querySelector('[data-trajectory-path]')?.getAttribute('stroke-dasharray')) {
-        throw new Error(`${status} trajectory needs a non-color line pattern.`);
+      if (trajectory.querySelector('[data-trajectory-path]')?.getAttribute('stroke-dasharray') !== dash) {
+        throw new Error(`${status} trajectory must encode its state with the ${dash} dash pattern.`);
       }
       if (status !== 'planned') {
         assertNavigationProgressHead(trajectory, `${status} Trajectory`, 'trajectory');
@@ -150,9 +153,10 @@ export const Statuses = {
     }
     assertNavigationStateGlyphGeometry(canvasElement, 'Trajectory statuses');
     assertNavigationProgressHead(compound, 'Invalid + stale Trajectory', 'trajectory');
+    // The only glyph badges left are the data-quality flags.
     const renderedKinds = new Set(Array.from(canvasElement.querySelectorAll('[data-navigation-state-glyph]'))
       .map((glyph) => glyph.getAttribute('data-navigation-state-glyph')));
-    for (const kind of ['planned', 'waiting', 'blocked', 'rerouting', 'completed', 'active', 'invalid', 'stale']) {
+    for (const kind of ['invalid', 'stale']) {
       if (!renderedKinds.has(kind)) throw new Error(`Trajectory state glyph mapping is missing ${kind}.`);
     }
   },

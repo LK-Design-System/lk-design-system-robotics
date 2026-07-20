@@ -519,6 +519,9 @@ function SemanticMirrorFixture() {
                       tabIndex={-1}
                       aria-hidden="true"
                       showEndpoints={false}
+                      // 이 코리도 위를 배송 경로·궤적이 달리며 상위 레이어에서 이미
+                      // 방향을 표시하므로 레인 자체 셰브론은 끕니다(코리도당 화살표 1개).
+                      showDirection={false}
                       selected={selectedKey === 'lanes:lane-corridor'}
                       onActivate={() => selectFromMap('lanes:lane-corridor')}
                     />

@@ -9,24 +9,18 @@ import {
   routeProgressGeometry,
 } from './_navigationProgressHead.js';
 import { NavigationAnnotationBlock, annotationPriority, useNavigationObstacles } from './_navigationAnnotations.js';
-import { navStateOpacity, NAV_DASH, NAV_HIT, NAV_STATE_BADGE, NAV_PROGRESS_HEAD, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION } from './_navigationVocabulary.js';
+import { navStateOpacity, NAV_DASH, NAV_PATH_DASH, NAV_HIT, NAV_STATE_BADGE, NAV_PROGRESS_HEAD, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION } from './_navigationVocabulary.js';
 
+// 'active' reads 주행 중, not 이동 중: a route is a PLAN being traversed, while
+// 이동 중 is the trajectory/robot's own motion state — two different claims
+// that must not share one word on a map that shows both layers.
 const STATUS_LABEL = {
   planned: '계획됨',
-  active: '이동 중',
+  active: '주행 중',
   waiting: '대기 중',
   blocked: '차단됨',
   rerouting: '경로 재계산 중',
   completed: '완료됨',
-};
-
-const STATUS_GLYPH_KIND = {
-  planned: 'planned',
-  active: 'active',
-  waiting: 'waiting',
-  blocked: 'blocked',
-  rerouting: 'rerouting',
-  completed: 'completed',
 };
 
 const PHASE_LABEL = {
@@ -42,19 +36,15 @@ const CONDITION_LABEL = {
   conflict: '충돌',
 };
 
-const CONDITION_GLYPH_KIND = {
-  waiting: 'waiting',
-  blocked: 'blocked',
-  conflict: 'conflict',
-};
-
+// Lifecycle status and segment conditions live on the LINE itself — tone plus
+// the shared NAV_PATH_DASH patterns (and the progress head for the traversal
+// position). Badges are point-vocabulary; the only glyph badges a route keeps
+// are the data-quality flags (invalid/stale), whose one non-color channel is
+// the badge because the dash channel is already spent on phase/condition.
 const MARKER_GAP_PX = 4;
 const MARKER_ROW_CLEARANCE_PX = 8;
 const LABEL_ROW_GAP_PX = 12;
-const STATE_BADGE_FOOTPRINT_PX = NAV_STATE_BADGE.radius + NAV_STATE_BADGE.strokeWidth / 2;
 const MARKER_RADIUS_PX = {
-  condition: 8.75,
-  status: STATE_BADGE_FOOTPRINT_PX,
   invalid: 8.75,
   stale: 8.75,
 };
@@ -173,14 +163,6 @@ function normalizedProgress(route) {
   };
 }
 
-function statusTone(status) {
-  if (status === 'waiting' || status === 'rerouting') return 'var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))';
-  if (status === 'blocked') return 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))';
-  if (status === 'completed') return 'var(--viewer-positive, var(--color-semantic-status-positive-foreground))';
-  if (status === 'active') return 'var(--viewer-accent, var(--color-semantic-primary-normal))';
-  return 'var(--viewer-muted, var(--color-semantic-label-alternative))';
-}
-
 function segmentTone(segment, invalid) {
   if (invalid || segment.condition === 'blocked' || segment.condition === 'conflict') {
     return 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))';
@@ -192,11 +174,11 @@ function segmentTone(segment, invalid) {
 }
 
 function segmentDash(segment) {
-  if (segment.condition === 'waiting') return '10 3 2 3';
-  if (segment.condition === 'blocked') return '1 5';
-  if (segment.condition === 'conflict') return '5 3 1 3';
-  if (segment.phase === 'completed') return '7 4';
-  if (segment.phase === 'upcoming') return '2 6';
+  if (segment.condition === 'waiting') return NAV_PATH_DASH.waiting;
+  if (segment.condition === 'blocked') return NAV_PATH_DASH.blocked;
+  if (segment.condition === 'conflict') return NAV_PATH_DASH.conflict;
+  if (segment.phase === 'completed') return NAV_PATH_DASH.completed;
+  if (segment.phase === 'upcoming') return NAV_PATH_DASH.pending;
   return undefined;
 }
 
@@ -311,11 +293,6 @@ export function RouteOverlay({
   const progressCarrier = progressHeadVisible && progressGeometry?.usesCarrier
     ? progressCarrierPath(progressGeometry.point, progressGeometry.angle, inverseScale)
     : '';
-  const routeStatusPoint = pointAlong(statusPoints, 0.18);
-  const statusCondition = ['normal', 'waiting', 'blocked', 'conflict'].includes(statusSegment?.condition)
-    ? statusSegment.condition
-    : 'normal';
-  const statusMidpoint = pointAlong(statusPoints, 0.5);
   const routeStateMarkers = [
     invalid ? {
       state: 'invalid',
@@ -330,17 +307,11 @@ export function RouteOverlay({
       tone: 'var(--viewer-muted, var(--color-semantic-label-alternative))',
     } : null,
   ].filter(Boolean);
-  const naturalMarkers = statusPoints.length >= 2 ? [
-    CONDITION_GLYPH_KIND[statusCondition]
-      ? { name: 'condition', point: statusMidpoint, radius: MARKER_RADIUS_PX.condition }
-      : null,
-    { name: 'status', point: routeStatusPoint, radius: MARKER_RADIUS_PX.status },
-    ...routeStateMarkers.map((item) => ({
-      name: item.state,
-      point: item.point,
-      radius: MARKER_RADIUS_PX[item.state],
-    })),
-  ].filter(Boolean) : [];
+  const naturalMarkers = statusPoints.length >= 2 ? routeStateMarkers.map((item) => ({
+    name: item.state,
+    point: item.point,
+    radius: MARKER_RADIUS_PX[item.state],
+  })) : [];
   const fixedProgressMarkers = progressHeadVisible ? [{
     name: 'progress',
     point: progressPoint,
@@ -408,8 +379,6 @@ export function RouteOverlay({
         const tone = segmentTone(normalizedSegment, invalid);
         const dash = segmentDash(normalizedSegment);
         const isProgressSegment = segment.id === progressSegment?.id && Boolean(progressGeometry);
-        const conditionGlyphKind = CONDITION_GLYPH_KIND[condition];
-        const conditionSlot = segment.id === statusSegment?.id ? routeMarkerSlot('condition') : undefined;
         const segmentLabelSlot = segment.id === statusSegment?.id
           ? labelScreenSlot(midpoint, markerLayout, scale)
           : undefined;
@@ -610,7 +579,12 @@ export function RouteOverlay({
                 />
               </>
             )}
-            {pathData && (
+            {/* The progress head already points the travel direction on its
+                segment — drawing the chevron there too would say "direction"
+                twice, at full tone on top of the future-faded remainder. One
+                arrow per stretch of line: head where it exists, chevron
+                elsewhere. */}
+            {pathData && !(isProgressSegment && progressHeadVisible) && (
               <path
                 data-route-direction=""
                 data-navigation-vector-glyph="direction"
@@ -621,31 +595,9 @@ export function RouteOverlay({
                 strokeWidth="1"
                 strokeLinejoin="round"
                 vectorEffect="non-scaling-stroke"
+                opacity={isProgressSegment ? NAV_PROGRESS_HEAD.route.futureOpacity : undefined}
                 pointerEvents="none"
               />
-            )}
-            {conditionGlyphKind && (
-              <g
-                data-route-condition-glyph={condition}
-                data-route-screen-slot={conditionSlot ? 'condition' : undefined}
-                data-route-anchor-x={midpoint.x}
-                data-route-anchor-y={midpoint.y}
-                transform={markerTransform(midpoint, inverseScale, conditionSlot)}
-                aria-hidden="true"
-                pointerEvents="none"
-              >
-                <circle
-                  {...obstacle(`route:${route.id}:condition:${segment.id}`)}
-                  data-route-marker-badge="condition"
-                  data-navigation-marker-circle=""
-                  r={NAV_STATE_BADGE.radius}
-                  fill="var(--viewer-surface-elevated, var(--color-semantic-background-elevated-normal))"
-                  stroke={tone}
-                  strokeWidth={NAV_STATE_BADGE.strokeWidth}
-                  vectorEffect="non-scaling-stroke"
-                />
-                <NavigationStateGlyph kind={conditionGlyphKind} size={10} color={markerForeground} />
-              </g>
             )}
             {[
               segment.entryTransitionId && points[0] ? { kind: 'entry', id: segment.entryTransitionId, point: points[0] } : null,
@@ -761,33 +713,6 @@ export function RouteOverlay({
           inverseScale={inverseScale}
           dataPrefix="route"
         />
-      )}
-      {statusSegment && statusPoints.length >= 2 && (
-        <g
-          data-route-status-marker=""
-          data-route-screen-slot={routeMarkerSlot('status') ? 'status' : undefined}
-          data-route-anchor-x={routeStatusPoint.x}
-          data-route-anchor-y={routeStatusPoint.y}
-          transform={markerTransform(routeStatusPoint, inverseScale, routeMarkerSlot('status'))}
-          aria-hidden="true"
-          pointerEvents="none"
-        >
-          <circle
-            {...obstacle(`route:${route.id}:status`)}
-            data-route-marker-badge="status"
-            data-navigation-marker-circle=""
-            r={NAV_STATE_BADGE.radius}
-            fill={surface}
-            stroke={statusTone(route.status)}
-            strokeWidth={NAV_STATE_BADGE.strokeWidth}
-            vectorEffect="non-scaling-stroke"
-          />
-          <NavigationStateGlyph
-            kind={STATUS_GLYPH_KIND[route.status] ?? 'unknown'}
-            size={10}
-            color={markerForeground}
-          />
-        </g>
       )}
       {showLabel && progressPoint && (
         <NavigationAnnotationBlock
