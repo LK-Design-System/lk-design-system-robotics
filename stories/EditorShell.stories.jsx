@@ -38,6 +38,16 @@ export const WorkspaceRegions = {
     '여러 편집 영역을 동시에 사용하는 넓은 워크스페이스 상황입니다. 좌우 패널과 중앙 캔버스가 같은 작업 단위로 읽히고 각 영역의 크기 조절 경계가 분명한지 확인하세요.',
   ),
   render: () => <WorkspaceRegionsExample />,
+  play: async ({ canvasElement }) => {
+    const statusSlot = canvasElement.querySelector('.lk-canvas-editor-shell__status');
+    if (!statusSlot || statusSlot.getAttribute('role') !== 'group') {
+      throw new Error('CanvasEditorShell must expose its passive status slot as a named group.');
+    }
+    const liveStatuses = statusSlot.querySelectorAll('[role="status"]');
+    if (liveStatuses.length !== 1 || statusSlot.querySelector('[role="status"] [role="status"]')) {
+      throw new Error('Only the transient ViewportStatusBar message may own live status semantics.');
+    }
+  },
 };
 
 export const ContextDrawer = {

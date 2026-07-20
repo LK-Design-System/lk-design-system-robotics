@@ -409,17 +409,6 @@ export const ViewerFrame = React.forwardRef(function ViewerFrame({
       {(source != null || badges != null || hud != null || topToolbar != null || presentation.corner) && (
         <React.Fragment>
           <div
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              zIndex: 1,
-              inset: '0 0 auto',
-              height: 82,
-              pointerEvents: 'none',
-              background: 'linear-gradient(180deg, var(--viewer-surface) 0%, transparent 100%)',
-            }}
-          />
-          <div
             data-viewer-topbar=""
             inert={blocking ? true : undefined}
             aria-hidden={blocking || undefined}
@@ -432,6 +421,8 @@ export const ViewerFrame = React.forwardRef(function ViewerFrame({
               alignItems: 'start',
               gap: 8,
               padding: 12,
+              borderBottom: '1px solid var(--viewer-border)',
+              background: 'var(--viewer-surface-elevated)',
               pointerEvents: 'none',
             }}
           >

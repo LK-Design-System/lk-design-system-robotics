@@ -118,6 +118,12 @@ export const StatePlacement = {
     if (!stale.querySelector('[data-viewer-edge-state] [role="status"][aria-live="polite"]') || stale.querySelector('[role="alert"]')) {
       throw new Error('Retained-content Viewer states must remain polite and noninterrupting.');
     }
+    for (const frame of frames.filter((candidate) => candidate.querySelector('[data-viewer-topbar]'))) {
+      const topbar = frame.querySelector('[data-viewer-topbar]');
+      if (topbar.style.background !== 'var(--viewer-surface-elevated)') {
+        throw new Error('Viewer topbar metadata and controls require an opaque contrast surface.');
+      }
+    }
   },
 };
 

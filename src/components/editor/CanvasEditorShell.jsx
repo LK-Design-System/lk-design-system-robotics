@@ -363,7 +363,7 @@ export function CanvasEditorShell({
 
       {status != null && (
         <div
-          role="status"
+          role="group"
           aria-label={statusLabel}
           className="lk-canvas-editor-shell__status"
           style={{ display: 'flex', alignItems: 'center', minWidth: 0, minHeight: 32, padding: 'var(--space-1) var(--space-4)', borderTop: '1px solid var(--color-semantic-line-normal-normal)', fontSize: 'var(--caption1-size)', lineHeight: 'var(--caption1-line)', color: 'var(--color-semantic-label-neutral)', background: 'var(--color-semantic-background-normal-alternative)', boxSizing: 'border-box', flexShrink: 0 }}
