@@ -1,9 +1,9 @@
 const config = {
   stories: ['../stories/**/*.stories.@(js|jsx)'],
-  staticDirs: [
-    { from: '../tokens', to: '/tokens' },
-    { from: '../styles.css', to: '/styles.css' },
-  ],
+  // styles.css is imported as a module from preview.jsx; serving it as a
+  // static file on the same /styles.css URL shadows Vite's module transform
+  // in dev mode and breaks the preview bootstrap.
+  staticDirs: [{ from: '../tokens', to: '/tokens' }],
   addons: ['@storybook/addon-docs', '@storybook/addon-a11y'],
   framework: { name: '@storybook/react-vite', options: {} },
   docs: { defaultName: 'Docs' },
@@ -15,6 +15,12 @@ const config = {
 
     return {
       ...config,
+      // A sibling-checkout LDS core linked via file:/link: brings its own React
+      // copy; dedupe keeps every import on this repository's single instance.
+      resolve: {
+        ...config.resolve,
+        dedupe: Array.from(new Set([...(config.resolve?.dedupe || []), 'react', 'react-dom'])),
+      },
       server: {
         ...config.server,
         allowedHosts,
