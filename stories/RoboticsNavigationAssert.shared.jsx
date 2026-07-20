@@ -27,3 +27,17 @@ export function contrastRatio(foreground, background) {
   const darker = Math.min(relativeLuminance(foreground), relativeLuminance(background));
   return (lighter + 0.05) / (darker + 0.05);
 }
+
+// Every navigation renderer must draw its focus indicator with the shared
+// focus token and a zoom-stable stroke. Each page asserts its own ring against
+// this one contract, which keeps the rings consistent across renderers without
+// a side-by-side catalog page.
+export function assertSharedFocusIndicator(ring, rendererName) {
+  if (!ring) throw new Error(`${rendererName} focus indicator is missing.`);
+  if (ring.getAttribute('stroke') !== 'var(--color-semantic-focus-indicator)') {
+    throw new Error(`${rendererName} focus indicator must stroke with --color-semantic-focus-indicator.`);
+  }
+  if (ring.getAttribute('vector-effect') !== 'non-scaling-stroke') {
+    throw new Error(`${rendererName} focus indicator stroke must be non-scaling.`);
+  }
+}

@@ -19,6 +19,7 @@ import {
   assertNavigationStateGlyphGeometry,
   assertNavigationVectorGeometry,
 } from './RoboticsNavigationRouteTrajectory.shared.jsx';
+import { assertSharedFocusIndicator } from './RoboticsNavigationAssert.shared.jsx';
 
 const meta = {
   title: 'LDS Robotics/Navigation/Route',
@@ -824,6 +825,7 @@ export const PathSelectionAndActivation = {
     if (!routeSegment.querySelector('[data-route-focus-ring]') || view.getComputedStyle(routeSegment).outlineStyle !== 'none') {
       throw new Error('Route keyboard input must restore only its shape-managed focus ring after pointer modality.');
     }
+    assertSharedFocusIndicator(routeSegment.querySelector('[data-route-focus-ring]'), 'Route');
     await userEvent.click(trajectory);
     const trajectoryFocusVisible = trajectory.matches(':focus-visible');
     await waitFor(() => {
@@ -840,6 +842,7 @@ export const PathSelectionAndActivation = {
     if (!trajectory.querySelector('[data-trajectory-focus-indicator]') || view.getComputedStyle(trajectory).outlineStyle !== 'none') {
       throw new Error('Trajectory keyboard input must restore only its shape-managed focus ring after pointer modality.');
     }
+    assertSharedFocusIndicator(trajectory.querySelector('[data-trajectory-focus-indicator]'), 'Trajectory');
     if (!output().includes('activation 4회') || trajectory.getAttribute('data-selected') !== 'true') {
       throw new Error(`Path activation or trajectory selection failed: ${output()}`);
     }

@@ -28,7 +28,6 @@ export const parameters = {
         '': ['LDS Robotics'],
         'LDS Robotics': ['Foundation', 'Assets', 'Control', 'Status', 'Data', 'Editor', 'Viewer', 'Navigation'],
         'LDS Robotics/Foundation': [
-          'Navigation Encoding Tokens',
           'State Badge',
           'Marker Pin',
           'Facility Glyph',

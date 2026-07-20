@@ -36,7 +36,7 @@ const meta = {
       eyebrow: 'Foundation / State Badge',
       title: '상태 글리프는 마커 배지 안에서 진행·오류·가용성을 하나의 도형으로 압축합니다',
       description:
-        '설비·경로·궤적·차선·웨이포인트·구역 마커의 모서리 배지에 들어가는 작은 상태 지시자입니다. 내부 모듈 NavigationStateGlyph가 Material Symbols(Apache 2.0)에서 가져온 11종의 상태 글리프를 렌더하며 FacilityTransition·RouteOverlay·TrajectoryOverlay·LaneOverlay·WaypointMarker·SpatialRegion이 공유합니다. 공유 상태 글리프의 선택과 복합 상태 스택 규칙을 검토할 때 사용합니다. 독립적인 상태 라벨이나 완성된 마커를 이 배지로 대신하는 용도에는 사용하지 마세요. 이 페이지는 그 글리프 자산을 그대로(배지 원은 마커가 그리므로 여기선 생략) 나열해 도형 세트를 검토·회귀하고, 한 개체에 여러 상태가 겹칠 때 배지가 오프셋 스택되는 복합 상태 규칙과 렌더러별 스택 축도 함께 보여줍니다. 배지 컨텍스트의 실제 합성은 Facility Glyph의 상태 표기 스토리를, 배지 원 기하(NAV_STATE_BADGE, r=7)는 Navigation Encoding Tokens 페이지를 참고하세요. 공개 API가 아닌 내부 모듈입니다.',
+        '설비·경로·궤적·차선·웨이포인트·구역 마커의 모서리 배지에 들어가는 작은 상태 지시자입니다. 내부 모듈 NavigationStateGlyph가 Material Symbols(Apache 2.0)에서 가져온 11종의 상태 글리프를 렌더하며 FacilityTransition·RouteOverlay·TrajectoryOverlay·LaneOverlay·WaypointMarker·SpatialRegion이 공유합니다. 공유 상태 글리프의 선택과 복합 상태 스택 규칙을 검토할 때 사용합니다. 독립적인 상태 라벨이나 완성된 마커를 이 배지로 대신하는 용도에는 사용하지 마세요. 이 페이지는 그 글리프 자산을 그대로(배지 원은 마커가 그리므로 여기선 생략) 나열해 도형 세트를 검토·회귀하고, 한 개체에 여러 상태가 겹칠 때 배지가 오프셋 스택되는 복합 상태 규칙과 렌더러별 스택 축도 함께 보여줍니다. 배지 컨텍스트의 실제 합성은 Facility Glyph의 상태 표기 스토리를 참고하세요. 배지 원 기하는 내부 모듈 _navigationVocabulary의 NAV_STATE_BADGE(r=7)가 소유합니다. 공개 API가 아닌 내부 모듈입니다.',
     },
     docs: {
       description: {

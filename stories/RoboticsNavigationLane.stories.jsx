@@ -3,7 +3,7 @@ import { userEvent, waitFor } from 'storybook/test';
 import { Button, LaneOverlay, Map2DCanvas } from './lds.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
-import { contrastRatio } from './RoboticsNavigationAssert.shared.jsx';
+import { assertSharedFocusIndicator, contrastRatio } from './RoboticsNavigationAssert.shared.jsx';
 
 const meta = {
   title: 'LDS Robotics/Navigation/Lane',
@@ -840,6 +840,7 @@ export const LaneSelectionAndActivation = {
     if (!enabled.querySelector('[data-lane-focus-ring]')) {
       throw new Error('Lane keyboard input must restore its shape-managed focus ring after pointer modality.');
     }
+    assertSharedFocusIndicator(enabled.querySelector('[data-lane-focus-ring]'), 'Lane');
     if (canvasElement.ownerDocument.defaultView.getComputedStyle(enabled).outlineStyle !== 'none') {
       throw new Error('Lane keyboard modality must not restore the global rectangular outline.');
     }

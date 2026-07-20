@@ -3,6 +3,7 @@ import { userEvent } from 'storybook/test';
 import { Map2DCanvas, SpatialRegion } from './lds.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
+import { assertSharedFocusIndicator } from './RoboticsNavigationAssert.shared.jsx';
 
 const meta = {
   title: 'LDS Robotics/Navigation/Regions',
@@ -280,6 +281,7 @@ export const ConcaveGeometryAndCompoundStates = {
     }
     assertCenteredStateGlyph(region.querySelector('[data-region-invalid-mark]'), 'invalid');
     assertCenteredStateGlyph(region.querySelector('[data-region-stale-mark]'), 'stale');
+    assertSharedFocusIndicator(region.querySelector('[data-region-focus-ring]'), 'Region');
     const focusWidth = Number(region.querySelector('[data-region-focus-ring]')?.getAttribute('stroke-width'));
     const selectionWidth = Number(region.querySelector('[data-region-selection-ring]')?.getAttribute('stroke-width'));
     if (!Number.isFinite(focusWidth) || !Number.isFinite(selectionWidth) || (focusWidth - selectionWidth) / 2 < 1.5) {

@@ -3,7 +3,7 @@ import { userEvent, waitFor } from 'storybook/test';
 import { Map2DCanvas, WaypointMarker } from './lds.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { NavigationLegend, NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
-import { contrastRatio } from './RoboticsNavigationAssert.shared.jsx';
+import { assertSharedFocusIndicator, contrastRatio } from './RoboticsNavigationAssert.shared.jsx';
 
 const meta = {
   title: 'LDS Robotics/Navigation/Waypoint',
@@ -411,6 +411,7 @@ export const SelectionSync = {
       if (!holding.querySelector('[data-waypoint-focus-indicator]')) {
         throw new Error('Waypoint keyboard input must restore its shape-managed focus indicator after pointer modality.');
       }
+      assertSharedFocusIndicator(holding.querySelector('[data-waypoint-focus-indicator]'), 'Waypoint');
       if (canvasElement.ownerDocument.defaultView.getComputedStyle(holding).outlineStyle !== 'none') {
         throw new Error('Waypoint keyboard modality must not restore the global rectangular outline.');
       }

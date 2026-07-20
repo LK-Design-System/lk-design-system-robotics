@@ -1,6 +1,7 @@
 import React from 'react';
 import { HazardMarker } from './lds.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
+import { assertSharedFocusIndicator } from './RoboticsNavigationAssert.shared.jsx';
 
 const STAGE = 'stage';
 const at = (x, y) => ({ x, y });
@@ -221,6 +222,7 @@ export const States = {
     ) {
       throw new Error('The controlled focused hazard must render only its pin-following focus outline and focused name.');
     }
+    assertSharedFocusIndicator(focused.querySelector('[data-hazard-focus-ring]'), 'Hazard pin');
     if (disabled.getAttribute('aria-disabled') !== 'true' || disabled.getAttribute('tabindex') !== '-1') {
       throw new Error('A disabled interactive hazard must block activation and expose aria-disabled.');
     }

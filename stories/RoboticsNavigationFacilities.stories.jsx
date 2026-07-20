@@ -4,6 +4,7 @@ import { Map2DCanvas, FacilityTransition, NavigationAnnotationLayer, SpatialRegi
 import { NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { assertNoLabelCollisions } from './RoboticsNavigationCollision.shared.jsx';
+import { assertSharedFocusIndicator } from './RoboticsNavigationAssert.shared.jsx';
 
 const meta = {
   title: 'LDS Robotics/Navigation/Facility Transition',
@@ -319,6 +320,7 @@ export const ValidationAndFocusStates = {
     ]) {
       if (!transition.querySelector(selector)) throw new Error(`Compound state glyph is missing: ${selector}.`);
     }
+    assertSharedFocusIndicator(transition.querySelector('[data-transition-focus-ring]'), 'Facility transition');
     const unknownMark = transition.querySelector('[data-transition-unknown-mark]');
     const invalidMark = transition.querySelector('[data-transition-invalid-mark]');
     const staleMark = transition.querySelector('[data-transition-stale-mark]');
