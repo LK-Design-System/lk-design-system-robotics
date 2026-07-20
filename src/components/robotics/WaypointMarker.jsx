@@ -1,6 +1,7 @@
 import React from 'react';
 import { isFocusVisibleTarget } from './_NavigationFocus.js';
 import { NavigationStateGlyph } from './_NavigationStateGlyph.js';
+import { NavigationRoleGlyph } from './_navigationRoleGlyph.js';
 import { ANNOTATION_CODE as ANNOTATION_CODES, ROLE_CODE as ROLE_CODES } from './_navigationEncoding.js';
 import { NavigationAnnotationBlock, annotationPriority, useNavigationObstacles } from './_navigationAnnotations.js';
 import { navStateOpacity, NAV_DASH, NAV_NODE, NAV_HIT, NAV_STATE_BADGE, NAV_LABEL_HALO, NAV_FOCUS } from './_navigationVocabulary.js';
@@ -37,8 +38,12 @@ function normalizeViewportScale(value) {
   return Number.isFinite(value) && value > 0 ? value : 1;
 }
 
-function semanticSummary(waypoint) {
-  const roleCodes = (waypoint.roles || []).map((role) => ROLE_CODES[role]);
+function semanticSummary(waypoint, { excludeCharger = false } = {}) {
+  // charger, when present, renders as a ⚡ pictogram instead of a `C` code, so
+  // drop it from the code string to avoid saying the same role twice.
+  const roleCodes = (waypoint.roles || [])
+    .filter((role) => !(excludeCharger && role === 'charger'))
+    .map((role) => ROLE_CODES[role]);
   const annotationCodes = (waypoint.annotations || [])
     .map((annotation) => ANNOTATION_CODES[annotation.kind]);
   const codes = [...roleCodes, ...annotationCodes].filter(Boolean);
@@ -108,7 +113,8 @@ export function WaypointMarker({
   const focusVisible = !pointerOnly && (focused || hasDomFocus);
   const availability = waypoint.availability || 'unknown';
   const compoundUnknownInvalid = availability === 'unknown' && invalid;
-  const details = semanticSummary(waypoint);
+  const hasCharger = (waypoint.roles || []).includes('charger');
+  const details = semanticSummary(waypoint, { excludeCharger: hasCharger });
   const label = ariaLabel ?? accessibleName(waypoint, {
     selected,
     focused: focusVisible,
@@ -380,7 +386,7 @@ export function WaypointMarker({
               <text
                 data-waypoint-primary-label=""
                 x="15"
-                y={details ? '-1.5' : '3.5'}
+                y={details || hasCharger ? '-1.5' : '3.5'}
                 fill={foreground}
                 stroke={surface}
                 strokeWidth={NAV_LABEL_HALO.primary}
@@ -393,10 +399,15 @@ export function WaypointMarker({
               >
                 {waypoint.label}
               </text>
+              {hasCharger && (
+                <g data-waypoint-role-charger="" transform="translate(18.5 6.2)">
+                  <NavigationRoleGlyph kind="charger" size={9} color={muted} haloColor={surface} />
+                </g>
+              )}
               {details && (
                 <text
                   data-waypoint-details=""
-                  x="15"
+                  x={hasCharger ? 25 : 15}
                   y="10"
                   fill={muted}
                   stroke={surface}

@@ -134,7 +134,7 @@ function CodesCatalog() {
     <main data-codes-catalog style={{ width: 'min(880px, 100%)', display: 'grid', gap: 16 }}>
       <Card
         title="역할 코드"
-        hint="웨이포인트 역할을 한 글자로 압축한 코드입니다. 마커 배지와 지도 범례가 ROLE_CODE 한 집합에서 같은 글자를 읽습니다."
+        hint="웨이포인트 역할을 한 글자로 압축한 코드입니다. 마커 배지와 지도 범례가 ROLE_CODE 한 집합에서 같은 글자를 읽습니다. 단, charger(C)는 보편 기호가 있어 지도·범례에서 ⚡ 픽토그램으로 렌더되고, C는 내부 코드·접근성 계층으로 남습니다(규약 Appendix A)."
       >
         <RoleCodes />
       </Card>

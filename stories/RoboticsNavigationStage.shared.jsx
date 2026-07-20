@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavigationStateGlyph } from '@lk-robotics/lds-robotics-ui/components/robotics/_NavigationStateGlyph';
+import { NavigationRoleGlyph, ROLE_GLYPH_KINDS } from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationRoleGlyph';
 import { ANNOTATION_CODE, ROLE_CODE } from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationEncoding';
 
 /**
@@ -244,6 +245,29 @@ function StateSwatch({ kind }) {
   );
 }
 
+// Roles with a pictogram (charger) show the glyph in a code-sized chip so the
+// legend mirrors what the map draws, instead of a letter the map no longer uses.
+function RoleGlyphSwatch({ role }) {
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minWidth: 20,
+        height: 20,
+        padding: '0 6px',
+        borderRadius: 'var(--radius-sm)',
+        background: 'var(--color-semantic-fill-normal)',
+      }}
+    >
+      <svg width="12" height="12" viewBox="-7 -7 14 14" aria-hidden="true" style={{ display: 'block' }}>
+        <NavigationRoleGlyph kind={role} size={11} color="var(--color-semantic-label-strong)" />
+      </svg>
+    </span>
+  );
+}
+
 function LegendGroup({ title, children }) {
   return (
     <div style={{ display: 'grid', gap: 'var(--space-2)', minWidth: 0 }}>
@@ -328,6 +352,9 @@ export function NavigationLegend({ title = '지도 범례', roles, annotations, 
           {roles.map((key) => {
             const entry = NAV_ROLE_LEGEND[key];
             if (!entry) return null;
+            if (ROLE_GLYPH_KINDS.has(key)) {
+              return <LegendRow key={key} swatch={<RoleGlyphSwatch role={key} />} label={entry.label} />;
+            }
             return <LegendRow key={key} code={entry.code} label={entry.label} />;
           })}
         </LegendGroup>

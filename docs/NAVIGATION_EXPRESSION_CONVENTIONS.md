@@ -179,10 +179,10 @@ label is clipped or suppressed.
 
 ---
 
-## Appendix A — Proposed: waypoint role pictograms (design, not yet built)
+## Appendix A — Waypoint role pictograms
 
-*Status: design for review. Tracks task "역할 픽토그램 도입 설계". Not implemented —
-the recommended scope is deliberately narrow and needs a pick before building.*
+*Status: option A shipped. charger renders as a ⚡ pictogram; the rest stay
+codes. `_navigationRoleGlyph` holds the glyph, `ROLE_GLYPH_KINDS` is the roster.*
 
 **Today.** A waypoint's roles render as compact **letter codes** in the detail
 line beside the marker (`H` holding · `T` passthrough · `P` parking · `C`
@@ -205,20 +205,24 @@ knockout-glyph precedent (`_FacilityGlyph`) for visual family:
 
 | Role | Today | Proposed |
 | --- | --- | --- |
-| charger | `C` | ⚡ bolt pictogram |
+| charger | `C` | **⚡ bolt pictogram (shipped)** — leads the detail line; `C` drops from the code string |
 | parking | `P` | keep `P` (already conventional) |
 | holding | `H` | keep `H` (no universal symbol; revisit) |
 | passthrough | `T` | keep `T` (no universal symbol; revisit) |
 
-**Open decision (pick before building):**
-- **A — minimal:** charger ⚡ only; everything else stays a code. Lowest risk,
-  highest convention payoff.
-- **B — full glyph set:** author a pictogram per role (new `_navigationRoleGlyph`
-  atom), retire the letter codes. Bigger surface: new atom + `ROLE_CODE`
-  migration + `Codes` foundation story rewrite + legend updates.
+**What shipped (option A).** charger renders as a bolt glyph
+(`_navigationRoleGlyph`) leading the waypoint detail line (with a surface halo),
+and the map legend shows the same glyph in its role chip. `ROLE_CODE.charger`
+stays `C` as the internal/data-attribute + accessibility identifier; the Codes
+foundation story documents that the map draws it as ⚡.
 
-Either way: on-node placement is rejected (crowding); pictograms live in the
-detail line at code size, and the accessible name keeps the full role words.
+**If ever extended (option B).** Author a pictogram per role in
+`_navigationRoleGlyph` and add each to `ROLE_GLYPH_KINDS`; the marker, legend,
+and Codes story already route glyph-backed roles automatically, so the work is
+authoring shapes + deciding whether to retire the letter codes.
+
+On-node placement is rejected (crowding); pictograms live in the detail line at
+code size, and the accessible name keeps the full role words.
 
 ---
 
