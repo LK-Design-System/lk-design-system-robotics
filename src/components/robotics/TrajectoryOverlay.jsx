@@ -156,8 +156,12 @@ function longestSegmentMidpoint(points) {
   };
 }
 
-function statusTone(status, invalid) {
-  if (invalid || status === 'blocked') return 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))';
+// Lifecycle status drives the line + head tone. `invalid` (a data-quality flag)
+// is carried by its own red badge, not by repainting the whole path + progress
+// head red — that stacked two red signals and made an invalid-but-active
+// trajectory read like a blocked one.
+function statusTone(status) {
+  if (status === 'blocked') return 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))';
   if (status === 'waiting' || status === 'rerouting') return 'var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))';
   if (status === 'completed') return 'var(--viewer-positive, var(--color-semantic-status-positive-foreground))';
   if (status === 'active') return 'var(--viewer-accent, var(--color-semantic-primary-normal))';
@@ -258,7 +262,7 @@ export function TrajectoryOverlay({
   // a progress head still reads a travel direction, matching the Route/Lane
   // direction chevron.
   const directionPoint = longestSegmentMidpoint(points);
-  const tone = statusTone(trajectory?.status, invalid);
+  const tone = statusTone(trajectory?.status);
   const dash = statusDash(trajectory?.status);
   const foreground = 'var(--viewer-foreground, var(--color-semantic-label-strong))';
   const surface = 'var(--viewer-surface-elevated, var(--color-semantic-background-elevated-normal))';

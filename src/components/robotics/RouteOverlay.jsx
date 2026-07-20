@@ -163,8 +163,12 @@ function normalizedProgress(route) {
   };
 }
 
-function segmentTone(segment, invalid) {
-  if (invalid || segment.condition === 'blocked' || segment.condition === 'conflict') {
+// Lifecycle CONDITION drives the line tone. `invalid` (a data-quality flag) is
+// carried by its own red badge, not by repainting the whole path + head red —
+// that stacked two red signals in one place and made an invalid-but-active line
+// indistinguishable from a truly blocked one.
+function segmentTone(segment) {
+  if (segment.condition === 'blocked' || segment.condition === 'conflict') {
     return 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))';
   }
   if (segment.condition === 'waiting') return 'var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))';
@@ -376,7 +380,7 @@ export function RouteOverlay({
           ? segment.phase
           : 'upcoming';
         const normalizedSegment = { ...segment, condition, phase };
-        const tone = segmentTone(normalizedSegment, invalid);
+        const tone = segmentTone(normalizedSegment);
         const dash = segmentDash(normalizedSegment);
         const isProgressSegment = segment.id === progressSegment?.id && Boolean(progressGeometry);
         const segmentLabelSlot = segment.id === statusSegment?.id

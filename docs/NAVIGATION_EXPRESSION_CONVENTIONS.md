@@ -111,7 +111,7 @@ Reserve the alarm hue for alarms.
 
 | Tone | Reserved for |
 | --- | --- |
-| **danger** (`--viewer-danger`) | **위험 · 금지 · 차단 · 데이터 오류** — hazard *danger*, keep-out region, blocked route/trajectory/lane, `invalid` |
+| **danger** (`--viewer-danger`) | **위험 · 금지 · 차단 · 데이터 오류** — hazard *danger*, keep-out region, blocked/conflict route/trajectory/lane, and the `invalid` **badge** |
 | **warning** (`--viewer-warning`) | caution · waiting · limit · availability unknown |
 | **muted** (`--viewer-muted`) | **operationally unavailable**, unknown body/outline, planned, inactive/stale |
 | **accent** (`--viewer-accent`) | current · active · facility-available · selection |
@@ -123,6 +123,13 @@ carry the meaning — it does not borrow danger red. Applied consistently to the
 waypoint (muted stroke + foreground slash) and the facility pin (muted pin +
 white-knockout slash). Only a genuine *data error* (`invalid`) keeps the danger
 attention ring.
+
+**`invalid` is a badge, not a repaint.** A data-quality error shows as its red
+`!` badge (plus `aria-invalid`), and does **not** recolor the whole line +
+progress head to danger. Painting every element red stacked two red signals in
+one spot and made an invalid-but-active line indistinguishable from a blocked
+one. Lifecycle *conditions* (blocked, conflict) still tone the line danger; the
+data-quality flag rides on top as a badge.
 
 **Second channel for the top severity.** A `danger` hazard also wears a
 persistent alarm halo (`NAV_PIN.alarmRing`, scale 1.5) that a `caution` hazard
