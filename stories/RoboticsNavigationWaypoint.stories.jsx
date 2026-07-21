@@ -266,20 +266,21 @@ function WaypointGraphic({
       aria-label={label}
       style={{ display: 'block', overflow: 'visible' }}
     >
-      <NavigationMapStage width={width} height={height} eyebrow={mapId} north />
-      {waypoints.map((waypoint) => (
-        <WaypointMarker
-          key={waypoint.id}
-          waypoint={waypoint}
-          viewportScale={viewportScale}
-          selected={selectedId === waypoint.id || markerStates[waypoint.id]?.selected}
-          focused={markerStates[waypoint.id]?.focused}
-          disabled={markerStates[waypoint.id]?.disabled}
-          invalid={markerStates[waypoint.id]?.invalid}
-          stale={markerStates[waypoint.id]?.stale}
-          onActivate={onActivate}
-        />
-      ))}
+      <NavigationMapStage width={width} height={height} eyebrow={mapId} north>
+        {waypoints.map((waypoint) => (
+          <WaypointMarker
+            key={waypoint.id}
+            waypoint={waypoint}
+            viewportScale={viewportScale}
+            selected={selectedId === waypoint.id || markerStates[waypoint.id]?.selected}
+            focused={markerStates[waypoint.id]?.focused}
+            disabled={markerStates[waypoint.id]?.disabled}
+            invalid={markerStates[waypoint.id]?.invalid}
+            stale={markerStates[waypoint.id]?.stale}
+            onActivate={onActivate}
+          />
+        ))}
+      </NavigationMapStage>
     </svg>
   );
 }
@@ -667,6 +668,71 @@ export const CompoundRolesAndStates = {
   },
 };
 
+const stackedWaypoint = {
+  id: 'wp-stacked',
+  label: 'Dock 12',
+  mapId: 'L3',
+  position: { x: 310, y: 120 },
+  roles: ['parking', 'charger'],
+  annotations: [{ kind: 'dock', label: 'Dock 12', sourceId: 'dock-12' }],
+  availability: 'unknown',
+};
+
+function StackedStateFixture() {
+  return (
+    <main style={{ display: 'grid', gap: 'var(--space-3)', width: '100%', maxWidth: 760, minWidth: 0 }}>
+      <MapSurface
+        waypoints={[stackedWaypoint]}
+        markerStates={{ 'wp-stacked': { selected: true, focused: true, invalid: true, stale: true } }}
+        width={620}
+        height={240}
+        label="상태 링 적층 지도"
+      />
+    </main>
+  );
+}
+
+export const StackedStateRings = {
+  name: '변형·상태 · 상태 링 적층',
+  parameters: storyDescription(
+    '선택·포커스·오래된 데이터·데이터 오류·가용성 미확인이 한 웨이포인트에 동시에 걸리는 최악 조합입니다. 모든 상태 링이 같은 다이아몬드 실루엣을 따라 교차 없이 안쪽→바깥쪽(선택→포커스→stale→경고)으로 중첩되는지 확인하세요.',
+  ),
+  render: () => <StackedStateFixture />,
+  play: async ({ canvasElement }) => {
+    await canvasElement.ownerDocument.fonts.ready;
+    const marker = canvasElement.querySelector('[data-waypoint-id="wp-stacked"]');
+    if (!marker) throw new Error('Stacked-state waypoint is missing.');
+
+    const rings = [
+      ['selection', marker.querySelector('[data-waypoint-selected-indicator]')],
+      ['focus', marker.querySelector('[data-waypoint-focus-indicator]')],
+      ['stale', marker.querySelector('[data-waypoint-stale-indicator]')],
+      ['attention', marker.querySelector('[data-waypoint-attention]')],
+    ];
+    for (const [ringName, ring] of rings) {
+      if (!ring) throw new Error(`Stacked waypoint lost its ${ringName} ring.`);
+      if (ring.tagName.toLowerCase() !== 'polygon') {
+        throw new Error(`Stacked ${ringName} ring must trace the diamond silhouette, found <${ring.tagName}>.`);
+      }
+    }
+    for (let index = 0; index < rings.length - 1; index += 1) {
+      const [innerName, innerRing] = rings[index];
+      const [outerName, outerRing] = rings[index + 1];
+      const inner = innerRing.getBoundingClientRect();
+      const outer = outerRing.getBoundingClientRect();
+      const nests = inner.left > outer.left && inner.right < outer.right
+        && inner.top > outer.top && inner.bottom < outer.bottom;
+      if (!nests) {
+        throw new Error(`Stacked ${innerName} ring does not nest inside the ${outerName} ring.`);
+      }
+    }
+
+    assertWaypointStateGeometry(marker, 'unknown', 'Stacked unknown badge');
+    assertWaypointStateGeometry(marker, 'invalid', 'Stacked invalid badge');
+    assertWaypointFocusLabelGap(marker, 'Stacked-state waypoint');
+  },
+};
+
 const zoomWaypoint = {
   id: 'wp-zoom',
   label: 'Zoom target',
@@ -787,5 +853,11 @@ export const NarrowWidth = {
 export const WaypointVisualParity = {
   ...CompoundRolesAndStates,
   name: 'Waypoint visual parity',
+  tags: ['!dev', 'visual-parity'],
+};
+
+export const WaypointStackedStateParity = {
+  ...StackedStateRings,
+  name: 'Waypoint stacked-state parity',
   tags: ['!dev', 'visual-parity'],
 };

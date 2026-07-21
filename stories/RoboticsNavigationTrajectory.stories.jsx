@@ -60,7 +60,7 @@ export const Overview = {
     }
     trajectories.forEach((trajectory) => {
       const path = trajectory.querySelector('[data-trajectory-path]');
-      if (!path?.getAttribute('d')?.includes('L 370 164')) throw new Error('Dense trajectory geometry is incomplete.');
+      if (!path?.getAttribute('d')?.includes('L 468 164')) throw new Error('Dense trajectory geometry is incomplete.');
       assertNavigationProgressHead(trajectory, 'Overview Trajectory', 'trajectory');
       assertNavigationStateGlyphGeometry(trajectory, 'Overview Trajectory');
     });
@@ -89,7 +89,9 @@ function trajectoryForStatus(status) {
 // state glyph) changes across the matrix.
 const TRAJECTORY_STATUS_ROWS = [
   { status: 'planned', trajectory: L2_TRAJECTORY },
-  { status: 'waiting', trajectory: { ...trajectoryForStatus('waiting'), currentSampleIndex: 0 } },
+  // Head at index 1 (not 0): the tail sample sits closest to the stage scale
+  // bar, and the head-anchored label would overlap that chrome corner.
+  { status: 'waiting', trajectory: { ...trajectoryForStatus('waiting'), currentSampleIndex: 1 } },
   { status: 'blocked', trajectory: trajectoryForStatus('blocked') },
   { status: 'rerouting', trajectory: trajectoryForStatus('rerouting') },
   { status: 'completed', trajectory: { ...trajectoryForStatus('completed'), currentSampleIndex: ACTIVE_TRAJECTORY.samples.length - 1 } },

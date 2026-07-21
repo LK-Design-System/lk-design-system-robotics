@@ -46,15 +46,19 @@ export const ACTIVE_TRAJECTORY = {
   label: 'Robot 2 예상 궤적',
   mapId: 'L1',
   status: 'active',
+  // The tail starts right of the stage scale bar (x ≤ 130, bottom-left) so the
+  // trajectory never rides along the map chrome in any story reusing this
+  // fixture. Keep y untouched: route stories draw ACTIVE_ROUTE at y 196 and
+  // rely on the trajectory staying parallel below it.
   samples: [
-    { position: { x: 42, y: 224 }, timeMs: 0, headingRad: 0 },
-    { position: { x: 84, y: 222 }, timeMs: 250, headingRad: -0.05 },
-    { position: { x: 128, y: 214 }, timeMs: 500, headingRad: -0.14 },
-    { position: { x: 170, y: 200 }, timeMs: 750, headingRad: -0.3 },
-    { position: { x: 214, y: 184 }, timeMs: 1000, headingRad: -0.36 },
-    { position: { x: 262, y: 172 }, timeMs: 1250, headingRad: -0.2 },
-    { position: { x: 314, y: 166 }, timeMs: 1500, headingRad: -0.08 },
-    { position: { x: 370, y: 164 }, timeMs: 1750, headingRad: 0 },
+    { position: { x: 140, y: 224 }, timeMs: 0, headingRad: 0 },
+    { position: { x: 182, y: 222 }, timeMs: 250, headingRad: -0.05 },
+    { position: { x: 226, y: 214 }, timeMs: 500, headingRad: -0.14 },
+    { position: { x: 268, y: 200 }, timeMs: 750, headingRad: -0.3 },
+    { position: { x: 312, y: 184 }, timeMs: 1000, headingRad: -0.36 },
+    { position: { x: 360, y: 172 }, timeMs: 1250, headingRad: -0.2 },
+    { position: { x: 412, y: 166 }, timeMs: 1500, headingRad: -0.08 },
+    { position: { x: 468, y: 164 }, timeMs: 1750, headingRad: 0 },
   ],
   currentSampleIndex: 5,
 };
@@ -64,8 +68,9 @@ export const L2_TRAJECTORY = {
   label: 'Robot 2 L2 예상 궤적',
   mapId: 'L2',
   status: 'planned',
+  // The tail starts right of the stage scale bar (x ≤ 130, bottom-left) for
+  // the same chrome-clearance reason as ACTIVE_TRAJECTORY.
   samples: [
-    { position: { x: 70, y: 218 }, timeMs: 2000, headingRad: 0 },
     { position: { x: 142, y: 214 }, timeMs: 2400, headingRad: -0.06 },
     { position: { x: 216, y: 198 }, timeMs: 2800, headingRad: -0.28 },
     { position: { x: 286, y: 158 }, timeMs: 3200, headingRad: -0.62 },
@@ -133,8 +138,9 @@ export function PathMap({ appearance = 'light', label, children, height = 270, s
         aria-label={`${label}의 route와 trajectory 계층`}
         style={{ display: 'block', width: 'min(540px, calc(100cqw - 32px))', height: 'auto' }}
       >
-        <NavigationMapStage width={540} height={svgHeight} eyebrow={eyebrow} scaleBar={{ px: 100, label: '5 m' }} />
-        {typeof children === 'function' ? children(cssViewBoxScale) : children}
+        <NavigationMapStage width={540} height={svgHeight} eyebrow={eyebrow} scaleBar={{ px: 100, label: '5 m' }}>
+          {typeof children === 'function' ? children(cssViewBoxScale) : children}
+        </NavigationMapStage>
       </svg>
     </Map2DCanvas>
   );

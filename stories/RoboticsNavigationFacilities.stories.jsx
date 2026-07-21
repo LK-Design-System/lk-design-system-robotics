@@ -98,8 +98,9 @@ function TransitionMap({ children, appearance = 'light', width = 400, height = 2
         aria-label={label}
         data-transition-map-scale={viewBoxScale}
       >
-        <NavigationMapStage width={width} height={height} eyebrow={eyebrow} north />
-        {typeof children === 'function' ? children({ viewportScale: viewBoxScale }) : children}
+        <NavigationMapStage width={width} height={height} eyebrow={eyebrow} north>
+          {typeof children === 'function' ? children({ viewportScale: viewBoxScale }) : children}
+        </NavigationMapStage>
       </svg>
     </Map2DCanvas>
   );

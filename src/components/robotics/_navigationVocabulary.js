@@ -144,9 +144,19 @@ export const NAV_PIN = {
 export const NAV_NODE = {
   radius: 7,
   endpointRadius: 4,
-  // Selection ring scale — traces the diamond just outside the point edge, and
-  // inside the focus shell (NAV_FOCUS.waypointShellScale 1.5) so the two nest.
+  // Every waypoint ring traces this same diamond silhouette on one outward
+  // ladder, so any co-occurring states nest concentrically instead of
+  // crossing (concentric same-shape rings cannot intersect — a circle around
+  // the diamond cuts through its edges the moment radii collide):
+  //   point edge (1.0) ⊂ selection 1.28 ⊂ focus shell 1.5 (NAV_FOCUS)
+  //   ⊂ stale 1.8 ⊂ attention 2.15 ⊂ hit circle (r 17.5).
+  // The steps leave clearance for each ring's non-scaling stroke; persistent
+  // data-state rings (stale/attention) sit OUTSIDE the transient focus shell —
+  // the same layering NAV_PIN uses (alarmRing 1.5 > focusRing 1.34) — so an
+  // alarm keeps its salience while the marker is focused.
   selectionRingScale: 1.28,
+  staleRingScale: 1.8,
+  attentionRingScale: 2.15,
   points: (r) => `0,${-r} ${r},0 0,${r} ${-r},0`,
 };
 
