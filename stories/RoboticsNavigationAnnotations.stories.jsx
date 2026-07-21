@@ -86,8 +86,9 @@ function AnnotationMap({
         style={{ display: 'block', width: '100%', height: 'auto' }}
         aria-label={label}
       >
-        <NavigationMapStage width={width} height={height} eyebrow={eyebrow} north />
-        {children({ viewportScale: viewBoxScale })}
+        <NavigationMapStage width={width} height={height} eyebrow={eyebrow} north>
+          {children({ viewportScale: viewBoxScale })}
+        </NavigationMapStage>
       </svg>
     </Map2DCanvas>
   );

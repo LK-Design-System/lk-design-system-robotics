@@ -87,16 +87,22 @@ Rank: **current position (head) > heading (chevron)**. The head is larger
 
 ---
 
-## 4. Selection & focus: trace the silhouette, don't recolor meaning
+## 4. Rings trace the silhouette, don't recolor meaning
 
-Every marker class shows selection/focus as a ring that **traces its own
-silhouette**, nested outside → in as *focus ⊃ selection ⊃ shape*, so selection
-never overrides a meaning-carrying fill or stroke:
+Every ring a marker wears — selection, focus, and any persistent state ring —
+**traces the marker's own silhouette**, so co-occurring rings nest
+concentrically instead of crossing (a circle around a diamond cuts through its
+edges as soon as radii collide), and no ring ever overrides a meaning-carrying
+fill or stroke:
 
-- **Pins** (facility, hazard): scale `NAV_PIN.path` — focus `1.34`, selection `1.16`.
-- **Waypoint diamond**: scale the diamond — focus shell `1.5`
-  (`NAV_FOCUS.waypointShellScale`), selection ring `NAV_NODE.selectionRingScale`
-  `1.28`. The point keeps its surface fill + availability stroke in every state.
+- **Pins** (facility, hazard): scale `NAV_PIN.path` — selection `1.16` ⊂ focus
+  `1.34` ⊂ alarm halo `1.5` (`NAV_PIN.alarmRing`).
+- **Waypoint diamond**: scale the diamond on one outward ladder — selection
+  `1.28` ⊂ focus shell `1.5` (`NAV_FOCUS.waypointShellScale`) ⊂ stale ring
+  `1.8` ⊂ attention ring `2.15` (`NAV_NODE`). Persistent data-state rings sit
+  OUTSIDE the transient focus shell — the same layering as the pin alarm halo —
+  so an alarm keeps its salience while the marker is focused. The point keeps
+  its surface fill + availability stroke in every state.
 - **Region**: stroke the polygon outline (focus/selection widths in
   `NAV_FOCUS`/`NAV_SELECTION`), never refilling the pattern.
 - **Line**: a translucent accent halo one tier wider on route.

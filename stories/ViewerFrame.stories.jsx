@@ -50,10 +50,13 @@ function LocalToolbar({ appearance }) {
   const [zoom, setZoom] = React.useState(100);
   return (
     <ViewerToolbar orientation="horizontal" appearance={appearance === 'dark' ? 'on-dark' : 'surface'} label="보기 도구">
-      <ViewerToolbarButton label="확대" onClick={() => setZoom((value) => Math.min(200, value + 10))}><Icon name="plus" size={16} /></ViewerToolbarButton>
+      {/* Stepper convention: the readout sits between − and + (like Miro or
+          Excalidraw) so the cause-effect loop between the buttons and the
+          value stays adjacent; reset trails the cluster. */}
       <ViewerToolbarButton label="축소" onClick={() => setZoom((value) => Math.max(50, value - 10))}><Icon name="minus" size={16} /></ViewerToolbarButton>
-      <ViewerToolbarButton label="보기 초기화" onClick={() => setZoom(100)}><Icon name="reset" size={16} /></ViewerToolbarButton>
       <output aria-live="polite" style={{ color: 'var(--viewer-muted)', fontSize: 'var(--caption2-size)', fontVariantNumeric: 'tabular-nums' }}>{zoom}%</output>
+      <ViewerToolbarButton label="확대" onClick={() => setZoom((value) => Math.min(200, value + 10))}><Icon name="plus" size={16} /></ViewerToolbarButton>
+      <ViewerToolbarButton label="보기 초기화" onClick={() => setZoom(100)}><Icon name="reset" size={16} /></ViewerToolbarButton>
     </ViewerToolbar>
   );
 }

@@ -216,12 +216,14 @@ export function WaypointMarker({
           pointerEvents="none"
         />
         {invalid && (
-          <circle
+          <polygon
             data-waypoint-attention=""
-            r="10.5"
+            points={NAV_NODE.points(NAV_NODE.radius)}
+            transform={`scale(${NAV_NODE.attentionRingScale})`}
             fill="none"
             stroke="var(--viewer-danger, var(--color-semantic-status-negative-foreground))"
             strokeWidth="2.5"
+            strokeLinejoin="round"
             opacity="0.4"
             vectorEffect="non-scaling-stroke"
             pointerEvents="none"
@@ -262,12 +264,14 @@ export function WaypointMarker({
         )}
 
         {stale && (
-          <circle
+          <polygon
             data-waypoint-stale-indicator=""
-            r="9.5"
+            points={NAV_NODE.points(NAV_NODE.radius)}
+            transform={`scale(${NAV_NODE.staleRingScale})`}
             fill="none"
             stroke={muted}
             strokeWidth="1.5"
+            strokeLinejoin="round"
             strokeDasharray={NAV_DASH.staleRing}
             vectorEffect="non-scaling-stroke"
           />

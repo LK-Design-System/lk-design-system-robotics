@@ -367,8 +367,9 @@ function ViewerMapCanvas({ children }) {
         aria-hidden="true"
         style={{ display: 'block', width: '100cqw', height: 'auto' }}
       >
-        <NavigationMapStage width={540} height={290} scaleBar={{ px: 100, label: '5 m' }} />
-        {typeof children === 'function' ? children(cssViewBoxScale) : children}
+        <NavigationMapStage width={540} height={290} scaleBar={{ px: 100, label: '5 m' }}>
+          {typeof children === 'function' ? children(cssViewBoxScale) : children}
+        </NavigationMapStage>
       </svg>
     </Map2DCanvas>
   );

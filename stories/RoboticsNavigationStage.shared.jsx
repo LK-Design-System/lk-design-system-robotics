@@ -63,9 +63,13 @@ export const NAV_STATE_LEGEND = {
 };
 
 // ---------------------------------------------------------------------------
-// NavigationMapStage — the framed, gridded backdrop. Renders an SVG <g> meant
-// to be the first child of a story's own <svg width/height/viewBox>. Marker,
-// lane, and region fragments are drawn on top of it in the same coordinates.
+// NavigationMapStage — the framed, gridded backdrop. Renders into a story's
+// own <svg width/height/viewBox>. Marker, lane, and region fragments belong in
+// its `children` slot, which paints BETWEEN the backdrop and the map chrome
+// (eyebrow · north · scale bar): fixture geometry is free to route through any
+// corner, and the chrome stays on top with a surface-halo knockout — the same
+// legibility contract the annotation labels use — instead of silently
+// disappearing under a path.
 // ---------------------------------------------------------------------------
 
 function buildGridPath(x0, y0, x1, y1, step, origin = 0) {
@@ -112,109 +116,137 @@ export function NavigationMapStage({
   const majorD = buildGridPath(fx, fy, fx + fw, fy + fh, major, fx);
 
   return (
-    <g data-navigation-stage="" aria-hidden="true" pointerEvents="none">
-      <defs>
-        <clipPath id={clipId}>
-          <rect x={fx} y={fy} width={fw} height={fh} rx={radius} ry={radius} />
-        </clipPath>
-        <radialGradient id={vignetteId} cx="50%" cy="42%" r="75%">
-          <stop offset="60%" stopColor="var(--color-semantic-static-black)" stopOpacity="0" />
-          <stop offset="100%" stopColor="var(--color-semantic-static-black)" stopOpacity="0.06" />
-        </radialGradient>
-        <linearGradient id={sheenId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="var(--color-semantic-static-white)" stopOpacity="0.10" />
-          <stop offset="16%" stopColor="var(--color-semantic-static-white)" stopOpacity="0" />
-        </linearGradient>
-      </defs>
+    <>
+      <g data-navigation-stage="" aria-hidden="true" pointerEvents="none">
+        <defs>
+          <clipPath id={clipId}>
+            <rect x={fx} y={fy} width={fw} height={fh} rx={radius} ry={radius} />
+          </clipPath>
+          <radialGradient id={vignetteId} cx="50%" cy="42%" r="75%">
+            <stop offset="60%" stopColor="var(--color-semantic-static-black)" stopOpacity="0" />
+            <stop offset="100%" stopColor="var(--color-semantic-static-black)" stopOpacity="0.06" />
+          </radialGradient>
+          <linearGradient id={sheenId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--color-semantic-static-white)" stopOpacity="0.10" />
+            <stop offset="16%" stopColor="var(--color-semantic-static-white)" stopOpacity="0" />
+          </linearGradient>
+        </defs>
 
-      {/* Soft cast shadow gives the panel a lifted, physical edge. */}
-      <rect
-        x={fx}
-        y={fy + 3}
-        width={fw}
-        height={fh}
-        rx={radius}
-        ry={radius}
-        fill="var(--color-semantic-static-black)"
-        opacity="0.05"
-      />
+        {/* Soft cast shadow gives the panel a lifted, physical edge. */}
+        <rect
+          x={fx}
+          y={fy + 3}
+          width={fw}
+          height={fh}
+          rx={radius}
+          ry={radius}
+          fill="var(--color-semantic-static-black)"
+          opacity="0.05"
+        />
 
-      {/* Panel surface. */}
-      <rect
-        data-navigation-stage-surface=""
-        x={fx}
-        y={fy}
-        width={fw}
-        height={fh}
-        rx={radius}
-        ry={radius}
-        fill={STAGE_SURFACE}
-        stroke={STAGE_BORDER}
-        vectorEffect="non-scaling-stroke"
-      />
+        {/* Panel surface. */}
+        <rect
+          data-navigation-stage-surface=""
+          x={fx}
+          y={fy}
+          width={fw}
+          height={fh}
+          rx={radius}
+          ry={radius}
+          fill={STAGE_SURFACE}
+          stroke={STAGE_BORDER}
+          vectorEffect="non-scaling-stroke"
+        />
 
-      <g clipPath={`url(#${clipId})`}>
-        <path d={minorD} fill="none" stroke={STAGE_GRID} strokeWidth="1" strokeOpacity="0.4" vectorEffect="non-scaling-stroke" />
-        <path d={majorD} fill="none" stroke={STAGE_GRID} strokeWidth="1" strokeOpacity="0.75" vectorEffect="non-scaling-stroke" />
-        {children}
-        <rect x={fx} y={fy} width={fw} height={fh} fill={`url(#${vignetteId})`} />
-        <rect x={fx} y={fy} width={fw} height={fh} fill={`url(#${sheenId})`} />
+        <g clipPath={`url(#${clipId})`}>
+          <path d={minorD} fill="none" stroke={STAGE_GRID} strokeWidth="1" strokeOpacity="0.4" vectorEffect="non-scaling-stroke" />
+          <path d={majorD} fill="none" stroke={STAGE_GRID} strokeWidth="1" strokeOpacity="0.75" vectorEffect="non-scaling-stroke" />
+          <rect x={fx} y={fy} width={fw} height={fh} fill={`url(#${vignetteId})`} />
+          <rect x={fx} y={fy} width={fw} height={fh} fill={`url(#${sheenId})`} />
+        </g>
+
+        {/* Crisp inner keyline over the grid for a finished frame. */}
+        <rect
+          x={fx}
+          y={fy}
+          width={fw}
+          height={fh}
+          rx={radius}
+          ry={radius}
+          fill="none"
+          stroke={STAGE_BORDER}
+          vectorEffect="non-scaling-stroke"
+        />
       </g>
 
-      {/* Crisp inner keyline over the grid for a finished frame. */}
-      <rect
-        x={fx}
-        y={fy}
-        width={fw}
-        height={fh}
-        rx={radius}
-        ry={radius}
-        fill="none"
-        stroke={STAGE_BORDER}
-        vectorEffect="non-scaling-stroke"
-      />
+      {/* Map content: paints above the backdrop, below the chrome. Lives
+          outside the aria-hidden/pointer-events:none stage groups so
+          interactive fragments keep their semantics and hit targets. */}
+      {children}
 
-      {eyebrow && (
-        <text
-          data-navigation-stage-eyebrow=""
-          x={fx + 14}
-          y={fy + 20}
-          fill={STAGE_MUTED}
-          style={{ fontFamily: MONO_FONT, fontSize: '10px', fontWeight: 'var(--fw-bold)', letterSpacing: '1.4px' }}
-        >
-          {eyebrow}
-        </text>
-      )}
-
-      {north && (
-        <g data-navigation-stage-north="" transform={`translate(${fx + fw - 20} ${fy + 22})`}>
-          <path d="M0 -9 L4 6 L0 2 L-4 6 Z" fill={STAGE_MUTED} />
-          <text x="0" y="17" textAnchor="middle" fill={STAGE_MUTED} style={{ fontFamily: MONO_FONT, fontSize: '8px', fontWeight: 'var(--fw-bold)', letterSpacing: '0.5px' }}>N</text>
-        </g>
-      )}
-
-      {scaleBar && (
-        <g data-navigation-stage-scalebar="" transform={`translate(${fx + 14} ${fy + fh - 16})`}>
-          <path
-            d={`M0 0 H${scaleBar.px} M0 -3 V3 M${scaleBar.px} -3 V3`}
-            fill="none"
-            stroke={STAGE_MUTED}
-            strokeWidth="1.25"
-            strokeLinecap="round"
-            vectorEffect="non-scaling-stroke"
-          />
+      {/* Map chrome stays legible above any fixture geometry: each mark wears
+          the surface-halo knockout (paint-order: stroke) the annotation labels
+          already use, instead of vanishing under a path that crosses its
+          corner. */}
+      <g data-navigation-stage-chrome="" aria-hidden="true" pointerEvents="none">
+        {eyebrow && (
           <text
-            x={scaleBar.px / 2}
-            y="-6"
-            textAnchor="middle"
+            data-navigation-stage-eyebrow=""
+            x={fx + 14}
+            y={fy + 20}
             fill={STAGE_MUTED}
-            style={{ fontFamily: MONO_FONT, fontSize: '9px', fontWeight: 'var(--fw-semibold)', letterSpacing: '0.4px' }}
+            stroke={STAGE_SURFACE}
+            strokeWidth="3"
+            strokeLinejoin="round"
+            paintOrder="stroke"
+            style={{ fontFamily: MONO_FONT, fontSize: '10px', fontWeight: 'var(--fw-bold)', letterSpacing: '1.4px' }}
           >
-            {scaleBar.label}
+            {eyebrow}
           </text>
-        </g>
-      )}
-    </g>
+        )}
+
+        {north && (
+          <g data-navigation-stage-north="" transform={`translate(${fx + fw - 20} ${fy + 22})`}>
+            <path d="M0 -9 L4 6 L0 2 L-4 6 Z" fill={STAGE_MUTED} stroke={STAGE_SURFACE} strokeWidth="2.5" strokeLinejoin="round" paintOrder="stroke" />
+            <text x="0" y="17" textAnchor="middle" fill={STAGE_MUTED} stroke={STAGE_SURFACE} strokeWidth="2.5" strokeLinejoin="round" paintOrder="stroke" style={{ fontFamily: MONO_FONT, fontSize: '8px', fontWeight: 'var(--fw-bold)', letterSpacing: '0.5px' }}>N</text>
+          </g>
+        )}
+
+        {scaleBar && (
+          <g data-navigation-stage-scalebar="" transform={`translate(${fx + 14} ${fy + fh - 16})`}>
+            <path
+              d={`M0 0 H${scaleBar.px} M0 -3 V3 M${scaleBar.px} -3 V3`}
+              fill="none"
+              stroke={STAGE_SURFACE}
+              strokeWidth="4.5"
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            />
+            <path
+              d={`M0 0 H${scaleBar.px} M0 -3 V3 M${scaleBar.px} -3 V3`}
+              fill="none"
+              stroke={STAGE_MUTED}
+              strokeWidth="1.25"
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            />
+            <text
+              x={scaleBar.px / 2}
+              y="-6"
+              textAnchor="middle"
+              fill={STAGE_MUTED}
+              stroke={STAGE_SURFACE}
+              strokeWidth="3"
+              strokeLinejoin="round"
+              paintOrder="stroke"
+              style={{ fontFamily: MONO_FONT, fontSize: '9px', fontWeight: 'var(--fw-semibold)', letterSpacing: '0.4px' }}
+            >
+              {scaleBar.label}
+            </text>
+          </g>
+        )}
+      </g>
+    </>
   );
 }
 

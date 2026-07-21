@@ -112,8 +112,9 @@ function LaneMap({ appearance = 'light', label, children, height = 270, testId, 
         aria-label={`${label}의 레인 계층`}
         style={{ display: 'block', width: 'min(520px, calc(100cqw - 32px))', height: 'auto' }}
       >
-        <NavigationMapStage width={520} height={svgHeight} eyebrow={eyebrow} scaleBar={{ px: 96, label: '4 m' }} />
-        {scaledChildren}
+        <NavigationMapStage width={520} height={svgHeight} eyebrow={eyebrow} scaleBar={{ px: 96, label: '4 m' }}>
+          {scaledChildren}
+        </NavigationMapStage>
       </svg>
     </Map2DCanvas>
   );

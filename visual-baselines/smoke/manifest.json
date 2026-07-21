@@ -22,8 +22,8 @@
         "width": 980,
         "height": 720
       },
-      "bytes": 104921,
-      "sha256": "15ce60d5f660efc1bcc979f6daec7c6f8f2e63690c782db8c812280c5dbc069d"
+      "bytes": 92309,
+      "sha256": "b9b76c1165d8c3233e3b02fe0ef6ff8db8506130935a6154849422a38f04426d"
     },
     {
       "name": "robotics-viewer-light-frame-on-dark",
@@ -35,8 +35,8 @@
         "width": 720,
         "height": 520
       },
-      "bytes": 10257,
-      "sha256": "fe7b0c850064d02169fdc384c1fed84dd058ab4124607a3dc67502f34de3243a"
+      "bytes": 9716,
+      "sha256": "9a20403a3e64c5280f4b2ff348f52971bc0d2a43cf5c2a56bc3f8c7586c806d5"
     },
     {
       "name": "robotics-viewer-map",
@@ -68,8 +68,8 @@
         "width": 320,
         "height": 520
       },
-      "bytes": 48820,
-      "sha256": "f81346a9e0f6a65c5ac56539f350d9cf9731b6dde61bbd11490be06571371778"
+      "bytes": 33838,
+      "sha256": "d4df453ed36724a7759be43e72bfc1a84b878ce0333e5df38e2eef071acb0a01"
     },
     {
       "name": "robotics-viewer-toolbar",
@@ -90,8 +90,8 @@
         "width": 1000,
         "height": 920
       },
-      "bytes": 106331,
-      "sha256": "8183b782b4d510113c65827262d80b2dd24b6bbe6c46efd7d884edc0423d9dbe"
+      "bytes": 90588,
+      "sha256": "cf743f6419c92037c45f6fc629617194ef3031c7c8deed9e88c673a34ff7bf15"
     },
     {
       "name": "robotics-viewer-video-narrow",
@@ -101,8 +101,8 @@
         "width": 320,
         "height": 520
       },
-      "bytes": 18845,
-      "sha256": "f0c96d933244e76488b9503ce85e0e723a995fea1d7c622cde6ffc4562ec2811"
+      "bytes": 11832,
+      "sha256": "67a4b22c2a2ac7a98cd990a671d059d765609786d3e71f7120d2cea57cad952f"
     },
     {
       "name": "robotics-viewer-video-compact-states",
@@ -112,8 +112,8 @@
         "width": 240,
         "height": 900
       },
-      "bytes": 114357,
-      "sha256": "ba0c1cd95529eb91c48d71272c536fedda1e671b5948885302ecd4064380005d"
+      "bytes": 80473,
+      "sha256": "c0dbdb476430f34577c947753ad5a7ef8ba4640c5e5776ee4d3ee484dfe16503"
     },
     {
       "name": "robotics-viewer-telemetry-compact",
@@ -178,8 +178,8 @@
         "width": 980,
         "height": 760
       },
-      "bytes": 1974,
-      "sha256": "9ad66d7221b06761fbb98139860d7fe9b71359805a3b2b7c6a4d03b7463d8a51"
+      "bytes": 2082,
+      "sha256": "91fa65220eeb311759702de66f050a4e7fc2ef128f5ae93323f350f2758eef5b"
     },
     {
       "name": "atom-facility-door-marker@8x",
@@ -189,8 +189,8 @@
         "width": 980,
         "height": 760
       },
-      "bytes": 4796,
-      "sha256": "ba0fdce7b0eded87bdca73c257f70f62e74ec95309cc1c3c1bd4bb72d7b19b9d"
+      "bytes": 4855,
+      "sha256": "eadf1679c2d0603056732a56de57b5d487b78ab71f458ddec71e83b21b8f2405"
     },
     {
       "name": "atom-facility-dock-marker",
@@ -200,8 +200,8 @@
         "width": 980,
         "height": 760
       },
-      "bytes": 1811,
-      "sha256": "8e00ee7ac86c8942b9f029257347700706dafc02849505eb8f4840a7c3ef80d6"
+      "bytes": 1858,
+      "sha256": "769e1a3e661717e5f53a97e7d28560fc4cfa54ac6fae4e44dd19a48c90008228"
     },
     {
       "name": "atom-facility-dock-marker@8x",
@@ -211,8 +211,8 @@
         "width": 980,
         "height": 760
       },
-      "bytes": 4958,
-      "sha256": "7a50ccd2e4ea5f9ad3c8891bf72ab0806842719476f96f443cefe4328721c397"
+      "bytes": 4947,
+      "sha256": "afb57242e82b768398ecf56b9b4dedbc315105fdb267b054bc5127be62694b74"
     },
     {
       "name": "atom-waypoint-point",

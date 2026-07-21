@@ -111,8 +111,9 @@ function RegionMap({ children, appearance = 'light', width = 480, height = 288, 
       style={{ width: '100%', maxWidth: width, height: 'auto', aspectRatio: `${width} / ${height}` }}
     >
       <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="group" style={{ display: 'block', width: '100%', height: 'auto' }} aria-label={label}>
-        <NavigationMapStage width={width} height={height} eyebrow={eyebrow} north />
-        {children}
+        <NavigationMapStage width={width} height={height} eyebrow={eyebrow} north>
+          {children}
+        </NavigationMapStage>
       </svg>
     </Map2DCanvas>
   );

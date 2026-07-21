@@ -428,7 +428,19 @@ export const ViewerFrame = React.forwardRef(function ViewerFrame({
           >
             <div style={{ display: 'grid', gap: 7, minWidth: 0, justifyItems: 'start' }}>
               {(source != null || badges != null || presentation.corner) && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 7, minWidth: 0, maxWidth: '100%' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 7,
+                    minWidth: 0,
+                    maxWidth: '100%',
+                    // The topbar grid is top-aligned so HUD rows can stack under
+                    // this row; without a matching min-height a lone source
+                    // title rides 8px above the 32px control cluster's center.
+                    minHeight: topToolbar != null ? 32 : undefined,
+                  }}
+                >
                   {source != null && (
                     <span
                       data-viewer-source=""

@@ -90,7 +90,7 @@ export const RouteAndTrajectoryOverview = {
     });
     trajectories.forEach((trajectory) => {
       const path = trajectory.querySelector('[data-trajectory-path]');
-      if (!path?.getAttribute('d')?.includes('L 370 164')) throw new Error('Dense trajectory geometry is incomplete.');
+      if (!path?.getAttribute('d')?.includes('L 468 164')) throw new Error('Dense trajectory geometry is incomplete.');
       assertNavigationProgressHead(trajectory, 'Overview Trajectory', 'trajectory');
       assertNavigationStateGlyphGeometry(trajectory, 'Overview Trajectory');
     });
@@ -785,9 +785,9 @@ function PathActivationFixture() {
                 mapId: 'L1',
                 status: 'blocked',
                 samples: [
-                  { position: { x: 50, y: 414 }, timeMs: 0, headingRad: 0 },
-                  { position: { x: 260, y: 408 }, timeMs: 500, headingRad: 0 },
-                  { position: { x: 480, y: 414 }, timeMs: 1000, headingRad: 0 },
+                  { position: { x: 50, y: 384 }, timeMs: 0, headingRad: 0 },
+                  { position: { x: 260, y: 378 }, timeMs: 500, headingRad: 0 },
+                  { position: { x: 480, y: 384 }, timeMs: 1000, headingRad: 0 },
                 ],
                 currentSampleIndex: 1,
               }}
