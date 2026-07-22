@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const candidates = [
   process.env.LDS_CONFORMANCE_CLI,
+  path.resolve(repositoryRoot, '..', 'lk-design-system', 'packages', 'conformance', 'src', 'cli.mjs'),
   path.resolve(repositoryRoot, '..', 'LK Design System', 'packages', 'conformance', 'src', 'cli.mjs'),
   path.resolve(repositoryRoot, '.lds-conformance', 'lds', 'packages', 'conformance', 'src', 'cli.mjs'),
   path.resolve(repositoryRoot, 'node_modules', '@lk-robotics', 'lds-conformance', 'src', 'cli.mjs'),
