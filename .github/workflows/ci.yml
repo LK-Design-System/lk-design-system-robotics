@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v7
       - name: Run pinned LDS conformance
         id: lds_conformance
-        uses: LK-Design-System/lk-design-system/.github/actions/lds-conformance@9fa53fea7e069287601d448f987bf43a157b8a82
+        uses: LK-Design-System/lk-design-system/.github/actions/lds-conformance@e37372d2660b4ac76dcd6ea4fda40dbdc6378b93
         with:
           profile: robotics-ui
           root: .
