@@ -108,16 +108,21 @@ function InspectorSection({ section }) {
     <section style={{ minWidth: 0, borderTop: '1px solid var(--color-semantic-line-normal-alternative)' }}>
       {section.title != null && (
         collapsible ? (
-          <button
-            type="button"
-            aria-expanded={expanded}
-            aria-controls={contentId}
-            onClick={() => setExpanded((value) => !value)}
-            style={{ width: '100%', minHeight: 40, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)', padding: 0, border: 0, background: 'transparent', color: 'var(--color-semantic-label-strong)', fontFamily: 'var(--font-sans)', cursor: 'pointer', textAlign: 'left' }}
-          >
-            <span style={{ fontSize: 'var(--label2-size)', lineHeight: 'var(--label2-line)', fontWeight: 'var(--fw-bold)' }}>{section.title}</span>
-            <Icon name={expanded ? 'chevron-up-small' : 'chevron-down-small'} size={16} aria-hidden="true" />
-          </button>
+          /* Wrap the disclosure control in a heading so the section title carries
+             document structure (WCAG 1.3.1), matching the static branch's level.
+             The heading is a bare block wrapper; the button owns the visuals. */
+          <h4 style={{ margin: 0, font: 'inherit', color: 'inherit' }}>
+            <button
+              type="button"
+              aria-expanded={expanded}
+              aria-controls={contentId}
+              onClick={() => setExpanded((value) => !value)}
+              style={{ width: '100%', minHeight: 40, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-2)', padding: 0, border: 0, background: 'transparent', color: 'var(--color-semantic-label-strong)', fontFamily: 'var(--font-sans)', cursor: 'pointer', textAlign: 'left' }}
+            >
+              <span style={{ fontSize: 'var(--label2-size)', lineHeight: 'var(--label2-line)', fontWeight: 'var(--fw-bold)' }}>{section.title}</span>
+              <Icon name={expanded ? 'chevron-up-small' : 'chevron-down-small'} size={16} aria-hidden="true" />
+            </button>
+          </h4>
         ) : (
           <h4 style={{ minHeight: 40, display: 'flex', alignItems: 'center', margin: 0, fontSize: 'var(--label2-size)', lineHeight: 'var(--label2-line)', fontWeight: 'var(--fw-bold)', color: 'var(--color-semantic-label-strong)' }}>
             {section.title}

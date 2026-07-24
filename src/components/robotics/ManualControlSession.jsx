@@ -272,10 +272,16 @@ export function ManualControlSession({
     : children;
 
   const canRequestArm = linkReady && authorityGranted && !stopBlockActive;
-  const stopRequestDisabled = typeof stopCallback !== 'function'
-    || displayStopState === 'requesting'
+  /* Split "no handler wired" from "request already in flight". The former is a hard
+     unavailable control (native `disabled`); the latter is a temporal block that must
+     keep the button focusable so a keyboard operator who just pressed the stop does
+     not drop focus to <body> — the same aria-disabled + click-guard pattern the DS
+     Button uses for `loading`. */
+  const stopHasCallback = typeof stopCallback === 'function';
+  const stopLifecycleBlocked = displayStopState === 'requesting'
     || displayStopState === 'acknowledged'
     || displayStopState === 'stopped';
+  const stopRequestDisabled = !stopHasCallback || stopLifecycleBlocked;
 
   const requestStop = () => {
     if (stopRequestDisabled) return;
@@ -335,7 +341,8 @@ export function ManualControlSession({
             <Button
               variant="danger"
               size="md"
-              disabled={stopRequestDisabled}
+              disabled={!stopHasCallback}
+              aria-disabled={stopLifecycleBlocked || undefined}
               aria-label={STOP_BUTTON_LABELS[displayStopState] || stopRequestLabel}
               aria-busy={displayStopState === 'requesting' || undefined}
               aria-controls={statusId}

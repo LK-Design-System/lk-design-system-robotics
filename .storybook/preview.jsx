@@ -5,12 +5,33 @@ import '../styles.css';
 import React from 'react';
 import { StoryGuide } from '../stories/StoryGuide.shared.jsx';
 
+export const globalTypes = {
+  theme: {
+    name: 'Theme',
+    description: '시맨틱 테마(라이트·다크)',
+    defaultValue: 'light',
+    toolbar: {
+      icon: 'contrast',
+      items: [
+        { value: 'light', title: '라이트' },
+        { value: 'dark', title: '다크' },
+      ],
+      dynamicTitle: true,
+    },
+  },
+};
+
 export const decorators = [
   (Story, context) => {
     const guide = context.parameters?.storyGuide;
     const showGuide = guide?.storyId === context.id;
+    // The viewer tokens carry a dark appearance that used to be reachable only
+    // through a per-component prop, so no story ever rendered the global dark
+    // theme. The toolbar toggle stamps data-theme on the stage so every story
+    // can be reviewed on both surfaces.
+    const theme = context.globals?.theme === 'dark' ? 'dark' : 'light';
     return (
-      <div data-theme="light" className="theme-light" style={{ minHeight: '100vh', boxSizing: 'border-box', padding: 'clamp(16px, 5vw, 32px)', background: 'var(--color-semantic-background-normal-normal)', color: 'var(--color-semantic-label-normal)', fontFamily: 'var(--font-sans)' }}>
+      <div data-theme={theme} className={`theme-${theme}`} style={{ minHeight: '100vh', boxSizing: 'border-box', padding: 'clamp(16px, 5vw, 32px)', background: 'var(--color-semantic-background-normal-normal)', color: 'var(--color-semantic-label-normal)', fontFamily: 'var(--font-sans)' }}>
         {showGuide ? <div style={{ display: 'grid', gap: 'var(--space-6)', minWidth: 0 }}><StoryGuide {...guide} /><Story /></div> : <Story />}
       </div>
     );

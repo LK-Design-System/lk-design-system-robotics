@@ -1,4 +1,5 @@
 import React from 'react';
+import { userEvent, waitFor } from 'storybook/test';
 import { DirectionalPad } from './lds.js';
 
 const meta = {
@@ -129,4 +130,61 @@ export const Sizes = {
       </PadSample>
     </main>
   ),
+};
+
+/* 홀드 중 부모 리렌더로 onStep 핸들러가 바뀌어도, 실행 중인 반복은 최신
+   핸들러를 호출해야 한다(stale 클로저 회귀 방지). aria-keyshortcuts 노출과
+   방향 버튼의 키보드 활성화도 함께 고정한다. */
+function StaleHandlerFixture() {
+  const [generation, setGeneration] = React.useState(0);
+  const stepsRef = React.useRef([]);
+  const [count, setCount] = React.useState(0);
+  const onStep = React.useCallback(
+    (dir) => { stepsRef.current.push({ dir, generation }); setCount((value) => value + 1); },
+    [generation],
+  );
+  return (
+    <main style={stageStyle}>
+      <button type="button" data-testid="bump" onClick={() => setGeneration((value) => value + 1)}>
+        세대 증가 (현재 {generation})
+      </button>
+      <span data-testid="last-generation" hidden>
+        {stepsRef.current.length ? stepsRef.current[stepsRef.current.length - 1].generation : ''}
+      </span>
+      <span data-testid="step-count" hidden>{count}</span>
+      <DirectionalPad label="스텝 계약" onStep={onStep} />
+    </main>
+  );
+}
+
+export const StaleHandlerContract = {
+  name: '스텝 핸들러 계약',
+  tags: ['!dev'],
+  render: () => <StaleHandlerFixture />,
+  play: async ({ canvasElement }) => {
+    const pad = canvasElement.querySelector('[role="group"][aria-label="스텝 계약"]');
+    if (!pad || pad.getAttribute('aria-keyshortcuts') !== 'ArrowUp ArrowDown ArrowLeft ArrowRight') {
+      throw new Error('D-pad group must expose its arrow-key shortcuts.');
+    }
+
+    const up = canvasElement.querySelector('button[aria-label="위로 이동"]') ?? pad.querySelector('button');
+    // A single tap steps once through the current handler.
+    await userEvent.click(up);
+    await waitFor(() => {
+      const last = canvasElement.querySelector('[data-testid="last-generation"]');
+      if (last?.textContent !== '0') throw new Error('The first step must run through the generation-0 handler.');
+    });
+
+    // Swap the handler by bumping the parent generation, then step again: the
+    // step must route to the new handler, not the one captured at mount.
+    await userEvent.click(canvasElement.querySelector('[data-testid="bump"]'));
+    await userEvent.click(up);
+    await waitFor(() => {
+      const last = canvasElement.querySelector('[data-testid="last-generation"]');
+      if (last?.textContent !== '1') throw new Error('After a re-render swaps onStep, the next step must call the current handler.');
+    });
+
+    canvasElement.querySelector('[data-testid="bump"]').blur();
+    up.blur();
+  },
 };

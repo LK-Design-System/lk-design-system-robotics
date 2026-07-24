@@ -188,6 +188,57 @@ export const UnitFormattingAt320 = {
   },
 };
 
+export const SectionHeadingStructureContract = {
+  name: '섹션 제목 heading 구조 계약',
+  tags: ['!dev'],
+  parameters: storyDescription(
+    '접이식 섹션 제목이 실제 heading으로 렌더되어 문서 구조가 보조기술에 전달되는지 고정하는 fixture입니다(WCAG 1.3.1). 접이식 제목이 heading 안의 disclosure 버튼(접근 이름·aria-expanded)으로, 정적 제목도 같은 레벨 heading으로 노출되고 토글이 콘텐츠 표시를 바꾸는지 확인하세요.',
+  ),
+  render: () => (
+    <InspectorFrame>
+      <SelectionInspector
+        item={{ label: 'Zone A-03', kind: 'Polygon', status: 'Draft', statusTone: 'signal' }}
+        sections={[
+          { title: 'Geometry', fields: [{ label: 'Vertices', value: 6 }, { label: 'Area', value: 24.8, unit: 'm²' }] },
+          { title: 'Behavior', fields: [{ label: 'Mode', value: 'Restricted' }] },
+          { title: 'Static section', collapsible: false, fields: [{ label: 'Layer', value: 'Regions' }] },
+        ]}
+        onClearSelection={() => {}}
+      />
+    </InspectorFrame>
+  ),
+  play: async ({ canvasElement }) => {
+    const scope = canvasElement.querySelector('[data-testid="inspector-frame"]') || canvasElement;
+    const disclosure = Array.from(scope.querySelectorAll('button[aria-expanded]'))
+      .find((button) => (button.textContent || '').includes('Geometry'));
+    if (!disclosure) throw new Error('A collapsible section must expose a disclosure button.');
+
+    const heading = disclosure.closest('h1,h2,h3,h4,h5,h6');
+    if (!heading || heading.tagName !== 'H4') {
+      throw new Error('A collapsible section title must render as an h4 heading wrapping the disclosure control (WCAG 1.3.1).');
+    }
+    if (!(disclosure.textContent || '').includes('Geometry') || !disclosure.hasAttribute('aria-expanded')) {
+      throw new Error('The disclosure control must keep its accessible name and aria-expanded state.');
+    }
+    const staticHeading = Array.from(scope.querySelectorAll('h4')).find((node) => (node.textContent || '').includes('Static section'));
+    if (!staticHeading) throw new Error('A non-collapsible section title must also render as an h4 heading.');
+
+    const controls = document.getElementById(disclosure.getAttribute('aria-controls'));
+    if (disclosure.getAttribute('aria-expanded') !== 'true' || !controls || controls.hidden) {
+      throw new Error('An expanded section must reveal the region it controls.');
+    }
+    await userEvent.click(disclosure);
+    await waitFor(() => {
+      const now = Array.from(scope.querySelectorAll('button[aria-expanded]')).find((button) => (button.textContent || '').includes('Geometry'));
+      if (now.getAttribute('aria-expanded') !== 'false' || !document.getElementById(now.getAttribute('aria-controls')).hidden) {
+        throw new Error('Toggling the disclosure must collapse and hide its content region.');
+      }
+    });
+    await userEvent.click(Array.from(scope.querySelectorAll('button[aria-expanded]')).find((button) => (button.textContent || '').includes('Geometry')));
+    document.activeElement?.blur?.();
+  },
+};
+
 export const MixedSelection = {
   name: '사용법 · 다중 선택 공통 속성',
   parameters: storyDescription(

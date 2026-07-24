@@ -156,8 +156,8 @@ export const AuthorizedSession = {
       const requestingButton = Array.from(session.querySelectorAll('button'))
         .find((button) => button.textContent?.includes('정지 요청 전송 중'));
       const stoppedControls = session.querySelector('[data-interaction-enabled="false"]');
-      if (!requestingButton?.disabled || requestingButton.getAttribute('aria-busy') !== 'true') {
-        throw new Error('A pending stop request must expose progress and prevent duplicate requests.');
+      if (requestingButton?.getAttribute('aria-disabled') !== 'true' || requestingButton.disabled || requestingButton.getAttribute('aria-busy') !== 'true') {
+        throw new Error('A pending stop request must block via aria-disabled (focus-preserving), not native disabled, while exposing progress.');
       }
       if (!session.querySelector('[data-banner-variant="embedded"]')?.textContent?.includes('운행 정지 요청 전송 중')) {
         throw new Error('A stop request must not be presented as an already confirmed stop.');
@@ -306,6 +306,61 @@ export const StopRequestUnmount = {
         throw new Error('A stop-triggered unmount must publish exactly one stop-requested release without a duplicate unmount release.');
       }
     });
+  },
+};
+
+export const StopFocusPreservedContract = {
+  name: '정지 요청 후 키보드 포커스 보존 계약',
+  tags: ['!dev'],
+  parameters: storyDescription(
+    '키보드로 운행 정지를 요청한 직후 정지 컨트롤이 진행 상태로 잠기는 순간의 포커스 계약입니다. 정지 버튼이 native disabled로 바뀌어 포커스가 body로 떨어지지 않고, 초점을 유지한 채 aria-disabled + aria-busy로만 중복 요청을 막는지 확인하세요.',
+  ),
+  render: function Example() {
+    const [stopRequestState, setStopRequestState] = React.useState('idle');
+    return (
+      <div style={{ display: 'grid', gap: 'var(--space-3)', width: 620, maxWidth: 'calc(100vw - 48px)' }}>
+        <ManualControlSession
+          data-testid="stop-focus-session"
+          title="AMR 수동 주행"
+          linkState="ready"
+          authority="granted"
+          armed
+          deadmanRequired={false}
+          stopRequestState={stopRequestState}
+          onArmedChange={() => {}}
+          onStopRequest={() => setStopRequestState('requesting')}
+        >
+          {({ interactionEnabled }) => <Joystick disabled={!interactionEnabled} label="이동" />}
+        </ManualControlSession>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const session = canvasElement.querySelector('[data-testid="stop-focus-session"]');
+    const stopButton = session && Array.from(session.querySelectorAll('button'))
+      .find((button) => button.textContent?.includes('운행 정지 요청'));
+    if (!session || !stopButton) throw new Error('Stop-focus fixture did not render.');
+    if (stopButton.disabled || stopButton.getAttribute('aria-disabled') === 'true') {
+      throw new Error('An authorized idle session must offer an active stop control.');
+    }
+
+    stopButton.focus();
+    stopButton.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    if (document.activeElement !== stopButton) throw new Error('The stop control must be focusable.');
+
+    await userEvent.keyboard('{Enter}');
+    await waitFor(() => {
+      const requesting = Array.from(session.querySelectorAll('button'))
+        .find((button) => button.textContent?.includes('정지 요청 전송 중'));
+      if (!requesting) throw new Error('The stop request state did not advance.');
+      if (document.activeElement === document.body || document.activeElement !== requesting) {
+        throw new Error('Keyboard focus must stay on the stop control after it locks — it must not fall to <body>.');
+      }
+      if (requesting.disabled || requesting.getAttribute('aria-disabled') !== 'true' || requesting.getAttribute('aria-busy') !== 'true') {
+        throw new Error('A pending stop must block via aria-disabled + aria-busy, not native disabled.');
+      }
+    });
+    document.activeElement?.blur?.();
   },
 };
 

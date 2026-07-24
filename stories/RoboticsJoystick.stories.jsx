@@ -259,4 +259,55 @@ export const PointerPressAndRelease = {
   },
 };
 
+export const PointerCaptureFallbackContract = {
+  name: '포인터 캡처 실패 후 정지 보장',
+  tags: ['!dev'],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '포인터 캡처가 붙지 않는 입력(synthetic·일부 장치)에서 요소 밖에서 손을 떼도 명령이 0으로 정지하는지 검증하는 안전 계약입니다.',
+      },
+    },
+  },
+  render: () => <ContractFixture />,
+  play: async ({ canvasElement }) => {
+    const fixture = canvasElement.querySelector('[data-testid="joystick-contract"]');
+    const control = fixture?.querySelector('[role="application"]');
+    if (!fixture || !control) throw new Error('Joystick contract fixture did not render.');
+    const view = control.ownerDocument.defaultView;
+    const PointerEvent = view.PointerEvent;
+    const bounds = control.getBoundingClientRect();
+
+    // A pointerId that is not a real active pointer makes setPointerCapture
+    // throw/no-op, so hasPointerCapture stays false — the exact path where the
+    // element would otherwise never receive the release. The engagement must
+    // fall back to the window so a release anywhere still stops the command.
+    const pointerId = 999;
+    control.dispatchEvent(new PointerEvent('pointerdown', {
+      pointerId, pointerType: 'touch', isPrimary: true,
+      clientX: bounds.left + bounds.width * 0.8, clientY: bounds.top + bounds.height / 2,
+      bubbles: true, cancelable: true,
+    }));
+    await waitFor(() => readVector(fixture).x > 0, 'Pointer down must emit a command even when capture does not take.');
+    if (control.hasPointerCapture?.(pointerId)) {
+      throw new Error('This contract requires the capture to have failed; the fixture unexpectedly captured the pointer.');
+    }
+
+    // Release on the window, far outside the control bounds.
+    view.dispatchEvent(new PointerEvent('pointerup', {
+      pointerId, pointerType: 'touch',
+      clientX: bounds.left - 400, clientY: bounds.top - 400,
+      bubbles: true, cancelable: true,
+    }));
+    await waitFor(() => {
+      const vector = readVector(fixture);
+      return vector.x === 0 && vector.y === 0 && fixture.dataset.endCount === '1';
+    }, 'A release outside the element must still emit one zero vector and end the command.');
+    if (control.dataset.active !== 'false') {
+      throw new Error('The joystick must clear its active state after the window fallback release.');
+    }
+  },
+};
+
 export const JoystickCard = { ...JoystickCardStory, name: 'Joystick card parity', tags: ['!dev', 'visual-parity'] };

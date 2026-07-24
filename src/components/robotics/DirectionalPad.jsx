@@ -37,6 +37,11 @@ const normalizeNumber = (value, fallback) => {
 export function DirectionalPad({ onStep, rate = 8, size = 48, disabled = false, center, onCenter, label = '방향 패드', directionLabels, centerLabel = '가운데', style, ...rest }) {
   const timer = React.useRef(null);
   const activeRef = React.useRef(null);
+  // The repeat interval is a long-lived closure; capture onStep by ref so a
+  // parent re-render that swaps the handler (rate multiplier, transmit gate)
+  // does not leave the running hold calling a stale one.
+  const onStepRef = React.useRef(onStep);
+  onStepRef.current = onStep;
   const [activeDirection, setActiveDirection] = React.useState(null);
   const [hoveredControl, setHoveredControl] = React.useState(null);
   const [centerActive, setCenterActive] = React.useState(false);
@@ -77,8 +82,8 @@ export function DirectionalPad({ onStep, rate = 8, size = 48, disabled = false, 
     stop();
     activeRef.current = dir;
     setActiveDirection(dir);
-    onStep(dir);
-    timer.current = setInterval(() => onStep(dir), repeatDelay);
+    onStepRef.current(dir);
+    timer.current = setInterval(() => onStepRef.current(dir), repeatDelay);
   };
   const handlePointerUp = (event) => {
     if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
@@ -139,7 +144,7 @@ export function DirectionalPad({ onStep, rate = 8, size = 48, disabled = false, 
   const btn = (dir) => (
     <button type="button" aria-label={labels[dir] || dir} disabled={!canStep}
       data-direction={dir}
-      onPointerDown={(e) => { e.preventDefault(); e.currentTarget.setPointerCapture?.(e.pointerId); start(dir); }}
+      onPointerDown={(e) => { e.preventDefault(); try { e.currentTarget.setPointerCapture?.(e.pointerId); } catch { /* synthetic pointers expose no capturable pointer */ } start(dir); }}
       onPointerUp={handlePointerUp} onPointerLeave={stop} onPointerCancel={stop}
       onMouseEnter={() => setHoveredControl(dir)} onMouseLeave={() => setHoveredControl(null)}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); start(dir); } }}
@@ -152,6 +157,7 @@ export function DirectionalPad({ onStep, rate = 8, size = 48, disabled = false, 
 
   return (
     <div role="group" aria-label={label}
+      aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight"
       data-active-direction={activeDirection || undefined}
       onKeyDown={handleDirectionalKeyDown}
       onKeyUp={handleDirectionalKeyUp}

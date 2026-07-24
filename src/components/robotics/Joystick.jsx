@@ -35,6 +35,7 @@ export function Joystick({
   const commandRef = React.useRef(ZERO_VECTOR);
   const engagedRef = React.useRef(false);
   const pointerIdRef = React.useRef(null);
+  const detachWindowRef = React.useRef(null);
   const activeKeysRef = React.useRef(new Set());
   const onChangeRef = React.useRef(onChange);
   const onEndRef = React.useRef(onEnd);
@@ -81,6 +82,8 @@ export function Joystick({
 
     engagedRef.current = false;
     pointerIdRef.current = null;
+    detachWindowRef.current?.();
+    detachWindowRef.current = null;
     activeKeysRef.current.clear();
     setActive(false);
 
@@ -111,13 +114,40 @@ export function Joystick({
 
   const handlePointerDown = (event) => {
     if (disabled || engagedRef.current || event.isPrimary === false || (event.pointerType === 'mouse' && event.button !== 0)) return;
+    const element = event.currentTarget;
     pointerIdRef.current = event.pointerId;
     beginInteraction();
-    event.currentTarget.focus({ preventScroll: true });
+    element.focus({ preventScroll: true });
     try {
-      event.currentTarget.setPointerCapture?.(event.pointerId);
+      element.setPointerCapture?.(event.pointerId);
     } catch {
       // Some synthetic pointer sources do not expose a capturable active pointer.
+    }
+    // When capture does not take (synthetic sources, some input devices), the
+    // element only receives pointer events while the pointer is over it, so a
+    // release outside its bounds would never reach onPointerUp and the command
+    // would stay engaged. Bind the release to the window as a safety fallback so
+    // every hold has a guaranteed stop path. Capture-lost while a real capture
+    // was held is already handled by onLostPointerCapture.
+    const captured = element.hasPointerCapture?.(event.pointerId) ?? false;
+    if (!captured && typeof window !== 'undefined') {
+      const pointerId = event.pointerId;
+      const onWindowMove = (moveEvent) => {
+        if (moveEvent.pointerId !== pointerId || !engagedRef.current) return;
+        setFromClientPoint(moveEvent.clientX, moveEvent.clientY);
+      };
+      const onWindowEnd = (endEvent) => {
+        if (endEvent.pointerId !== pointerId) return;
+        endInteraction(endEvent.type === 'pointercancel' ? 'pointer-cancel' : 'pointer-release');
+      };
+      window.addEventListener('pointermove', onWindowMove);
+      window.addEventListener('pointerup', onWindowEnd);
+      window.addEventListener('pointercancel', onWindowEnd);
+      detachWindowRef.current = () => {
+        window.removeEventListener('pointermove', onWindowMove);
+        window.removeEventListener('pointerup', onWindowEnd);
+        window.removeEventListener('pointercancel', onWindowEnd);
+      };
     }
     setFromClientPoint(event.clientX, event.clientY);
   };
@@ -177,6 +207,8 @@ export function Joystick({
   }, [disabled, endInteraction]);
 
   React.useEffect(() => () => {
+    detachWindowRef.current?.();
+    detachWindowRef.current = null;
     if (!engagedRef.current && isStopped(commandRef.current)) return;
     engagedRef.current = false;
     pointerIdRef.current = null;
