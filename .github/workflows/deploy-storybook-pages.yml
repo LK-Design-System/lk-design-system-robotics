@@ -74,6 +74,9 @@ jobs:
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
+      - name: Build robotics package
+        run: npm.cmd run build
+
       - name: Build Storybook
         run: npm run build:storybook
 
