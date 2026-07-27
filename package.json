@@ -11,6 +11,7 @@
     "dist",
     "styles.css",
     "tokens",
+    "vendor",
     "licenses",
     "THIRD_PARTY_NOTICES.md"
   ],
@@ -36,15 +37,15 @@
     "prepublishOnly": "npm run check"
   },
   "dependencies": {
-    "@lk-robotics/lds-core": "0.1.0-rc.1",
-    "@lk-robotics/lds-product": "0.1.0-rc.1"
+    "@lk-robotics/lds-core": "file:vendor/lk-robotics-lds-core-0.1.0-rc.1.tgz",
+    "@lk-robotics/lds-product": "file:vendor/lk-robotics-lds-product-0.1.0-rc.1.tgz"
   },
   "peerDependencies": {
     "react": ">=18 <20",
     "react-dom": ">=18 <20"
   },
   "devDependencies": {
-    "@lk-robotics/lds-theme": "0.1.0-rc.1",
+    "@lk-robotics/lds-theme": "file:vendor/lk-robotics-lds-theme-0.1.0-rc.1.tgz",
     "@storybook/addon-a11y": "10.4.6",
     "@storybook/addon-docs": "10.4.6",
     "@storybook/react-vite": "10.4.6",

@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: read
-  packages: read
   pages: write
   id-token: write
 
@@ -20,8 +19,6 @@ jobs:
   build:
     name: Build Storybook
     runs-on: windows-latest
-    env:
-      NODE_AUTH_TOKEN: ${{ secrets.LK_PACKAGES_READ_TOKEN || github.token }}
 
     steps:
       - name: Checkout
@@ -33,46 +30,8 @@ jobs:
           node-version: 22.17.1
           cache: npm
 
-      # The shared LDS packages are public source but have not been published
-      # to GitHub Packages. Package them from a fixed public commit so this
-      # deployment remains reproducible without widening package access.
-      - name: Checkout public LDS package source
-        uses: actions/checkout@v7.0.0
-        with:
-          repository: LK-Design-System/lk-design-system
-          ref: a9ac5fc15bb2be0d6300c7029807ca393f223496
-          path: .lds-package-source
-
-      - name: Build public LDS packages
-        working-directory: .lds-package-source
-        run: |
-          npm.cmd ci
-          npm.cmd run build:workspaces
-
-      - name: Pack public LDS packages
-        shell: pwsh
-        run: |
-          foreach ($package in 'core', 'product', 'theme') {
-            Push-Location ".lds-package-source/packages/$package"
-            npm.cmd pack --pack-destination "$env:GITHUB_WORKSPACE"
-            Pop-Location
-          }
-
       - name: Install dependencies
-        shell: pwsh
-        run: |
-          $manifest = Get-Content -Raw package.json | ConvertFrom-Json
-          $coreTarball = Get-ChildItem -Filter 'lk-robotics-lds-core-*.tgz' | Select-Object -First 1
-          $productTarball = Get-ChildItem -Filter 'lk-robotics-lds-product-*.tgz' | Select-Object -First 1
-          $themeTarball = Get-ChildItem -Filter 'lk-robotics-lds-theme-*.tgz' | Select-Object -First 1
-          if (-not $coreTarball -or -not $productTarball -or -not $themeTarball) {
-            throw 'The public LDS package set could not be packed.'
-          }
-          $manifest.dependencies.'@lk-robotics/lds-core' = "file:./$($coreTarball.Name)"
-          $manifest.dependencies.'@lk-robotics/lds-product' = "file:./$($productTarball.Name)"
-          $manifest.devDependencies.'@lk-robotics/lds-theme' = "file:./$($themeTarball.Name)"
-          $manifest | ConvertTo-Json -Depth 100 | Set-Content package.json
-          npm.cmd install --ignore-scripts --package-lock=false
+        run: npm.cmd ci
 
       - name: Prepare LDS Product Storybook compatibility surface
         run: node scripts/prepare-pages-lds-product-storybook.mjs
