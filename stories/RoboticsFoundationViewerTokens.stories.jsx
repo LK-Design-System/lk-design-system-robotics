@@ -1,5 +1,5 @@
 import React from 'react';
-import { ViewerFrame } from './lds.js';
+import { ViewerFrame } from '@lk-robotics/lds-product';
 import { storyDescription } from './StoryGuide.shared.jsx';
 
 // This page renders the REAL --viewer-* color tokens LIVE. Each swatch's
@@ -46,7 +46,7 @@ const STATE_TONE_MAP = [
   { tone: '--viewer-danger', meaning: '대표: 위험 · 금지 · 차단 · 데이터 오류', states: ['해저드 위험', '경로·궤적 차단', '구역 진입 금지', '데이터 오류(invalid)'] },
   { tone: '--viewer-warning', meaning: '대표: 주의 · 대기 · 제한', states: ['해저드 주의', '경로·궤적 대기·재계산', '구역 속도 제한', '웨이포인트 가용성 미확인'] },
   { tone: '--viewer-positive', meaning: '대표: 완료', states: ['경로·궤적 완료', '경로 완료 구간'] },
-  { tone: '--viewer-accent', meaning: '대표: 현재 · 활성 · 시설 가용 · 선택', states: ['시설 사용 가능', '경로·궤적 현재·활성', '선택 링'] },
+  { tone: '--viewer-accent', meaning: '대표: 현재 · 활성 · 시설 가용', states: ['시설 사용 가능', '경로·궤적 현재·활성', '선택은 색이 아닌 기하 강조'] },
   { tone: '--viewer-muted', meaning: '대표: 사용 불가 · 미확인 · 비활성', states: ['시설·웨이포인트 사용 불가(+슬래시)', '가용성 미확인 몸통', '구역 통과 미확인 외곽선', '경로·궤적 계획됨', '비활성·지연'] },
 ];
 
@@ -221,12 +221,15 @@ function ViewerTokenCatalog({ frameHeight = 340, toneFrameHeight = 420 }) {
 
 const meta = {
   title: 'LDS Robotics/Foundation/Viewer Tokens',
+  tags: ['autodocs'],
   parameters: {
     storyGuide: {
       storyId: 'lds-robotics-foundation-viewer-tokens--overview',
       eyebrow: 'Foundation / Viewer Tokens',
       title: '내비게이션 렌더러가 색을 맞추는 --viewer-* 토큰을 외관별로 문서화합니다',
       description:
+        '뷰어 안의 지도·3D·영상 오버레이가 밝고 어두운 외관에서 같은 색 어휘를 공유할 때 사용합니다. 일반 앱 표면을 지정하거나 상태를 색만으로 전달하는 용도에는 사용하지 마세요.',
+      docsDescription:
         '지도·3D·영상 위의 웨이포인트·설비·해저드·차선·경로·궤적·구역 렌더러가 한 뷰포트 안에서 하나의 색 시스템으로 읽히도록, 이들이 공유하는 색 토큰 --viewer-surface·--viewer-surface-elevated·--viewer-foreground·--viewer-muted·--viewer-border·--viewer-accent·--viewer-danger·--viewer-warning·--viewer-positive 9종을 뷰어 프레임이 단일 소스로 소유합니다. 뷰어 프레임 안의 오버레이가 밝은·어두운 외관에서 같은 톤 어휘를 공유할 때 사용합니다. 일반 앱 표면의 색을 지정하거나 상태를 색만으로 전달하는 용도에는 사용하지 마세요. 이 페이지는 그 9종을 두 외관에서 실제 색으로 렌더하고 컴포넌트별 의미 연결 예시를 함께 문서화합니다. 톤 어휘는 공유하지만 의미 매핑은 각 렌더러가 소유합니다. 예를 들어 FacilityTransition의 사용 가능은 accent이고 FacilityTransition·SpatialRegion의 미확인 몸통·외곽선은 muted이며, WaypointMarker의 가용성 미확인은 warning입니다. 색은 글리프·dash 위의 보조 단서이며 색만으로 상태를 전달하지 않습니다.',
     },
     docs: {

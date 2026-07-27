@@ -1,28 +1,32 @@
 import React from 'react';
 import { userEvent, waitFor } from 'storybook/test';
+import { SegmentedControl } from '@lk-robotics/lds-core';
 import {
   RouteOverlay,
   TrajectoryOverlay,
   NavigationAnnotationLayer,
-  SegmentedControl,
-} from './lds.js';
+  NavigationCoordinateBoundary,
+} from '../src/index.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { assertNoLabelCollisions, assertPairwiseNonOverlap } from './RoboticsNavigationCollision.shared.jsx';
 import {
   ACTIVE_ROUTE,
   ACTIVE_TRAJECTORY,
   L2_TRAJECTORY,
+  PROJECTED_FRAME_L1,
+  PROJECTED_FRAME_L2,
   StoryPage,
   PathMap,
   nextRender,
   assertNavigationProgressHead,
+  assertTrajectoryTemporalEncoding,
   assertNavigationStateGlyphGeometry,
-  assertNavigationVectorGeometry,
 } from './RoboticsNavigationRouteTrajectory.shared.jsx';
 import { assertSharedFocusIndicator } from './RoboticsNavigationAssert.shared.jsx';
 
 const meta = {
   title: 'LDS Robotics/Navigation/Route',
+  tags: ['autodocs'],
   component: RouteOverlay,
   parameters: {
     storyGuide: {
@@ -30,6 +34,8 @@ const meta = {
       eyebrow: 'Robotics / Navigation / Route',
       title: '계획된 그래프 경로와 로봇의 조밀한 궤적은 서로 다른 계층입니다',
       description:
+        'Route는 graph segment의 phase·condition을, Trajectory는 시간 순서의 조밀한 sample을 표시합니다. 정적 연결에는 Lane을 사용하며 두 선의 상태와 진행 의미를 합치지 마세요.',
+      docsDescription:
         'Route는 graph segment의 phase와 condition을, Trajectory는 한 지도에서 시간 순서로 이어진 조밀한 sample을 보여줍니다. 두 선이 비슷해 보여도 상태와 진행 의미를 합치지 마세요. 정적 그래프 연결에는 Lane이, 자유 공간의 조밀한 궤적에는 Trajectory가 적합합니다.',
     },
     docs: {
@@ -45,28 +51,28 @@ export default meta;
 
 function ActivePathLayers({ viewportScale }) {
   return (
-    <>
+    <NavigationCoordinateBoundary frame={PROJECTED_FRAME_L1}>
       <RouteOverlay route={ACTIVE_ROUTE} activeMapId="L1" viewportScale={viewportScale} />
       <TrajectoryOverlay trajectory={ACTIVE_TRAJECTORY} viewportScale={viewportScale} />
-    </>
+    </NavigationCoordinateBoundary>
   );
 }
 
 export const RouteAndTrajectoryOverview = {
   name: '개요',
   parameters: storyDescription(
-    '같은 이동을 표현하는 planned route와 dense trajectory를 light/dark 지도에서 비교합니다. 둘 다 현재 지점까지의 선이 open progress head로 끝나지만, Route의 segment phase·condition과 Trajectory의 sample 순서는 별도 의미로 남습니다.',
+    '같은 이동을 표현하는 planned route와 dense trajectory를 light/dark 지도에서 비교합니다. Route는 굵은 graph 계획선과 방향 head, Trajectory는 얇은 시간선·sample 점·원형 cursor로 구분됩니다.',
   ),
   render: () => (
     <StoryPage
       title="Route는 선택된 graph 구간을, Trajectory는 시간 순 sample을 보여줍니다"
-      description="경로의 완료·현재·예정과 대기·차단·충돌은 segment에 속합니다. 진행 head는 path tangent를 따르며 robot heading·pose를 대신하지 않습니다."
+      description="Route는 굵은 계획선과 방향 head로 graph 진행을 표시하고, Trajectory는 별도의 sample 점과 원형 시간 cursor로 구분합니다."
     >
       <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(360px, 100%), 1fr))', gap: 'var(--space-4)', minWidth: 0 }}>
-        <PathMap label="Light route와 trajectory 지도">
+        <PathMap label="Light route와 trajectory 지도" annotationDetailMode="overview">
           {(cssViewBoxScale) => <ActivePathLayers viewportScale={cssViewBoxScale} />}
         </PathMap>
-        <PathMap appearance="dark" label="Dark route와 trajectory 지도">
+        <PathMap appearance="dark" label="Dark route와 trajectory 지도" annotationDetailMode="overview">
           {(cssViewBoxScale) => <ActivePathLayers viewportScale={cssViewBoxScale} />}
         </PathMap>
       </section>
@@ -75,10 +81,50 @@ export const RouteAndTrajectoryOverview = {
   play: async ({ canvasElement }) => {
     const routes = canvasElement.querySelectorAll('[data-lk-route-overlay]');
     const trajectories = canvasElement.querySelectorAll('[data-lk-trajectory-overlay]');
+    const annotationLayers = canvasElement.querySelectorAll('[data-lk-navigation-annotation-layer]');
+    const coordinateBoundaries = canvasElement.querySelectorAll('[data-navigation-coordinate-boundary]');
     if (routes.length !== 2 || trajectories.length !== 2) {
       throw new Error(`Light/dark layer parity failed: ${routes.length} routes, ${trajectories.length} trajectories.`);
     }
+    if (annotationLayers.length !== 2 || coordinateBoundaries.length !== 2) {
+      throw new Error('Each overview map must coordinate route, trajectory, and map chrome in one annotation layer.');
+    }
+    annotationLayers.forEach((layer) => {
+      if (layer.getAttribute('data-annotation-detail-mode') !== 'overview') {
+        throw new Error('Route overview maps must use the explicit overview density tier.');
+      }
+      const completed = layer.querySelector('[data-annotation-id*="segment-l1-completed"]');
+      const current = layer.querySelector('[data-annotation-id*="segment-l1-current"]');
+      const progress = layer.querySelector('[data-route-progress-label]');
+      const trajectoryLabel = layer.querySelector('[data-trajectory-label]');
+      const trajectoryAnnotation = trajectoryLabel?.closest('[data-navigation-annotation]');
+      if (completed?.getAttribute('data-annotation-suppressed-reason') !== 'density') {
+        throw new Error('Completed route labels must yield to current context in overview density.');
+      }
+      if (!progress || progress.closest('[data-navigation-annotation]')?.getAttribute('data-annotation-suppressed') === 'true') {
+        throw new Error('Overview density must preserve the highest-priority current progress label.');
+      }
+      for (const contextLabel of [current, trajectoryAnnotation]) {
+        if (
+          contextLabel?.getAttribute('data-annotation-suppressed') === 'true'
+          && contextLabel.getAttribute('data-annotation-suppressed-reason') !== 'collision'
+        ) {
+          throw new Error('Current route/trajectory context may yield only to a measured collision.');
+        }
+      }
+      assertNoLabelCollisions(layer, 'Route overview', 8);
+      [...layer.querySelectorAll('[data-annotation-displaced="true"]')].forEach((label) => {
+        const nudge = Math.hypot(
+          Number(label.getAttribute('data-annotation-nudge-x') || 0),
+          Number(label.getAttribute('data-annotation-nudge-y') || 0),
+        );
+        if (nudge > 24.5) throw new Error(`Leaderless label nudge exceeds 24px: ${nudge}.`);
+      });
+    });
     routes.forEach((route) => {
+      if (route.getAttribute('data-coordinate-space') !== 'svg-map') {
+        throw new Error('Overview route must be projected from world coordinates into SVG map space.');
+      }
       const paths = route.querySelectorAll('[data-route-path]');
       if (paths.length !== 2) throw new Error('L1 route must render only its two L1 segments.');
       if (!route.querySelector('[data-route-progress-marker][data-current-segment-id="segment-l1-current"]')) {
@@ -86,12 +132,14 @@ export const RouteAndTrajectoryOverview = {
       }
       assertNavigationProgressHead(route, 'Overview Route', 'route');
       assertNavigationStateGlyphGeometry(route, 'Overview Route');
-      assertNavigationVectorGeometry(route, 'Overview Route');
     });
     trajectories.forEach((trajectory) => {
+      if (trajectory.getAttribute('data-coordinate-space') !== 'svg-map') {
+        throw new Error('Overview trajectory must be projected from world coordinates into SVG map space.');
+      }
       const path = trajectory.querySelector('[data-trajectory-path]');
       if (!path?.getAttribute('d')?.includes('L 468 164')) throw new Error('Dense trajectory geometry is incomplete.');
-      assertNavigationProgressHead(trajectory, 'Overview Trajectory', 'trajectory');
+      assertTrajectoryTemporalEncoding(trajectory, 'Overview Trajectory');
       assertNavigationStateGlyphGeometry(trajectory, 'Overview Trajectory');
     });
   },
@@ -222,7 +270,6 @@ export const RouteAndTrajectoryStates = {
       throw new Error('Trajectory invalid + stale needs independent ! and ~ visual evidence.');
     }
     assertNavigationStateGlyphGeometry(canvasElement, 'Route/Trajectory states');
-    assertNavigationVectorGeometry(canvasElement, 'Route/Trajectory states');
     // The only glyph badges left on lines are the data-quality flags.
     const renderedKinds = new Set(Array.from(canvasElement.querySelectorAll('[data-navigation-state-glyph]'))
       .map((glyph) => glyph.getAttribute('data-navigation-state-glyph')));
@@ -354,8 +401,13 @@ function assertProgressTextSpacing(route, label) {
   const headRect = headObstacle.getBoundingClientRect();
   const textRect = progressText.getBoundingClientRect();
   const pathRect = path.getBoundingClientRect();
-  const headGap = textRect.top - headRect.bottom;
-  const pathGap = textRect.top - pathRect.bottom;
+  const rectClearance = (first, second) => {
+    const horizontal = Math.max(first.left - second.right, second.left - first.right, 0);
+    const vertical = Math.max(first.top - second.bottom, second.top - first.bottom, 0);
+    return Math.hypot(horizontal, vertical);
+  };
+  const headGap = rectClearance(textRect, headRect);
+  const pathGap = rectClearance(textRect, pathRect);
   if (headGap < 3.9 || pathGap < 3.9) {
     throw new Error(`${label} progress text needs 4 CSS px clearance: head ${headGap}, path ${pathGap}.`);
   }
@@ -553,8 +605,11 @@ export const ShortPathCompoundMarkers = {
       ]) {
         assertNavigationStateGlyphGeometry(fixture, fixtureLabel);
         const role = fixture.hasAttribute('data-lk-trajectory-overlay') ? 'trajectory' : 'route';
-        assertNavigationProgressHead(fixture, fixtureLabel, role);
-        if (role === 'route') assertNavigationVectorGeometry(fixture, fixtureLabel);
+        if (role === 'trajectory') {
+          assertTrajectoryTemporalEncoding(fixture, fixtureLabel);
+        } else {
+          assertNavigationProgressHead(fixture, fixtureLabel, role);
+        }
       }
 
       // Cross-entity contract: coordinated labels never overlap each other or
@@ -571,15 +626,28 @@ export const ShortPathCompoundMarkers = {
         && progressLabelRect.right > trajectoryLabelRect.left + 0.5
         && progressLabelRect.top < trajectoryLabelRect.bottom - 0.5
         && progressLabelRect.bottom > trajectoryLabelRect.top + 0.5;
-      if (defectPairOverlaps) {
+      const progressAnnotation = progressLabelRect
+        && route.querySelector('[data-route-progress-label]')?.closest('[data-navigation-annotation]');
+      const trajectoryAnnotation = trajectoryLabelRect
+        && trajectory.querySelector('[data-trajectory-label]')?.closest('[data-navigation-annotation]');
+      const bothVisible = progressAnnotation?.getAttribute('data-annotation-suppressed') !== 'true'
+        && trajectoryAnnotation?.getAttribute('data-annotation-suppressed') !== 'true';
+      if (bothVisible && defectPairOverlaps) {
         throw new Error('Route progress label and trajectory label still overlap across entities.');
       }
       if (!stress.querySelector('[data-annotation-displaced="true"], [data-annotation-suppressed="true"]')) {
         throw new Error('Cross-entity coordination did not engage on the colliding fixtures.');
       }
-      const normalRouteLabels = normalRoute.querySelectorAll('[data-annotation-displaced="true"], [data-annotation-suppressed="true"]');
-      if (normalRouteLabels.length > 0) {
-        throw new Error('Naturally separated labels must not be displaced or suppressed.');
+      const normalProgressAnnotation = normalRoute.querySelector('[data-route-progress-label]')
+        ?.closest('[data-navigation-annotation]');
+      if (
+        normalProgressAnnotation?.getAttribute('data-annotation-suppressed') === 'true'
+        || Math.hypot(
+          Number(normalProgressAnnotation?.getAttribute('data-annotation-nudge-x') || 0),
+          Number(normalProgressAnnotation?.getAttribute('data-annotation-nudge-y') || 0),
+        ) > 0.5
+      ) {
+        throw new Error('A naturally separated progress label must not be displaced or suppressed.');
       }
     });
   },
@@ -602,9 +670,16 @@ function MultiFloorFixture() {
         aria-label="표시할 층"
         style={{ alignSelf: 'start' }}
       />
-      <PathMap label={`${activeMapId} route와 trajectory 지도`} testId="multi-floor-path-map">
+      <PathMap
+        label={`${activeMapId} route와 trajectory 지도`}
+        testId="multi-floor-path-map"
+        annotationDetailMode="standard"
+        eyebrow={`ROUTE · ${activeMapId}`}
+      >
         {(cssViewBoxScale) => (
-          <>
+          <NavigationCoordinateBoundary
+            frame={activeMapId === 'L1' ? PROJECTED_FRAME_L1 : PROJECTED_FRAME_L2}
+          >
             <RouteOverlay route={ACTIVE_ROUTE} activeMapId={activeMapId} viewportScale={cssViewBoxScale} />
             <RouteOverlay route={ACTIVE_ROUTE} activeMapId="missing-map" viewportScale={cssViewBoxScale} data-empty-route-probe="" />
             <RouteOverlay
@@ -640,10 +715,43 @@ function MultiFloorFixture() {
               onActivate={() => {}}
               data-insufficient-trajectory-probe=""
             />
+            <RouteOverlay
+              route={{
+                id: 'route-unprojected',
+                label: '미투영 world route',
+                status: 'planned',
+                segments: [{
+                  id: 'segment-unprojected',
+                  mapId: activeMapId,
+                  source: activeMapId === 'L1' ? PROJECTED_FRAME_L1 : PROJECTED_FRAME_L2,
+                  points: [{ x: 2, y: 2 }, { x: 8, y: 8 }],
+                  phase: 'upcoming',
+                  condition: 'normal',
+                }],
+              }}
+              activeMapId={activeMapId}
+              viewportScale={cssViewBoxScale}
+              data-unprojected-route-probe=""
+            />
+            <TrajectoryOverlay
+              trajectory={{
+                id: 'trajectory-unprojected',
+                label: '미투영 world trajectory',
+                mapId: activeMapId,
+                source: activeMapId === 'L1' ? PROJECTED_FRAME_L1 : PROJECTED_FRAME_L2,
+                status: 'planned',
+                samples: [
+                  { position: { x: 2, y: 2 }, timeMs: 0 },
+                  { position: { x: 8, y: 8 }, timeMs: 100 },
+                ],
+              }}
+              viewportScale={cssViewBoxScale}
+              data-unprojected-trajectory-probe=""
+            />
             {trajectory.mapId === activeMapId && (
               <TrajectoryOverlay trajectory={trajectory} viewportScale={cssViewBoxScale} />
             )}
-          </>
+          </NavigationCoordinateBoundary>
         )}
       </PathMap>
       <output data-testid="active-map-output" hidden>{activeMapId}</output>
@@ -659,6 +767,12 @@ export const MultiFloorFiltering = {
   render: () => <MultiFloorFixture />,
   play: async ({ canvasElement }) => {
     const assertMap = (mapId, routeCount, trajectoryId, expectProgress) => {
+      const map = canvasElement.querySelector('[data-testid="multi-floor-path-map"]');
+      const annotationLayer = map?.querySelector('[data-lk-navigation-annotation-layer]');
+      const coordinateBoundary = map?.querySelector('[data-navigation-coordinate-boundary]');
+      if (!annotationLayer || annotationLayer.getAttribute('data-annotation-detail-mode') !== 'standard') {
+        throw new Error(`${mapId} route/trajectory composition must use the standard annotation layer.`);
+      }
       const segments = Array.from(canvasElement.querySelectorAll('[data-route-segment]'));
       if (segments.length !== routeCount || segments.some((segment) => segment.getAttribute('data-map-id') !== mapId)) {
         throw new Error(`${mapId} route filtering failed: ${segments.map((segment) => segment.getAttribute('data-map-id')).join(',')}`);
@@ -677,12 +791,28 @@ export const MultiFloorFiltering = {
       if (trajectory?.getAttribute('data-trajectory-id') !== trajectoryId || trajectory.getAttribute('data-map-id') !== mapId) {
         throw new Error(`${mapId} trajectory renderer filtering failed.`);
       }
+      const expectedFrameId = mapId === 'L1' ? 'warehouse_L1/map' : 'warehouse_L2/map';
+      if (
+        coordinateBoundary?.getAttribute('data-source-map-id') !== mapId
+        || coordinateBoundary?.getAttribute('data-source-frame-id') !== expectedFrameId
+        || coordinateBoundary?.getAttribute('data-require-projected-coordinates') !== 'true'
+        || route?.getAttribute('data-coordinate-space') !== 'svg-map'
+        || trajectory.getAttribute('data-coordinate-space') !== 'svg-map'
+        || trajectory.getAttribute('data-source-frame-id') !== expectedFrameId
+        || segments.some((segment) => segment.closest('[data-lk-route-overlay]')?.getAttribute('data-source-frame-ids') !== expectedFrameId)
+      ) {
+        throw new Error(`${mapId} source frame traceability was not preserved.`);
+      }
+      assertNoLabelCollisions(map, `Multi-floor ${mapId}`);
     };
     if (canvasElement.querySelector('[data-empty-route-probe]')) {
       throw new Error('A route with zero visible segments must not leave an empty accessibility object.');
     }
     if (canvasElement.querySelector('[data-insufficient-route-probe], [data-insufficient-trajectory-probe]')) {
       throw new Error('Route/Trajectory with fewer than two finite points must not leave an invisible control.');
+    }
+    if (canvasElement.querySelector('[data-unprojected-route-probe], [data-unprojected-trajectory-probe]')) {
+      throw new Error('Coordinate boundary must suppress line geometry without svg-map projection proof.');
     }
     assertMap('L1', 2, 'trajectory-robot-2-l1', true);
     [...canvasElement.querySelectorAll('button')].find((btn) => btn.textContent.trim() === 'L2')?.click();
@@ -705,7 +835,7 @@ function PathActivationFixture() {
   return (
     <StoryPage
       title="Route segment와 trajectory는 각각의 identity로 선택됩니다"
-      description="segment activation은 routeId와 segmentId를 함께 전달하고 trajectory는 자체 id를 전달합니다. 선택 halo는 공유하지만 서로의 phase, progress, sample 상태를 변경하지 않습니다."
+      description="segment activation은 routeId와 segmentId를 함께 전달하고 trajectory는 자체 id를 전달합니다. 선택은 상태색 코어와 중립 casing의 굵기 확대로 공유하지만 서로의 phase, progress, sample 상태를 변경하지 않습니다."
       maxWidth={820}
     >
       <PathMap label="route와 trajectory 선택 지도" height={460} svgHeight={440}>
@@ -807,7 +937,7 @@ function PathActivationFixture() {
 export const PathSelectionAndActivation = {
   name: '상호작용 · 구간과 궤적 선택',
   parameters: storyDescription(
-    'route segment와 trajectory의 accessible name, pointer·Enter/Space activation, Route·Trajectory disabled prevention과 선택 halo를 확인합니다.',
+    'route segment와 trajectory의 accessible name, pointer·Enter/Space activation, Route·Trajectory disabled prevention과 상태색 보존 선택 굵기를 확인합니다.',
   ),
   render: () => <PathActivationFixture />,
   play: async ({ canvasElement }) => {
@@ -831,6 +961,11 @@ export const PathSelectionAndActivation = {
       throw new Error('Interactive trajectory needs a target core containing 24×24 CSS px.');
     }
     await userEvent.click(routeSegment);
+    await waitFor(() => {
+      if (!routeSegment.querySelector('[data-route-selection-casing]')) {
+        throw new Error('Selected route segment must widen its neutral casing without an accent halo.');
+      }
+    });
     const routeFocusVisible = routeSegment.matches(':focus-visible');
     await waitFor(() => {
       const hasRouteFocusRing = Boolean(routeSegment.querySelector('[data-route-focus-ring]'));
@@ -848,6 +983,11 @@ export const PathSelectionAndActivation = {
     }
     assertSharedFocusIndicator(routeSegment.querySelector('[data-route-focus-ring]'), 'Route');
     await userEvent.click(trajectory);
+    await waitFor(() => {
+      if (!trajectory.querySelector('[data-trajectory-selection-casing]')) {
+        throw new Error('Selected trajectory must widen its neutral casing without an accent halo.');
+      }
+    });
     const trajectoryFocusVisible = trajectory.matches(':focus-visible');
     await waitFor(() => {
       const hasTrajectoryFocusRing = Boolean(trajectory.querySelector('[data-trajectory-focus-indicator]'));
@@ -976,9 +1116,8 @@ export const RouteAndTrajectoryNarrow320 = {
       assertCircleContainsTarget('[data-trajectory-hit-target-core]', 'Trajectory');
       assertNavigationStateGlyphGeometry(route, '320px Route');
       assertNavigationStateGlyphGeometry(trajectory, '320px Trajectory');
-      assertNavigationVectorGeometry(route, '320px Route');
       assertNavigationProgressHead(route, '320px Route', 'route');
-      assertNavigationProgressHead(trajectory, '320px Trajectory', 'trajectory');
+      assertTrajectoryTemporalEncoding(trajectory, '320px Trajectory');
     });
   },
 };

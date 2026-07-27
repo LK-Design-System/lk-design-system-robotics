@@ -1,7 +1,16 @@
 import React from 'react';
+import {
+  isNavigationSourceCompatible,
+  useNavigationCoordinateBoundary,
+} from './NavigationCoordinateBoundary.jsx';
 import { isFocusVisibleTarget } from './_NavigationFocus.js';
 import { NavigationStateGlyph } from './_NavigationStateGlyph.js';
-import { NavigationAnnotationBlock, annotationPriority, useNavigationObstacles } from './_navigationAnnotations.js';
+import {
+  ANNOTATION_IMPORTANCE,
+  NavigationAnnotationBlock,
+  annotationPriority,
+  useNavigationObstacles,
+} from './_navigationAnnotations.js';
 import { navStateOpacity, NAV_DASH, NAV_STATE_BADGE, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION } from './_navigationVocabulary.js';
 
 // facility uses a DOT field rather than a grid: the map canvas already draws a
@@ -302,6 +311,7 @@ export function SpatialRegion({
 }) {
   const reactId = React.useId();
   const [focusVisible, setFocusVisible] = React.useState(false);
+  const coordinateBoundary = useNavigationCoordinateBoundary();
   const obstacle = useNavigationObstacles();
   const kind = regionKind(region);
   const pattern = CATEGORY_PATTERNS[region.category] ?? CATEGORY_PATTERNS.behavior;
@@ -324,7 +334,11 @@ export function SpatialRegion({
   const unknownTerrain = region.category === 'terrain' && region.traversability === 'unknown';
   const stateDash = invalid ? NAV_DASH.invalid : stale ? NAV_DASH.staleShape : unknownTerrain ? NAV_DASH.unknown : undefined;
 
-  if (hidden) return null;
+  if (
+    hidden
+    || (region?.source && region.source.mapId !== region.mapId)
+    || !isNavigationSourceCompatible(region?.source, coordinateBoundary)
+  ) return null;
 
   const activate = (event) => {
     if (disabled || !interactive) return;
@@ -355,6 +369,8 @@ export function SpatialRegion({
       data-lds-spatial-region=""
       data-region-id={region.id}
       data-map-id={region.mapId}
+      data-source-frame-id={region?.source?.frameId}
+      data-source-map-version={region?.source?.mapVersion}
       data-region-category={region.category}
       data-region-kind={kind}
       data-region-pattern={pattern}
@@ -419,25 +435,16 @@ export function SpatialRegion({
           data-region-focus-ring=""
         />
       )}
-      {selected && (
-        <RegionShape
-          shape={region.shape}
-          fill="none"
-          stroke="var(--viewer-accent, var(--color-semantic-primary-normal))"
-          strokeWidth={NAV_SELECTION.regionStrokeWidth}
-          vectorEffect="non-scaling-stroke"
-          pointerEvents="none"
-          data-region-selection-ring=""
-        />
-      )}
       <RegionShape
         shape={region.shape}
         fill={`url(#${patternId})`}
         stroke={stroke}
-        strokeWidth="1.5"
+        strokeWidth={selected ? NAV_SELECTION.regionStrokeWidth : 1.5}
         strokeDasharray={stateDash}
         vectorEffect="non-scaling-stroke"
         data-region-geometry={region.shape.kind}
+        data-region-selection-geometry={selected ? '' : undefined}
+        data-navigation-selection-geometry=""
       />
 
       {(invalid || stale) && (
@@ -469,10 +476,12 @@ export function SpatialRegion({
           id={`region:${region.id}:label`}
           kind="region-label"
           anchor={anchor}
+          detailLevel="detail"
           priority={annotationPriority({
             selected,
             focused: activeFocus,
             alarm: invalid,
+            importance: ANNOTATION_IMPORTANCE.background,
           })}
         >
           <g

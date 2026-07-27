@@ -1,9 +1,18 @@
 import React from 'react';
+import {
+  isNavigationSourceCompatible,
+  useNavigationCoordinateBoundary,
+} from './NavigationCoordinateBoundary.jsx';
 import { isFocusVisibleTarget } from './_NavigationFocus.js';
 import { FACILITY_GLYPH_PATHS } from './_FacilityGlyph.js';
 import { HAZARD_GLYPH_PATHS, HAZARD_GLYPH_FIT } from './_HazardGlyph.js';
-import { NavigationAnnotationBlock, annotationPriority, useNavigationObstacles } from './_navigationAnnotations.js';
-import { navStateOpacity, NAV_PIN, NAV_HIT, NAV_LABEL_HALO } from './_navigationVocabulary.js';
+import {
+  ANNOTATION_IMPORTANCE,
+  NavigationAnnotationBlock,
+  annotationPriority,
+  useNavigationObstacles,
+} from './_navigationAnnotations.js';
+import { navStateOpacity, NAV_PIN, NAV_HIT, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION } from './_navigationVocabulary.js';
 
 // Accessible-name copy is Korean to match every sibling navigation overlay
 // (Waypoint / Lane / Region / Route / Trajectory / Facility) so a Korean-first
@@ -40,8 +49,8 @@ const GLYPH_FIT = HAZARD_GLYPH_FIT;
 // The same map-pin silhouette as FacilityTransition, so hazards read as part of
 // the one marker family; what marks them as "avoid" is the severity fill
 // (cautionary/negative instead of the facility accent), the hazard glyph, and
-// the accessible name — not a competing shape. Shared by the fill AND the
-// focus/selection outlines so a selected hazard reads as the same pin.
+// the accessible name — not a competing shape. Focus follows the silhouette;
+// selection enlarges the same severity-filled pin body.
 const PIN_PATH = NAV_PIN.path;
 
 function normalizeViewportScale(value) {
@@ -92,6 +101,7 @@ export function HazardMarker({
   ...rest
 }) {
   const [hasDomFocus, setHasDomFocus] = React.useState(false);
+  const coordinateBoundary = useNavigationCoordinateBoundary();
   const obstacle = useNavigationObstacles();
   const scale = normalizeViewportScale(viewportScale);
   const inverseScale = 1 / scale;
@@ -116,6 +126,11 @@ export function HazardMarker({
     activate(event);
   };
 
+  if (
+    (hazard?.source && hazard.source.mapId !== hazard.mapId)
+    || !isNavigationSourceCompatible(hazard?.source, coordinateBoundary)
+  ) return null;
+
   return (
     <g
       {...rest}
@@ -124,6 +139,8 @@ export function HazardMarker({
       data-hazard-kind={hazard.kind}
       data-hazard-severity={hazard.severity}
       data-map-id={hazard.mapId}
+      data-source-frame-id={hazard?.source?.frameId}
+      data-source-map-version={hazard?.source?.mapVersion}
       data-selected={selected ? 'true' : 'false'}
       data-focused={focusVisible ? 'true' : 'false'}
       data-disabled={disabled ? 'true' : 'false'}
@@ -160,46 +177,34 @@ export function HazardMarker({
       }}
     >
       <g data-hazard-screen-space="" data-viewport-scale={scale} transform={`scale(${inverseScale})`}>
-        {/* Cast shadow + focus/selection outlines all trace the SAME pin
-            silhouette (shared with FacilityTransition), so every state reads as
-            one marker instead of a pin ringed by a mismatched circle. */}
-        <path d={PIN_PATH} transform={NAV_PIN.shadow.transform} fill={NAV_PIN.shadow.fill} opacity={NAV_PIN.shadow.opacity} pointerEvents="none" data-hazard-shadow="" />
-        {/* Severity carries a SECOND channel beyond hue: a danger hazard wears a
-            persistent alarm halo tracing its own pin silhouette (outside the
-            focus/selection rings), so danger vs caution survives desaturation
-            and red/green color-vision deficiency — not fill color alone. */}
-        {hazard.severity === 'danger' && (
-          <path
-            d={PIN_PATH}
-            transform={`scale(${NAV_PIN.alarmRing.scale})`}
-            fill="none"
-            stroke={severity.fill}
-            strokeWidth={NAV_PIN.alarmRing.strokeWidth}
-            strokeLinejoin="round"
-            opacity={NAV_PIN.alarmRing.opacity}
-            vectorEffect="non-scaling-stroke"
-            pointerEvents="none"
-            data-hazard-alarm-ring=""
-          />
-        )}
+        {/* Focus traces the shared pin silhouette. Selection enlarges the body
+            without changing severity paint or implying an active alarm. */}
         {focusVisible && (
-          <path d={PIN_PATH} transform={`scale(${NAV_PIN.focusRing.scale})`} fill="none" stroke="var(--color-semantic-focus-indicator)" strokeWidth={NAV_PIN.focusRing.strokeWidth} strokeLinejoin="round" vectorEffect="non-scaling-stroke" pointerEvents="none" data-hazard-focus-ring="" />
-        )}
-        {selected && (
-          <path d={PIN_PATH} transform={`scale(${NAV_PIN.selectionRing.scale})`} fill="none" stroke="var(--viewer-accent, var(--color-semantic-primary-normal))" strokeWidth={NAV_PIN.selectionRing.strokeWidth} strokeLinejoin="round" vectorEffect="non-scaling-stroke" pointerEvents="none" data-hazard-selection-ring="" />
+          <>
+            <path d={PIN_PATH} transform={`scale(${NAV_PIN.focusRing.scale})`} fill="none" stroke={surface} strokeWidth={NAV_FOCUS.contrastStrokeWidth} strokeLinejoin="round" vectorEffect="non-scaling-stroke" pointerEvents="none" data-hazard-focus-contrast="" />
+            <path d={PIN_PATH} transform={`scale(${NAV_PIN.focusRing.scale})`} fill="none" stroke="var(--color-semantic-focus-indicator)" strokeWidth={NAV_PIN.focusRing.strokeWidth} strokeLinejoin="round" vectorEffect="non-scaling-stroke" pointerEvents="none" data-hazard-focus-ring="" />
+          </>
         )}
         {/* WCAG 2.2 minimum target: a transparent 24px-equivalent hit circle in
             screen space, wider than the pin. */}
         <circle r={NAV_HIT.radius} fill="transparent" stroke="none" pointerEvents={interactive ? 'all' : 'none'} data-hazard-hit-area="" data-screen-target-size={NAV_HIT.screenTargetSize} />
-        <path
-          {...obstacle(`hazard:${hazard.id}:sign`)}
-          d={PIN_PATH}
-          fill={severity.fill}
-          vectorEffect="non-scaling-stroke"
-          data-hazard-sign=""
-        />
-        <g fill={surface} pointerEvents="none" transform={GLYPH_FIT} data-hazard-glyph="">
-          <path d={glyph} />
+        <g
+          data-navigation-selection-scale=""
+          data-hazard-selection-visual=""
+          data-hazard-selected-scale={selected ? NAV_SELECTION.pinScale : undefined}
+          style={{ transform: `scale(${selected ? NAV_SELECTION.pinScale : 1})` }}
+        >
+          <path d={PIN_PATH} transform={NAV_PIN.shadow.transform} fill={NAV_PIN.shadow.fill} opacity={NAV_PIN.shadow.opacity} pointerEvents="none" data-hazard-shadow="" />
+          <path
+            {...obstacle(`hazard:${hazard.id}:sign`)}
+            d={PIN_PATH}
+            fill={severity.fill}
+            vectorEffect="non-scaling-stroke"
+            data-hazard-sign=""
+          />
+          <g fill={surface} pointerEvents="none" transform={GLYPH_FIT} data-hazard-glyph="">
+            <path d={glyph} />
+          </g>
         </g>
 
         {showLabel && (
@@ -207,7 +212,13 @@ export function HazardMarker({
             id={`hazard:${hazard.id}:label`}
             kind="hazard-label"
             anchor={hazard.position}
-            priority={annotationPriority({ selected, focused: focusVisible, alarm: hazard.severity === 'danger' })}
+            detailLevel="standard"
+            priority={annotationPriority({
+              selected,
+              focused: focusVisible,
+              alarm: invalid || hazard.severity === 'danger',
+              importance: ANNOTATION_IMPORTANCE.context,
+            })}
           >
             <text
               x="20"

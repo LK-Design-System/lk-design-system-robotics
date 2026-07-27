@@ -40,56 +40,19 @@ const targets = [
     viewport: { width: 1180, height: 820 },
   },
   {
-    name: 'robotics-viewer-frame-states',
-    match: { importPath: './stories/ViewerFrame.stories.jsx', exportName: 'StatePlacement' },
-    viewport: { width: 980, height: 720 },
+    name: 'robotics-navigation-viewer',
+    match: { importPath: './stories/RoboticsViewerNavigationViewer.stories.jsx', exportName: 'Overview' },
+    viewport: { width: 1180, height: 820 },
   },
   {
-    name: 'robotics-viewer-light-frame-on-dark',
-    match: { importPath: './stories/ViewerFrame.stories.jsx', exportName: 'LightMapFrame' },
-    query: { globals: 'backgrounds.value:Dark' },
-    theme: 'dark',
-    viewport: { width: 720, height: 520 },
+    name: 'robotics-navigation-viewer-narrow',
+    match: { importPath: './stories/RoboticsViewerNavigationViewer.stories.jsx', exportName: 'NarrowViewport' },
+    viewport: { width: 320, height: 720 },
   },
   {
-    name: 'robotics-viewer-map',
-    match: { importPath: './stories/ViewerMap.stories.jsx', exportName: 'MapCanvasOverview' },
+    name: 'robotics-occupancy-map',
+    match: { importPath: './stories/RoboticsViewerOccupancyMap.stories.jsx', exportName: 'Overview' },
     viewport: { width: 900, height: 620 },
-  },
-  {
-    name: 'robotics-viewer-map-narrow',
-    match: { importPath: './stories/ViewerMap.stories.jsx', exportName: 'KeyboardAndPointerContract' },
-    viewport: { width: 320, height: 520 },
-  },
-  {
-    name: 'robotics-viewer-3d-narrow',
-    match: { importPath: './stories/Viewer3D.stories.jsx', exportName: 'NarrowWidth' },
-    viewport: { width: 320, height: 520 },
-  },
-  {
-    name: 'robotics-viewer-toolbar',
-    match: { importPath: './stories/ViewerToolbar.stories.jsx', exportName: 'ViewerToolbarOverview' },
-    viewport: { width: 320, height: 520 },
-  },
-  {
-    name: 'robotics-viewer-video-states',
-    match: { importPath: './stories/ViewerVideo.stories.jsx', exportName: 'VideoStreamOverview' },
-    viewport: { width: 1000, height: 920 },
-  },
-  {
-    name: 'robotics-viewer-video-narrow',
-    match: { importPath: './stories/ViewerVideo.stories.jsx', exportName: 'NarrowWidth' },
-    viewport: { width: 320, height: 520 },
-  },
-  {
-    name: 'robotics-viewer-video-compact-states',
-    match: { importPath: './stories/ViewerVideo.stories.jsx', exportName: 'CommonStateContract' },
-    viewport: { width: 240, height: 900 },
-  },
-  {
-    name: 'robotics-viewer-telemetry-compact',
-    match: { importPath: './stories/RoboticsTelemetryValue.stories.jsx', exportName: 'CompactReadouts' },
-    viewport: { width: 320, height: 900 },
   },
 ];
 

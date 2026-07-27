@@ -4,6 +4,8 @@ import type {
   NavigationPoint,
   NavigationSvgFeatureProps,
 } from './WaypointMarker';
+import type { NavigationFrameRef, NavigationTimestamp } from './NavigationCoordinateSystem';
+import type { NavigationGeometrySpace } from './NavigationGeometryAdapters';
 import type { RouteStatus } from './RouteOverlay';
 
 export interface TrajectorySample {
@@ -11,6 +13,7 @@ export interface TrajectorySample {
   readonly timeMs?: number;
   /** Source heading in radians. The path progress head follows path tangent; pose renderers may consume this separately. */
   readonly headingRad?: number;
+  readonly stamp?: NavigationTimestamp;
 }
 
 export interface TrajectoryData {
@@ -18,6 +21,10 @@ export interface TrajectoryData {
   readonly label?: string;
   /** A trajectory belongs to one map. The owning renderer performs map filtering. */
   readonly mapId: string;
+  /** Source frame/version/time retained after projection into SVG map space. */
+  readonly source?: NavigationFrameRef;
+  /** Proof that samples were projected from world coordinates into SVG map space. */
+  readonly coordinateSpace?: NavigationGeometrySpace;
   readonly status: RouteStatus;
   readonly samples: readonly TrajectorySample[];
   /** Explicit sample where the elapsed line ends and the path-tangent progress head is attached. */

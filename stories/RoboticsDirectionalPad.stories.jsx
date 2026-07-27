@@ -1,10 +1,19 @@
 import React from 'react';
 import { userEvent, waitFor } from 'storybook/test';
-import { DirectionalPad } from './lds.js';
+import { DirectionalPad } from '../src/index.js';
 
 const meta = {
   title: 'LDS Robotics/Control/Directional Pad',
+  tags: ['autodocs'],
+  component: DirectionalPad,
   parameters: {
+    storyGuide: {
+      storyId: 'lds-robotics-control-directional-pad--directional-pads',
+      eyebrow: 'Robotics / Directional Pad',
+      title: '방향 패드는 누르는 만큼만 이동하는 momentary 제어입니다',
+      description:
+        'PTZ·짐벌·조그처럼 단계적 이동이 필요할 때 적합합니다. 탭은 1스텝, 홀드는 rate로 반복하고 손을 떼면 멈추며, 연속 아날로그 주행에는 Joystick을 사용하세요.',
+    },
     docs: {
       description: {
         component: 'PTZ·짐벌·조그 제어용 momentary D-pad 패턴입니다. 탭은 1회 스텝, 홀드는 rate Hz 반복, 아날로그 이동은 조이스틱 패턴을 씁니다.',
@@ -59,18 +68,6 @@ export const DirectionalPads = {
     const [log, setLog] = React.useState('대기');
     return (
       <main style={{ ...stageStyle, gap: 'var(--space-6)' }}>
-        <header style={{ display: 'grid', gap: 'var(--space-2)', justifyItems: 'start' }}>
-          <p className="lk-overline lk-overline--signal" style={{ margin: 0 }}>
-            Robotics / Directional Pad
-          </p>
-          <h1 style={{ margin: 0, color: 'var(--color-semantic-label-strong)', fontSize: 'var(--title2-size)', lineHeight: 'var(--title2-line)' }}>
-            방향 패드는 누르는 만큼만 이동하는 momentary 제어입니다
-          </h1>
-          <p style={{ margin: 0, maxWidth: 640, color: 'var(--color-semantic-label-neutral)', lineHeight: 1.7 }}>
-            PTZ·짐벌·조그처럼 단계적 이동이 필요할 때 적합합니다. 탭은 1스텝, 홀드는 rate(Hz)로 반복하며, 손을
-            떼면 멈춥니다. 연속 아날로그 주행에는 이 패드 대신 Joystick을 쓰세요.
-          </p>
-        </header>
         <DirectionalPad
           onStep={(direction) => setLog(`step: ${direction}`)}
           onCenter={() => setLog('home')}

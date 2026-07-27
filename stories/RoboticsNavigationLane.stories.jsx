@@ -1,12 +1,23 @@
 import React from 'react';
 import { userEvent, waitFor } from 'storybook/test';
-import { Button, LaneOverlay, Map2DCanvas } from './lds.js';
+import { Button } from '@lk-robotics/lds-core';
+import { Map2DCanvas } from '@lk-robotics/lds-product';
+import {
+  LaneOverlay,
+  NavigationCoordinateBoundary,
+  adaptWorldLaneToLane,
+} from '../src/index.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
 import { assertSharedFocusIndicator, contrastRatio } from './RoboticsNavigationAssert.shared.jsx';
+import {
+  PROJECTED_FRAME_L1,
+  ROUTE_TRANSFORM_L1,
+} from './RoboticsNavigationRouteTrajectory.shared.jsx';
 
 const meta = {
   title: 'LDS Robotics/Navigation/Lane',
+  tags: ['autodocs'],
   component: LaneOverlay,
   parameters: {
     storyGuide: {
@@ -27,22 +38,22 @@ const meta = {
 
 export default meta;
 
-const BASE_LANE = {
+const BASE_LANE = adaptWorldLaneToLane({
   id: 'lane-a-b',
   label: 'A → B',
   mapId: 'L1',
   points: [
-    { x: 72, y: 178 },
-    { x: 190, y: 178 },
-    { x: 286, y: 92 },
-    { x: 440, y: 92 },
+    { x: 7.2, y: 7.2 },
+    { x: 19, y: 7.2 },
+    { x: 28.6, y: 15.8 },
+    { x: 44, y: 15.8 },
   ],
   entry: { waypointId: 'A', orientation: 'forward' },
   exit: { waypointId: 'B', orientation: 'forward' },
   relation: { kind: 'paired', pairedLaneId: 'lane-b-a' },
   speedLimitMps: 0.8,
   mutexGroupId: 'corridor-2',
-};
+}, { transform: ROUTE_TRANSFORM_L1 });
 
 function StoryPage({ title, description, children, maxWidth = 1040 }) {
   return (
@@ -85,9 +96,11 @@ function LaneMap({ appearance = 'light', label, children, height = 270, testId, 
     return () => view?.removeEventListener('resize', updateScale);
   }, []);
 
-  const scaledChildren = React.Children.map(children, (child) => (
-    React.isValidElement(child) ? React.cloneElement(child, { viewportScale }) : child
-  ));
+  const scaledChildren = typeof children === 'function'
+    ? children(viewportScale)
+    : React.Children.map(children, (child) => (
+        React.isValidElement(child) ? React.cloneElement(child, { viewportScale }) : child
+      ));
 
   return (
     <Map2DCanvas
@@ -123,19 +136,27 @@ function LaneMap({ appearance = 'light', label, children, height = 270, testId, 
 export const LaneOverview = {
   name: '개요',
   parameters: storyDescription(
-    '같은 방향·endpoint·속도·상호 배제 관계를 light와 dark 지도에서 비교합니다. 테마가 달라도 방향 arrow, endpoint, 선 pattern과 label의 정보 우선순위가 유지되는지 확인하세요.',
+    '같은 endpoint·속도·상호 배제 관계를 light와 dark 지도에서 비교합니다. 기본 Lane은 별도 방향 삼각형을 그리지 않고 entry·exit 구조와 endpoint 방위 제약으로 필요한 정보만 전달합니다.',
   ),
   render: () => (
     <StoryPage
       title="레인은 방향, 관계, 제한을 한 번에 읽되 시설 상태와 궤적은 분리합니다"
-      description="entry에서 exit로 향하는 arrow가 실제 이동 방향입니다. paired relation은 반대 방향 레인이 별도 graph entity로 존재한다는 뜻이며 양방향 boolean이 아닙니다."
+      description="Lane의 점 순서와 entry·exit가 graph 방향을 소유합니다. 기본 지도에서는 선 위 방향 삼각형을 반복하지 않으며, paired relation은 반대 방향 Lane이 별도 graph entity로 존재한다는 뜻입니다."
     >
       <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(360px, 100%), 1fr))', gap: 'var(--space-4)', minWidth: 0 }}>
         <LaneMap label="Light 레인 지도">
-          <LaneOverlay lane={BASE_LANE} />
+          {(viewportScale) => (
+            <NavigationCoordinateBoundary frame={PROJECTED_FRAME_L1}>
+              <LaneOverlay lane={BASE_LANE} viewportScale={viewportScale} />
+            </NavigationCoordinateBoundary>
+          )}
         </LaneMap>
         <LaneMap appearance="dark" label="Dark 레인 지도">
-          <LaneOverlay lane={BASE_LANE} />
+          {(viewportScale) => (
+            <NavigationCoordinateBoundary frame={PROJECTED_FRAME_L1}>
+              <LaneOverlay lane={BASE_LANE} viewportScale={viewportScale} />
+            </NavigationCoordinateBoundary>
+          )}
         </LaneMap>
       </section>
     </StoryPage>
@@ -144,11 +165,14 @@ export const LaneOverview = {
     const lanes = canvasElement.querySelectorAll('[data-lk-lane-overlay]');
     if (lanes.length !== 2) throw new Error(`Light/dark lane parity expected 2 lanes, found ${lanes.length}.`);
     lanes.forEach((lane) => {
+      if (lane.getAttribute('data-coordinate-space') !== 'svg-map') {
+        throw new Error('Lane overview must be projected from world coordinates into SVG map space.');
+      }
       if (lane.getAttribute('data-relation') !== 'paired') throw new Error('Paired lane relation was not preserved.');
       const path = lane.querySelector('[data-lane-path]');
       if (!path?.getAttribute('d')?.startsWith('M 72 178 L')) throw new Error('Lane geometry did not preserve directed points.');
       if (path.getAttribute('vector-effect') !== 'non-scaling-stroke') throw new Error('Lane stroke must remain non-scaling.');
-      assertDirectionGeometry(lane, 'Lane overview');
+      assertDirectionOmitted(lane, 'Lane overview');
     });
   },
 };
@@ -236,8 +260,8 @@ export const LaneStatesAndConstraints = {
     if (!unknownConflict?.querySelector('[data-lane-conflict-pattern]')) {
       throw new Error('Conflict must remain an independent pattern over unknown availability.');
     }
-    assertDirectionGeometry(closed, 'Closed lane');
-    assertDirectionGeometry(unknownConflict, 'Unknown/conflict lane');
+    assertDirectionOmitted(closed, 'Closed lane');
+    assertDirectionOmitted(unknownConflict, 'Unknown/conflict lane');
   },
 };
 
@@ -340,31 +364,9 @@ function assertCircularTextGeometry(badge, context) {
   }
 }
 
-function assertDirectionGeometry(lane, context) {
-  const direction = lane?.querySelector('[data-lane-direction]');
-  const localMatrix = direction?.getScreenCTM();
-  const laneMatrix = lane?.querySelector('[data-lane-path]')?.getScreenCTM();
-  if (!direction || !localMatrix || !laneMatrix) throw new Error(`${context} direction geometry is missing.`);
-  const coordinates = direction.getAttribute('d')?.match(/-?\d+(?:\.\d+)?/g)?.map(Number) ?? [];
-  if (coordinates.length !== 6) throw new Error(`${context} direction path is not one centered triangle.`);
-  const points = [
-    { x: coordinates[0], y: coordinates[1] },
-    { x: coordinates[2], y: coordinates[3] },
-    { x: coordinates[4], y: coordinates[5] },
-  ];
-  const centroid = {
-    x: points.reduce((sum, point) => sum + point.x, 0) / points.length,
-    y: points.reduce((sum, point) => sum + point.y, 0) / points.length,
-  };
-  const paintedCentroid = new DOMPoint(centroid.x, centroid.y).matrixTransform(localMatrix);
-  const declaredAnchor = new DOMPoint(
-    Number(direction.getAttribute('data-lane-direction-anchor-x')),
-    Number(direction.getAttribute('data-lane-direction-anchor-y')),
-  ).matrixTransform(laneMatrix);
-  const centerDeltaX = Math.abs(declaredAnchor.x - paintedCentroid.x);
-  const centerDeltaY = Math.abs(declaredAnchor.y - paintedCentroid.y);
-  if (centerDeltaX > 1 || centerDeltaY > 1) {
-    throw new Error(`${context} direction area centroid is off-anchor by ${centerDeltaX.toFixed(2)}×${centerDeltaY.toFixed(2)}px.`);
+function assertDirectionOmitted(lane, context) {
+  if (lane?.querySelector('[data-lane-direction]')) {
+    throw new Error(`${context} must not repeat entry/exit direction with an on-line triangle.`);
   }
 }
 
@@ -443,7 +445,7 @@ function assertLaneFocusStateClearance(lane, context) {
 export const LaneDarkCompoundStates = {
   name: '변형·상태 · 다크 복합 상태',
   parameters: storyDescription(
-    '어두운 viewer에서 focused·selected·unknown·conflict·invalid가 한 레인에 함께 있을 때 선택·포커스 링과 상태 glyph가 서로 독립적으로 남고, stale 레인은 별도 freshness 표식과 0.76 opacity를 유지하는지 확인합니다.',
+    '어두운 viewer에서 focused·selected·unknown·conflict·invalid가 한 레인에 함께 있을 때 선택 굵기·포커스 링과 상태 glyph가 서로 독립적으로 남고, stale 레인은 별도 freshness 표식과 0.76 opacity를 유지하는지 확인합니다.',
   ),
   render: () => (
     <StoryPage
@@ -486,7 +488,7 @@ export const LaneDarkCompoundStates = {
     const compound = canvasElement.querySelector('[data-lane-id="lane-dark-compound"]');
     const stale = canvasElement.querySelector('[data-lane-id="lane-dark-stale"]');
     if (!viewer || !compound || !stale) throw new Error('Dark compound lane fixture is incomplete.');
-    if (!compound.querySelector('[data-lane-focus-ring]') || !compound.querySelector('[data-lane-selection-halo]')) {
+    if (!compound.querySelector('[data-lane-focus-ring]') || !compound.querySelector('[data-lane-selection-casing]')) {
       throw new Error('Focused and selected lane indicators must remain independently visible.');
     }
     assertLaneFocusTextClearance(compound, 'Dark compound lane');
@@ -521,8 +523,8 @@ export const LaneDarkCompoundStates = {
       throw new Error(`Stale lane must retain its glyph and 0.76 opacity; received ${stale.style.opacity}.`);
     }
     assertCircularStateGeometry(staleMarker, staleMarker.querySelector('[data-lane-state-circle]'), 'Dark stale');
-    assertDirectionGeometry(compound, 'Dark compound lane');
-    assertDirectionGeometry(stale, 'Dark stale lane');
+    assertDirectionOmitted(compound, 'Dark compound lane');
+    assertDirectionOmitted(stale, 'Dark stale lane');
   },
 };
 
@@ -574,8 +576,8 @@ export const LaneShortPathCompoundStates = {
     if (lane.querySelector('[data-lane-state-glyph="unknown"]')) {
       throw new Error('Unknown availability must live on the line, not a stacked point badge.');
     }
-    if (!lane.querySelector('[data-lane-selection-halo]')) {
-      throw new Error('Short-path selected state must retain the established path halo.');
+    if (!lane.querySelector('[data-lane-selection-casing]')) {
+      throw new Error('Short-path selected state must retain its widened neutral casing.');
     }
     const accessibleName = lane.getAttribute('aria-label') ?? '';
     for (const stateName of ['상태 미확인', '선택됨', '데이터 오류', '오래된 데이터']) {
@@ -621,21 +623,18 @@ export const LaneShortPathCompoundStates = {
       const stateCircles = states.map((state) => lane.querySelector(`[data-lane-state-circle="${state}"]`));
       const endpointPoints = [...lane.querySelectorAll('[data-lane-endpoint-point]')];
       const endpointLabels = [...lane.querySelectorAll('[data-lane-endpoint-label]')];
-      const direction = lane.querySelector('[data-lane-direction]');
       const primaryLabel = lane.querySelector('[data-lane-primary-label]');
       const metadata = lane.querySelector('[data-lane-metadata]');
       if (
         stateCircles.some((node) => !node)
         || endpointPoints.length !== 2
         || endpointLabels.length !== 2
-        || !direction
         || !primaryLabel
         || !metadata
       ) {
         throw new Error('Short-path standalone anatomy is incomplete.');
       }
       const surroundingAnatomy = [
-        ['direction', direction],
         ...endpointPoints.map((node, index) => [`endpoint point ${index + 1}`, node]),
         ...endpointLabels.map((node, index) => [`endpoint label ${index + 1}`, node]),
         ['primary label', primaryLabel],
@@ -652,7 +651,7 @@ export const LaneShortPathCompoundStates = {
       });
       const primaryLabelBounds = primaryLabel.getBoundingClientRect();
       const metadataBounds = metadata.getBoundingClientRect();
-      [...endpointPoints, ...endpointLabels, direction].forEach((node) => {
+      [...endpointPoints, ...endpointLabels].forEach((node) => {
         const bounds = node.getBoundingClientRect();
         if (bboxOverlap(primaryLabelBounds, bounds) || bboxOverlap(metadataBounds, bounds)) {
           throw new Error('Short-path label or metadata overlaps endpoint/direction chrome.');
@@ -661,7 +660,7 @@ export const LaneShortPathCompoundStates = {
       if (bboxOverlap(primaryLabelBounds, metadataBounds)) {
         throw new Error('Short-path primary label overlaps metadata.');
       }
-      assertDirectionGeometry(lane, 'Short-path compound lane');
+      assertDirectionOmitted(lane, 'Short-path compound lane');
     });
   },
 };
@@ -765,7 +764,7 @@ function LaneActivationFixture() {
   return (
     <StoryPage
       title="선택 가능한 레인은 pointer와 키보드가 같은 identity를 전달합니다"
-      description="선택은 path의 굵은 solid halo로 남습니다. disabled 레인은 맥락을 보존하지만 Tab 순서와 activation에서 빠지며, 전체 그래프 탐색은 이름 있는 목록을 함께 제공해야 합니다."
+      description="선택은 상태색을 유지한 path 코어와 중립 casing의 굵기 확대로 남습니다. disabled 레인은 맥락을 보존하지만 Tab 순서와 activation에서 빠지며, 전체 그래프 탐색은 이름 있는 목록을 함께 제공해야 합니다."
       maxWidth={780}
     >
       <LaneMap label="레인 선택 지도">
@@ -935,7 +934,7 @@ export const LaneNarrow320 = {
       if (lane.querySelector('[data-lane-state-glyph]')) {
         throw new Error('A closed/conflict lane must not paint point state badges.');
       }
-      assertDirectionGeometry(lane, '320px lane');
+      assertDirectionOmitted(lane, '320px lane');
     });
   },
 };

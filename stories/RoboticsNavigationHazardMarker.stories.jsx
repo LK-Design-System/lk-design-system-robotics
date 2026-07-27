@@ -1,7 +1,7 @@
 import React from 'react';
-import { HazardMarker } from './lds.js';
+import { HazardMarker } from '../src/index.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
-import { assertSharedFocusIndicator } from './RoboticsNavigationAssert.shared.jsx';
+import { assertContrastBackedFocus } from './RoboticsNavigationAssert.shared.jsx';
 
 const STAGE = 'stage';
 const at = (x, y) => ({ x, y });
@@ -95,6 +95,7 @@ const KINDS = [
 
 const meta = {
   title: 'LDS Robotics/Navigation/Hazard Marker',
+  tags: ['autodocs'],
   component: HazardMarker,
   parameters: {
     storyGuide: {
@@ -102,7 +103,9 @@ const meta = {
       eyebrow: 'Navigation / Hazard Marker',
       title: 'Hazard 마커는 AGV가 피해야 하는 지점 위험물을 severity 색 핀으로 표시합니다',
       description:
-        'FacilityTransition과 같은 map-pin 실루엣을 공유해 한 지도의 marker가 하나의 패밀리로 읽히되, "여기는 피한다"는 severity 색(주의=cautionary, 위험=negative)과 위험물 knockout 글리프, 접근성 이름이 전달합니다. severity는 색에만 기대지 않습니다 — 위험(danger) 마커는 핀 실루엣을 따라가는 상시 alarm halo를 두르고 주의(caution)는 두르지 않아, 탈채도·적록색약에서도 두 등급이 구분됩니다. 계단·경사로·단차(낙하)·충돌 위험물 같은 지점 위험물을 제품이 분류한 severity 그대로 보여 주며, 회피 경로를 계획하거나 명령을 내리지 않습니다. 충돌 위험물은 정적으로 등록된 지점(기둥·저고도 배관·상시 적치)만 뜻하고, 센서가 실시간으로 잡는 동적 장애물은 제품의 live 레이어 소관입니다. 같은 경사로도 fleet에 따라 통과 설비(FacilityTransition)일 수도, 회피 대상(Hazard)일 수도 있으며 그 분류는 제품 소유입니다. 넓은 keep-out 구역은 SpatialRegion 소관입니다.',
+        'AGV가 피해야 하는 계단·경사로·단차·충돌 위험 지점을 제품이 정한 severity로 표시할 때 사용합니다. 동적 장애물, 넓은 keep-out 구역과 경로 계획은 각각 제품 live 레이어·SpatialRegion·제품 runtime이 담당합니다.',
+      docsDescription:
+        'FacilityTransition과 같은 map-pin 실루엣을 공유해 한 지도의 marker가 하나의 패밀리로 읽히되, "여기는 피한다"는 severity 색(주의=cautionary, 위험=negative)과 위험물 knockout 글리프, 접근성 이름이 전달합니다. 정적으로 분류된 severity에는 상시 링이나 펄스를 덧붙이지 않습니다. 펄스는 향후 실시간 active alarm 상태가 별도로 정의될 때만 사용합니다. 계단·경사로·단차(낙하)·충돌 위험물 같은 지점 위험물을 제품이 분류한 severity 그대로 보여 주며, 회피 경로를 계획하거나 명령을 내리지 않습니다. 충돌 위험물은 정적으로 등록된 지점(기둥·저고도 배관·상시 적치)만 뜻하고, 센서가 실시간으로 잡는 동적 장애물은 제품의 live 레이어 소관입니다. 같은 경사로도 fleet에 따라 통과 설비(FacilityTransition)일 수도, 회피 대상(Hazard)일 수도 있으며 그 분류는 제품 소유입니다. 넓은 keep-out 구역은 SpatialRegion 소관입니다.',
     },
     docs: {
       description: {
@@ -140,7 +143,7 @@ function HazardTile({ hazard, label, props }) {
 export const Overview = {
   name: '개요',
   parameters: storyDescription(
-    '계단·경사로·단차(낙하)·충돌 위험물을 주의·위험 severity로 비교합니다. severity 색이 설비 핀의 accent와 뚜렷이 구분되고, 핀 안 위험물 글리프가 작은 크기에서도 서로 구분되는지, 위험(danger) 등급이 상시 alarm halo라는 색과 독립된 채널로도 주의와 구분되는지 확인하세요.',
+    '계단·경사로·단차(낙하)·충돌 위험물을 주의·위험 severity 색으로 비교합니다. 정적 severity는 핀 색만 바꾸며 상시 링이나 펄스를 추가하지 않습니다. 핀 안 위험물 글리프와 접근성 이름은 위험물 종류와 심각도를 전달합니다.',
   ),
   render: () => (
     <main style={{ width: 'min(560px, 100%)', display: 'grid', gap: 20 }}>
@@ -172,14 +175,22 @@ export const Overview = {
       if (!marker.querySelector('[data-hazard-sign]') || !marker.querySelector('[data-hazard-glyph]')) {
         throw new Error('Each marker must render its severity pin badge and knockout glyph.');
       }
-      // Severity must not rest on hue alone: a danger hazard wears a persistent
-      // alarm halo that a caution hazard does not, so the two stay distinct
-      // under desaturation / red-green CVD.
-      const isDanger = marker.getAttribute('data-hazard-severity') === 'danger';
-      const hasAlarm = Boolean(marker.querySelector('[data-hazard-alarm-ring]'));
-      if (isDanger !== hasAlarm) {
-        throw new Error('Danger hazards must render an alarm halo and caution hazards must not — severity needs a non-color channel.');
+      const severityLabel = marker.getAttribute('data-hazard-severity') === 'danger' ? '위험' : '주의';
+      if (!marker.getAttribute('aria-label')?.includes(`심각도 ${severityLabel}`)) {
+        throw new Error('The accessible name must state the hazard severity.');
       }
+      if (marker.querySelector('[data-hazard-alarm-ring]')) {
+        throw new Error('Static hazard severity must not render a persistent alarm ring.');
+      }
+    }
+    const severityFills = new Map(
+      markers.map((marker) => [
+        marker.getAttribute('data-hazard-severity'),
+        marker.querySelector('[data-hazard-sign]')?.getAttribute('fill'),
+      ]),
+    );
+    if (!severityFills.get('caution') || severityFills.get('caution') === severityFills.get('danger')) {
+      throw new Error('Caution and danger hazards must use distinct severity fills.');
     }
   },
 };
@@ -187,7 +198,7 @@ export const Overview = {
 export const States = {
   name: '변형·상태 · 선택·포커스·비활성',
   parameters: storyDescription(
-    '같은 계단 위험물이 선택·포커스·비활성 상태로 바뀔 때의 표기입니다. 선택/포커스 outline이 핀 형상을 그대로 따라가고, 별도 원형 ring을 덧그리지 않는지 확인하세요.',
+    '같은 계단 위험물이 선택·포커스·비활성 상태로 바뀔 때의 표기입니다. 선택은 severity 색을 유지한 핀 본체의 1.12배 정적 확대, 키보드 포커스는 surface 대비층을 둔 바깥 outline으로 분리합니다.',
   ),
   render: () => {
     const states = [
@@ -216,21 +227,27 @@ export const States = {
     if (!base || !selected || !focused || !disabled) {
       throw new Error('The hazard state matrix must render base, selected, focused, and disabled fixtures.');
     }
-    if (base.querySelector('[data-hazard-selection-ring], [data-hazard-focus-ring]')) {
-      throw new Error('The base hazard must not render a selection or focus outline.');
+    if (base.querySelector('[data-hazard-selected-scale], [data-hazard-focus-ring], [data-hazard-focus-contrast]')) {
+      throw new Error('The base hazard must not render selection enlargement or focus outline.');
     }
-    if (!selected.querySelector('[data-hazard-selection-ring]') || selected.querySelector('[data-hazard-focus-ring]')) {
-      throw new Error('A selected hazard must trace a pin-following selection outline.');
+    if (!selected.querySelector('[data-hazard-selected-scale="1.12"]') || selected.querySelector('[data-hazard-focus-ring]')) {
+      throw new Error('A selected hazard must enlarge only its severity-preserving pin body.');
     }
     if (
       focused.getAttribute('data-focused') !== 'true'
       || !focused.querySelector('[data-hazard-focus-ring]')
-      || focused.querySelector('[data-hazard-selection-ring]')
+      || !focused.querySelector('[data-hazard-focus-contrast]')
+      || focused.querySelector('[data-hazard-selected-scale]')
       || !focused.getAttribute('aria-label')?.includes('포커스됨')
     ) {
       throw new Error('The controlled focused hazard must render only its pin-following focus outline and focused name.');
     }
-    assertSharedFocusIndicator(focused.querySelector('[data-hazard-focus-ring]'), 'Hazard pin');
+    assertContrastBackedFocus(
+      focused,
+      '[data-hazard-focus-contrast]',
+      '[data-hazard-focus-ring]',
+      'Hazard pin',
+    );
     if (disabled.getAttribute('aria-disabled') !== 'true' || disabled.getAttribute('tabindex') !== '-1') {
       throw new Error('A disabled interactive hazard must block activation and expose aria-disabled.');
     }

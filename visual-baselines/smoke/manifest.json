@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "count": 37,
+  "count": 30,
   "maxDiffRatio": 0.01,
   "captures": [
     {
@@ -11,120 +11,41 @@
         "width": 1180,
         "height": 820
       },
-      "bytes": 46716,
-      "sha256": "1f25d84d9ee61495ea5948167f20ffeec89a4f90d252d37a25d852bb80cbe57c"
+      "bytes": 37780,
+      "sha256": "907fb839586d4ab9993185e4426f832cc73f6620aad708ce0a86f98c2771e9fa"
     },
     {
-      "name": "robotics-viewer-frame-states",
-      "id": "lds-robotics-viewer-shared-viewer-frame--state-placement",
+      "name": "robotics-navigation-viewer",
+      "id": "lds-robotics-viewer-navigation-viewer--overview",
       "query": {},
       "viewport": {
-        "width": 980,
+        "width": 1180,
+        "height": 820
+      },
+      "bytes": 189492,
+      "sha256": "bfc5ca7b4f08a4348387a83059f6c16cd039cba497f8cdee6bc81842cc99059d"
+    },
+    {
+      "name": "robotics-navigation-viewer-narrow",
+      "id": "lds-robotics-viewer-navigation-viewer--narrow-viewport",
+      "query": {},
+      "viewport": {
+        "width": 320,
         "height": 720
       },
-      "bytes": 92309,
-      "sha256": "b9b76c1165d8c3233e3b02fe0ef6ff8db8506130935a6154849422a38f04426d"
+      "bytes": 112509,
+      "sha256": "5a48d25c57b37f1401179aa273f285c82e1cbdf6650cab8e35f3e289d92a1d77"
     },
     {
-      "name": "robotics-viewer-light-frame-on-dark",
-      "id": "lds-robotics-viewer-shared-viewer-frame--light-map-frame",
-      "query": {
-        "globals": "backgrounds.value:Dark"
-      },
-      "viewport": {
-        "width": 720,
-        "height": 520
-      },
-      "bytes": 9716,
-      "sha256": "9a20403a3e64c5280f4b2ff348f52971bc0d2a43cf5c2a56bc3f8c7586c806d5"
-    },
-    {
-      "name": "robotics-viewer-map",
-      "id": "lds-robotics-viewer-2d-map--map-canvas-overview",
+      "name": "robotics-occupancy-map",
+      "id": "lds-robotics-viewer-2d-map-occupancy-layer--overview",
       "query": {},
       "viewport": {
         "width": 900,
         "height": 620
       },
-      "bytes": 48103,
-      "sha256": "b1b8a1d42872c8b0fcec9a29aa68914430aacf111e047fcfb3abaae21611cfa0"
-    },
-    {
-      "name": "robotics-viewer-map-narrow",
-      "id": "lds-robotics-viewer-2d-map--keyboard-and-pointer-contract",
-      "query": {},
-      "viewport": {
-        "width": 320,
-        "height": 520
-      },
-      "bytes": 10439,
-      "sha256": "dc9033a2ecc6ce97a81234a7a40c41fa4c4c4af903599218603325b421c0d487"
-    },
-    {
-      "name": "robotics-viewer-3d-narrow",
-      "id": "lds-robotics-viewer-3d-scene--narrow-width",
-      "query": {},
-      "viewport": {
-        "width": 320,
-        "height": 520
-      },
-      "bytes": 33838,
-      "sha256": "d4df453ed36724a7759be43e72bfc1a84b878ce0333e5df38e2eef071acb0a01"
-    },
-    {
-      "name": "robotics-viewer-toolbar",
-      "id": "lds-robotics-viewer-toolbar--viewer-toolbar-overview",
-      "query": {},
-      "viewport": {
-        "width": 320,
-        "height": 520
-      },
-      "bytes": 35487,
-      "sha256": "843406534199453bda637f433c901d437bd6bc4617c4792e21180a55e02de380"
-    },
-    {
-      "name": "robotics-viewer-video-states",
-      "id": "lds-robotics-viewer-video-stream--video-stream-overview",
-      "query": {},
-      "viewport": {
-        "width": 1000,
-        "height": 920
-      },
-      "bytes": 90588,
-      "sha256": "cf743f6419c92037c45f6fc629617194ef3031c7c8deed9e88c673a34ff7bf15"
-    },
-    {
-      "name": "robotics-viewer-video-narrow",
-      "id": "lds-robotics-viewer-video-stream--narrow-width",
-      "query": {},
-      "viewport": {
-        "width": 320,
-        "height": 520
-      },
-      "bytes": 11832,
-      "sha256": "67a4b22c2a2ac7a98cd990a671d059d765609786d3e71f7120d2cea57cad952f"
-    },
-    {
-      "name": "robotics-viewer-video-compact-states",
-      "id": "lds-robotics-viewer-video-stream--common-state-contract",
-      "query": {},
-      "viewport": {
-        "width": 240,
-        "height": 900
-      },
-      "bytes": 80473,
-      "sha256": "c0dbdb476430f34577c947753ad5a7ef8ba4640c5e5776ee4d3ee484dfe16503"
-    },
-    {
-      "name": "robotics-viewer-telemetry-compact",
-      "id": "lds-robotics-status-telemetry-value--compact-readouts",
-      "query": {},
-      "viewport": {
-        "width": 320,
-        "height": 900
-      },
-      "bytes": 49579,
-      "sha256": "9f48edc01a352963b19d2a8cc036b5597fb1ffbfd768225d43c3007dc2b141d6"
+      "bytes": 24516,
+      "sha256": "e9d960fcae7ce41b66aac26a11b722139b97b955000c9ca6eaa0aae6a3a39555"
     },
     {
       "name": "atom-facility-lift-marker",
@@ -134,8 +55,8 @@
         "width": 900,
         "height": 720
       },
-      "bytes": 2300,
-      "sha256": "0c634280724ccbdf2435258371c8b348080631961a3b7797d2167d219a4f4a54"
+      "bytes": 1871,
+      "sha256": "e5ed5e564ec18275075f17c91e0b77de379468764ca6389bd8c73500332f6d75"
     },
     {
       "name": "atom-facility-lift-marker@8x",
@@ -145,8 +66,8 @@
         "width": 900,
         "height": 720
       },
-      "bytes": 5422,
-      "sha256": "a6ebe03568b3cdc77e07fa4eb739605843b1cb73bad15ecc060fd8bc43627b7a"
+      "bytes": 4767,
+      "sha256": "ef2bbfb6c84f647ffbaad895d61d26fb51510f4a6e4d0f8a8b93a8de7b300caa"
     },
     {
       "name": "atom-facility-lift-marker-dark",
@@ -156,8 +77,8 @@
         "width": 980,
         "height": 760
       },
-      "bytes": 2030,
-      "sha256": "1f1576fa37724b0aa6fc7016cf9977e48407e1502ccf3810554eac79a176d83e"
+      "bytes": 1595,
+      "sha256": "9947ce00796e2ebefdfe053cb33aeebe6dfa11c16f096f10e8aa38b3b23b69de"
     },
     {
       "name": "atom-facility-lift-marker-dark@8x",
@@ -167,8 +88,8 @@
         "width": 980,
         "height": 760
       },
-      "bytes": 4362,
-      "sha256": "4abe20520692350f7fe085321f17084f7b4391973d595893f0fd4ed205269ccf"
+      "bytes": 3605,
+      "sha256": "bc372f6b24d7ad2c07f7374063149dfd8455a8a8545e77a876a2d8c69a701303"
     },
     {
       "name": "atom-facility-door-marker",
@@ -200,8 +121,8 @@
         "width": 980,
         "height": 760
       },
-      "bytes": 1858,
-      "sha256": "769e1a3e661717e5f53a97e7d28560fc4cfa54ac6fae4e44dd19a48c90008228"
+      "bytes": 2127,
+      "sha256": "506d4a23a6b0fbf3e996eed54a08169f68d8dc077c6183667bf9fbd3b9001051"
     },
     {
       "name": "atom-facility-dock-marker@8x",
@@ -211,8 +132,8 @@
         "width": 980,
         "height": 760
       },
-      "bytes": 4947,
-      "sha256": "afb57242e82b768398ecf56b9b4dedbc315105fdb267b054bc5127be62694b74"
+      "bytes": 5143,
+      "sha256": "79045235bc7d8f2cb6b18781d4e6fccbf219fd1d271e361d6dbf0affca8f7904"
     },
     {
       "name": "atom-waypoint-point",
@@ -222,8 +143,8 @@
         "width": 900,
         "height": 720
       },
-      "bytes": 541,
-      "sha256": "0fc31a5b7f5c426eadaeec05ce50b4cc15251248edea528b346e84e3daa9168c"
+      "bytes": 591,
+      "sha256": "65743b84fc9aceeb3f8d8ce9e4af39a182d4488303bbf2b7671ab8efd3426bca"
     },
     {
       "name": "atom-waypoint-point@8x",
@@ -233,8 +154,8 @@
         "width": 900,
         "height": 720
       },
-      "bytes": 1683,
-      "sha256": "3249eb370d0ec1f43305afbd6dec3bf00e3b1ebaeb4e37cc18d54ca6acf54e7b"
+      "bytes": 1448,
+      "sha256": "b0bdbee4d63fca9d95bb1031c3a8470b4729a92f3376bd49f24255a10b67980e"
     },
     {
       "name": "atom-glyph-unknown",

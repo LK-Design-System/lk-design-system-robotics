@@ -134,7 +134,7 @@ function CodesCatalog() {
     <main data-codes-catalog style={{ width: 'min(880px, 100%)', display: 'grid', gap: 16 }}>
       <Card
         title="역할 코드"
-        hint="웨이포인트 역할을 한 글자로 압축한 코드입니다. 마커 배지와 지도 범례가 ROLE_CODE 한 집합에서 같은 글자를 읽습니다. 단, charger(C)는 보편 기호가 있어 지도·범례에서 ⚡ 픽토그램으로 렌더되고, C는 내부 코드·접근성 계층으로 남습니다(규약 Appendix A)."
+        hint="웨이포인트 역할을 데이터 교환용 한 글자로 압축한 내부 코드입니다. 실제 지도와 범례는 네 역할 모두 _navigationRoleGlyph의 벡터 아이콘으로 렌더하고, ROLE_CODE는 data attribute와 직렬화 계층에 남습니다."
       >
         <RoleCodes />
       </Card>
@@ -150,18 +150,21 @@ function CodesCatalog() {
 
 const meta = {
   title: 'LDS Robotics/Foundation/Codes',
+  tags: ['autodocs'],
   parameters: {
     storyGuide: {
       storyId: 'lds-robotics-foundation-codes--overview',
       eyebrow: 'Foundation / Codes',
       title: '지도와 범례가 공유하는 온맵 역할·주석 코드 레지스트리를 원자 단위로 문서화합니다',
       description:
-        '지도 위에서 언어에 상관없이 읽히는 짧은 코드를 내부 모듈 _navigationEncoding이 단일 소스로 소유합니다: 웨이포인트 역할 코드 ROLE_CODE(H·T·P·C)와 지점 주석 코드 ANNOTATION_CODE(dock·clean·disp 등). 마커 배지와 지도 범례가 같은 이 코드 집합을 함께 디코드하므로 지도와 범례가 서로 어긋나지 않습니다. 지도와 범례가 동일한 짧은 역할·주석 코드를 공유하는지 검토할 때 사용합니다. 제품 문구나 설명이 필요한 긴 라벨을 이 코드로 대체하는 용도에는 사용하지 마세요. 이 페이지는 두 레지스트리를 그대로 렌더해 각 칩의 텍스트가 소스 코드 값과 일치함을 회귀로 못 박습니다. 공개 API가 아닌 내부 코드 레지스트리입니다.',
+        '지도와 범례가 웨이포인트 역할 코드와 지점 주석 코드를 동일하게 직렬화할 때 사용합니다. 완성된 마커나 제품 문구에는 코드 칩 대신 역할 글리프와 해당 컴포넌트를 사용하세요.',
+      docsDescription:
+        '내부 모듈 _navigationEncoding은 웨이포인트 역할의 데이터 교환 코드 ROLE_CODE(H·T·P·C)와 화면에 남는 지점 주석 코드 ANNOTATION_CODE(dock·clean·disp 등)를 소유합니다. 실제 웨이포인트와 범례의 역할 표시는 _navigationRoleGlyph의 벡터 아이콘을 사용하며, 이 페이지는 직렬화·data attribute용 역할 코드와 주석 코드 레지스트리를 회귀합니다. 제품 문구나 완성된 마커를 이 코드 칩으로 대신하지 마세요. 공개 API가 아닌 내부 코드 레지스트리입니다.',
     },
     docs: {
       description: {
         component:
-          '지도 위에서 언어 중립적으로 읽히는 짧은 온맵 코드를 내부 모듈 _navigationEncoding에서 그대로 렌더해 문서화·회귀합니다: 웨이포인트 역할 코드 ROLE_CODE(H·T·P·C)와 지점 주석 코드 ANNOTATION_CODE(dock·clean·disp 등). 마커 배지와 지도 범례가 이 한 집합을 공유하므로 지도와 범례가 어긋나지 않습니다. 공개 API가 아닌 내부 코드 레지스트리입니다.',
+          '내부 모듈 _navigationEncoding의 역할 데이터 코드 ROLE_CODE(H·T·P·C)와 지점 주석 코드 ANNOTATION_CODE(dock·clean·disp 등)를 그대로 렌더해 문서화·회귀합니다. 역할의 실제 온맵 표시는 _navigationRoleGlyph 벡터 아이콘을 사용합니다. 공개 API가 아닌 내부 코드 레지스트리입니다.',
       },
     },
   },

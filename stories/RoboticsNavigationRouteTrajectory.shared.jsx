@@ -1,9 +1,39 @@
 import React from 'react';
-import { Map2DCanvas } from './lds.js';
-import { NAV_PROGRESS_HEAD } from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationVocabulary';
+import { Map2DCanvas } from '@lk-robotics/lds-product';
+import {
+  NAV_PROGRESS_HEAD,
+  NAV_TRAJECTORY_SAMPLE,
+} from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationVocabulary';
+import {
+  NavigationAnnotationLayer,
+  adaptWorldRouteToRoute,
+  adaptWorldTrajectoryToTrajectory,
+  createNavigationMapTransform,
+} from '../src/index.js';
 import { NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
 
-export const ACTIVE_ROUTE = {
+function createFixtureTransform(mapId, frameId) {
+  return createNavigationMapTransform({
+    mapId,
+    frameId,
+    mapVersion: 'fixture-map-v1',
+    stamp: { sec: 1_720_000_000, nanosec: 0 },
+    widthCells: 54,
+    heightCells: 25,
+    resolutionMPerCell: 1,
+    origin: { xM: 0, yM: 0, yawRad: 0 },
+  }, {
+    svgUnitsPerMeter: 10,
+    svgOrigin: { x: 0, y: 0 },
+  });
+}
+
+export const ROUTE_TRANSFORM_L1 = createFixtureTransform('L1', 'warehouse_L1/map');
+export const ROUTE_TRANSFORM_L2 = createFixtureTransform('L2', 'warehouse_L2/map');
+export const PROJECTED_FRAME_L1 = ROUTE_TRANSFORM_L1.metadata;
+export const PROJECTED_FRAME_L2 = ROUTE_TRANSFORM_L2.metadata;
+
+export const ACTIVE_ROUTE = adaptWorldRouteToRoute({
   id: 'route-delivery-17',
   label: '배송 경로 17',
   status: 'active',
@@ -12,7 +42,7 @@ export const ACTIVE_ROUTE = {
       id: 'segment-l1-completed',
       mapId: 'L1',
       label: '입구 → 교차로',
-      points: [{ x: 44, y: 196 }, { x: 130, y: 196 }, { x: 190, y: 154 }],
+      points: [{ x: 4.4, y: 5.4 }, { x: 13, y: 5.4 }, { x: 19, y: 9.6 }],
       laneIds: ['lane-entry', 'lane-corridor-a'],
       phase: 'completed',
       condition: 'normal',
@@ -21,7 +51,7 @@ export const ACTIVE_ROUTE = {
       id: 'segment-l1-current',
       mapId: 'L1',
       label: '교차로 → Lift A',
-      points: [{ x: 190, y: 154 }, { x: 284, y: 112 }, { x: 456, y: 112 }],
+      points: [{ x: 19, y: 9.6 }, { x: 28.4, y: 13.8 }, { x: 45.6, y: 13.8 }],
       laneIds: ['lane-corridor-b'],
       exitTransitionId: 'transition-lift-a',
       phase: 'current',
@@ -31,7 +61,7 @@ export const ACTIVE_ROUTE = {
       id: 'segment-l2-upcoming',
       mapId: 'L2',
       label: 'Lift A → 목적지',
-      points: [{ x: 72, y: 196 }, { x: 230, y: 196 }, { x: 328, y: 92 }, { x: 470, y: 92 }],
+      points: [{ x: 7.2, y: 5.4 }, { x: 23, y: 5.4 }, { x: 32.8, y: 15.8 }, { x: 47, y: 15.8 }],
       laneIds: ['lane-l2-main'],
       entryTransitionId: 'transition-lift-a',
       phase: 'upcoming',
@@ -39,45 +69,44 @@ export const ACTIVE_ROUTE = {
     },
   ],
   progress: { segmentId: 'segment-l1-current', fraction: 0.42 },
-};
+}, {
+  transformsByMap: {
+    L1: ROUTE_TRANSFORM_L1,
+    L2: ROUTE_TRANSFORM_L2,
+  },
+});
 
-export const ACTIVE_TRAJECTORY = {
+export const ACTIVE_TRAJECTORY = adaptWorldTrajectoryToTrajectory({
   id: 'trajectory-robot-2-l1',
   label: 'Robot 2 예상 궤적',
   mapId: 'L1',
   status: 'active',
-  // The tail starts right of the stage scale bar (x ≤ 130, bottom-left) so the
-  // trajectory never rides along the map chrome in any story reusing this
-  // fixture. Keep y untouched: route stories draw ACTIVE_ROUTE at y 196 and
-  // rely on the trajectory staying parallel below it.
   samples: [
-    { position: { x: 140, y: 224 }, timeMs: 0, headingRad: 0 },
-    { position: { x: 182, y: 222 }, timeMs: 250, headingRad: -0.05 },
-    { position: { x: 226, y: 214 }, timeMs: 500, headingRad: -0.14 },
-    { position: { x: 268, y: 200 }, timeMs: 750, headingRad: -0.3 },
-    { position: { x: 312, y: 184 }, timeMs: 1000, headingRad: -0.36 },
-    { position: { x: 360, y: 172 }, timeMs: 1250, headingRad: -0.2 },
-    { position: { x: 412, y: 166 }, timeMs: 1500, headingRad: -0.08 },
-    { position: { x: 468, y: 164 }, timeMs: 1750, headingRad: 0 },
+    { position: { x: 14, y: 2.6 }, timeMs: 0, headingRad: 0 },
+    { position: { x: 18.2, y: 2.8 }, timeMs: 250, headingRad: 0.05 },
+    { position: { x: 22.6, y: 3.6 }, timeMs: 500, headingRad: 0.14 },
+    { position: { x: 26.8, y: 5 }, timeMs: 750, headingRad: 0.3 },
+    { position: { x: 31.2, y: 6.6 }, timeMs: 1000, headingRad: 0.36 },
+    { position: { x: 36, y: 7.8 }, timeMs: 1250, headingRad: 0.2 },
+    { position: { x: 41.2, y: 8.4 }, timeMs: 1500, headingRad: 0.08 },
+    { position: { x: 46.8, y: 8.6 }, timeMs: 1750, headingRad: 0 },
   ],
   currentSampleIndex: 5,
-};
+}, { transform: ROUTE_TRANSFORM_L1 });
 
-export const L2_TRAJECTORY = {
+export const L2_TRAJECTORY = adaptWorldTrajectoryToTrajectory({
   id: 'trajectory-robot-2-l2',
   label: 'Robot 2 L2 예상 궤적',
   mapId: 'L2',
   status: 'planned',
-  // The tail starts right of the stage scale bar (x ≤ 130, bottom-left) for
-  // the same chrome-clearance reason as ACTIVE_TRAJECTORY.
   samples: [
-    { position: { x: 142, y: 214 }, timeMs: 2400, headingRad: -0.06 },
-    { position: { x: 216, y: 198 }, timeMs: 2800, headingRad: -0.28 },
-    { position: { x: 286, y: 158 }, timeMs: 3200, headingRad: -0.62 },
-    { position: { x: 354, y: 112 }, timeMs: 3600, headingRad: -0.32 },
-    { position: { x: 458, y: 104 }, timeMs: 4000, headingRad: 0 },
+    { position: { x: 14.2, y: 3.6 }, timeMs: 2400, headingRad: 0.06 },
+    { position: { x: 21.6, y: 5.2 }, timeMs: 2800, headingRad: 0.28 },
+    { position: { x: 28.6, y: 9.2 }, timeMs: 3200, headingRad: 0.62 },
+    { position: { x: 35.4, y: 13.8 }, timeMs: 3600, headingRad: 0.32 },
+    { position: { x: 45.8, y: 14.6 }, timeMs: 4000, headingRad: 0 },
   ],
-};
+}, { transform: ROUTE_TRANSFORM_L2 });
 
 export function StoryPage({ title, description, children, maxWidth = 1040 }) {
   return (
@@ -91,7 +120,16 @@ export function StoryPage({ title, description, children, maxWidth = 1040 }) {
   );
 }
 
-export function PathMap({ appearance = 'light', label, children, height = 270, svgHeight = 250, testId, eyebrow = 'ROUTE · L1' }) {
+export function PathMap({
+  appearance = 'light',
+  label,
+  children,
+  height = 270,
+  svgHeight = 250,
+  testId,
+  eyebrow = 'ROUTE · L1',
+  annotationDetailMode,
+}) {
   const svgRef = React.useRef(null);
   const [cssViewBoxScale, setCssViewBoxScale] = React.useState(1);
 
@@ -114,6 +152,12 @@ export function PathMap({ appearance = 'light', label, children, height = 270, s
       view?.removeEventListener('resize', updateScale);
     };
   }, []);
+
+  const stage = (
+    <NavigationMapStage width={540} height={svgHeight} eyebrow={eyebrow} scaleBar={{ px: 100, label: '5 m' }}>
+      {typeof children === 'function' ? children(cssViewBoxScale) : children}
+    </NavigationMapStage>
+  );
 
   return (
     <Map2DCanvas
@@ -138,9 +182,9 @@ export function PathMap({ appearance = 'light', label, children, height = 270, s
         aria-label={`${label}의 route와 trajectory 계층`}
         style={{ display: 'block', width: 'min(540px, calc(100cqw - 32px))', height: 'auto' }}
       >
-        <NavigationMapStage width={540} height={svgHeight} eyebrow={eyebrow} scaleBar={{ px: 100, label: '5 m' }}>
-          {typeof children === 'function' ? children(cssViewBoxScale) : children}
-        </NavigationMapStage>
+        {annotationDetailMode
+          ? <NavigationAnnotationLayer detailMode={annotationDetailMode}>{stage}</NavigationAnnotationLayer>
+          : stage}
       </svg>
     </Map2DCanvas>
   );
@@ -369,6 +413,35 @@ export function assertNavigationProgressHead(root, label, role) {
   }
   if (role === 'trajectory' && root.querySelector('[data-trajectory-marker-badge="current"]')) {
     throw new Error(`${label} must not restore the old circular Trajectory current badge.`);
+  }
+}
+
+export function assertTrajectoryTemporalEncoding(root, label) {
+  if (root.getAttribute('data-navigation-line-role') !== 'trajectory'
+    || root.getAttribute('data-line-encoding') !== 'temporal-samples') {
+    throw new Error(`${label} must expose the trajectory temporal-sample line role.`);
+  }
+  const samples = [...root.querySelectorAll('[data-trajectory-sample]')];
+  if (samples.length < 2 || samples.length > NAV_TRAJECTORY_SAMPLE.maxVisible) {
+    throw new Error(`${label} must render a capped sequence of temporal sample dots: ${samples.length}.`);
+  }
+  const cursor = root.querySelector('[data-trajectory-time-cursor]');
+  const outer = cursor?.querySelector('[data-trajectory-cursor-surface]');
+  const core = cursor?.querySelector('[data-trajectory-cursor-core]');
+  if (!cursor || !outer || !core) {
+    throw new Error(`${label} needs a circular current-sample time cursor.`);
+  }
+  if (root.querySelector('[data-navigation-progress-head="trajectory"], [data-trajectory-direction]')) {
+    throw new Error(`${label} must not reuse Route arrowheads or direction chevrons.`);
+  }
+  if (Number(outer.getAttribute('r')) !== NAV_TRAJECTORY_SAMPLE.cursorOuterRadius
+    || Number(core.getAttribute('r')) !== NAV_TRAJECTORY_SAMPLE.cursorInnerRadius) {
+    throw new Error(`${label} current-sample cursor lost its fixed geometry.`);
+  }
+  const futurePath = root.querySelector('[data-trajectory-path]');
+  const futureOpacity = Number(futurePath?.getAttribute('opacity'));
+  if (!(futureOpacity > 0 && futureOpacity < 1)) {
+    throw new Error(`${label} needs a recessed future line behind the elapsed samples.`);
   }
 }
 

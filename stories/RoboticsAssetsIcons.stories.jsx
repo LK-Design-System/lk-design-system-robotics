@@ -1,5 +1,5 @@
 import React from 'react';
-import { ICON_NAMES, Icon } from './lds.js';
+import { ICON_NAMES, Icon } from '@lk-robotics/lds-core';
 import { storyDescription } from './StoryGuide.shared.jsx';
 
 const LDS_EXTENSION_NAMES = [
@@ -27,6 +27,7 @@ const roboticsExtensionIconNames = LDS_EXTENSION_NAMES.filter((name) => ICON_NAM
 
 const meta = {
   title: 'LDS Robotics/Assets/Icons',
+  tags: ['autodocs'],
   parameters: {
     storyGuide: {
       storyId: 'lds-robotics-assets-icons--robotics-extension-icons',

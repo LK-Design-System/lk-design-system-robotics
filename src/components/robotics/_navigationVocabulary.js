@@ -39,37 +39,86 @@ export function navStateOpacity(disabled, stale) {
 }
 
 /**
- * Interaction state layering — the two independent axes every navigation marker
- * uses. See docs/NAVIGATION_EXPRESSION_CONVENTIONS.md §2.5.
+ * Interaction state layering — selection and keyboard focus are independent
+ * axes; data/operation state remains a third channel on base paint, dashes, or
+ * badges. See docs/NAVIGATION_EXPRESSION_CONVENTIONS.md §4.1.
  *
  * FOCUS (transient, keyboard): `--color-semantic-focus-indicator`, always traces
  * the marker's OWN silhouette with non-scaling-stroke, sits OUTSIDE selection.
+ * Point/pin focus adds `contrastStrokeWidth` as a surface-colored underlay.
  * Geometry hugs each shape, so this holds one named scalar per marker class.
  * Pin focus lives in `NAV_PIN.focusRing` (silhouette scale). The `path`/`route`
  * split is real: route segments render one tier wider than lane/trajectory.
  */
 export const NAV_FOCUS = {
+  contrastStrokeWidth: 5,
   waypointShellScale: 1.5,
   strokeWidth: 2,
   regionStrokeWidth: 6.5,
-  pathHaloWidth: 10,
-  routeHaloWidth: 11,
+  pathHaloWidth: 11,
+  routeHaloWidth: 12,
 };
 
 /**
- * SELECTION (persistent, semantic): `--viewer-accent`, the INNER/tighter cue vs
- * focus. It never recolors meaning-encoded fills (pin severity, region texture,
- * path status), so each geometry uses its strongest allowed cue: waypoint solid
- * fill, pin ring (`NAV_PIN.selectionRing`, 1.16 < focus 1.34), region outline
- * (thinner than focus), path translucent accent halo (`haloOpacity`, width one
- * tier wider on route). Path base/emphasis/casing widths belong to the separate
- * path-stroke set, not here.
+ * SELECTION (persistent, semantic) uses geometry, never the focus color. Point
+ * bodies enlarge while status badges stay fixed; paths and regions retain their
+ * semantic paint and increase core/casing width. Focus remains the outer blue
+ * cue, so selected + focused can coexist without sharing one visual channel.
  */
 export const NAV_SELECTION = {
+  waypointScale: 1.25,
+  robotPoseScale: 1.15,
+  pinScale: 1.12,
   regionStrokeWidth: 3.5,
-  haloOpacity: 0.24,
-  pathHaloWidth: 7,
-  routeHaloWidth: 8,
+  pathCasingWidth: 7.5,
+  routeCasingWidth: 8.5,
+  pathStrokeWidth: 4,
+  trajectoryStrokeWidth: 4.5,
+  routeStrokeWidth: 5,
+};
+
+/**
+ * Baseline geometry by navigation line ROLE.
+ *
+ * State dashes may change along any line, so width and repeated geometry carry
+ * the identity that must remain legible without a legend:
+ * - lane: quiet topology / connectivity
+ * - route: selected graph plan
+ * - trajectory: time-ordered samples in free space
+ */
+export const NAV_LINE_ROLE = {
+  lane: {
+    casingWidth: 4,
+    coreWidth: 1.5,
+    selectedCasingWidth: 6,
+    selectedCoreWidth: 3,
+  },
+  route: {
+    casingWidth: 7,
+    coreWidth: 3.5,
+    currentWidth: 4.5,
+  },
+  trajectory: {
+    casingWidth: 4.5,
+    coreWidth: 1.75,
+    activeWidth: 2.25,
+    futureOpacity: 0.24,
+  },
+};
+
+/**
+ * Temporal punctuation unique to TrajectoryOverlay. Samples are capped and
+ * screen-space sized so dense telemetry remains readable at every map zoom.
+ * The current sample is a circular time cursor—not a route arrowhead.
+ */
+export const NAV_TRAJECTORY_SAMPLE = {
+  radius: 1.75,
+  maxVisible: 12,
+  pastOpacity: 0.78,
+  futureOpacity: 0.48,
+  cursorOuterRadius: 5,
+  cursorInnerRadius: 2.5,
+  cursorCollisionRadius: 9,
 };
 
 /**
@@ -119,45 +168,39 @@ export const NAV_PATH_DASH = {
  * Map-pin marker geometry, shared by FacilityTransition and HazardMarker so a
  * facility pin and a hazard pin read as one marker family — severity fill and
  * knockout glyph (not a different shape) distinguish them. The shadow and the
- * focus/selection rings all trace this same silhouette; rings are applied with
- * a `scale()` transform plus `vector-effect="non-scaling-stroke"`.
+ * focus ring traces this same silhouette. Selection enlarges the complete pin
+ * body while leaving external state badges fixed.
  */
 export const NAV_PIN = {
   path: 'M0 15 Q-6 10 -9.2 5 A10.5 10.5 0 1 1 9.2 5 Q6 10 0 15 Z',
   shadow: { transform: 'translate(0 0.8)', fill: 'var(--color-semantic-static-black)', opacity: 0.16 },
   focusRing: { scale: 1.34, strokeWidth: 2.5 },
-  selectionRing: { scale: 1.16, strokeWidth: 2 },
-  // Persistent severity/alarm halo tracing the pin silhouette, sized OUTSIDE the
-  // focus ring so the two nest concentrically. A second, hue-independent channel
-  // for the highest-severity state (e.g. a danger hazard).
-  alarmRing: { scale: 1.5, strokeWidth: 3.5, opacity: 0.45 },
 };
 
 /**
- * Graph-node diamond silhouette. A navigation-graph point renders as this
- * diamond wherever it appears, so the SAME graph node reads as the SAME symbol
+ * Graph-node rounded-square silhouette. A navigation-graph point renders as
+ * this shape wherever it appears, so the SAME graph node reads as the SAME symbol
  * across layers: WaypointMarker draws it at the full `radius`, and a lane
  * endpoint — which references a waypoint by id — draws the same shape at the
- * smaller `endpointRadius`. `points(r)` returns the polygon vertices for a
- * given half-diagonal.
+ * smaller `endpointRadius`. `rect(r, cornerRadius)` returns SVG rect geometry
+ * for a given half-size.
  */
 export const NAV_NODE = {
-  radius: 7,
+  radius: 10,
+  cornerRadius: 4,
   endpointRadius: 4,
-  // Every waypoint ring traces this same diamond silhouette on one outward
-  // ladder, so any co-occurring states nest concentrically instead of
-  // crossing (concentric same-shape rings cannot intersect — a circle around
-  // the diamond cuts through its edges the moment radii collide):
-  //   point edge (1.0) ⊂ selection 1.28 ⊂ focus shell 1.5 (NAV_FOCUS)
-  //   ⊂ stale 1.8 ⊂ attention 2.15 ⊂ hit circle (r 17.5).
-  // The steps leave clearance for each ring's non-scaling stroke; persistent
-  // data-state rings (stale/attention) sit OUTSIDE the transient focus shell —
-  // the same layering NAV_PIN uses (alarmRing 1.5 > focusRing 1.34) — so an
-  // alarm keeps its salience while the marker is focused.
-  selectionRingScale: 1.28,
-  staleRingScale: 1.8,
-  attentionRingScale: 2.15,
-  points: (r) => `0,${-r} ${r},0 0,${r} ${-r},0`,
+  endpointCornerRadius: 1.5,
+  labelOffsetX: 22,
+  // The primary role sits inside, availability uses the solid fill, selection
+  // enlarges the body, and focus uses one contrast-backed shell. Exceptional
+  // data quality lives in one fixed-size top-right badge.
+  rect: (r, cornerRadius = 3) => ({
+    x: -r,
+    y: -r,
+    width: r * 2,
+    height: r * 2,
+    rx: cornerRadius,
+  }),
 };
 
 /**
@@ -174,12 +217,26 @@ export const NAV_HIT = { radius: 17.5, screenTargetSize: 24 };
 export const NAV_STATE_BADGE = { radius: 7, strokeWidth: 1.5 };
 
 /**
- * Line-integrated current-progress head shared by RouteOverlay and
- * TrajectoryOverlay. The elapsed/current path is the shaft; this open V is
- * attached with SVG `marker-end` so its tip stays on the source position and
- * its orientation follows the incoming path tangent. Marker dimensions are
- * screen-space dimensions after the owning renderer applies viewportScale's
- * inverse to markerWidth/markerHeight.
+ * Compact solid exception badge for the 20px waypoint body. It overlaps the
+ * top-right corner, matching RobotPoseMarker's attached badge grammar. A
+ * surface-colored separator stroke keeps the solid status tone distinct from
+ * the body. The badge stays fixed while selection enlarges the body and
+ * consolidates simultaneous data-quality states to one priority slot
+ * (`invalid` before `stale`).
+ */
+export const NAV_WAYPOINT_STATUS_BADGE = {
+  radius: 6,
+  offsetX: 8,
+  offsetY: -8,
+  strokeWidth: 1.5,
+  glyphSize: 8.5,
+};
+
+/**
+ * Route's line-integrated current-progress head. The elapsed plan is the
+ * shaft; this open V is attached with SVG `marker-end` so its tip stays on the
+ * source progress position. Trajectory deliberately uses a circular
+ * current-sample cursor instead.
  */
 export const NAV_PROGRESS_HEAD = {
   path: 'M 2 1.5 L 16 8 L 2 14.5',
@@ -191,7 +248,6 @@ export const NAV_PROGRESS_HEAD = {
   collisionRadius: 20,
   obstacle: { x: -20, y: -10, width: 24, height: 20 },
   route: { casingWidth: 7, coreWidth: 4, futureOpacity: 0.34 },
-  trajectory: { casingWidth: 6.5, coreWidth: 3.5, futureOpacity: 0.28 },
 };
 
 /**

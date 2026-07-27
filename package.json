@@ -2,6 +2,7 @@
   "name": "@lk-robotics/lds-robotics-ui",
   "version": "0.1.0-rc.2",
   "description": "Robotics DOM, SVG, and 2D UI presentation layer for LDS.",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -9,7 +10,9 @@
   "files": [
     "dist",
     "styles.css",
-    "tokens"
+    "tokens",
+    "licenses",
+    "THIRD_PARTY_NOTICES.md"
   ],
   "sideEffects": [
     "*.css",
@@ -22,12 +25,14 @@
     "capture:visual-smoke": "node scripts/capture-visual-smoke.mjs",
     "check:visual-regression": "node scripts/capture-visual-smoke.mjs --check",
     "update:visual-baseline": "npm run build:storybook && node scripts/capture-visual-smoke.mjs --update-baseline",
-    "check:storybook": "npm run build:storybook && npm run check:representative-stories && npm run check:visual-regression",
+    "check:storybook": "npm run build:storybook && node scripts/check-owner-boundaries.mjs --storybook-index storybook-static/index.json && npm run check:representative-stories && npm run check:visual-regression",
     "check:representative-stories": "node scripts/check-lds-style.mjs --storybook-index storybook-static/index.json --require-built-stories",
     "check:lds-style": "node scripts/check-lds-style.mjs",
+    "check:ownership": "node scripts/check-owner-boundaries.mjs",
+    "check:coordinates": "node scripts/check-navigation-coordinates.mjs",
     "check:types": "tsc --noEmit",
     "check:pack": "npm pack --dry-run --ignore-scripts",
-    "check": "npm run check:lds-style && npm run build && npm run check:types && npm run check:pack",
+    "check": "npm run check:lds-style && npm run check:ownership && npm run check:coordinates && npm run build && npm run check:types && npm run check:pack",
     "prepublishOnly": "npm run check"
   },
   "dependencies": {

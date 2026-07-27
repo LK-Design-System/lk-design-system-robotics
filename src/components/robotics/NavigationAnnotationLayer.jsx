@@ -1,22 +1,23 @@
 import React from 'react';
 import {
   NavigationAnnotationContext,
+  NavigationAnnotationDetailContext,
   createAnnotationStore,
   useIsomorphicLayoutEffect,
 } from './_navigationAnnotations.js';
 
 /**
  * SVG `<g>` fragment that coordinates screen-space label collisions across
- * the navigation overlays composed under it. Labels nudge vertically up to
- * `maxLabelDisplacementPx`; when no free slot remains, the lowest-priority
- * label alone is suppressed — markers, state badges, accessible names, and
- * the semantic mirror never change. Overlays rendered without this provider
- * behave exactly as standalone fragments.
+ * the navigation overlays composed under it. Labels try conventional
+ * placements, then a bounded 2D nudge; when no free slot remains, the
+ * lowest-priority label alone is suppressed. Markers, state badges, accessible
+ * names, and the semantic mirror never change.
  */
 export function NavigationAnnotationLayer({
   children,
-  maxLabelDisplacementPx = 56,
-  labelGapPx = 4,
+  detailMode = 'standard',
+  maxLabelDisplacementPx = 24,
+  labelGapPx = 8,
   ...rest
 }) {
   const [store] = React.useState(createAnnotationStore);
@@ -25,7 +26,12 @@ export function NavigationAnnotationLayer({
   // Children's layout effects register before this one runs, so the first
   // coordinated layout lands in the same commit, before paint.
   useIsomorphicLayoutEffect(() => {
-    store.setOptions({ maxLabelDisplacementPx, labelGapPx, host: hostRef.current });
+    store.setOptions({
+      detailMode,
+      maxLabelDisplacementPx,
+      labelGapPx,
+      host: hostRef.current,
+    });
     store.flush();
   });
 
@@ -50,9 +56,11 @@ export function NavigationAnnotationLayer({
 
   return (
     <g {...rest} ref={hostRef} data-lk-navigation-annotation-layer="">
-      <NavigationAnnotationContext.Provider value={store}>
-        {children}
-      </NavigationAnnotationContext.Provider>
+      <NavigationAnnotationDetailContext.Provider value={detailMode}>
+        <NavigationAnnotationContext.Provider value={store}>
+          {children}
+        </NavigationAnnotationContext.Provider>
+      </NavigationAnnotationDetailContext.Provider>
     </g>
   );
 }

@@ -1,12 +1,14 @@
 import React from 'react';
 import { userEvent } from 'storybook/test';
-import { Map2DCanvas, SpatialRegion } from './lds.js';
+import { Map2DCanvas } from '@lk-robotics/lds-product';
+import { SpatialRegion } from '../src/index.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
 import { assertSharedFocusIndicator } from './RoboticsNavigationAssert.shared.jsx';
 
 const meta = {
   title: 'LDS Robotics/Navigation/Regions',
+  tags: ['autodocs'],
   component: SpatialRegion,
   parameters: {
     storyGuide: {
@@ -159,7 +161,7 @@ function OverviewFixture() {
 export const SpatialRegionOverview = {
   name: '개요',
   parameters: storyDescription(
-    '진입 금지 행동 영역, 승강기 객실 설비 영역, 8% 경사 지형 영역을 한 지도에서 비교합니다. category는 서로 다른 pattern과 라벨로 구분되고, 선택은 원래 의미 stroke를 지우지 않는 별도 외곽선으로 표시되어야 합니다.',
+    '진입 금지 행동 영역, 승강기 객실 설비 영역, 8% 경사 지형 영역을 한 지도에서 비교합니다. category는 서로 다른 pattern과 라벨로 구분되고, 선택은 원래 의미 stroke 색을 유지한 경계 굵기 확대로 표시되어야 합니다.',
   ),
   render: () => <OverviewFixture />,
   play: async ({ canvasElement }) => {
@@ -273,7 +275,7 @@ export const ConcaveGeometryAndCompoundStates = {
       if (!name.includes(state)) throw new Error(`Accessible name is missing the visible region state: ${state}.`);
     }
     for (const selector of [
-      '[data-region-selection-ring]',
+      '[data-region-selection-geometry]',
       '[data-region-focus-ring]',
       '[data-region-invalid-mark]',
       '[data-region-stale-mark]',
@@ -284,7 +286,7 @@ export const ConcaveGeometryAndCompoundStates = {
     assertCenteredStateGlyph(region.querySelector('[data-region-stale-mark]'), 'stale');
     assertSharedFocusIndicator(region.querySelector('[data-region-focus-ring]'), 'Region');
     const focusWidth = Number(region.querySelector('[data-region-focus-ring]')?.getAttribute('stroke-width'));
-    const selectionWidth = Number(region.querySelector('[data-region-selection-ring]')?.getAttribute('stroke-width'));
+    const selectionWidth = Number(region.querySelector('[data-region-selection-geometry]')?.getAttribute('stroke-width'));
     if (!Number.isFinite(focusWidth) || !Number.isFinite(selectionWidth) || (focusWidth - selectionWidth) / 2 < 1.5) {
       throw new Error(`Compound region must preserve at least a 1.5px visible focus band outside selection: ${focusWidth}/${selectionWidth}.`);
     }

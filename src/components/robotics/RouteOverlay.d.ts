@@ -4,6 +4,8 @@ import type {
   NavigationPoint,
   NavigationSvgFeatureProps,
 } from './WaypointMarker';
+import type { NavigationFrameRef } from './NavigationCoordinateSystem';
+import type { NavigationGeometrySpace } from './NavigationGeometryAdapters';
 
 export type RouteStatus = 'planned' | 'active' | 'waiting' | 'blocked' | 'rerouting' | 'completed';
 export type RouteSegmentPhase = 'completed' | 'current' | 'upcoming';
@@ -14,6 +16,10 @@ export interface RouteSegmentData {
   readonly mapId: string;
   readonly label?: string;
   readonly points: readonly NavigationPoint[];
+  /** Source frame/version/time retained after projection into SVG map space. */
+  readonly source?: NavigationFrameRef;
+  /** Proof that points were projected from world coordinates into SVG map space. */
+  readonly coordinateSpace?: NavigationGeometrySpace;
   /** Static graph lanes represented by this planned segment. */
   readonly laneIds?: readonly string[];
   /** Neutral FacilityTransition references at segment boundaries. */

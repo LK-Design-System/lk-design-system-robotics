@@ -5,9 +5,12 @@
  * legend helper — so the map and its key could silently drift apart. Import
  * these everywhere a role/annotation code is rendered or decoded.
  *
- * These are terse codes only (H / T / P / C, dock / disp / ...). Human-facing
- * labels stay with each surface because the accessible-name copy and the
- * visible legend copy have different audiences and languages.
+ * These are terse semantic/export codes (H / T / P / C, dock / disp / ...).
+ * WaypointMarker renders primary roles with _navigationRoleGlyph instead of
+ * these letters; the codes remain useful for data attributes, secondary
+ * annotations, and non-visual interchange. Human-facing labels stay with each
+ * surface because the accessible-name copy and visible legend have different
+ * audiences and languages.
  */
 
 export const ROLE_CODE = {

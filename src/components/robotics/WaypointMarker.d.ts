@@ -1,4 +1,5 @@
 import * as React from 'react';
+import type { NavigationFrameRef } from './NavigationCoordinateSystem';
 
 /** Renderer-neutral 2D point in the owning navigation map's coordinate space. */
 export interface NavigationPoint {
@@ -55,6 +56,8 @@ export interface WaypointData {
   readonly id: string;
   readonly label: string;
   readonly mapId: string;
+  /** Source frame/version/time retained after projection into SVG map space. */
+  readonly source?: NavigationFrameRef;
   readonly position: NavigationPoint;
   /** Independent graph roles. Multiple values may be present at the same waypoint. */
   readonly roles?: readonly WaypointRole[];

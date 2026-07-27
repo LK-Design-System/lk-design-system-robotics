@@ -8,7 +8,8 @@ const KINDS = new Set([
 // State badge glyphs sourced from Material Symbols (Google, Apache License 2.0),
 // rounded fill. Each icon's native viewBox is `0 -960 960 960`; MAT_FIT recenters
 // the icon (center 480,-480) on the badge origin and scales the 960u artwork into
-// the ~10u badge slot, painted 1:1 as currentColor. Some states intentionally
+// the 10u reference slot, painted 1:1 as currentColor. Waypoint exception badges
+// can scale that reference down to 7u. Some states intentionally
 // share a symbol (closed/blocked → ×). See docs/references/ATTRIBUTIONS.md.
 const MAT = {
   unknown: 'M593-646.63q0-48.37-31.24-76.87Q530.52-752 479-752q-31.81 0-57.58 14.03T377-697q-11 16-29.5 20t-35.5-5q-19-11-23-27t8-35q30-46 77.62-71 47.62-25 104.38-25 94 0 151 52.24 57 52.23 57 136.76 0 46-20 85t-66 84q-37 35-50 55.72T534-379q-3 21-18 35t-34.8 14q-19.79 0-34-13.5Q433-357 433-375q0-34 18-66t55.36-66.22Q554-550 573.5-582t19.5-64.63ZM478.91-80Q450-80 429.5-100.59q-20.5-20.59-20.5-49.5t20.59-49.41q20.59-20.5 49.5-20.5t49.41 20.59q20.5 20.59 20.5 49.5t-20.59 49.41Q507.82-80 478.91-80Z',
@@ -46,7 +47,7 @@ export function NavigationStateGlyph({
   ...rest
 }) {
   const resolvedKind = KINDS.has(kind) ? kind : 'unknown';
-  const resolvedSize = Math.max(10, Number(size) || 10);
+  const resolvedSize = Math.max(7, Number(size) || 10);
   const scale = resolvedSize / 10;
 
   return React.createElement(

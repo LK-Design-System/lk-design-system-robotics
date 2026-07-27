@@ -1,13 +1,15 @@
 import React from 'react';
 import { userEvent, waitFor } from 'storybook/test';
-import { Map2DCanvas, FacilityTransition, NavigationAnnotationLayer, SpatialRegion } from './lds.js';
+import { Map2DCanvas } from '@lk-robotics/lds-product';
+import { FacilityTransition, NavigationAnnotationLayer, SpatialRegion } from '../src/index.js';
 import { NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { assertNoLabelCollisions } from './RoboticsNavigationCollision.shared.jsx';
-import { assertSharedFocusIndicator } from './RoboticsNavigationAssert.shared.jsx';
+import { assertContrastBackedFocus } from './RoboticsNavigationAssert.shared.jsx';
 
 const meta = {
   title: 'LDS Robotics/Navigation/Facility Transition',
+  tags: ['autodocs'],
   component: FacilityTransition,
   parameters: {
     storyGuide: {
@@ -164,7 +166,7 @@ const secondFloorCabin = cabinRegion('warehouse-2f', 'lift-cabin-2f', '2층 객�
 export const FacilityTransitionOverview = {
   name: '개요',
   parameters: storyDescription(
-    '같은 설비 identity가 1층 접근에서 2층 도착으로 이어지는 multi-map 상황과 from/to endpoint·선택 링을 봅니다. phase·문·이동·운영 모드·세션 상태 등 각 상태축의 독립 표기는 변형·상태 스토리에서 확인하세요.',
+    '같은 설비 identity가 1층 접근에서 2층 도착으로 이어지는 multi-map 상황과 from/to endpoint·선택 확대를 봅니다. phase·문·이동·운영 모드·세션 상태 등 각 상태축의 독립 표기는 변형·상태 스토리에서 확인하세요.',
   ),
   render: () => (
     <main style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(340px, 100%), 1fr))', gap: 'var(--space-4)', width: '100%', maxWidth: 880 }}>
@@ -198,7 +200,7 @@ export const FacilityTransitionOverview = {
     if (!name.includes('접근')) {
       throw new Error(`Lift overview endpoint must keep its accessible identity: ${name}`);
     }
-    if (!from.querySelector('[data-transition-selection-ring]')) throw new Error('Selected lift transition requires a distinct selection ring.');
+    if (!from.querySelector('[data-transition-selected-scale="1.12"]')) throw new Error('Selected lift transition requires a 1.12x pin-body enlargement.');
   },
 };
 
@@ -283,7 +285,7 @@ const compoundStateDock = {
 export const ValidationAndFocusStates = {
   name: '변형·상태 · 선택·포커스·오류·지연',
   parameters: storyDescription(
-    '수동 설비 전이에 선택·포커스·오류·지연이 동시에 적용된 상황입니다. source의 미확인 question SVG와 네 상태 glyph가 서로 덮이지 않고, 시각 상태와 접근 가능한 이름·aria-invalid가 같은 정보를 제공해야 합니다.',
+    '수동 설비 전이에 선택·포커스·오류·지연이 동시에 적용된 상황입니다. 선택은 핀 본체의 1.12배 정적 확대, 포커스는 surface 대비층을 둔 바깥 outline이며, 데이터 상태 glyph와 접근 가능한 이름·aria-invalid가 같은 정보를 제공해야 합니다.',
   ),
   render: () => (
     <main style={{ width: 'min(100%, 520px)' }}>
@@ -314,35 +316,32 @@ export const ValidationAndFocusStates = {
       if (!name.includes(state)) throw new Error(`Accessible name is missing the visible state: ${state}.`);
     }
     for (const selector of [
-      '[data-transition-selection-ring]',
+      '[data-transition-selected-scale="1.12"]',
+      '[data-transition-focus-contrast]',
       '[data-transition-focus-ring]',
       '[data-transition-invalid-mark]',
-      '[data-transition-stale-mark]',
     ]) {
       if (!transition.querySelector(selector)) throw new Error(`Compound state glyph is missing: ${selector}.`);
     }
-    assertSharedFocusIndicator(transition.querySelector('[data-transition-focus-ring]'), 'Facility transition');
-    const unknownMark = transition.querySelector('[data-transition-unknown-mark]');
+    assertContrastBackedFocus(
+      transition,
+      '[data-transition-focus-contrast]',
+      '[data-transition-focus-ring]',
+      'Facility transition',
+    );
     const invalidMark = transition.querySelector('[data-transition-invalid-mark]');
-    const staleMark = transition.querySelector('[data-transition-stale-mark]');
-    const glyphs = [
-      unknownMark?.querySelector('circle'),
-      invalidMark?.querySelector('circle'),
-      staleMark?.querySelector('circle'),
-    ];
-    if (glyphs.some((glyph) => !glyph)) throw new Error('Unknown, invalid, and stale facility glyphs must all remain visible.');
-    assertCenteredStateGlyph(unknownMark, 'unknown');
+    if (
+      !invalidMark
+      || transition.querySelectorAll('[data-transition-state-slot]').length !== 1
+      || invalidMark.getAttribute('data-transition-status-badge-style') !== 'solid'
+      || transition.querySelector('[data-transition-unknown-mark], [data-transition-stale-mark]')
+    ) {
+      throw new Error('Facility compound state must resolve invalid > stale > unknown into one solid status badge.');
+    }
     assertCenteredStateGlyph(invalidMark, 'invalid');
-    assertCenteredStateGlyph(staleMark, 'stale');
-    const bounds = glyphs.map((glyph) => glyph.getBoundingClientRect());
-    for (let first = 0; first < bounds.length; first += 1) {
-      for (let second = first + 1; second < bounds.length; second += 1) {
-        const overlapWidth = Math.min(bounds[first].right, bounds[second].right) - Math.max(bounds[first].left, bounds[second].left);
-        const overlapHeight = Math.min(bounds[first].bottom, bounds[second].bottom) - Math.max(bounds[first].top, bounds[second].top);
-        if (overlapWidth > 0.25 && overlapHeight > 0.25) {
-          throw new Error(`Facility compound glyphs ${first}/${second} overlap by ${overlapWidth}×${overlapHeight} CSS px.`);
-        }
-      }
+    const badgeCircle = invalidMark.querySelector('circle');
+    if (!badgeCircle || badgeCircle.hasAttribute('stroke-dasharray')) {
+      throw new Error('Facility status badge must use a solid tone with no dashed ring.');
     }
 
     const opacity = Number(canvasElement.ownerDocument.defaultView.getComputedStyle(transition).opacity);
@@ -461,6 +460,12 @@ export const InteractionAndMapFiltering = {
     if (!active.querySelector('[data-transition-focus-ring]') || view.getComputedStyle(active).outlineStyle !== 'none') {
       throw new Error('Facility keyboard input must restore only its shape-managed focus ring after pointer modality.');
     }
+    assertContrastBackedFocus(
+      active,
+      '[data-transition-focus-contrast]',
+      '[data-transition-focus-ring]',
+      'Facility transition',
+    );
     active.dispatchEvent(new view.KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }));
     await waitForRender();
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { FacilityTransition } from './lds.js';
+import { FacilityTransition } from '../src/index.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
 
 // Everything here renders the real FacilityTransition marker (no hand-drawn
@@ -108,12 +108,15 @@ const LIFT_STATES = [
 
 const meta = {
   title: 'LDS Robotics/Foundation/Facility Glyph',
+  tags: ['autodocs'],
   parameters: {
     storyGuide: {
       storyId: 'lds-robotics-foundation-facility-glyph--overview',
       eyebrow: 'Foundation / Facility Glyph',
       title: '설비 글리프는 Facility Transition 마커 위에서 문·승강기·도킹·경사로·충전·보안 게이트·핸드오프를 구분합니다',
       description:
+        'Facility Transition 마커에서 문·승강기·도킹·경사로·충전·보안 게이트·핸드오프 글리프를 비교할 때 사용합니다. 제품 지도에는 글리프를 직접 배치하지 말고 FacilityTransition을 사용하세요.',
+      docsDescription:
         '문·승강기·도킹·경사로·충전·보안 게이트·핸드오프 일곱 종류를 실제 FacilityTransition 마커로 나란히 비교합니다. 배지 도형을 따로 그리지 않고 프로덕션 컴포넌트를 그대로 렌더하므로, 여기 보이는 핀·글리프·상태 표기는 마커에 실제로 나타나는 것과 동일합니다. 종류를 결정하는 knockout 글리프는 경사로·핸드오프를 뺀 다섯이 Material Symbols(Apache 2.0)이고, 경사로·핸드오프는 Material Symbols에 층간 경사로·filled transfer 글리프가 없어 LDS가 그린 것이며, 내부 모듈 _FacilityGlyph가 렌더하고 공개 API가 아닙니다. 글리프 도형 자체를 검토·회귀할 때 적합하며, 제품 지도 구현에는 이 페이지 대신 FacilityTransition을 사용하세요.',
     },
     docs: {

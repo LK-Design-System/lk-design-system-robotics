@@ -28,11 +28,16 @@ The single most load-bearing split.
 | Element kind | Renderers | State lives as |
 | --- | --- | --- |
 | **Line** | Lane, Route, Trajectory | tone **+ `NAV_PATH_DASH` dash pattern** on the stroke |
-| **Point** | Waypoint, Facility pin, Region | a **glyph badge** at a corner/anchor |
+| **Marker** | Waypoint, Facility pin, Robot pose | availability/identity on the body **+ at most one prioritized solid badge** |
+| **Area** | Region | category/state on fill and outline **+ anchored data-quality marks when needed** |
 
 Lines do **not** wear lifecycle/condition/availability badges — the dash carries
 those, and a badge on a polyline reads as clutter and collides with labels.
-Points have no long stroke to dash, so a badge is their non-color channel.
+Markers have no long stroke to dash, so one attached solid badge is their
+non-color exception channel. They never grow a badge stack: each renderer
+resolves its own priority into one visual slot while the accessible name
+preserves every raw state. Waypoint uses `invalid > stale`; FacilityTransition
+uses `invalid > stale > unknown`.
 
 The only badges a line keeps are the two **data-quality flags**, `invalid` and
 `stale`, exposed as `[data-*-overlay-state]` — a data error is not a lifecycle
@@ -55,59 +60,90 @@ states stay distinguishable at 2.5–4px strokes.
 
 The 11-shape `NavigationStateGlyph` set is still the canonical vocabulary for
 these states — the dash *encodes* the state that the glyph *names*. The State
-Badge foundation story is that shape reference; the shapes render as badges only
-on point elements (unknown / invalid / stale).
+Badge foundation story is that shape reference. Compact markers attach at most
+one solid badge; paths and areas use their own geometry channels.
 
 ---
 
-## 3. Arrows: one per line, in a fixed hierarchy
+## 3. Line roles are geometry, not color
 
-Three arrow families, three jobs — never interchange them:
+The three line renderers must remain identifiable after color is removed:
 
-1. **Direction chevron** (`NAVIGATION_DIRECTION_PATH`, a filled ►, 12×12px at
-   viewportScale 1) — travel *heading* riding on the line. Its area centroid is
-   the local origin, so rotation alone points it.
-2. **Progress head** (`NAV_PROGRESS_HEAD`, an open ‹ casing+core V attached with
-   `marker-end`) — the *current position* at the elapsed line's end.
-3. **Endpoint orientation arrow** (`NAVIGATION_ENDPOINT_ORIENTATION_PATH`, a
-   stroked shaft-and-head →) — a lane endpoint's approach orientation, pointing
-   *away* from the path.
+1. **Lane** is quiet graph topology: a 1.5px neutral line with endpoint nodes.
+   Its on-line direction chevron is opt-in for topology/debug views only.
+2. **Route** is the selected graph plan: a 3.5–4.5px cased line with an open-V
+   progress head only at the current plan boundary.
+3. **Trajectory** is temporal telemetry: a 1.75–2.25px line punctuated by
+   capped sample dots and a circular current-sample cursor.
 
-**One arrow per stretch of line.** The progress head already states direction on
-its segment, so the chevron is *suppressed* wherever a progress head shows
-(`isProgressSegment && progressHeadVisible`). A head-less line (a planned
-trajectory) still gets a chevron.
+Default Route and Trajectory views do not reuse `NAVIGATION_DIRECTION_PATH`.
+Route segment order communicates plan direction, Trajectory sample order
+communicates time, and RobotPose owns physical heading.
 
-**Layer deference.** When a composed viewer stacks a route/trajectory over the
-lane it rides, the higher layer's arrow already states direction, so the lane's
-own chevron is turned off (`showDirection={false}`). One corridor, one arrow.
+The remaining arrow families have separate jobs:
 
-Rank: **current position (head) > heading (chevron)**. The head is larger
-(~18px) than the chevron (~12px) so position outranks heading visually.
+- `NAVIGATION_DIRECTION_PATH`: optional Lane topology/debug direction only.
+- `NAV_PROGRESS_HEAD`: Route progress at the elapsed plan boundary.
+- `NAVIGATION_ENDPOINT_ORIENTATION_PATH`: lane endpoint approach orientation.
+
+Lane's default is `showDirection={false}`. A topology/debug tool may opt in only
+when endpoint identity is hidden and direction would otherwise be ambiguous.
 
 ---
 
-## 4. Rings trace the silhouette, don't recolor meaning
+## 4. Selection and focus stay independent without growing a ring ladder
 
-Every ring a marker wears — selection, focus, and any persistent state ring —
-**traces the marker's own silhouette**, so co-occurring rings nest
-concentrically instead of crossing (a circle around a diamond cuts through its
-edges as soon as radii collide), and no ring ever overrides a meaning-carrying
-fill or stroke:
+Selection is persistent product state; focus is a transient keyboard location.
+They must remain independently visible, but they do not need identical chrome.
+Each renderer chooses the smallest cue its geometry can carry:
 
-- **Pins** (facility, hazard): scale `NAV_PIN.path` — selection `1.16` ⊂ focus
-  `1.34` ⊂ alarm halo `1.5` (`NAV_PIN.alarmRing`).
-- **Waypoint diamond**: scale the diamond on one outward ladder — selection
-  `1.28` ⊂ focus shell `1.5` (`NAV_FOCUS.waypointShellScale`) ⊂ stale ring
-  `1.8` ⊂ attention ring `2.15` (`NAV_NODE`). Persistent data-state rings sit
-  OUTSIDE the transient focus shell — the same layering as the pin alarm halo —
-  so an alarm keeps its salience while the marker is focused. The point keeps
-  its surface fill + availability stroke in every state.
-- **Region**: stroke the polygon outline (focus/selection widths in
-  `NAV_FOCUS`/`NAV_SELECTION`), never refilling the pattern.
-- **Line**: a translucent accent halo one tier wider on route.
+| Geometry | Selection | Keyboard focus |
+| --- | --- | --- |
+| Waypoint rounded square | static 1.25× enlargement from 20px to 25px; availability fill is unchanged and the solid badge stays fixed | one silhouette shell made from a surface contrast underlay + `--color-semantic-focus-indicator` |
+| Robot pose | static 1.15× body enlargement; status badge stays fixed | one outer high-contrast double ring |
+| Facility / hazard pin | static 1.12× body enlargement; facility/severity fill and the status badge stay unchanged | outer contrast-backed silhouette ring |
+| Region | wider semantic-color boundary; pattern and category tint remain unchanged | wider focus outline |
+| Lane / route / trajectory | wider semantic-color core plus neutral casing | wider solid focus halo under the status path |
 
-Focus uses `--color-semantic-focus-indicator`; selection uses `--viewer-accent`.
+Compact markers never stack status badges. The waypoint is the strictest case:
+
+- selection enlarges the complete marker body and role icon from 20px to 25px;
+- focus contributes one visible outer shell;
+- the most specific role occupies the interior as a consistent SVG icon using
+  **`charger > parking > holding > passthrough`**;
+- availability uses one solid fill color;
+- data quality uses one top-right 12px solid badge with priority
+  **`invalid > stale`**, never two stacked badges;
+- unavailable uses a muted fill, and disabled keeps the shared opacity
+  treatment.
+
+The accessible name still announces every role and true state even when the
+marker shows only the primary role icon, availability fill, and highest-priority
+data-quality badge.
+Point-marker selection uses a one-shot 160ms ease-out scale transition; path and
+region selection use the same duration for stroke-width changes. Both become
+immediate under `prefers-reduced-motion` and never repeat. A pulse is not a
+selection, focus, or static severity cue; reserve repeating motion for an
+explicitly modeled live alarm or activity state.
+
+### 4.1 Three independent state axes
+
+Every interactive map renderer keeps the following axes separate in DOM hooks,
+accessible naming, and paint:
+
+1. **Selection** — persistent product choice, exposed through `data-selected`
+   and `aria-pressed` when the fragment is interactive.
+2. **Keyboard focus** — transient input location, mirrored from
+   `:focus-visible` or the controlled `focused` prop and painted with the focus
+   token. Point/pin geometry adds a wider surface contrast underlay.
+3. **Data/operation state** — availability, validation, freshness, lifecycle,
+   or severity. It remains on the base stroke/fill, dash, slash, or state badge
+   and never substitutes for selection or focus.
+
+Co-occurrence is expected: selecting an object must not erase its focus or data
+state, and focusing it must not manufacture selection. Storybook interaction
+tests assert the axes independently for waypoint, robot pose, facility, hazard,
+lane, route, trajectory, and region renderers.
 
 ---
 
@@ -117,29 +153,30 @@ Reserve the alarm hue for alarms.
 
 | Tone | Reserved for |
 | --- | --- |
-| **danger** (`--viewer-danger`) | **위험 · 금지 · 차단 · 데이터 오류** — hazard *danger*, keep-out region, blocked/conflict route/trajectory/lane, and the `invalid` **badge** |
+| **danger** (`--viewer-danger`) | **위험 · 금지 · 차단 · 데이터 오류** — hazard *danger*, keep-out region, blocked/conflict route/trajectory/lane, and the `invalid` badge |
 | **warning** (`--viewer-warning`) | caution · waiting · limit · availability unknown |
 | **muted** (`--viewer-muted`) | **operationally unavailable**, unknown body/outline, planned, inactive/stale |
-| **accent** (`--viewer-accent`) | current · active · facility-available · selection |
+| **accent** (`--viewer-accent`) | current · active · facility-available; selection does not borrow this semantic color |
 | **positive** (`--viewer-positive`) | completed |
 
 **"Can't use right now" is not an alarm.** Operational unavailability
-desaturates to **muted** (the greyed-out convention) and lets a **slash shape**
-carry the meaning — it does not borrow danger red. Applied consistently to the
-waypoint (muted stroke + foreground slash) and the facility pin (muted pin +
-white-knockout slash). Only a genuine *data error* (`invalid`) keeps the danger
-attention ring.
+desaturates to **muted** (the greyed-out convention) and does not borrow danger
+red. A facility pin retains its white-knockout slash; the smaller waypoint uses
+only its muted fill and announces the full state in text/accessibility
+metadata.
 
-**`invalid` is a badge, not a repaint.** A data-quality error shows as its red
-`!` badge (plus `aria-invalid`), and does **not** recolor the whole line +
-progress head to danger. Painting every element red stacked two red signals in
-one spot and made an invalid-but-active line indistinguishable from a blocked
-one. Lifecycle *conditions* (blocked, conflict) still tone the line danger; the
-data-quality flag rides on top as a badge.
+**`invalid` is not a whole-object repaint.** A data-quality error shows as a red
+`!` badge on renderers with a badge slot (plus `aria-invalid`). It does **not**
+recolor a whole line + progress
+head to danger. Painting every element red stacked two signals in one spot and
+made an invalid-but-active line indistinguishable from a blocked one. Lifecycle
+*conditions* (blocked, conflict) still tone the line danger.
 
-**Second channel for the top severity.** A `danger` hazard also wears a
-persistent alarm halo (`NAV_PIN.alarmRing`, scale 1.5) that a `caution` hazard
-does not — severity survives desaturation, not on fill hue alone.
+**Hazard severity is a classification, not a live alarm.** A static hazard uses
+the cautionary or danger fill and exposes the severity in its accessible name;
+it does not add a persistent ring or pulse. Motion is reserved for a separately
+defined real-time `activeAlarm` state so a registered danger location never
+pretends that an alarm event is currently firing.
 
 ---
 
@@ -147,10 +184,13 @@ does not — severity survives desaturation, not on fill hue alone.
 
 A given graph entity reads as the same shape wherever it appears:
 
-- **Graph node** = the `NAV_NODE` diamond. A `WaypointMarker` draws it at
-  `radius` 7; a lane endpoint (which references a waypoint by id) draws the same
-  diamond at `endpointRadius` 4. Never a circle in one place and a diamond in
-  another.
+- **Graph node** = the `NAV_NODE` rounded square. A `WaypointMarker` draws it at
+  `radius` 10 with a 4px corner radius; a lane endpoint (which references a
+  waypoint by id) draws the same shape at `endpointRadius` 4. Never a circle in
+  one place and a rounded square in another. Waypoint availability changes its
+  solid fill; the primary role is a surface-knockout vector icon inside the same
+  silhouette, and invalid/stale data quality overlaps its top-right corner as a
+  single 12px solid badge.
 - **Map pin** = `NAV_PIN.path`, shared by facility and hazard so they read as
   one marker family; severity/availability fill and the knockout glyph — not a
   different outline — distinguish them.
@@ -174,61 +214,130 @@ over the map's own grid:
 
 ## 8. Labels (annotation layer)
 
-Labels negotiate one deterministic vertical layout: placed greedily by
-(priority desc, kind-weight desc, id asc); obstacles (marker/badge footprints)
-are immovable; a label whose natural spot is free never moves; when every
-candidate within `maxLabelDisplacementPx` collides, the label is **suppressed**
-rather than displaced. Priority is state-first (`annotationPriority`): selected
-outranks focused outranks alarm outranks emphasized; kind weight only breaks
-ties. Identity is always preserved in the accessible name even when the visual
-label is clipped or suppressed.
+`NavigationAnnotationLayer` is the public composition boundary; individual
+route, trajectory, waypoint, facility, lane, region, and robot-pose labels stay
+internal to their renderer. A map that composes two or more of these overlays
+places their shared SVG stage below one layer. Standalone overlays remain
+pixel-compatible when no provider is present.
+
+### 8.1 External category evidence
+
+This contract adapts, rather than copies, the following authoritative map-label
+systems:
+
+- [Mapbox label placement](https://docs.mapbox.com/help/dive-deeper/optimize-map-label-placement/)
+  establishes collision avoidance, ordered variable anchors, radial offset,
+  sort priority, and hiding when no valid placement remains.
+- [ArcGIS Standard Label Engine](https://pro.arcgis.com/en/pro-app/3.6/help/mapping/text/label-with-the-standard-label-engine.htm)
+  establishes label priority, feature weights, buffer, alternate placement,
+  and removal before overlap.
+- [QGIS label settings](https://docs.qgis.org/4.2/en/docs/user_manual/style_library/label_settings.html)
+  establishes obstacle weights, scale/pixel visibility, fallback placements,
+  z-order, and callouts for placements that no longer read as attached.
+- [OGC Testbed-14 Symbology Engineering Report](https://docs.ogc.org/per/18-029.html)
+  confirms `labelObstacle` and priority as portable symbology concepts.
+- [WCAG 2.2](https://www.w3.org/TR/WCAG22/) and
+  [Use of Color](https://www.w3.org/WAI/WCAG22/Understanding/use-of-color)
+  require sufficient text/graphic contrast and a non-color channel for state.
+
+The LDS adaptation deliberately omits automatic callout leaders in v1. A
+leaderless fine adjustment is capped at 24 CSS px; a farther arbitrary move
+would break feature association, so the label is hidden instead. A named
+quadrant or along-path fallback is an alternate anchor, not an unbounded nudge.
+
+### 8.2 Deterministic placement contract
+
+Labels are placed greedily by `(priority desc, kind-weight desc, id asc)`.
+Registered marker, progress-head, status-badge, robot-pose, waypoint, facility,
+map-header, north-indicator, and scale-bar rectangles are immovable obstacles.
+Route, trajectory, and lane strokes are sampled as narrow screen-space
+obstacles as well, so a label cannot technically clear another label while
+still painting across the path. Every label/label, label/chrome, and label/path
+pair keeps an 8 CSS px buffer. Labels also stay inside a 16px SVG safe inset.
+
+Candidate order is stable:
+
+| Kind | Placement candidates |
+| --- | --- |
+| route segment | above → below |
+| route progress | below → above → leading/trailing fallback |
+| trajectory | above → below → leading/trailing along-path fallback |
+| waypoint, facility, robot pose | top-right → top-left → bottom-right → bottom-left |
+| lane, region | natural centered/normal placement only; hide if it fails |
+
+Each candidate may receive a deterministic 2D fine nudge in 8px increments up
+to 24px. If every candidate still collides, only that decorative label is
+suppressed. Geometry, state badges, hit targets, accessible names, and the
+ordinary-text semantic mirror do not change.
+
+### 8.3 Priority and density
+
+State tiers are strict: **danger/error > keyboard focus > selection > ordinary
+map context**. Inside the ordinary tier the order is current route progress >
+robot pose > current route segment > active trajectory > other context >
+background lane/region. Kind weight only breaks a remaining tie.
+
+Density is explicit, not inferred from an unreliable raw viewport scale:
+
+| `detailMode` | Default visible context |
+| --- | --- |
+| `overview` | danger, focus, selection, current progress, current segment, active trajectory |
+| `standard` | overview set + key waypoint/facility and upcoming context |
+| `detail` | standard set + completed route, lane, and region context when it fits |
+
+Visual copy is also density-aware. Standard waypoint and trajectory names use
+a single ellipsized line, while facility annotations render at most one primary
+and one status line. Detail mode restores full waypoint/trajectory names, but
+facility annotations still cap at two visible lines; complete operational state
+remains in the accessible name and belongs in the selection inspector, not as a
+permanent map paragraph.
+
+Danger, focused, and selected labels bypass density filtering but still
+participate in collision placement. On the Route overview fixture the
+highest-priority `현재 42%` remains visible. `교차로 → Lift A` and
+`Robot 2 예상 궤적` remain eligible but may yield when their only placements
+cross a route/trajectory stroke; completed `입구 → 교차로` yields by density
+until detail mode or direct attention.
+
+### 8.4 Validation contract
+
+The annotation stories cover 540px and 320px surfaces, long Korean labels,
+light/dark Route composition, density tiers, no-provider parity, and a compound
+danger + focus + selection cluster. Acceptance is:
+
+- no expanded label/label, label/chrome, or label/path overlap at an 8px buffer;
+- no leaderless fine nudge over 24px;
+- no horizontal overflow at 320px;
+- standalone no-provider output stays uncoordinated;
+- suppression never removes the feature's accessible name;
+- label text remains at least 4.5:1 and non-text state graphics at least 3:1.
 
 ---
 
 ## Appendix A — Waypoint role pictograms
 
-*Status: option A shipped. charger renders as a ⚡ pictogram; the rest stay
-codes. `_navigationRoleGlyph` holds the glyph, `ROLE_GLYPH_KINDS` is the roster.*
+*Status: all primary-role pictograms shipped. `_navigationRoleGlyph` owns the
+font-independent shapes and `ROLE_GLYPH_KINDS` is the roster.*
 
-**Today.** A waypoint's roles render as compact **letter codes** in the detail
-line beside the marker (`H` holding · `T` passthrough · `P` parking · `C`
-charger), from `ROLE_CODE` in `_navigationEncoding`. This is language-neutral and
-compact, but `C`/`H`/`T` need the legend to decode.
+The 20px waypoint rounded square carries one surface-knockout role icon over its
+solid availability fill. A data-quality 12px solid badge may overlap the top-right
+corner without replacing that role:
 
-**Finding.** Fleet-management UIs lean on pictograms for roles that have a
-universal symbol; letter codes read as a decoder puzzle. But two caveats pull
-against a wholesale conversion:
+| Role | Icon |
+| --- | --- |
+| holding | pause bars |
+| passthrough | forward arrow |
+| parking | vector `P` |
+| charger | bolt |
 
-1. **`P` for parking is already a worldwide convention** — the letter *is* the
-   pictogram. Converting it gains nothing.
-2. The marker is a small diamond already carrying corner state badges; adding
-   role glyphs *on* the node would crowd it.
+When roles overlap, the marker shows one primary icon using
+`charger > parking > holding > passthrough`. The full role set remains in the
+accessible name and inspector data. The map legend draws the same four vector
+icons; it never asks operators to decode H/T/P/C from the map.
 
-**Recommendation — enhance the code line, don't move glyphs onto the node.**
-Keep roles in the detail line, but swap the few codes that have an unambiguous
-universal symbol for a small inline pictogram, following the facility
-knockout-glyph precedent (`_FacilityGlyph`) for visual family:
-
-| Role | Today | Proposed |
-| --- | --- | --- |
-| charger | `C` | **⚡ bolt pictogram (shipped)** — leads the detail line; `C` drops from the code string |
-| parking | `P` | keep `P` (already conventional) |
-| holding | `H` | keep `H` (no universal symbol; revisit) |
-| passthrough | `T` | keep `T` (no universal symbol; revisit) |
-
-**What shipped (option A).** charger renders as a bolt glyph
-(`_navigationRoleGlyph`) leading the waypoint detail line (with a surface halo),
-and the map legend shows the same glyph in its role chip. `ROLE_CODE.charger`
-stays `C` as the internal/data-attribute + accessibility identifier; the Codes
-foundation story documents that the map draws it as ⚡.
-
-**If ever extended (option B).** Author a pictogram per role in
-`_navigationRoleGlyph` and add each to `ROLE_GLYPH_KINDS`; the marker, legend,
-and Codes story already route glyph-backed roles automatically, so the work is
-authoring shapes + deciding whether to retire the letter codes.
-
-On-node placement is rejected (crowding); pictograms live in the detail line at
-code size, and the accessible name keeps the full role words.
+`ROLE_CODE` remains the stable internal/data-attribute and serialization
+identifier. It is documented by the Codes foundation story but is no longer the
+finished waypoint visual.
 
 ---
 

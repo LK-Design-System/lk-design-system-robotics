@@ -1,13 +1,6 @@
-// Direction / heading vector glyphs shared across the Navigation renderers.
-// Internal `_`-prefixed module: geometry-only string constants, imported by the
-// renderers but never exported from the public entry.
-//
-// The filled direction chevron is the compact "direction of travel / heading"
-// marker painted on a path — lane mid-direction, route direction, trajectory
-// heading. Its area centroid is the local origin — (-4 - 4 + 8) / 3 = 0 — so it
-// sits on the path anchor after rotation. Sized 12x12px at viewportScale 1:
-// clearly legible on a 2.5-4px path stroke at map zoom, while staying visually
-// subordinate to the ~18px progress head (current position outranks heading).
+// Optional topology/debug direction cue. Normal Lane and Route views omit it;
+// Trajectory uses temporal samples and RobotPose owns physical heading.
+// Internal `_`-prefixed geometry, not part of the public package entry.
 export const NAVIGATION_DIRECTION_PATH = 'M -4 -6 L 8 0 L -4 6 Z';
 
 // The stroked shaft-and-head arrow that annotates a lane ENDPOINT's approach

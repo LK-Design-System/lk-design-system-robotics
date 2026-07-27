@@ -1,5 +1,5 @@
 import React from 'react';
-import { Joystick } from './lds.js';
+import { Joystick } from '../src/index.js';
 import { JoystickCard as JoystickCardStory } from './RoboticsAndViz.shared.jsx';
 
 const waitFor = async (predicate, message) => {
@@ -59,8 +59,16 @@ const assertTextContract = (control) => {
 
 const meta = {
   title: 'LDS Robotics/Control/Joystick',
+  tags: ['autodocs'],
   component: Joystick,
   parameters: {
+    storyGuide: {
+      storyId: 'lds-robotics-control-joystick--joystick-control',
+      eyebrow: 'Robotics / Joystick',
+      title: '조이스틱은 누르는 동안만 명령을 내보내고 놓으면 정지합니다',
+      description:
+        '연속 아날로그 수동 주행이 필요할 때 적합합니다. 모든 입력 종료 경로에서 0 벡터로 확실히 멈춰야 하며, 단계적 이동에는 Directional Pad를 사용하세요.',
+    },
     docs: {
       description: {
         component: '누르는 동안만 수동 조작 벡터를 내보내고, 모든 입력 종료 경로에서 0 벡터로 정지하는 Joystick 패턴입니다.',
@@ -83,19 +91,6 @@ export const JoystickControl = {
   },
   render: () => (
     <main style={{ display: 'grid', gap: 'var(--space-6)', maxWidth: 720 }}>
-      <header style={{ display: 'grid', gap: 'var(--space-2)' }}>
-        <p className="lk-overline lk-overline--signal" style={{ margin: 0 }}>
-          Robotics / Joystick
-        </p>
-        <h1 style={{ margin: 0, color: 'var(--color-semantic-label-strong)', fontSize: 'var(--title2-size)', lineHeight: 'var(--title2-line)' }}>
-          조이스틱은 누르는 동안만 명령을 내보내고 놓으면 정지합니다
-        </h1>
-        <p style={{ margin: 0, maxWidth: 640, color: 'var(--color-semantic-label-neutral)', lineHeight: 1.7 }}>
-          연속 아날로그 수동 주행이 필요할 때 적합합니다. 포인터·키보드 어느 입력이든 누르는 동안만 벡터를 내보내고,
-          모든 종료 경로(키업·포인터업·포커스 상실)에서 0 벡터로 확실히 멈춥니다 — 안전상 '놓으면 정지'가 핵심입니다.
-          단계적 이동에는 방향 패드를 쓰세요.
-        </p>
-      </header>
       <section style={{ display: 'grid', placeItems: 'center', minHeight: 240 }}>
         <Joystick size={180} label="수동 조작" />
       </section>

@@ -4,6 +4,7 @@ import type {
   NavigationPoint,
   NavigationSvgFeatureProps,
 } from './WaypointMarker';
+import type { NavigationFrameRef } from './NavigationCoordinateSystem';
 
 export type SpatialRegionShape =
   | {
@@ -19,6 +20,8 @@ export type SpatialRegionShape =
 interface SpatialRegionBase {
   readonly id: string;
   readonly mapId: string;
+  /** Source frame/version/time retained after projection into SVG map space. */
+  readonly source?: NavigationFrameRef;
   readonly label: string;
   readonly shape: SpatialRegionShape;
 }

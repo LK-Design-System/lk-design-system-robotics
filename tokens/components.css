@@ -1,14 +1,67 @@
 :root {
-  --component-viewer-surface: color-mix(in srgb, var(--color-semantic-static-black) 88%, var(--color-semantic-primary-normal));
-  --component-viewer-surface-elevated: color-mix(in srgb, var(--color-semantic-static-black) 78%, var(--color-semantic-primary-normal));
-  --component-viewer-foreground: var(--color-semantic-static-white);
-  --component-viewer-muted: color-mix(in srgb, var(--color-semantic-static-white) 72%, transparent);
-  --component-viewer-subtle: color-mix(in srgb, var(--color-semantic-static-white) 52%, transparent);
-  --component-viewer-border: color-mix(in srgb, var(--color-semantic-static-white) 18%, transparent);
-  --component-viewer-overlay: color-mix(in srgb, var(--color-semantic-static-black) 68%, transparent);
-  --component-viewer-light-surface: var(--color-semantic-static-white);
-  --component-viewer-light-surface-elevated: color-mix(in srgb, var(--color-semantic-static-black) 4%, var(--color-semantic-static-white));
-  --component-viewer-light-foreground: color-mix(in srgb, var(--color-semantic-static-black) 90%, transparent);
-  --component-viewer-light-muted: color-mix(in srgb, var(--color-semantic-static-black) 68%, transparent);
-  --component-viewer-light-border: color-mix(in srgb, var(--color-semantic-static-black) 16%, transparent);
+  --component-viewer-map-free: color-mix(in srgb, var(--color-semantic-static-black) 78%, var(--color-semantic-primary-normal));
+  --component-viewer-map-occupied: color-mix(in srgb, var(--color-semantic-static-white) 88%, transparent);
+  --component-viewer-map-unknown: color-mix(in srgb, var(--color-semantic-static-black) 88%, var(--color-semantic-primary-normal));
+  --component-viewer-map-boundary: color-mix(in srgb, var(--color-semantic-static-white) 32%, transparent);
+  --component-viewer-light-map-free: var(--color-semantic-static-white);
+  --component-viewer-light-map-occupied: color-mix(in srgb, var(--color-semantic-static-black) 79%, transparent);
+  --component-viewer-light-map-unknown: color-mix(in srgb, var(--color-semantic-static-black) 4%, var(--color-semantic-static-white));
+  --component-viewer-light-map-boundary: color-mix(in srgb, var(--color-semantic-static-black) 28%, transparent);
+}
+
+[data-viewer-appearance='dark'] [data-occupancy-state='free'] {
+  fill: var(--component-viewer-map-free);
+}
+
+[data-viewer-appearance='dark'] [data-occupancy-state='occupied'] {
+  fill: var(--component-viewer-map-occupied);
+}
+
+[data-viewer-appearance='dark'] [data-occupancy-state='unknown'] {
+  fill: var(--component-viewer-map-unknown);
+}
+
+[data-viewer-appearance='dark'] [data-occupancy-boundary] {
+  stroke: var(--component-viewer-map-boundary);
+}
+
+@keyframes lds-robot-pose-pulse {
+  0% {
+    opacity: 0.34;
+    transform: scale(0.82);
+  }
+
+  72%,
+  100% {
+    opacity: 0;
+    transform: scale(1.42);
+  }
+}
+
+[data-robot-pose-motion-indicator] {
+  animation: lds-robot-pose-pulse 1.7s var(--ease-out) infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+[data-navigation-selection-scale] {
+  transform: scale(1);
+  transform-box: view-box;
+  transform-origin: 0 0;
+  transition: transform 160ms var(--ease-out);
+}
+
+[data-navigation-selection-geometry] {
+  transition: stroke-width 160ms var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-robot-pose-motion-indicator] {
+    display: none;
+  }
+
+  [data-navigation-selection-scale],
+  [data-navigation-selection-geometry] {
+    transition-duration: 0.01ms;
+  }
 }

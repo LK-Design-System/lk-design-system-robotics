@@ -4,6 +4,8 @@ import type {
   NavigationPoint,
   NavigationSvgFeatureProps,
 } from './WaypointMarker';
+import type { NavigationFrameRef } from './NavigationCoordinateSystem';
+import type { NavigationGeometrySpace } from './NavigationGeometryAdapters';
 
 export type LaneId = string;
 export type LaneAvailability = 'available' | 'closed' | 'unknown';
@@ -25,6 +27,10 @@ export interface LaneData {
   readonly id: string;
   readonly label?: string;
   readonly mapId: string;
+  /** Source frame/version/time retained after projection into SVG map space. */
+  readonly source?: NavigationFrameRef;
+  /** Proof that points were projected from world coordinates into SVG map space. */
+  readonly coordinateSpace?: NavigationGeometrySpace;
   /** Directed geometry from entry to exit in map coordinates. */
   readonly points: readonly NavigationPoint[];
   readonly entry: LaneEndpointData;
@@ -42,6 +48,8 @@ export interface LaneOverlayProps extends NavigationSvgFeatureProps {
   conflict?: boolean;
   /** Show entry/exit endpoint chrome. Disable when a composed waypoint layer owns the same endpoint identities. @default true */
   showEndpoints?: boolean;
+  /** Optional on-line direction chevron for topology/debug views with hidden endpoint identity. @default false */
+  showDirection?: boolean;
   onActivate?: (id: string, event: NavigationActivateEvent) => void;
 }
 

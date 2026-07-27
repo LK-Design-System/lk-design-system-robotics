@@ -41,3 +41,29 @@ export function assertSharedFocusIndicator(ring, rendererName) {
     throw new Error(`${rendererName} focus indicator stroke must be non-scaling.`);
   }
 }
+
+// Point and pin renderers sit on arbitrary map imagery, so the semantic focus
+// stroke needs a wider surface-colored underlay. The pair is one visible focus
+// indicator: the underlay supplies contrast and the foreground supplies the
+// stable focus color.
+export function assertContrastBackedFocus(root, contrastSelector, ringSelector, rendererName) {
+  const contrast = root?.querySelector(contrastSelector);
+  const ring = root?.querySelector(ringSelector);
+  if (!contrast || !ring) {
+    throw new Error(`${rendererName} focus indicator needs both contrast and foreground layers.`);
+  }
+
+  assertSharedFocusIndicator(ring, rendererName);
+  if (contrast.getAttribute('vector-effect') !== 'non-scaling-stroke') {
+    throw new Error(`${rendererName} focus contrast stroke must be non-scaling.`);
+  }
+  if (Number(contrast.getAttribute('stroke-width')) <= Number(ring.getAttribute('stroke-width'))) {
+    throw new Error(`${rendererName} focus contrast layer must be wider than its foreground ring.`);
+  }
+
+  for (const geometryAttribute of ['d', 'points', 'r', 'transform']) {
+    if (contrast.getAttribute(geometryAttribute) !== ring.getAttribute(geometryAttribute)) {
+      throw new Error(`${rendererName} focus layers must share ${geometryAttribute} geometry.`);
+    }
+  }
+}

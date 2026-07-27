@@ -31,17 +31,19 @@ export interface ManualControlSessionProps extends Omit<React.HTMLAttributes<HTM
   controlMode?: 'pointer' | 'keyboard' | 'hybrid';
   focusRequired?: boolean;
   sessionMeta?: React.ReactNode;
+  /** 이동 명령 차단과 독립적으로 사용할 모드·감도 선택 영역. */
+  controlToolbar?: React.ReactNode;
   deadmanControl?: React.ReactNode;
-  /** 소프트웨어 운행 정지 요청의 전송·수신·실제 정지·실패 상태. Full lifecycle UI를 쓰려면 제어하세요. 생략 시 callback-only 호환 모드입니다. @default "idle" */
+  /** 소프트웨어 주행 정지 요청의 전송·수신·실제 정지·실패 상태. Full lifecycle UI를 쓰려면 제어하세요. 생략 시 callback-only 호환 모드입니다. @default "idle" */
   stopRequestState?: ManualControlStopRequestState;
   /** 현재 정지 요청 상태의 기본 설명을 교체합니다. */
   stopRequestMessage?: React.ReactNode;
-  /** idle 상태의 정지 요청 버튼 레이블. @default "운행 정지 요청" */
+  /** idle 상태의 정지 요청 버튼 레이블. @default "주행 정지" */
   stopRequestLabel?: string;
   /** arm 상태 변경 요청. 안전 해제·정지 요청에서 전달되는 false를 소비자가 반영해야 합니다. */
   onArmedChange?: (armed: boolean) => void;
   onSafetyReleaseRequest?: (reason: ManualControlReleaseReason) => void;
-  /** 안전 등급 E-stop 완료가 아닌 소프트웨어 운행 정지 요청을 시작합니다. */
+  /** 안전 등급 E-stop 완료가 아닌 소프트웨어 주행 정지 요청을 시작합니다. */
   onStopRequest?: () => void;
   /** @deprecated onStopRequest를 사용하세요. callback-only 하위 호환 별칭이며 onArmedChange(false)를 반영해야 합니다. */
   onEmergencyStopRequest?: () => void;

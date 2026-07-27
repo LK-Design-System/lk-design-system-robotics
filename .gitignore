@@ -4,3 +4,5 @@ storybook-static/
 visual-artifacts/
 .lds-conformance/
 *.tgz
+*.log
+temp/

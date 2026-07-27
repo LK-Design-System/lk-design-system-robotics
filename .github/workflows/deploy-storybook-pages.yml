@@ -1,0 +1,73 @@
+name: Deploy Storybook to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Storybook
+    runs-on: windows-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.LK_PACKAGES_READ_TOKEN || github.token }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v6.4.0
+        with:
+          node-version: 22.17.1
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Build Storybook
+        run: npm run build:storybook
+
+      - name: Include third-party notices
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force storybook-static/licenses | Out-Null
+          Copy-Item -LiteralPath THIRD_PARTY_NOTICES.md -Destination storybook-static/THIRD_PARTY_NOTICES.md
+          Copy-Item -LiteralPath licenses/Apache-2.0.txt -Destination storybook-static/licenses/Apache-2.0.txt
+          Copy-Item -LiteralPath licenses/MIT-WDS.txt -Destination storybook-static/licenses/MIT-WDS.txt
+          Copy-Item -LiteralPath licenses/PRETENDARD-OFL-1.1.txt -Destination storybook-static/licenses/PRETENDARD-OFL-1.1.txt
+          Copy-Item -LiteralPath node_modules/@lk-robotics/lds-core/THIRD_PARTY_NOTICES.md -Destination storybook-static/licenses/lds-core-THIRD_PARTY_NOTICES.md
+          Copy-Item -LiteralPath node_modules/@lk-robotics/lds-product/THIRD_PARTY_NOTICES.md -Destination storybook-static/licenses/lds-product-THIRD_PARTY_NOTICES.md
+          Copy-Item -LiteralPath node_modules/@lk-robotics/lds-theme/THIRD_PARTY_NOTICES.md -Destination storybook-static/licenses/lds-theme-THIRD_PARTY_NOTICES.md
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: storybook-static
+
+  deploy:
+    name: Deploy GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

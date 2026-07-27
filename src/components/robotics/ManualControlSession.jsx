@@ -1,9 +1,9 @@
 import React from 'react';
 import { Button } from '@lk-robotics/lds-core/components/buttons/Button';
+import { Card } from '@lk-robotics/lds-core/components/cards/Card';
 import { StatusBadge } from '@lk-robotics/lds-core/components/content/StatusBadge';
 import { Icon } from '@lk-robotics/lds-core/components/icon/Icon';
-import { Banner } from '@lk-robotics/lds-core/components/status/Banner';
-import { ConnectionBadge } from './ConnectionBadge.jsx';
+import { ConnectionBadge } from '@lk-robotics/lds-product/components/robotics/ConnectionBadge';
 
 const LINK_LABELS = {
   ready: '연결 준비됨',
@@ -15,7 +15,7 @@ const AUTHORITY_LABELS = {
   checking: '권한 확인 중',
   granted: '권한 부여됨',
   denied: '권한 거부됨',
-  revoked: '권한 회수됨',
+  revoked: '권한 없음',
 };
 
 const LINK_CONNECTION_STATUS = {
@@ -27,7 +27,7 @@ const LINK_CONNECTION_STATUS = {
 const CONTROL_MODE_LABELS = {
   pointer: '포인터',
   keyboard: '키보드',
-  hybrid: '포인터 + 키보드',
+  hybrid: '포인터 또는 키보드',
 };
 
 const GUARD_STATUS = {
@@ -43,13 +43,13 @@ const GUARD_STATUS = {
   },
   disarmed: {
     tone: 'signal',
-    title: '수동 제어 잠김 — 아래에서 수동 제어를 준비하세요',
-    message: null,
+    title: '수동 제어 잠김',
+    message: '수동 제어를 준비한 뒤 활성화 장치를 누르고 있는 동안만 이동할 수 있습니다.',
   },
   'deadman-released': {
     tone: 'cautionary',
-    title: '외부 활성화 입력 대기',
-    message: '연결된 활성화 장치를 계속 유지하는 동안만 제어 명령을 보낼 수 있습니다.',
+    title: '연속 활성화 입력 대기',
+    message: '연결된 활성화 장치를 누르고 있는 동안만 제어 명령을 보낼 수 있습니다.',
   },
   'focus-lost': {
     tone: 'cautionary',
@@ -79,37 +79,37 @@ const READY_STATUS = {
 const REARM_STATUS = {
   tone: 'cautionary',
   title: '수동 제어 재활성화 필요',
-  message: '정지 요청 이후에는 수동 제어를 해제한 뒤 다시 준비하세요.',
+  message: '주행 정지 이후에는 수동 제어를 해제한 뒤 다시 준비하세요.',
 };
 
 const STOP_REQUEST_STATUS = {
   requesting: {
     tone: 'signal',
-    title: '운행 정지 요청 전송 중',
+    title: '정지 요청 중',
     message: '로봇이 요청을 수신했는지 확인하고 있습니다.',
   },
   acknowledged: {
     tone: 'cautionary',
-    title: '운행 정지 요청 수신됨',
+    title: '정지 확인 중',
     message: '요청은 수신됐지만 실제 정지는 아직 확인되지 않았습니다.',
   },
   stopped: {
     tone: 'positive',
-    title: '운행 정지 확인됨',
+    title: '정지됨',
     message: null,
   },
   failed: {
     tone: 'negative',
-    title: '운행 정지 요청 실패',
+    title: '정지 요청 실패',
     message: '로봇의 실제 상태를 확인한 뒤 다시 요청하세요.',
   },
 };
 
 const STOP_BUTTON_LABELS = {
-  requesting: '정지 요청 전송 중',
-  acknowledged: '정지 요청 수신됨',
-  stopped: '운행 정지 확인됨',
-  failed: '운행 정지 다시 요청',
+  requesting: '정지 요청 중',
+  acknowledged: '정지 확인 중',
+  stopped: '정지됨',
+  failed: '정지 다시 시도',
 };
 
 function releaseReason({ linkReady, authorityGranted, armed, deadmanRequired, deadmanActive, focusSatisfied, windowActive }) {
@@ -151,10 +151,11 @@ export function ManualControlSession({
   controlMode = 'pointer',
   focusRequired = false,
   sessionMeta,
+  controlToolbar,
   deadmanControl,
   stopRequestState,
   stopRequestMessage,
-  stopRequestLabel = '운행 정지 요청',
+  stopRequestLabel = '주행 정지',
   onArmedChange,
   onSafetyReleaseRequest,
   onStopRequest,
@@ -272,6 +273,8 @@ export function ManualControlSession({
     : children;
 
   const canRequestArm = linkReady && authorityGranted && !stopBlockActive;
+  const showControlSurface = armed && linkReady && authorityGranted && !stopBlockActive;
+  const showControlNotice = showControlSurface && reason != null && reason !== 'deadman-released';
   /* Split "no handler wired" from "request already in flight". The former is a hard
      unavailable control (native `disabled`); the latter is a temporal block that must
      keep the button focusable so a keyboard operator who just pressed the stop does
@@ -282,6 +285,18 @@ export function ManualControlSession({
     || displayStopState === 'acknowledged'
     || displayStopState === 'stopped';
   const stopRequestDisabled = !stopHasCallback || stopLifecycleBlocked;
+  const armControl = (
+    <Button
+      data-manual-control-arm=""
+      variant={armed ? 'outlined' : 'primary'}
+      color={armed ? 'assistive' : 'primary'}
+      aria-pressed={armed}
+      disabled={typeof onArmedChange !== 'function' || (!armed && !canRequestArm)}
+      onClick={() => onArmedChange?.(!armed)}
+    >
+      {armed ? '수동 제어 해제' : '수동 제어 준비'}
+    </Button>
+  );
 
   const requestStop = () => {
     if (stopRequestDisabled) return;
@@ -297,8 +312,11 @@ export function ManualControlSession({
   };
 
   return (
-    <section
+    <Card
+      role="region"
       aria-labelledby={titleId}
+      elevation="sm"
+      padding={0}
       tabIndex={focusRequired && controlMode !== 'pointer' ? 0 : undefined}
       onFocus={(event) => {
         setFocusState(true);
@@ -313,26 +331,20 @@ export function ManualControlSession({
         minWidth: 0,
         boxSizing: 'border-box',
         overflow: 'hidden',
-        border: 'var(--component-card-border)',
-        borderRadius: 'var(--component-card-radius)',
-        background: 'var(--color-semantic-background-elevated-normal)',
-        boxShadow: focused && controlMode !== 'pointer'
-          ? '0 0 0 4px var(--color-semantic-focus-ring)'
-          : 'var(--component-card-shadow-sm)',
         fontFamily: 'var(--font-sans)',
-        outline: 'none',
+        outline: focused && controlMode !== 'pointer'
+          ? '2px solid var(--color-semantic-focus-ring)'
+          : 'none',
+        outlineOffset: 2,
         ...style,
       }}
       {...rest}
     >
-      <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-4)', flexWrap: 'wrap', padding: 'var(--space-4) var(--space-5)' }}>
-        <div style={{ display: 'grid', gap: 'var(--space-1)', minWidth: 0, flex: '1 1 180px' }}>
+      <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', flexWrap: 'wrap', padding: 'var(--space-4) var(--space-5)', borderBottom: '1px solid var(--color-semantic-line-normal-alternative)' }}>
+        <div style={{ minWidth: 0, flex: '1 1 180px' }}>
           <Heading id={titleId} style={{ margin: 0, color: 'var(--color-semantic-label-strong)', fontSize: 'var(--body1-size)', lineHeight: 'var(--body1-line)', fontWeight: 'var(--fw-bold)', overflowWrap: 'anywhere' }}>{title}</Heading>
-          {sessionMeta != null && (
-            <span style={{ color: 'var(--color-semantic-label-neutral)', fontSize: 'var(--label1-size)', lineHeight: 'var(--label1-line)', fontWeight: 'var(--fw-semibold)', overflowWrap: 'anywhere' }}>{sessionMeta}</span>
-          )}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-3)', flex: '10 1 350px', minWidth: 0, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-3)', flex: '0 1 auto', minWidth: 0, flexWrap: 'wrap' }}>
           <div aria-label="제어 전제조건" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-2)', minWidth: 0, flexWrap: 'wrap' }}>
             <ConnectionBadge status={LINK_CONNECTION_STATUS[linkState] || 'offline'} label={LINK_LABELS[linkState]} size="sm" />
             <StatusBadge tone={statusTone(authority, 'granted')}>{AUTHORITY_LABELS[authority]}</StatusBadge>
@@ -355,58 +367,124 @@ export function ManualControlSession({
         </div>
       </header>
 
-      <Banner
-        id={statusId}
-        variant="embedded"
-        tone={guard.tone}
-        title={guard.title}
-      >
-        {guard.message}
-      </Banner>
-
-      {renderedControls != null && (
+      {!showControlSurface && (
         <div
-          ref={controlsRef}
-          aria-label="제어 입력"
-          aria-disabled={!interactionEnabled}
-          inert={!interactionEnabled ? true : undefined}
-          data-interaction-enabled={interactionEnabled ? 'true' : 'false'}
-          onClickCapture={(event) => {
-            if (!interactionEnabled) {
-              event.preventDefault();
-              event.stopPropagation();
-            }
+          id={statusId}
+          data-manual-control-state="preflight"
+          role={guard.tone === 'negative' ? 'alert' : 'status'}
+          style={{
+            minHeight: 300,
+            display: 'grid',
+            placeItems: 'center',
+            padding: 'var(--space-8) var(--space-5)',
+            boxSizing: 'border-box',
           }}
-          onKeyDownCapture={(event) => {
-            if (!interactionEnabled) {
-              event.preventDefault();
-              event.stopPropagation();
-            }
-          }}
-          style={{ display: 'flex', minHeight: 240, alignItems: 'center', justifyContent: 'center', padding: 'var(--space-5)', pointerEvents: interactionEnabled ? 'auto' : 'none' }}
         >
-          {renderedControls}
+          <div
+            data-manual-control-preflight=""
+            style={{
+              width: 'min(100%, 380px)',
+              display: 'grid',
+              justifyItems: 'center',
+              gap: 'var(--space-3)',
+              minWidth: 0,
+              textAlign: 'center',
+            }}
+          >
+            <div style={{ display: 'grid', gap: 'var(--space-1)', minWidth: 0 }}>
+              <strong style={{ color: 'var(--color-semantic-label-strong)', fontSize: 'var(--body1-size)', lineHeight: 'var(--body1-line)', fontWeight: 'var(--fw-bold)', overflowWrap: 'anywhere' }}>
+                {guard.title}
+              </strong>
+              {guard.message != null && (
+                <span style={{ color: 'var(--color-semantic-label-neutral)', fontSize: 'var(--label1-size)', lineHeight: 'var(--label1-line)', overflowWrap: 'anywhere' }}>
+                  {guard.message}
+                </span>
+              )}
+            </div>
+            {!stopBlockActive && (
+              <div style={{ marginTop: 'var(--space-2)' }}>{armControl}</div>
+            )}
+          </div>
         </div>
       )}
 
+      {showControlSurface && (
+        <>
+          {showControlNotice && (
+            <div
+              id={statusId}
+              data-manual-control-state="notice"
+              role="status"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)',
+                padding: 'var(--space-3) var(--space-5)',
+                color: 'var(--color-semantic-label-neutral)',
+                background: 'var(--color-semantic-fill-normal)',
+                borderBottom: '1px solid var(--color-semantic-line-normal-alternative)',
+                fontSize: 'var(--label1-size)',
+                lineHeight: 'var(--label1-line)',
+              }}
+            >
+              <Icon name="info" size={16} aria-hidden="true" />
+              <span><strong style={{ color: 'var(--color-semantic-label-strong)' }}>{guard.title}</strong>{guard.message ? ` · ${guard.message}` : ''}</span>
+            </div>
+          )}
+          {controlToolbar != null && (
+            <div
+              data-manual-control-toolbar=""
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: 'var(--space-4) var(--space-5) 0',
+              }}
+            >
+              {controlToolbar}
+            </div>
+          )}
+          {renderedControls != null && (
+            <div
+              ref={controlsRef}
+              id={!showControlNotice ? statusId : undefined}
+              aria-label="제어 입력"
+              aria-disabled={!interactionEnabled}
+              inert={!interactionEnabled ? true : undefined}
+              data-interaction-enabled={interactionEnabled ? 'true' : 'false'}
+              onClickCapture={(event) => {
+                if (!interactionEnabled) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }
+              }}
+              onKeyDownCapture={(event) => {
+                if (!interactionEnabled) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }
+              }}
+              style={{ display: 'flex', minHeight: controlToolbar != null ? 250 : 300, alignItems: 'center', justifyContent: 'center', padding: 'var(--space-4) var(--space-5) var(--space-5)', pointerEvents: interactionEnabled ? 'auto' : 'none' }}
+            >
+              {renderedControls}
+            </div>
+          )}
+        </>
+      )}
+
       <footer style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-3)', flexWrap: 'wrap', padding: 'var(--space-3) var(--space-5)', borderTop: '1px solid var(--color-semantic-line-normal-alternative)', background: 'var(--color-semantic-fill-normal)' }}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', color: 'var(--color-semantic-label-neutral)', fontSize: 'var(--label1-size)', lineHeight: 'var(--label1-line)', fontWeight: 'var(--fw-semibold)' }}>
-          <Icon name="joystick" size={16} aria-hidden="true" />
-          입력 방식 · {CONTROL_MODE_LABELS[controlMode] || controlMode}
-        </span>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
-          <Button
-            variant={armed ? 'outlined' : 'primary'}
-            color={armed ? 'assistive' : 'primary'}
-            aria-pressed={armed}
-            disabled={typeof onArmedChange !== 'function' || (!armed && !canRequestArm)}
-            onClick={() => onArmedChange?.(!armed)}
-          >
-            {armed ? '수동 제어 해제' : '수동 제어 준비'}
-          </Button>
-          {armed && deadmanRequired && !stopBlockActive && deadmanControl != null && deadmanControl}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', minWidth: 0, flexWrap: 'wrap', color: 'var(--color-semantic-label-neutral)', fontSize: 'var(--label1-size)', lineHeight: 'var(--label1-line)', fontWeight: 'var(--fw-semibold)' }}>
+          {sessionMeta != null && <span style={{ overflowWrap: 'anywhere' }}>{sessionMeta}</span>}
+          {sessionMeta != null && <span aria-hidden="true">·</span>}
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1)' }}>
+            <Icon name="joystick" size={16} aria-hidden="true" />
+            {CONTROL_MODE_LABELS[controlMode] || controlMode}
+          </span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 'var(--space-2)', flexWrap: 'wrap', marginLeft: 'auto' }}>
+          {showControlSurface && deadmanRequired && deadmanControl != null && deadmanControl}
+          {showControlSurface && armControl}
         </div>
       </footer>
-    </section>
+    </Card>
   );
 }

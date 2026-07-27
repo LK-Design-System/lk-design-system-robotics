@@ -192,6 +192,7 @@ export function NavigationMapStage({
         {eyebrow && (
           <text
             data-navigation-stage-eyebrow=""
+            data-navigation-annotation-obstacle="map-header"
             x={fx + 14}
             y={fy + 20}
             fill={STAGE_MUTED}
@@ -206,14 +207,22 @@ export function NavigationMapStage({
         )}
 
         {north && (
-          <g data-navigation-stage-north="" transform={`translate(${fx + fw - 20} ${fy + 22})`}>
+          <g
+            data-navigation-stage-north=""
+            data-navigation-annotation-obstacle="north-indicator"
+            transform={`translate(${fx + fw - 20} ${fy + 22})`}
+          >
             <path d="M0 -9 L4 6 L0 2 L-4 6 Z" fill={STAGE_MUTED} stroke={STAGE_SURFACE} strokeWidth="2.5" strokeLinejoin="round" paintOrder="stroke" />
             <text x="0" y="17" textAnchor="middle" fill={STAGE_MUTED} stroke={STAGE_SURFACE} strokeWidth="2.5" strokeLinejoin="round" paintOrder="stroke" style={{ fontFamily: MONO_FONT, fontSize: '8px', fontWeight: 'var(--fw-bold)', letterSpacing: '0.5px' }}>N</text>
           </g>
         )}
 
         {scaleBar && (
-          <g data-navigation-stage-scalebar="" transform={`translate(${fx + 14} ${fy + fh - 16})`}>
+          <g
+            data-navigation-stage-scalebar=""
+            data-navigation-annotation-obstacle="scale-bar"
+            transform={`translate(${fx + 14} ${fy + fh - 16})`}
+          >
             <path
               d={`M0 0 H${scaleBar.px} M0 -3 V3 M${scaleBar.px} -3 V3`}
               fill="none"
@@ -277,8 +286,8 @@ function StateSwatch({ kind }) {
   );
 }
 
-// Roles with a pictogram (charger) show the glyph in a code-sized chip so the
-// legend mirrors what the map draws, instead of a letter the map no longer uses.
+// Every waypoint role shows its glyph in a code-sized chip so the legend mirrors
+// what the map draws.
 function RoleGlyphSwatch({ role }) {
   return (
     <span

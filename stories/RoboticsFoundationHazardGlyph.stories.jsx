@@ -113,12 +113,15 @@ function HazardGlyphCatalog() {
 
 const meta = {
   title: 'LDS Robotics/Foundation/Hazard Glyph',
+  tags: ['autodocs'],
   parameters: {
     storyGuide: {
       storyId: 'lds-robotics-foundation-hazard-glyph--overview',
       eyebrow: 'Foundation / Hazard Glyph',
       title: '해저드 위험물 knockout 글리프를 원자 단위로 문서화합니다',
       description:
+        'Hazard 마커의 계단·단차·충돌·경사로 위험물 글리프가 작은 배지에서도 구분되는지 검토할 때 사용합니다. 제품 지도에는 글리프를 직접 배치하지 말고 HazardMarker를 사용하세요.',
+      docsDescription:
         '해저드 마커가 severity 색 핀 배지 위에 찍는 위험물 종류 글리프입니다. 계단·단차(낙하)·충돌 위험물 세 실루엣은 내부 원자 _HazardGlyph가 단일 소스로 소유하고(HAZARD_GLYPH_PATHS), 경사로는 같은 물리적 대상이 통과 설비일 수도 회피 대상일 수도 있어 Facility Glyph 원자를 공유합니다. 해저드 마커의 내부 글리프 자산과 배지 크기 판독성을 검토할 때 사용합니다. 제품 지도에 글리프를 직접 배치하거나 해저드 마커 전체를 대신하는 용도에는 사용하지 마세요. 이 페이지는 그 path를 fit 변환과 함께 그대로 렌더해 배지 크기에서 서로 구분되는지 보이고, play-test로 렌더된 path가 상수와 일치함을 단언합니다. 공개 API가 아닌 내부 글리프 모듈입니다.',
     },
     docs: {

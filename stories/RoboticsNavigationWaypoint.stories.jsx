@@ -1,12 +1,16 @@
 import React from 'react';
 import { userEvent, waitFor } from 'storybook/test';
-import { Map2DCanvas, WaypointMarker } from './lds.js';
+import { Map2DCanvas } from '@lk-robotics/lds-product';
+import { WaypointMarker } from '../src/index.js';
+import { NAV_SELECTION } from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationVocabulary';
+import { NAV_WAYPOINT_STATUS_BADGE } from '../src/components/robotics/_navigationVocabulary.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { NavigationLegend, NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
-import { assertSharedFocusIndicator, contrastRatio } from './RoboticsNavigationAssert.shared.jsx';
+import { assertContrastBackedFocus, contrastRatio } from './RoboticsNavigationAssert.shared.jsx';
 
 const meta = {
   title: 'LDS Robotics/Navigation/Waypoint',
+  tags: ['autodocs'],
   component: WaypointMarker,
   parameters: {
     storyGuide: {
@@ -19,7 +23,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'WaypointMarker는 renderer-neutral WaypointData를 한 SVG g 조각으로 표현합니다. 역할은 중첩 가능하고, availability와 선택·포커스·검증·freshness 상태는 색 외 표식과 접근 가능한 이름으로 함께 전달됩니다.',
+          'WaypointMarker는 renderer-neutral WaypointData를 한 SVG g 조각으로 표현합니다. 가장 구체적인 역할은 20px 라운드 스퀘어 내부 벡터 아이콘, 가용성은 본체 채움, invalid·stale 데이터 품질은 RobotPoseMarker와 같은 우측 상단 12px solid badge 하나, 선택은 25px 정적 확대, 키보드 포커스는 고대비 외곽 링으로 분리합니다. 모든 역할과 상태는 접근 가능한 이름에 보존됩니다.',
       },
     },
   },
@@ -159,7 +163,8 @@ const compoundWaypoints = [
 ];
 
 function assertWaypointFocusLabelGap(marker, context) {
-  const focus = marker?.querySelector('[data-waypoint-focus-indicator]');
+  const focus = marker?.querySelector('[data-waypoint-focus-contrast]')
+    || marker?.querySelector('[data-waypoint-focus-indicator]');
   const label = marker?.querySelector('[data-waypoint-label]');
   if (!focus || !label) throw new Error(`${context} focus/label anatomy is incomplete.`);
 
@@ -169,61 +174,104 @@ function assertWaypointFocusLabelGap(marker, context) {
   }
 }
 
-function waypointPaintedGlyphBounds(glyph) {
-  const view = glyph.ownerDocument.defaultView;
-  const painted = [...glyph.querySelectorAll('path, circle, rect, line, polyline, polygon')]
-    .map((node) => {
-      const style = view.getComputedStyle(node);
-      const hasFill = style.fill !== 'none' && Number.parseFloat(style.fillOpacity || '1') > 0;
-      const hasStroke = style.stroke !== 'none' && Number.parseFloat(style.strokeOpacity || '1') > 0;
-      if (!hasFill && !hasStroke) return null;
-      const bounds = node.getBoundingClientRect();
-      const strokeInset = hasStroke ? (Number.parseFloat(style.strokeWidth) || 0) / 2 : 0;
-      return {
-        left: bounds.left - strokeInset,
-        right: bounds.right + strokeInset,
-        top: bounds.top - strokeInset,
-        bottom: bounds.bottom + strokeInset,
-      };
-    })
-    .filter(Boolean);
-  if (painted.length === 0) throw new Error('Waypoint state glyph has no painted geometry.');
-  const left = Math.min(...painted.map((bounds) => bounds.left));
-  const right = Math.max(...painted.map((bounds) => bounds.right));
-  const top = Math.min(...painted.map((bounds) => bounds.top));
-  const bottom = Math.max(...painted.map((bounds) => bounds.bottom));
-  return { left, right, top, bottom, width: right - left, height: bottom - top };
-}
-
-function assertWaypointStateGeometry(marker, state, context, minimumInset = 1) {
-  const container = marker?.querySelector(`[data-waypoint-${state}-indicator]`);
-  const glyph = container?.querySelector('[data-navigation-state-glyph]');
-  const circle = container?.querySelector(`[data-waypoint-state-circle="${state}"]`)
-    || marker?.querySelector('[data-waypoint-point]');
-  if (!container || !glyph || !circle) throw new Error(`${context} state geometry is incomplete.`);
-  if (container.querySelector('text')) throw new Error(`${context} state badge regressed to font-rendered text.`);
-
-  const circleBounds = circle.getBoundingClientRect();
-  const glyphBounds = waypointPaintedGlyphBounds(glyph);
-  const requiredInset = circle.hasAttribute('data-waypoint-state-circle') ? 2 : minimumInset;
-  const centerDeltaX = Math.abs(
-    (circleBounds.left + circleBounds.width / 2) - (glyphBounds.left + glyphBounds.width / 2),
-  );
-  const centerDeltaY = Math.abs(
-    (circleBounds.top + circleBounds.height / 2) - (glyphBounds.top + glyphBounds.height / 2),
-  );
-  if (centerDeltaX > 1 || centerDeltaY > 1) {
-    throw new Error(`${context} glyph is off-center by ${centerDeltaX.toFixed(2)}×${centerDeltaY.toFixed(2)}px.`);
+function assertWaypointRoleSlot(marker, expectedRole, context) {
+  const point = marker?.querySelector('[data-waypoint-point]');
+  const slot = marker?.querySelector('[data-waypoint-role-slot]');
+  if (!point || !slot) throw new Error(`${context} role-in-square anatomy is incomplete.`);
+  if (
+    point.localName !== 'rect'
+    || point.getAttribute('width') !== '20'
+    || point.getAttribute('height') !== '20'
+    || point.getAttribute('rx') !== '4'
+  ) {
+    throw new Error(`${context} must use the shared 20px rounded-square silhouette.`);
+  }
+  if (slot.getAttribute('data-waypoint-primary-role') !== expectedRole) {
+    throw new Error(`${context} expected primary role ${expectedRole}.`);
   }
 
-  const insets = [
-    glyphBounds.left - circleBounds.left,
-    circleBounds.right - glyphBounds.right,
-    glyphBounds.top - circleBounds.top,
-    circleBounds.bottom - glyphBounds.bottom,
-  ];
-  if (Math.min(...insets) < requiredInset) {
-    throw new Error(`${context} glyph lacks ${requiredInset}px circle inset: ${insets.map((value) => value.toFixed(2)).join('/')}.`);
+  if (!slot.querySelector(`[data-navigation-role-glyph="${expectedRole}"]`) || slot.querySelector('text')) {
+    throw new Error(`${context} role must use the internal vector icon.`);
+  }
+
+  const pointBounds = point.getBoundingClientRect();
+  const slotBounds = slot.getBoundingClientRect();
+  const tolerance = 0.5;
+  if (
+    slotBounds.left < pointBounds.left - tolerance
+    || slotBounds.right > pointBounds.right + tolerance
+    || slotBounds.top < pointBounds.top - tolerance
+    || slotBounds.bottom > pointBounds.bottom + tolerance
+  ) {
+    throw new Error(`${context} role escaped the rounded square.`);
+  }
+}
+
+function assertWaypointStateChannels(marker, expectedKind, context) {
+  const point = marker?.querySelector('[data-waypoint-point][data-waypoint-state-color]');
+  const availability = marker?.getAttribute('data-availability') || 'unknown';
+  if (!point || point.getAttribute('data-waypoint-status-kind') !== availability) {
+    throw new Error(`${context} expected availability ${availability} on the waypoint body fill.`);
+  }
+  if (marker.querySelector('[data-waypoint-unavailable-indicator]')) {
+    throw new Error(`${context} regressed to a slash instead of the availability fill.`);
+  }
+
+  const expectedBadgeKind = ['invalid', 'stale'].includes(expectedKind) ? expectedKind : null;
+  const badges = [...marker.querySelectorAll('[data-waypoint-status-badge]')];
+  if (expectedBadgeKind == null) {
+    if (badges.length > 0) {
+      throw new Error(`${context} rendered a data-quality badge without invalid or stale state.`);
+    }
+  } else {
+    const badge = marker.querySelector(`[data-waypoint-status-badge="${expectedBadgeKind}"]`);
+    const circle = badge?.querySelector('[data-waypoint-status-badge-circle]');
+    const glyph = badge?.querySelector(`[data-navigation-state-glyph="${expectedBadgeKind}"]`);
+    if (
+      badges.length !== 1
+      || !badge
+      || !circle
+      || !glyph
+      || circle.getAttribute('r') !== String(NAV_WAYPOINT_STATUS_BADGE.radius)
+      || badge.getAttribute('data-waypoint-status-badge-style') !== 'solid'
+      || circle.hasAttribute('stroke-dasharray')
+    ) {
+      throw new Error(`${context} must render one solid ${expectedBadgeKind} waypoint micro badge.`);
+    }
+    const pointBounds = point.getBoundingClientRect();
+    const badgeBounds = circle.getBoundingClientRect();
+    const overlapWidth = Math.min(pointBounds.right, badgeBounds.right) - Math.max(pointBounds.left, badgeBounds.left);
+    const overlapHeight = Math.min(pointBounds.bottom, badgeBounds.bottom) - Math.max(pointBounds.top, badgeBounds.top);
+    const fullyInside = (
+      badgeBounds.left >= pointBounds.left
+      && badgeBounds.right <= pointBounds.right
+      && badgeBounds.top >= pointBounds.top
+      && badgeBounds.bottom <= pointBounds.bottom
+    );
+    if (overlapWidth <= 0 || overlapHeight <= 0 || fullyInside) {
+      throw new Error(`${context} micro badge must overlap the waypoint corner without being contained by it.`);
+    }
+  }
+
+  const view = marker.ownerDocument.defaultView;
+  const style = view.getComputedStyle(point);
+  if (style.fill === 'none' || style.fill === 'transparent') {
+    throw new Error(`${context} state color is not visible as a solid waypoint fill.`);
+  }
+}
+
+function assertWaypointSelectionScale(marker, context) {
+  const visual = marker?.querySelector('[data-waypoint-selection-visual]');
+  const point = marker?.querySelector('[data-waypoint-point]');
+  if (!visual || !point) throw new Error(`${context} selection-scale anatomy is incomplete.`);
+  if (
+    visual.getAttribute('data-waypoint-selected-scale') !== String(NAV_SELECTION.waypointScale)
+    || visual.style.transform !== `scale(${NAV_SELECTION.waypointScale})`
+  ) {
+    throw new Error(`${context} must enlarge the 20px marker to 25px when selected.`);
+  }
+  if (marker.querySelector('[data-waypoint-selected-outline]')) {
+    throw new Error(`${context} must not reuse an accent outline for selection.`);
   }
 }
 
@@ -363,17 +411,29 @@ function OverviewMapFixture() {
 export const Overview = {
   name: '개요',
   parameters: storyDescription(
-    '같은 내비게이션 그래프에서 대기·통과·주차·충전 역할과 중첩 역할을 한 지도에서 비교하는 대표 뷰입니다. 지도 표식의 이름·역할·상태가 범례와 일치하는지 확인하세요. 지도 마커의 선택·활성화와 키보드 계약은 상호작용 스토리에서 다룹니다.',
+    '같은 내비게이션 그래프에서 대기·통과·주차·충전 역할과 상태를 비교하는 대표 뷰입니다. 일시정지·진행·주차·충전 아이콘은 20px 라운드 스퀘어 안에, 가용성은 solid 채움에 나타나며 시설 주석만 보조 라벨에 남는지 확인하세요.',
   ),
   render: () => <OverviewMapFixture />,
   play: async ({ canvasElement }) => {
     const holding = canvasElement.querySelector('[data-waypoint-id="wp-holding"]');
     const passthrough = canvasElement.querySelector('[data-waypoint-id="wp-passthrough"]');
-    if (!holding || !passthrough) throw new Error('Waypoint overview markers are incomplete.');
+    const parking = canvasElement.querySelector('[data-waypoint-id="wp-parking"]');
+    const charger = canvasElement.querySelector('[data-waypoint-id="wp-charger"]');
+    if (!holding || !passthrough || !parking || !charger) throw new Error('Waypoint overview markers are incomplete.');
 
     const name = holding.getAttribute('aria-label') || '';
     if (!name.includes('Hold A') || !name.includes('지도 L1') || !name.includes('대기 지점') || !name.includes('가용성 사용 가능')) {
       throw new Error(`Waypoint accessible name lost identity or semantics: ${name}`);
+    }
+    assertWaypointRoleSlot(holding, 'holding', 'Holding waypoint');
+    assertWaypointRoleSlot(passthrough, 'passthrough', 'Passthrough waypoint');
+    assertWaypointRoleSlot(parking, 'parking', 'Parking waypoint');
+    assertWaypointRoleSlot(charger, 'charger', 'Charger waypoint');
+    assertWaypointStateChannels(holding, 'available', 'Available waypoint');
+    assertWaypointStateChannels(charger, 'unknown', 'Unknown waypoint');
+    const chargerDetails = charger.querySelector('[data-waypoint-details]')?.textContent ?? '';
+    if (chargerDetails !== 'dock') {
+      throw new Error(`Charger label must retain only its facility annotation, received ${chargerDetails}.`);
     }
   },
 };
@@ -412,7 +472,12 @@ export const SelectionSync = {
       if (!holding.querySelector('[data-waypoint-focus-indicator]')) {
         throw new Error('Waypoint keyboard input must restore its shape-managed focus indicator after pointer modality.');
       }
-      assertSharedFocusIndicator(holding.querySelector('[data-waypoint-focus-indicator]'), 'Waypoint');
+      assertContrastBackedFocus(
+        holding,
+        '[data-waypoint-focus-contrast]',
+        '[data-waypoint-focus-indicator]',
+        'Waypoint',
+      );
       if (canvasElement.ownerDocument.defaultView.getComputedStyle(holding).outlineStyle !== 'none') {
         throw new Error('Waypoint keyboard modality must not restore the global rectangular outline.');
       }
@@ -525,15 +590,21 @@ export const PointerOnlyMapFragment = {
       throw new Error('Passive controlled waypoint focus ring is missing.');
     }
     assertWaypointFocusLabelGap(passive, 'Passive controlled waypoint');
-    assertWaypointStateGeometry(pointerOnly, 'unknown', 'Pointer-only unknown waypoint');
-    assertWaypointStateGeometry(pointerOnly, 'invalid', 'Pointer-only invalid waypoint');
+    assertWaypointStateChannels(pointerOnly, 'invalid', 'Pointer-only invalid waypoint');
+    if (
+      !pointerOnly.querySelector('[data-waypoint-status-badge="invalid"]')
+      || pointerOnly.getAttribute('data-availability') !== 'unknown'
+      || pointerOnly.getAttribute('data-invalid') !== 'true'
+    ) {
+      throw new Error('Pointer-only compound state must preserve raw semantics while showing invalid in the micro badge.');
+    }
   },
 };
 
 export const LightAndDark = {
   name: '변형·상태 · 밝은·어두운 지도',
   parameters: storyDescription(
-    '같은 웨이포인트와 운영 상태를 light·dark 지도에서 나란히 비교합니다. 배경이 바뀌어도 unknown question geometry, invalid exclamation geometry, unavailable 사선과 label의 상대 우선순위·의미·대비가 유지되는지 확인하세요.',
+    '같은 웨이포인트와 운영 상태를 light·dark 지도에서 나란히 비교합니다. 배경이 바뀌어도 역할 벡터 아이콘은 라운드 스퀘어 안에 머물고, unknown·unavailable 가용성은 본체 채움, invalid 데이터 품질은 우측 상단 solid micro badge로 구분되는지 확인하세요.',
   ),
   render: () => (
     <main style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', gap: 'var(--space-4)', width: '100%', maxWidth: 940 }}>
@@ -556,22 +627,27 @@ export const LightAndDark = {
       const unknown = viewer.querySelector('[data-waypoint-id="wp-comparison-hold"]');
       const invalid = viewer.querySelector('[data-waypoint-id="wp-comparison-lift"]');
       const focused = viewer.querySelector('[data-waypoint-id="wp-comparison-dock"]');
-      const unknownGlyph = unknown?.querySelector('[data-waypoint-unknown-indicator] [data-navigation-state-glyph]');
-      const invalidGlyph = invalid?.querySelector('[data-waypoint-invalid-indicator] [data-navigation-state-glyph]');
       const unknownSurface = unknown?.querySelector('[data-waypoint-point]');
       const invalidSurface = invalid?.querySelector('[data-waypoint-point]');
-      if (!unknownGlyph || !invalidGlyph || !unknownSurface || !invalidSurface) {
+      if (!unknownSurface || !invalidSurface) {
         throw new Error(`${appearance} waypoint contrast fixture is incomplete.`);
       }
       assertWaypointFocusLabelGap(focused, `${appearance} focused waypoint`);
-      assertWaypointStateGeometry(unknown, 'unknown', `${appearance} unknown waypoint`);
-      assertWaypointStateGeometry(invalid, 'invalid', `${appearance} invalid waypoint`);
+      assertWaypointRoleSlot(unknown, 'holding', `${appearance} unknown waypoint`);
+      assertWaypointRoleSlot(invalid, 'parking', `${appearance} invalid waypoint`);
+      assertWaypointStateChannels(unknown, 'unknown', `${appearance} unknown waypoint`);
+      assertWaypointStateChannels(invalid, 'invalid', `${appearance} invalid waypoint`);
+      assertWaypointStateChannels(focused, 'unavailable', `${appearance} unavailable waypoint`);
       assertWaypointCompactText(invalid, `${appearance} annotated waypoint`);
       const view = canvasElement.ownerDocument.defaultView;
-      const unknownRatio = contrastRatio(view.getComputedStyle(unknownGlyph).color, view.getComputedStyle(unknownSurface).fill);
-      const invalidRatio = contrastRatio(view.getComputedStyle(invalidGlyph).color, view.getComputedStyle(invalidSurface).fill);
+      const unknownStyle = view.getComputedStyle(unknownSurface);
+      const invalidStyle = view.getComputedStyle(invalidSurface);
+      const unknownRole = unknown.querySelector('[data-navigation-role-glyph] path');
+      const invalidRole = invalid.querySelector('[data-navigation-role-glyph] path');
+      const unknownRatio = contrastRatio(view.getComputedStyle(unknownRole).fill, unknownStyle.fill);
+      const invalidRatio = contrastRatio(view.getComputedStyle(invalidRole).fill, invalidStyle.fill);
       if (unknownRatio < 3 || invalidRatio < 3) {
-        throw new Error(`${appearance} waypoint glyph contrast failed: unknown ${unknownRatio.toFixed(2)}:1, invalid ${invalidRatio.toFixed(2)}:1.`);
+        throw new Error(`${appearance} waypoint role-on-state contrast failed: unknown ${unknownRatio.toFixed(2)}:1, invalid ${invalidRatio.toFixed(2)}:1.`);
       }
     });
   },
@@ -607,16 +683,18 @@ function CompoundStateFixture() {
 export const CompoundRolesAndStates = {
   name: '변형·상태 · 중첩 역할과 운영 상태',
   parameters: storyDescription(
-    '여러 역할·시설 주석이 겹친 지점과 selected·focused·stale·unknown+invalid·unavailable·disabled 상태를 한 지도에서 비교합니다. 같은 waypoint의 question과 exclamation geometry를 포함해 각 상태가 독립 표식으로 구분되는지 확인하세요.',
+    '여러 역할·시설 주석이 겹친 지점과 selected·focused·stale·unknown+invalid·unavailable·disabled 상태를 한 지도에서 비교합니다. 가장 구체적인 역할 하나는 내부 벡터 아이콘, 가용성은 본체 채움, invalid·stale은 12px solid badge 한 자리, 선택은 20px에서 25px로 정적 확대, 포커스는 고대비 외곽 링으로 분리되는지 확인하세요.',
   ),
   render: () => <CompoundStateFixture />,
   play: async ({ canvasElement }) => {
     await canvasElement.ownerDocument.fonts.ready;
     const disabled = canvasElement.querySelector('[data-waypoint-id="wp-disabled"]');
     const unavailable = canvasElement.querySelector('[data-waypoint-id="wp-unavailable"]');
+    const stale = canvasElement.querySelector('[data-waypoint-id="wp-stale"]');
+    const compound = canvasElement.querySelector('[data-waypoint-id="wp-compound"]');
     const unknownInvalid = canvasElement.querySelector('[data-waypoint-id="wp-invalid"]');
     const log = canvasElement.querySelector('[data-compound-activation]');
-    if (!disabled || !unavailable || !unknownInvalid || !log) throw new Error('Compound waypoint fixture is incomplete.');
+    if (!disabled || !unavailable || !stale || !compound || !unknownInvalid || !log) throw new Error('Compound waypoint fixture is incomplete.');
 
     const before = log.textContent;
     await userEvent.click(disabled);
@@ -636,40 +714,29 @@ export const CompoundRolesAndStates = {
       if (!log.textContent.includes('wp-unavailable')) throw new Error('Unavailable waypoint must remain inspectable.');
     });
 
-    if (!canvasElement.querySelector('[data-waypoint-selected-indicator]')) throw new Error('Selected waypoint lost its silhouette selection ring.');
+    assertWaypointSelectionScale(compound, 'Selected compound waypoint');
     if (!canvasElement.querySelector('[data-waypoint-focus-indicator]')) throw new Error('Focused waypoint lost its focus indicator.');
-    if (!canvasElement.querySelector('[data-waypoint-stale-indicator]')) throw new Error('Stale waypoint lost its dashed halo.');
-    if (!canvasElement.querySelector('[data-waypoint-invalid-indicator]')) throw new Error('Invalid waypoint lost its exclamation geometry.');
-    if (!canvasElement.querySelector('[data-waypoint-unavailable-indicator]')) throw new Error('Unavailable waypoint lost its slash indicator.');
+    if (!canvasElement.querySelector('[data-waypoint-focus-contrast]')) throw new Error('Focused waypoint lost its contrast underlay.');
+    assertWaypointStateChannels(stale, 'stale', 'Stale waypoint');
+    assertWaypointStateChannels(unknownInvalid, 'invalid', 'Unknown + invalid waypoint');
+    assertWaypointStateChannels(unavailable, 'unavailable', 'Unavailable waypoint');
+    assertWaypointRoleSlot(compound, 'charger', 'Compound role waypoint');
+    assertWaypointRoleSlot(unknownInvalid, 'passthrough', 'Invalid waypoint');
     assertWaypointFocusLabelGap(unavailable, 'Compound focused waypoint');
-    assertWaypointCompactText(canvasElement.querySelector('[data-waypoint-id="wp-compound"]'), 'Compound role/annotation waypoint');
-    const unknownIndicator = unknownInvalid.querySelector('[data-waypoint-unknown-indicator]');
-    const invalidIndicator = unknownInvalid.querySelector('[data-waypoint-invalid-indicator]');
+    assertWaypointCompactText(compound, 'Compound role/annotation waypoint');
     const unknownInvalidName = unknownInvalid.getAttribute('aria-label') ?? '';
-    if (!unknownIndicator || !invalidIndicator || !unknownInvalidName.includes('가용성 상태 미확인') || !unknownInvalidName.includes('데이터 오류')) {
-      throw new Error(`Unknown + invalid waypoint must preserve both semantics and glyphs: ${unknownInvalidName}`);
-    }
-    assertWaypointStateGeometry(unknownInvalid, 'unknown', 'Compound unknown waypoint');
-    assertWaypointStateGeometry(unknownInvalid, 'invalid', 'Compound invalid waypoint');
-    const unknownBounds = unknownIndicator.getBoundingClientRect();
-    const invalidBounds = invalidIndicator.getBoundingClientRect();
-    const labelBounds = unknownInvalid.querySelector('[data-waypoint-label]')?.getBoundingClientRect();
-    if (!labelBounds) throw new Error('Unknown + invalid waypoint label is missing.');
-    const overlapWidth = Math.min(unknownBounds.right, invalidBounds.right) - Math.max(unknownBounds.left, invalidBounds.left);
-    const overlapHeight = Math.min(unknownBounds.bottom, invalidBounds.bottom) - Math.max(unknownBounds.top, invalidBounds.top);
-    if (overlapWidth > 0 && overlapHeight > 0) {
-      throw new Error(`Unknown and invalid geometry overlap: ${overlapWidth}×${overlapHeight}.`);
-    }
-    const labelOverlapWidth = Math.min(unknownBounds.right, labelBounds.right) - Math.max(unknownBounds.left, labelBounds.left);
-    const labelOverlapHeight = Math.min(unknownBounds.bottom, labelBounds.bottom) - Math.max(unknownBounds.top, labelBounds.top);
-    if (labelOverlapWidth > 0.25 && labelOverlapHeight > 0.25) {
-      throw new Error(`Compound unknown badge overlaps its label by ${labelOverlapWidth}×${labelOverlapHeight}px.`);
+    if (
+      !unknownInvalid.querySelector('[data-waypoint-status-badge="invalid"]')
+      || !unknownInvalidName.includes('가용성 상태 미확인')
+      || !unknownInvalidName.includes('데이터 오류')
+    ) {
+      throw new Error(`Unknown + invalid waypoint must announce both semantics and show one invalid micro badge: ${unknownInvalidName}`);
     }
   },
 };
 
-const stackedWaypoint = {
-  id: 'wp-stacked',
+const priorityWaypoint = {
+  id: 'wp-priority',
   label: 'Dock 12',
   mapId: 'L3',
   position: { x: 310, y: 120 },
@@ -678,58 +745,65 @@ const stackedWaypoint = {
   availability: 'unknown',
 };
 
-function StackedStateFixture() {
+function CompoundStatePriorityFixture() {
   return (
     <main style={{ display: 'grid', gap: 'var(--space-3)', width: '100%', maxWidth: 760, minWidth: 0 }}>
       <MapSurface
-        waypoints={[stackedWaypoint]}
-        markerStates={{ 'wp-stacked': { selected: true, focused: true, invalid: true, stale: true } }}
+        waypoints={[priorityWaypoint]}
+        markerStates={{ 'wp-priority': { selected: true, focused: true, invalid: true, stale: true } }}
         width={620}
         height={240}
-        label="상태 링 적층 지도"
+        label="복합 상태 우선순위 지도"
       />
     </main>
   );
 }
 
-export const StackedStateRings = {
-  name: '변형·상태 · 상태 링 적층',
+export const CompoundStatePriority = {
+  name: '변형·상태 · 복합 상태 우선순위',
   parameters: storyDescription(
-    '선택·포커스·오래된 데이터·데이터 오류·가용성 미확인이 한 웨이포인트에 동시에 걸리는 최악 조합입니다. 모든 상태 링이 같은 다이아몬드 실루엣을 따라 교차 없이 안쪽→바깥쪽(선택→포커스→stale→경고)으로 중첩되는지 확인하세요.',
+    '선택·포커스·오래된 데이터·데이터 오류·가용성 미확인이 동시에 걸리는 최악 조합입니다. 충전 역할은 내부 벡터 아이콘, unknown은 본체 채움, invalid > stale 우선순위는 고정 크기 12px solid badge 하나, 선택은 25px 정적 확대, 포커스는 고대비 외곽 링으로 분리되는지 확인하세요.',
   ),
-  render: () => <StackedStateFixture />,
+  render: () => <CompoundStatePriorityFixture />,
   play: async ({ canvasElement }) => {
     await canvasElement.ownerDocument.fonts.ready;
-    const marker = canvasElement.querySelector('[data-waypoint-id="wp-stacked"]');
-    if (!marker) throw new Error('Stacked-state waypoint is missing.');
+    const marker = canvasElement.querySelector('[data-waypoint-id="wp-priority"]');
+    if (!marker) throw new Error('Compound-state priority waypoint is missing.');
 
-    const rings = [
-      ['selection', marker.querySelector('[data-waypoint-selected-indicator]')],
-      ['focus', marker.querySelector('[data-waypoint-focus-indicator]')],
-      ['stale', marker.querySelector('[data-waypoint-stale-indicator]')],
-      ['attention', marker.querySelector('[data-waypoint-attention]')],
-    ];
-    for (const [ringName, ring] of rings) {
-      if (!ring) throw new Error(`Stacked waypoint lost its ${ringName} ring.`);
-      if (ring.tagName.toLowerCase() !== 'polygon') {
-        throw new Error(`Stacked ${ringName} ring must trace the diamond silhouette, found <${ring.tagName}>.`);
+    const point = marker.querySelector('[data-waypoint-point][data-waypoint-status-kind="unknown"]');
+    const statusBadge = marker.querySelector('[data-waypoint-status-badge="invalid"]');
+    const focusContrast = marker.querySelector('[data-waypoint-focus-contrast]');
+    const focusIndicator = marker.querySelector('[data-waypoint-focus-indicator]');
+    if (!point || !statusBadge || !focusContrast || !focusIndicator) {
+      throw new Error('Compound waypoint must retain unknown fill, one invalid micro badge, selection, and both focus layers.');
+    }
+    if (
+      marker.querySelector('[data-waypoint-selected-indicator]')
+      || marker.querySelector('[data-waypoint-attention]')
+      || marker.querySelectorAll('[data-waypoint-status-badge]').length !== 1
+      || !statusBadge.querySelector('[data-navigation-state-glyph="invalid"]')
+    ) {
+      throw new Error('Compound waypoint must consolidate invalid + stale into one invalid micro badge.');
+    }
+    const accessibleName = marker.getAttribute('aria-label') ?? '';
+    for (const stateName of ['선택됨', '포커스됨', '데이터 오류', '오래된 데이터', '가용성 상태 미확인']) {
+      if (!accessibleName.includes(stateName)) {
+        throw new Error(`Compound waypoint accessible name lost ${stateName}: ${accessibleName}`);
       }
     }
-    for (let index = 0; index < rings.length - 1; index += 1) {
-      const [innerName, innerRing] = rings[index];
-      const [outerName, outerRing] = rings[index + 1];
-      const inner = innerRing.getBoundingClientRect();
-      const outer = outerRing.getBoundingClientRect();
-      const nests = inner.left > outer.left && inner.right < outer.right
-        && inner.top > outer.top && inner.bottom < outer.bottom;
-      if (!nests) {
-        throw new Error(`Stacked ${innerName} ring does not nest inside the ${outerName} ring.`);
-      }
+    assertContrastBackedFocus(
+      marker,
+      '[data-waypoint-focus-contrast]',
+      '[data-waypoint-focus-indicator]',
+      'Waypoint',
+    );
+    assertWaypointSelectionScale(marker, 'Compound priority waypoint');
+    if (marker.querySelector('[data-waypoint-selection-visual]')?.contains(statusBadge)) {
+      throw new Error('The waypoint micro badge must remain fixed while selection enlarges the body.');
     }
-
-    assertWaypointStateGeometry(marker, 'unknown', 'Stacked unknown badge');
-    assertWaypointStateGeometry(marker, 'invalid', 'Stacked invalid badge');
-    assertWaypointFocusLabelGap(marker, 'Stacked-state waypoint');
+    assertWaypointStateChannels(marker, 'invalid', 'Compound priority state');
+    assertWaypointRoleSlot(marker, 'charger', 'Compound priority role');
+    assertWaypointFocusLabelGap(marker, 'Compound-state priority waypoint');
   },
 };
 
@@ -844,7 +918,8 @@ export const NarrowWidth = {
     await waitFor(() => {
       if (marker.getAttribute('aria-pressed') !== 'true') throw new Error('Narrow map marker did not select on pointer.');
       assertWaypointFocusLabelGap(marker, '320px waypoint');
-      assertWaypointStateGeometry(marker, 'unknown', '320px unknown waypoint');
+      assertWaypointStateChannels(marker, 'unknown', '320px unknown waypoint');
+      assertWaypointRoleSlot(marker, 'charger', '320px charger waypoint');
       assertWaypointCompactText(marker, '320px role/annotation waypoint');
     });
   },
@@ -856,8 +931,8 @@ export const WaypointVisualParity = {
   tags: ['!dev', 'visual-parity'],
 };
 
-export const WaypointStackedStateParity = {
-  ...StackedStateRings,
-  name: 'Waypoint stacked-state parity',
+export const WaypointCompoundStateParity = {
+  ...CompoundStatePriority,
+  name: 'Waypoint compound-state priority parity',
   tags: ['!dev', 'visual-parity'],
 };

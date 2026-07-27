@@ -7,27 +7,49 @@ import React from 'react';
  * no visibility change, no coordination attributes beyond the inert wrapper.
  */
 export const NavigationAnnotationContext = React.createContext(null);
+export const NavigationAnnotationDetailContext = React.createContext(null);
 
 export const useIsomorphicLayoutEffect = typeof window === 'undefined'
   ? React.useEffect
   : React.useLayoutEffect;
 
-const INERT_RESOLUTION = Object.freeze({ tx: 0, ty: 0, dyPx: 0, hidden: false });
+const INERT_RESOLUTION = Object.freeze({
+  tx: 0,
+  ty: 0,
+  dxPx: 0,
+  dyPx: 0,
+  nudgeDxPx: 0,
+  nudgeDyPx: 0,
+  placement: 'natural',
+  hidden: false,
+});
 const noopSubscribe = () => () => {};
 
 /**
- * State-first priority scale: a selected entity's label always outranks any
- * unselected one; kind order only breaks ties between equal states. The kind
- * weights mirror the SVG paint-order contract (region → lane → route →
- * trajectory → waypoint → facility) so topmost-painted point features keep
- * their labels under pressure.
+ * Strict state-first priority scale. Danger/error outranks keyboard focus,
+ * focus outranks selection, and selection outranks ordinary map context.
+ * `importance` orders labels inside the same state tier.
  */
-export function annotationPriority({ selected, focused, alarm, emphasized } = {}) {
-  return (selected ? 400 : 0)
-    + (focused ? 300 : 0)
-    + (alarm ? 200 : 0)
-    + (emphasized ? 100 : 0);
+export function annotationPriority({
+  selected,
+  focused,
+  alarm,
+  emphasized,
+  importance,
+} = {}) {
+  const statePriority = alarm ? 5000 : focused ? 4000 : selected ? 3000 : 0;
+  const contextPriority = Number.isFinite(importance) ? importance : emphasized ? 500 : 0;
+  return statePriority + contextPriority;
 }
+
+export const ANNOTATION_IMPORTANCE = Object.freeze({
+  background: 0,
+  context: 300,
+  'active-trajectory': 600,
+  'current-segment': 700,
+  'robot-pose': 800,
+  'current-progress': 900,
+});
 
 export const KIND_WEIGHT = {
   'region-label': 0,
@@ -37,18 +59,141 @@ export const KIND_WEIGHT = {
   'trajectory-label': 3,
   'waypoint-label': 4,
   'facility-label': 5,
+  'hazard-label': 5,
+  'robot-pose-label': 6,
 };
 
+const DETAIL_MODE_WEIGHT = Object.freeze({
+  overview: 0,
+  standard: 1,
+  detail: 2,
+});
+const FORCED_VISIBILITY_PRIORITY = 3000;
+const EPSILON = 0.5;
+
+function normalizedDetailMode(value, fallback = 'standard') {
+  return Object.hasOwn(DETAIL_MODE_WEIGHT, value) ? value : fallback;
+}
+
+function placementCandidates(label) {
+  const { kind } = label.meta;
+  const { width, height } = label.rect;
+
+  if (kind === 'route-segment-label') {
+    const alongPath = Math.max(32, Math.min(80, width * 0.6));
+    return [
+      { name: 'above', x: 0, y: 0 },
+      { name: 'below', x: 0, y: height + 16 },
+      { name: 'above-leading', x: -alongPath, y: 0 },
+      { name: 'above-trailing', x: alongPath, y: 0 },
+      { name: 'below-leading', x: -alongPath, y: height + 16 },
+      { name: 'below-trailing', x: alongPath, y: height + 16 },
+    ];
+  }
+  if (kind === 'trajectory-label') {
+    const alongPath = Math.max(32, Math.min(80, width * 0.6));
+    return [
+      { name: 'above', x: 0, y: 0 },
+      { name: 'below', x: 0, y: height + 16 },
+      { name: 'above-leading', x: -alongPath, y: 0 },
+      { name: 'above-trailing', x: alongPath, y: 0 },
+      { name: 'below-leading', x: -alongPath, y: height + 16 },
+      { name: 'below-trailing', x: alongPath, y: height + 16 },
+    ];
+  }
+  if (kind === 'route-progress-label') {
+    const horizontalSwap = width / 2 + 20;
+    return [
+      { name: 'below', x: 0, y: 0 },
+      { name: 'above', x: 0, y: -(height + 32) },
+      { name: 'below-leading', x: -horizontalSwap, y: 0 },
+      { name: 'below-trailing', x: horizontalSwap, y: 0 },
+      { name: 'above-leading', x: -horizontalSwap, y: -(height + 32) },
+      { name: 'above-trailing', x: horizontalSwap, y: -(height + 32) },
+    ];
+  }
+  if (kind === 'waypoint-label'
+    || kind === 'facility-label'
+    || kind === 'hazard-label'
+    || kind === 'robot-pose-label') {
+    const horizontalSwap = width + 40;
+    const lower = height + 16;
+    return [
+      { name: 'top-right', x: 0, y: 0 },
+      { name: 'top-left', x: -horizontalSwap, y: 0 },
+      { name: 'bottom-right', x: 0, y: lower },
+      { name: 'bottom-left', x: -horizontalSwap, y: lower },
+    ];
+  }
+  return [{ name: 'center', x: 0, y: 0 }];
+}
+
+function nudgeCandidates(direction, maxNudge, step) {
+  const vectors = [{ x: 0, y: 0 }];
+  const safeStep = Math.max(1, step);
+  for (let distance = safeStep; distance <= maxNudge + EPSILON; distance += safeStep) {
+    if (direction === 'up') {
+      vectors.push({ x: 0, y: -distance });
+      continue;
+    }
+    if (direction === 'down') {
+      vectors.push({ x: 0, y: distance });
+      continue;
+    }
+    vectors.push(
+      { x: 0, y: -distance },
+      { x: 0, y: distance },
+      { x: distance, y: 0 },
+      { x: -distance, y: 0 },
+      { x: distance, y: -distance },
+      { x: -distance, y: -distance },
+      { x: distance, y: distance },
+      { x: -distance, y: distance },
+    );
+  }
+  return vectors;
+}
+
+function shiftedRect(rect, x, y) {
+  return {
+    left: rect.left + x,
+    top: rect.top + y,
+    right: rect.right + x,
+    bottom: rect.bottom + y,
+    width: rect.width,
+    height: rect.height,
+  };
+}
+
+function rectsConflict(a, b, gap) {
+  return a.left < b.right + gap - EPSILON
+    && a.right > b.left - gap + EPSILON
+    && a.top < b.bottom + gap - EPSILON
+    && a.bottom > b.top - gap + EPSILON;
+}
+
+function rectInsideBoundary(rect, boundary, gap) {
+  if (!boundary) return true;
+  const inset = gap + 8;
+  return rect.left >= boundary.left + inset - EPSILON
+    && rect.right <= boundary.right - inset + EPSILON
+    && rect.top >= boundary.top + inset - EPSILON
+    && rect.bottom <= boundary.bottom - inset + EPSILON;
+}
+
 /**
- * Pure, deterministic vertical slot negotiation in CSS pixels. Labels are
+ * Pure, deterministic 2D label negotiation in CSS pixels. Labels are
  * placed greedily by (priority desc, kind weight desc, id asc); obstacles are
- * immovable. A label whose natural spot is free never moves. When every
- * candidate within `maxLabelDisplacementPx` collides, the label is suppressed
- * instead of displaced — visuals only, identity is the caller's concern.
+ * immovable. Each kind tries conventional anchor placements before applying a
+ * bounded leaderless nudge. When every candidate collides, the label is
+ * suppressed; accessible identity remains the caller's concern.
  */
 export function solveAnnotationLayout(labels, obstacleRects, options = {}) {
-  const gap = Number.isFinite(options.labelGapPx) ? options.labelGapPx : 4;
-  const maxNudge = Number.isFinite(options.maxLabelDisplacementPx) ? options.maxLabelDisplacementPx : 56;
+  const gap = Number.isFinite(options.labelGapPx) ? Math.max(0, options.labelGapPx) : 8;
+  const maxNudge = Number.isFinite(options.maxLabelDisplacementPx)
+    ? Math.max(0, options.maxLabelDisplacementPx)
+    : 24;
+  const detailMode = normalizedDetailMode(options.detailMode);
   const order = [...labels].sort((a, b) => (
     (b.meta.priority - a.meta.priority)
     || (b.meta.weight - a.meta.weight)
@@ -60,54 +205,74 @@ export function solveAnnotationLayout(labels, obstacleRects, options = {}) {
   const out = new Map();
 
   for (const label of order) {
-    const rect = label.rect;
-    const height = rect.height;
-    const naturalTop = rect.top;
-    // Horizontal filter is gap-free on purpose: diagonal corner contact is
-    // not a visual collision, and inflating both axes would nudge labels that
-    // merely brush an obstacle corner. The vertical intervals below keep the
-    // full gap so stacked labels stay separated.
-    const blockers = placed.filter((candidate) => (
-      candidate.left < rect.right && candidate.right > rect.left
-    ));
-    // Label top t collides with blocker b iff t ∈ (b.top - gap - height, b.bottom + gap).
-    const forbidden = blockers.map((blocker) => [blocker.top - gap - height, blocker.bottom + gap]);
-    const isFree = (top) => forbidden.every(([lo, hi]) => top <= lo + 1e-6 || top >= hi - 1e-6);
-    const direction = label.meta.nudgeDirection ?? 'any';
-
-    let chosenTop;
-    if (isFree(naturalTop)) {
-      chosenTop = naturalTop;
-    } else {
-      let best;
-      for (const [lo, hi] of forbidden) {
-        for (const candidate of [lo, hi]) {
-          const dy = candidate - naturalTop;
-          if (direction === 'up' && dy > 1e-6) continue;
-          if (direction === 'down' && dy < -1e-6) continue;
-          if (Math.abs(dy) > maxNudge) continue;
-          if (!isFree(candidate)) continue;
-          if (best === undefined) { best = candidate; continue; }
-          const bestDy = best - naturalTop;
-          if (Math.abs(dy) < Math.abs(bestDy) - 1e-6) best = candidate;
-          else if (Math.abs(Math.abs(dy) - Math.abs(bestDy)) <= 1e-6 && dy < bestDy) best = candidate;
-        }
-      }
-      chosenTop = best;
-    }
-
-    if (chosenTop === undefined) {
-      out.set(label.key, { dyPx: 0, hidden: true });
+    const requiredDetail = normalizedDetailMode(label.meta.detailLevel);
+    const filteredByDensity = DETAIL_MODE_WEIGHT[requiredDetail] > DETAIL_MODE_WEIGHT[detailMode]
+      && label.meta.priority < FORCED_VISIBILITY_PRIORITY;
+    if (filteredByDensity) {
+      out.set(label.key, {
+        dxPx: 0,
+        dyPx: 0,
+        nudgeDxPx: 0,
+        nudgeDyPx: 0,
+        placement: 'natural',
+        hidden: true,
+        hiddenReason: 'density',
+      });
       continue;
     }
-    out.set(label.key, { dyPx: chosenTop - naturalTop, hidden: false });
-    placed.push({ left: rect.left, top: chosenTop, right: rect.right, bottom: chosenTop + height });
+
+    const placements = placementCandidates(label);
+    const nudges = nudgeCandidates(label.meta.nudgeDirection ?? 'any', maxNudge, gap || 8);
+    let chosen;
+    for (const placement of placements) {
+      for (const nudge of nudges) {
+        const dxPx = placement.x + nudge.x;
+        const dyPx = placement.y + nudge.y;
+        const candidateRect = shiftedRect(label.rect, dxPx, dyPx);
+        if (
+          rectInsideBoundary(candidateRect, options.boundaryRect, gap)
+          && placed.every((blocker) => !rectsConflict(candidateRect, blocker, gap))
+        ) {
+          chosen = {
+            dxPx,
+            dyPx,
+            nudgeDxPx: nudge.x,
+            nudgeDyPx: nudge.y,
+            placement: placement.name,
+            hidden: false,
+          };
+          placed.push(candidateRect);
+          break;
+        }
+      }
+      if (chosen) break;
+    }
+
+    if (!chosen) {
+      out.set(label.key, {
+        dxPx: 0,
+        dyPx: 0,
+        nudgeDxPx: 0,
+        nudgeDyPx: 0,
+        placement: 'natural',
+        hidden: true,
+        hiddenReason: 'collision',
+      });
+      continue;
+    }
+    out.set(label.key, chosen);
   }
   return out;
 }
 
 function resolutionEquals(a, b) {
-  return a.hidden === b.hidden && Math.abs(a.dyPx - b.dyPx) <= 0.5;
+  return a.hidden === b.hidden
+    && a.hiddenReason === b.hiddenReason
+    && a.placement === b.placement
+    && Math.abs(a.dxPx - b.dxPx) <= EPSILON
+    && Math.abs(a.dyPx - b.dyPx) <= EPSILON
+    && Math.abs(a.nudgeDxPx - b.nudgeDxPx) <= EPSILON
+    && Math.abs(a.nudgeDyPx - b.nudgeDyPx) <= EPSILON;
 }
 
 /**
@@ -124,7 +289,12 @@ export function createAnnotationStore() {
   const obstacles = new Map();
   const listeners = new Set();
   let published = new Map();
-  let options = { labelGapPx: 4, maxLabelDisplacementPx: 56, host: null };
+  let options = {
+    labelGapPx: 8,
+    maxLabelDisplacementPx: 24,
+    detailMode: 'standard',
+    host: null,
+  };
   let frame = 0;
 
   const emit = () => { listeners.forEach((listener) => listener()); };
@@ -136,12 +306,15 @@ export function createAnnotationStore() {
     let suppressed = 0;
     published.forEach((resolution) => {
       if (resolution.hidden) suppressed += 1;
-      else if (Math.abs(resolution.dyPx) > 0.5) displaced += 1;
+      else if (Math.abs(resolution.dxPx) > EPSILON || Math.abs(resolution.dyPx) > EPSILON) displaced += 1;
     });
     host.setAttribute('data-annotation-label-count', String(labels.size));
     host.setAttribute('data-annotation-obstacle-count', String(obstacles.size));
     host.setAttribute('data-annotation-displaced-count', String(displaced));
     host.setAttribute('data-annotation-suppressed-count', String(suppressed));
+    host.setAttribute('data-annotation-detail-mode', normalizedDetailMode(options.detailMode));
+    host.setAttribute('data-annotation-label-gap', String(options.labelGapPx));
+    host.setAttribute('data-annotation-max-nudge', String(options.maxLabelDisplacementPx));
   };
 
   const flush = () => {
@@ -173,18 +346,61 @@ export function createAnnotationStore() {
         },
       });
     });
+    const obstacleElements = new Set(obstacles.values());
+    const obstacleScope = options.host?.ownerSVGElement ?? options.host;
+    obstacleScope?.querySelectorAll?.('[data-navigation-annotation-obstacle]').forEach((el) => {
+      obstacleElements.add(el);
+    });
     const obstacleRects = [];
-    obstacles.forEach((el) => {
+    obstacleElements.forEach((el) => {
       if (!el || !el.isConnected) return;
       const rect = el.getBoundingClientRect();
       if (rect.width > 0 && rect.height > 0) obstacleRects.push(rect);
     });
+    const pathObstacleElements = options.host?.querySelectorAll?.(
+      '[data-navigation-annotation-path-obstacle]',
+    ) ?? [];
+    pathObstacleElements.forEach((el) => {
+      if (
+        !el?.isConnected
+        || typeof el.getTotalLength !== 'function'
+        || typeof el.getPointAtLength !== 'function'
+        || typeof el.getScreenCTM !== 'function'
+      ) return;
+      const ctm = el.getScreenCTM();
+      const localLength = el.getTotalLength();
+      if (!ctm || !(localLength > 0)) return;
+      const scaleX = Math.hypot(ctm.a, ctm.b);
+      const scaleY = Math.hypot(ctm.c, ctm.d);
+      const screenLength = localLength * ((scaleX + scaleY) / 2 || 1);
+      const sampleCount = Math.max(1, Math.min(256, Math.ceil(screenLength / 6)));
+      const strokeWidth = Number.parseFloat(
+        typeof getComputedStyle === 'function' ? getComputedStyle(el).strokeWidth : '',
+      );
+      const radius = Math.max(2, (Number.isFinite(strokeWidth) ? strokeWidth : 3) / 2 + 1);
+      for (let index = 0; index <= sampleCount; index += 1) {
+        const point = el.getPointAtLength(localLength * index / sampleCount);
+        const x = ctm.a * point.x + ctm.c * point.y + ctm.e;
+        const y = ctm.b * point.x + ctm.d * point.y + ctm.f;
+        obstacleRects.push({
+          left: x - radius,
+          top: y - radius,
+          right: x + radius,
+          bottom: y + radius,
+          width: radius * 2,
+          height: radius * 2,
+        });
+      }
+    });
 
-    const solved = solveAnnotationLayout(measured, obstacleRects, options);
+    const solved = solveAnnotationLayout(measured, obstacleRects, {
+      ...options,
+      boundaryRect: options.host?.ownerSVGElement?.getBoundingClientRect?.(),
+    });
     const next = new Map();
     let changed = published.size !== measured.length;
     measured.forEach(({ key, ctm }) => {
-      const target = solved.get(key) ?? { dyPx: 0, hidden: false };
+      const target = solved.get(key) ?? INERT_RESOLUTION;
       const previous = published.get(key);
       if (previous && resolutionEquals(previous, target)) {
         next.set(key, previous);
@@ -192,12 +408,18 @@ export function createAnnotationStore() {
       }
       changed = true;
       const det = ctm.a * ctm.d - ctm.b * ctm.c;
+      const dxPx = target.hidden ? 0 : target.dxPx;
       const dyPx = target.hidden ? 0 : target.dyPx;
       next.set(key, {
-        tx: det ? (-ctm.c * dyPx) / det : 0,
-        ty: det ? (ctm.a * dyPx) / det : dyPx,
+        tx: det ? (ctm.d * dxPx - ctm.c * dyPx) / det : dxPx,
+        ty: det ? (-ctm.b * dxPx + ctm.a * dyPx) / det : dyPx,
+        dxPx,
         dyPx,
+        nudgeDxPx: target.nudgeDxPx ?? 0,
+        nudgeDyPx: target.nudgeDyPx ?? 0,
+        placement: target.placement,
         hidden: target.hidden,
+        hiddenReason: target.hiddenReason,
       });
     });
     if (changed) {
@@ -246,6 +468,10 @@ export function createAnnotationStore() {
   };
 }
 
+export function useNavigationAnnotationDetailMode() {
+  return React.useContext(NavigationAnnotationDetailContext);
+}
+
 /**
  * Wrapper for one decorative label block. A component — not a hook — so
  * overlays can use it inside `.map()` loops. With no provider it renders an
@@ -258,6 +484,7 @@ export function NavigationAnnotationBlock({
   anchor,
   priority = 0,
   nudgeDirection = 'any',
+  detailLevel = 'standard',
   children,
 }) {
   const store = React.useContext(NavigationAnnotationContext);
@@ -279,12 +506,14 @@ export function NavigationAnnotationBlock({
       kind,
       priority,
       nudgeDirection,
+      detailLevel,
       weight: KIND_WEIGHT[kind] ?? 0,
     }, resolution);
     return () => store.unregisterLabel(key);
   });
 
-  const displaced = !resolution.hidden && Math.abs(resolution.dyPx) > 0.5;
+  const displaced = !resolution.hidden
+    && (Math.abs(resolution.dxPx) > EPSILON || Math.abs(resolution.dyPx) > EPSILON);
   // React.createElement keeps this shared module a plain `.js` internal file
   // (JSX would force a `.jsx` extension and leak it into the generated entry).
   return React.createElement('g', {
@@ -295,9 +524,15 @@ export function NavigationAnnotationBlock({
     'data-annotation-anchor-x': anchor?.x,
     'data-annotation-anchor-y': anchor?.y,
     'data-annotation-priority': priority,
+    'data-annotation-detail-level': detailLevel,
+    'data-annotation-placement': resolution.hidden ? undefined : resolution.placement,
     'data-annotation-displaced': displaced ? 'true' : undefined,
+    'data-annotation-dx': displaced ? Math.round(resolution.dxPx * 100) / 100 : undefined,
     'data-annotation-dy': displaced ? Math.round(resolution.dyPx * 100) / 100 : undefined,
+    'data-annotation-nudge-x': displaced ? Math.round(resolution.nudgeDxPx * 100) / 100 : undefined,
+    'data-annotation-nudge-y': displaced ? Math.round(resolution.nudgeDyPx * 100) / 100 : undefined,
     'data-annotation-suppressed': resolution.hidden ? 'true' : undefined,
+    'data-annotation-suppressed-reason': resolution.hidden ? resolution.hiddenReason : undefined,
     transform: displaced ? `translate(${resolution.tx} ${resolution.ty})` : undefined,
     visibility: resolution.hidden ? 'hidden' : undefined,
     pointerEvents: 'none',

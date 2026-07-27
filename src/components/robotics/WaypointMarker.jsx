@@ -1,15 +1,34 @@
 import React from 'react';
+import {
+  isNavigationSourceCompatible,
+  useNavigationCoordinateBoundary,
+} from './NavigationCoordinateBoundary.jsx';
 import { isFocusVisibleTarget } from './_NavigationFocus.js';
 import { NavigationStateGlyph } from './_NavigationStateGlyph.js';
 import { NavigationRoleGlyph } from './_navigationRoleGlyph.js';
 import { ANNOTATION_CODE as ANNOTATION_CODES, ROLE_CODE as ROLE_CODES } from './_navigationEncoding.js';
-import { NavigationAnnotationBlock, annotationPriority, useNavigationObstacles } from './_navigationAnnotations.js';
-import { navStateOpacity, NAV_DASH, NAV_NODE, NAV_HIT, NAV_STATE_BADGE, NAV_LABEL_HALO, NAV_FOCUS } from './_navigationVocabulary.js';
+import {
+  ANNOTATION_IMPORTANCE,
+  NavigationAnnotationBlock,
+  annotationPriority,
+  useNavigationAnnotationDetailMode,
+  useNavigationObstacles,
+} from './_navigationAnnotations.js';
+import {
+  navStateOpacity,
+  NAV_NODE,
+  NAV_HIT,
+  NAV_LABEL_HALO,
+  NAV_FOCUS,
+  NAV_SELECTION,
+  NAV_WAYPOINT_STATUS_BADGE,
+} from './_navigationVocabulary.js';
 
 // Accessible-name copy is Korean to match every sibling navigation overlay
 // (Lane / Region / Route / Trajectory / Facility). A Korean-first product must
 // not announce mixed-language part names in one map (WCAG 3.1.2 Language of
-// Parts). The short on-map visual codes stay language-neutral (H / C / dock).
+// Parts). Primary roles use language-neutral vector icons; facility annotation
+// codes such as `dock` remain terse secondary labels.
 const ROLE_LABELS = {
   holding: '대기 지점',
   passthrough: '통과 지점',
@@ -34,19 +53,29 @@ const AVAILABILITY_LABELS = {
   unknown: '상태 미확인',
 };
 
+// One compact rounded square can carry one readable role. Prefer the most specific
+// operational role; the complete role set remains in the accessible name and
+// selection-inspector data.
+const ROLE_VISUAL_PRIORITY = ['charger', 'parking', 'holding', 'passthrough'];
+
 function normalizeViewportScale(value) {
   return Number.isFinite(value) && value > 0 ? value : 1;
 }
 
-function semanticSummary(waypoint, { excludeCharger = false } = {}) {
-  // charger, when present, renders as a ⚡ pictogram instead of a `C` code, so
-  // drop it from the code string to avoid saying the same role twice.
-  const roleCodes = (waypoint.roles || [])
-    .filter((role) => !(excludeCharger && role === 'charger'))
-    .map((role) => ROLE_CODES[role]);
+function compactLabel(label, limit = 14) {
+  if (typeof label !== 'string' || label.length <= limit) return label;
+  return `${label.slice(0, limit - 1).trimEnd()}…`;
+}
+
+function primaryVisualRole(waypoint) {
+  const roles = waypoint.roles || [];
+  return ROLE_VISUAL_PRIORITY.find((role) => roles.includes(role));
+}
+
+function annotationSummary(waypoint) {
   const annotationCodes = (waypoint.annotations || [])
     .map((annotation) => ANNOTATION_CODES[annotation.kind]);
-  const codes = [...roleCodes, ...annotationCodes].filter(Boolean);
+  const codes = annotationCodes.filter(Boolean);
 
   if (codes.length <= 3) return codes.join(' · ');
   return `${codes.slice(0, 3).join(' · ')} +${codes.length - 3}`;
@@ -105,6 +134,8 @@ export function WaypointMarker({
   ...rest
 }) {
   const [hasDomFocus, setHasDomFocus] = React.useState(false);
+  const coordinateBoundary = useNavigationCoordinateBoundary();
+  const annotationDetailMode = useNavigationAnnotationDetailMode();
   const obstacle = useNavigationObstacles();
   const scale = normalizeViewportScale(viewportScale);
   const inverseScale = 1 / scale;
@@ -112,9 +143,11 @@ export function WaypointMarker({
   const pointerOnly = ariaHidden === true || ariaHidden === 'true';
   const focusVisible = !pointerOnly && (focused || hasDomFocus);
   const availability = waypoint.availability || 'unknown';
-  const compoundUnknownInvalid = availability === 'unknown' && invalid;
-  const hasCharger = (waypoint.roles || []).includes('charger');
-  const details = semanticSummary(waypoint, { excludeCharger: hasCharger });
+  const primaryRole = primaryVisualRole(waypoint);
+  const details = annotationSummary(waypoint);
+  const visualLabel = annotationDetailMode === 'standard'
+    ? compactLabel(waypoint.label)
+    : waypoint.label;
   const label = ariaLabel ?? accessibleName(waypoint, {
     selected,
     focused: focusVisible,
@@ -125,17 +158,26 @@ export function WaypointMarker({
   const foreground = 'var(--viewer-foreground, var(--color-semantic-label-strong))';
   const muted = 'var(--viewer-muted, var(--color-semantic-label-neutral))';
   const surface = 'var(--viewer-surface-elevated, var(--color-semantic-background-elevated-normal))';
-  // Color hierarchy: danger red is reserved for DATA errors (invalid), not
-  // operational unavailability. "Can't use right now" desaturates to muted —
-  // the same greyed-out convention as a blocked lane — and the slash shape
-  // carries the "unavailable" meaning without competing with real alarms.
-  const stateColor = invalid
-    ? 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))'
-    : availability === 'unavailable'
-      ? muted
-      : availability === 'unknown'
-        ? 'var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))'
-        : foreground;
+  const danger = 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))';
+  const warning = 'var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))';
+  const positive = 'var(--color-semantic-status-positive-foreground)';
+  const warningState = `color-mix(in srgb, ${warning} 70%, ${foreground})`;
+  const positiveState = `color-mix(in srgb, ${positive} 72%, ${foreground})`;
+  // Availability remains on the body. Exceptional data quality uses one
+  // top-right solid micro badge, matching the RobotPoseMarker attachment grammar.
+  // Invalid wins over stale visually; the accessible name still announces
+  // every raw state without growing a badge stack.
+  const statusBadgeKind = invalid
+    ? 'invalid'
+    : stale
+      ? 'stale'
+      : null;
+  const stateFill = availability === 'unavailable'
+    ? muted
+    : availability === 'unknown'
+      ? warningState
+      : positiveState;
+  const statusBadgeTone = statusBadgeKind === 'invalid' ? danger : muted;
   const activate = (event) => {
     if (disabled || !interactive) return;
     onActivate(waypoint.id, event);
@@ -149,12 +191,19 @@ export function WaypointMarker({
     activate(event);
   };
 
+  if (
+    (waypoint?.source && waypoint.source.mapId !== waypoint.mapId)
+    || !isNavigationSourceCompatible(waypoint?.source, coordinateBoundary)
+  ) return null;
+
   return (
     <g
       {...rest}
       data-waypoint-marker=""
       data-waypoint-id={waypoint.id}
       data-map-id={waypoint.mapId}
+      data-source-frame-id={waypoint?.source?.frameId}
+      data-source-map-version={waypoint?.source?.mapVersion}
       data-availability={availability}
       data-selected={selected ? 'true' : 'false'}
       data-focused={focusVisible ? 'true' : 'false'}
@@ -188,7 +237,7 @@ export function WaypointMarker({
       }}
       style={{
         cursor: disabled ? 'not-allowed' : interactive ? 'pointer' : 'default',
-        opacity: navStateOpacity(disabled, stale),
+        opacity: navStateOpacity(disabled, stale && !invalid),
         outline: 'none',
         ...style,
       }}
@@ -198,37 +247,6 @@ export function WaypointMarker({
         data-viewport-scale={scale}
         transform={`scale(${inverseScale})`}
       >
-        {/*
-          Decorative depth + salience layers. They carry their own data hooks,
-          never the measured `data-waypoint-point`, so the 24px hit target and
-          the glyph-in-circle geometry contracts are untouched. The cast shadow
-          lifts every marker off the facility grid; the attention ring gives
-          the invalid alarm state visual weight so a DATA error is not painted at
-          the same hairline salience as routine state. Operational
-          unavailability is not an alarm — it desaturates instead of glowing.
-        */}
-        <polygon
-          data-waypoint-shadow=""
-          points="0,-7.5 7.5,0 0,7.5 -7.5,0"
-          transform="translate(0 1.4)"
-          fill="var(--color-semantic-static-black)"
-          opacity="0.16"
-          pointerEvents="none"
-        />
-        {invalid && (
-          <polygon
-            data-waypoint-attention=""
-            points={NAV_NODE.points(NAV_NODE.radius)}
-            transform={`scale(${NAV_NODE.attentionRingScale})`}
-            fill="none"
-            stroke="var(--viewer-danger, var(--color-semantic-status-negative-foreground))"
-            strokeWidth="2.5"
-            strokeLinejoin="round"
-            opacity="0.4"
-            vectorEffect="non-scaling-stroke"
-            pointerEvents="none"
-          />
-        )}
         {/*
           WCAG 2.2 sets the minimum interactive target at 24 screen px. This
           transparent hit circle lives inside the inverse-scaled screen-space
@@ -245,132 +263,111 @@ export function WaypointMarker({
         />
 
         {/*
-          Focus traces the point's OWN diamond silhouette (a shell scaled 1.5x)
-          rather than a circle — a round ring around a diamond reads as a shape
-          mismatch (the same reason selection fills the diamond solid below), and
-          it matches how the pin focus scales its silhouette.
+          Focus traces the point's OWN rounded-square silhouette instead of the
+          browser's rectangular outline. A surface-colored contrast underlay
+          makes the focus indicator survive both light/dark maps and separates
+          it from selection without introducing a dashed interaction state.
         */}
         {focusVisible && (
-          <polygon
-            data-waypoint-focus-indicator=""
-            points="0,-7 7,0 0,7 -7,0"
-            transform={`scale(${NAV_FOCUS.waypointShellScale})`}
-            fill="none"
-            stroke="var(--color-semantic-focus-indicator)"
-            strokeWidth={NAV_FOCUS.strokeWidth}
-            strokeLinejoin="round"
-            vectorEffect="non-scaling-stroke"
-          />
-        )}
-
-        {stale && (
-          <polygon
-            data-waypoint-stale-indicator=""
-            points={NAV_NODE.points(NAV_NODE.radius)}
-            transform={`scale(${NAV_NODE.staleRingScale})`}
-            fill="none"
-            stroke={muted}
-            strokeWidth="1.5"
-            strokeLinejoin="round"
-            strokeDasharray={NAV_DASH.staleRing}
-            vectorEffect="non-scaling-stroke"
-          />
+          <>
+            <rect
+              data-waypoint-focus-contrast=""
+              {...NAV_NODE.rect(NAV_NODE.radius, NAV_NODE.cornerRadius)}
+              transform={`scale(${NAV_FOCUS.waypointShellScale})`}
+              fill="none"
+              stroke={surface}
+              strokeWidth={NAV_FOCUS.contrastStrokeWidth}
+              strokeLinejoin="round"
+              vectorEffect="non-scaling-stroke"
+              pointerEvents="none"
+            />
+            <rect
+              data-waypoint-focus-indicator=""
+              data-waypoint-focus-ring=""
+              {...NAV_NODE.rect(NAV_NODE.radius, NAV_NODE.cornerRadius)}
+              transform={`scale(${NAV_FOCUS.waypointShellScale})`}
+              fill="none"
+              stroke="var(--color-semantic-focus-indicator)"
+              strokeWidth={NAV_FOCUS.strokeWidth}
+              strokeLinejoin="round"
+              vectorEffect="non-scaling-stroke"
+              pointerEvents="none"
+            />
+          </>
         )}
 
         {/*
-          The point keeps its surface fill and availability-colored stroke in
-          every state, so selection never overrides the availability channel.
-          Selection is an accent ring that traces the SAME diamond silhouette
-          (like the focus shell) rather than a circular ring around a diamond —
-          matching the pin markers' silhouette-ring selection grammar so every
-          marker class reads "selected" the same way.
+          Selection enlarges the complete visual marker from 20px to 25px
+          without changing its semantic state color. The one-shot transition
+          lives in tokens/components.css and is suppressed for reduced motion.
+          Keyboard focus stays outside this group as a transient input-location
+          cue.
         */}
-        <polygon
-          {...obstacle(`waypoint:${waypoint.id}:point`)}
-          data-waypoint-point=""
-          points={NAV_NODE.points(NAV_NODE.radius)}
-          fill={surface}
-          stroke={stateColor}
-          strokeWidth="2.25"
-          strokeLinejoin="round"
-          vectorEffect="non-scaling-stroke"
-        />
-        {selected && (
-          <polygon
-            data-waypoint-selected-indicator=""
-            points={NAV_NODE.points(NAV_NODE.radius)}
-            transform={`scale(${NAV_NODE.selectionRingScale})`}
-            fill="none"
-            stroke="var(--viewer-accent, var(--color-semantic-primary-normal))"
-            strokeWidth="2.25"
-            strokeLinejoin="round"
-            vectorEffect="non-scaling-stroke"
+        <g
+          data-navigation-selection-scale=""
+          data-waypoint-selection-visual=""
+          data-waypoint-selected-scale={selected ? NAV_SELECTION.waypointScale : undefined}
+          style={{ transform: `scale(${selected ? NAV_SELECTION.waypointScale : 1})` }}
+        >
+          {/*
+            Decorative depth is independent from semantic state. It scales with
+            the selected marker so the body still reads as one elevated object.
+          */}
+          <rect
+            data-waypoint-shadow=""
+            {...NAV_NODE.rect(NAV_NODE.radius + 0.5, NAV_NODE.cornerRadius + 0.5)}
+            transform="translate(0 1.4)"
+            fill="var(--color-semantic-static-black)"
+            opacity="0.16"
             pointerEvents="none"
           />
-        )}
-
-        {availability === 'unavailable' && (
-          <path
-            data-waypoint-unavailable-indicator=""
-            d="M-4.5 4.5 L4.5 -4.5"
-            fill="none"
-            stroke={foreground}
-            strokeWidth="2"
-            strokeLinecap="round"
+          <rect
+            {...obstacle(`waypoint:${waypoint.id}:point`)}
+            data-waypoint-point=""
+            data-waypoint-status-kind={availability}
+            data-waypoint-state-color=""
+            {...NAV_NODE.rect(NAV_NODE.radius, NAV_NODE.cornerRadius)}
+            fill={stateFill}
+            stroke={surface}
+            strokeWidth="1.5"
+            strokeLinejoin="round"
             vectorEffect="non-scaling-stroke"
           />
-        )}
+          {primaryRole && (
+            <g
+              data-waypoint-role-slot=""
+              data-waypoint-primary-role={primaryRole}
+              aria-hidden="true"
+              pointerEvents="none"
+            >
+              <NavigationRoleGlyph kind={primaryRole} size={11} color={surface} />
+            </g>
+          )}
+        </g>
 
-        {availability === 'unknown' && (
+        {statusBadgeKind && (
           <g
-            {...obstacle(`waypoint:${waypoint.id}:unknown`)}
-            data-waypoint-unknown-indicator=""
-            data-waypoint-state-slot="unknown"
-            transform={compoundUnknownInvalid ? 'translate(-8 -8)' : undefined}
-            aria-hidden="true"
+            {...obstacle(`waypoint:${waypoint.id}:status`)}
+            transform={`translate(${NAV_WAYPOINT_STATUS_BADGE.offsetX} ${NAV_WAYPOINT_STATUS_BADGE.offsetY})`}
+            data-waypoint-status-badge={statusBadgeKind}
+            data-waypoint-status-badge-style="solid"
+            data-waypoint-status-badge-offset-x={NAV_WAYPOINT_STATUS_BADGE.offsetX}
+            data-waypoint-status-badge-offset-y={NAV_WAYPOINT_STATUS_BADGE.offsetY}
+            pointerEvents="none"
           >
-            {compoundUnknownInvalid && (
-              <circle
-                data-waypoint-state-circle="unknown"
-                r={NAV_STATE_BADGE.radius}
-                fill={surface}
-                stroke="var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))"
-                strokeWidth={NAV_STATE_BADGE.strokeWidth}
-                vectorEffect="non-scaling-stroke"
-              />
-            )}
-            <NavigationStateGlyph
-              kind="unknown"
-              size={10}
-              color={foreground}
-              data-waypoint-state-glyph-geometry="unknown"
+            <circle
+              data-waypoint-status-badge-circle=""
+              r={NAV_WAYPOINT_STATUS_BADGE.radius}
+              fill={statusBadgeTone}
+              stroke={surface}
+              strokeWidth={NAV_WAYPOINT_STATUS_BADGE.strokeWidth}
+              vectorEffect="non-scaling-stroke"
             />
-          </g>
-        )}
-
-        {invalid && (
-          <g
-            {...obstacle(`waypoint:${waypoint.id}:invalid`)}
-            data-waypoint-invalid-indicator=""
-            data-waypoint-state-slot="invalid"
-            transform={compoundUnknownInvalid ? 'translate(-8 8)' : undefined}
-            aria-hidden="true"
-          >
-            {compoundUnknownInvalid && (
-              <circle
-                data-waypoint-state-circle="invalid"
-                r={NAV_STATE_BADGE.radius}
-                fill={surface}
-                stroke="var(--viewer-danger, var(--color-semantic-status-negative-foreground))"
-                strokeWidth={NAV_STATE_BADGE.strokeWidth}
-                vectorEffect="non-scaling-stroke"
-              />
-            )}
             <NavigationStateGlyph
-              kind="invalid"
-              size={10}
-              color={foreground}
-              data-waypoint-state-glyph-geometry="invalid"
+              kind={statusBadgeKind}
+              size={NAV_WAYPOINT_STATUS_BADGE.glyphSize}
+              color={surface}
+              data-waypoint-status-glyph=""
             />
           </g>
         )}
@@ -380,17 +377,19 @@ export function WaypointMarker({
             id={`waypoint:${waypoint.id}:label`}
             kind="waypoint-label"
             anchor={waypoint.position}
+            detailLevel="standard"
             priority={annotationPriority({
               selected,
               focused: focusVisible,
               alarm: invalid || availability === 'unavailable',
+              importance: ANNOTATION_IMPORTANCE.context,
             })}
           >
-            <g data-waypoint-label="" data-waypoint-label-offset-x="15" pointerEvents="none" aria-hidden="true">
+            <g data-waypoint-label="" data-waypoint-label-offset-x={NAV_NODE.labelOffsetX} pointerEvents="none" aria-hidden="true">
               <text
                 data-waypoint-primary-label=""
-                x="15"
-                y={details || hasCharger ? '-1.5' : '3.5'}
+                x={NAV_NODE.labelOffsetX}
+                y={details ? '-1.5' : '3.5'}
                 fill={foreground}
                 stroke={surface}
                 strokeWidth={NAV_LABEL_HALO.primary}
@@ -401,17 +400,12 @@ export function WaypointMarker({
                 fontSize="var(--label2-size)"
                 fontWeight="var(--fw-bold)"
               >
-                {waypoint.label}
+                {visualLabel}
               </text>
-              {hasCharger && (
-                <g data-waypoint-role-charger="" transform="translate(18.5 6.2)">
-                  <NavigationRoleGlyph kind="charger" size={9} color={muted} haloColor={surface} />
-                </g>
-              )}
               {details && (
                 <text
                   data-waypoint-details=""
-                  x={hasCharger ? 25 : 15}
+                  x={NAV_NODE.labelOffsetX}
                   y="10"
                   fill={muted}
                   stroke={surface}

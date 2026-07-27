@@ -1,32 +1,27 @@
 import React from 'react';
+import { PageHeader } from '@lk-robotics/lds-product';
 
-export function StoryGuide({ eyebrow, title, description, maxWidth = 760 }) {
+/**
+ * Keep the Robotics canvas masthead on the same LDS Product page-header
+ * contract used by the main LDS Storybook. Storybook chrome is part of the
+ * design-system surface, so it must not maintain a private heading treatment.
+ */
+export function StoryGuide({
+  eyebrow,
+  title,
+  description,
+  headingLevel = 1,
+  size = 'md',
+}) {
   return (
-    <header data-story-guide style={{ display: 'grid', gap: 'var(--space-2)' }}>
-      <p className="lk-overline lk-overline--signal" style={{ margin: 0 }}>
-        {eyebrow}
-      </p>
-      <h1
-        style={{
-          margin: 0,
-          color: 'var(--color-semantic-label-strong)',
-          fontSize: 'var(--title2-size)',
-          lineHeight: 'var(--title2-line)',
-        }}
-      >
-        {title}
-      </h1>
-      <p
-        style={{
-          margin: 0,
-          maxWidth,
-          color: 'var(--color-semantic-label-neutral)',
-          lineHeight: 1.7,
-        }}
-      >
-        {description}
-      </p>
-    </header>
+    <PageHeader
+      data-story-guide
+      headingLevel={headingLevel}
+      size={size}
+      eyebrow={eyebrow}
+      title={title}
+      description={description}
+    />
   );
 }
 

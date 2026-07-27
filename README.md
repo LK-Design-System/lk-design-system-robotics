@@ -2,8 +2,16 @@
 
 `@lk-robotics/lds-robotics-ui` is the independent Robotics UI package for
 LK ROBOTICS products. It owns DOM, SVG, editor, viewer, telemetry, and robotics
-operation UI; it does not own transport, authority, safety controls, coordinates,
-WebGL, Three/R3F, or LDS3D renderer lifecycle.
+operation UI. It owns the renderer-facing navigation coordinate contract and
+pure world/SVG/screen projection helpers, but not transport, TF authority,
+localization, safety controls, WebGL, Three/R3F, or LDS3D renderer lifecycle.
+
+Route, Trajectory, and Lane geometry should enter the renderer through the
+world/ROS projection adapters. A `NavigationCoordinateBoundary` rejects line
+data that lacks `svg-map` projection proof or targets another frame/version.
+
+See [Navigation Coordinate Contract](docs/NAVIGATION_COORDINATE_CONTRACT.md)
+before integrating ROS maps, paths, poses, multi-floor frames, or map editing.
 
 ## Dependencies
 

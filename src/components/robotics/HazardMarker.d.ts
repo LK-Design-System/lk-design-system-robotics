@@ -4,6 +4,7 @@ import type {
   NavigationPoint,
   NavigationSvgFeatureProps,
 } from './WaypointMarker';
+import type { NavigationFrameRef } from './NavigationCoordinateSystem';
 
 /** Point-hazard categories the AGV must avoid. Broad keep-out *areas* belong to
  * `SpatialRegion`; passages the AGV *uses* belong to `FacilityTransition`. The
@@ -24,6 +25,8 @@ export interface HazardData {
   readonly label: string;
   readonly kind: HazardKind;
   readonly mapId: string;
+  /** Source frame/version/time retained after projection into SVG map space. */
+  readonly source?: NavigationFrameRef;
   readonly position: NavigationPoint;
   readonly severity: HazardSeverity;
 }

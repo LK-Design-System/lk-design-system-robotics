@@ -1,21 +1,22 @@
 import React from 'react';
 import { waitFor } from 'storybook/test';
+import { Map2DCanvas } from '@lk-robotics/lds-product';
 import {
   FacilityTransition,
   LaneOverlay,
-  Map2DCanvas,
   NavigationAnnotationLayer,
   RouteOverlay,
   SpatialRegion,
   TrajectoryOverlay,
   WaypointMarker,
-} from './lds.js';
+} from '../src/index.js';
 import { NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { assertNoLabelCollisions, collectAnnotationLabels } from './RoboticsNavigationCollision.shared.jsx';
 
 const meta = {
   title: 'LDS Robotics/Navigation/Annotation Layer',
+  tags: ['autodocs'],
   component: NavigationAnnotationLayer,
   parameters: {
     storyGuide: {
@@ -23,7 +24,9 @@ const meta = {
       eyebrow: 'Robotics / Navigation / Annotation Layer',
       title: '한 지도의 여러 오버레이 라벨은 한 곳에서 충돌을 조정합니다',
       description:
-        '여러 내비게이션 오버레이를 한 지도에 합성해 라벨이 서로 겹칠 수 있을 때 적합합니다. 라벨만 수직으로 밀리고, 공간이 없으면 우선순위 낮은 라벨만 숨겨지며, 마커·상태 badge·접근 가능한 이름·semantic mirror는 절대 바뀌지 않습니다. 오버레이 하나만 단독 렌더하거나 제품이 자체 symbol collision 정책을 이미 소유한 지도에는 사용하지 마세요 — provider 없이 렌더된 오버레이는 오늘과 동일하게 동작합니다.',
+        '여러 내비게이션 오버레이의 라벨이 겹칠 때 후보 위치와 우선순위로 충돌을 조정합니다. 오버레이 하나만 쓰거나 제품이 자체 충돌 정책을 소유한 지도에는 적용하지 마세요.',
+      docsDescription:
+        '여러 내비게이션 오버레이를 한 지도에 합성해 라벨이 서로 겹칠 수 있을 때 적합합니다. 라벨뿐 아니라 경로선·지도 chrome·안전 여백을 피하는 후보 위치와 최대 24px의 2D 미세 조정을 적용하고, 공간이 없으면 우선순위 낮은 라벨만 숨깁니다. 마커·상태 badge·접근 가능한 이름·semantic mirror는 절대 바뀌지 않습니다. 오버레이 하나만 단독 렌더하거나 제품이 자체 symbol collision 정책을 이미 소유한 지도에는 사용하지 마세요 — provider 없이 렌더된 오버레이는 오늘과 동일하게 동작합니다.',
     },
     docs: {
       description: {
@@ -249,7 +252,7 @@ export const AnnotationLayerOverview = {
     <main style={{ display: 'grid', gap: 'var(--space-4)', width: '100%', maxWidth: 720 }}>
       <AnnotationMap label="여섯 오버레이가 합성된 내비게이션 지도" testId="annotation-overview-map">
         {({ viewportScale }) => (
-          <NavigationAnnotationLayer>
+          <NavigationAnnotationLayer detailMode="detail">
             <SpatialRegion region={OVERVIEW_REGION} viewportScale={viewportScale} />
             <LaneOverlay lane={OVERVIEW_LANE} viewportScale={viewportScale} />
             <RouteOverlay route={OVERVIEW_ROUTE} activeMapId="L1" viewportScale={viewportScale} />
@@ -280,10 +283,107 @@ export const AnnotationLayerOverview = {
   },
 };
 
+const DENSITY_ROUTE = {
+  ...OVERVIEW_ROUTE,
+  id: 'annotation-route-density',
+  segments: [
+    {
+      id: 'annotation-seg-completed',
+      mapId: 'L1',
+      label: '입구 적재 대기 구역 → 중앙 교차로',
+      points: [{ x: 58, y: 224 }, { x: 150, y: 224 }, { x: 236, y: 210 }],
+      phase: 'completed',
+      condition: 'normal',
+    },
+    {
+      ...OVERVIEW_ROUTE.segments[0],
+      id: 'annotation-seg-current-density',
+      label: '중앙 교차로 → 북동측 화물 승강기 A',
+    },
+  ],
+  progress: { segmentId: 'annotation-seg-current-density', fraction: 0.42 },
+};
+
+function densityFixtures(viewportScale) {
+  return (
+    <>
+      <SpatialRegion
+        region={{ ...OVERVIEW_REGION, id: 'annotation-zone-density', label: '충전 준비 구역 장기 체류 진입 제한' }}
+        viewportScale={viewportScale}
+      />
+      <LaneOverlay
+        lane={{ ...OVERVIEW_LANE, id: 'annotation-lane-density', label: '주 통로 A에서 북동측 승강기 B까지' }}
+        viewportScale={viewportScale}
+      />
+      <RouteOverlay route={DENSITY_ROUTE} activeMapId="L1" viewportScale={viewportScale} />
+      <TrajectoryOverlay
+        trajectory={{ ...OVERVIEW_TRAJECTORY, id: 'annotation-trajectory-density', label: 'AMR 7 장거리 배송 예상 궤적' }}
+        viewportScale={viewportScale}
+      />
+      <WaypointMarker
+        waypoint={{ ...OVERVIEW_WAYPOINT, id: 'annotation-wp-density', label: '북측 피킹 작업 인계 지점 P1' }}
+        viewportScale={viewportScale}
+      />
+      <FacilityTransition
+        transition={{ ...OVERVIEW_FACILITY, id: 'annotation-facility-density', label: '북동측 화물 승강기 A' }}
+        activeMapId="L1"
+        viewportScale={viewportScale}
+      />
+    </>
+  );
+}
+
+export const DensityLevels = {
+  name: '변형·상태 · 라벨 밀도 단계',
+  parameters: storyDescription(
+    '같은 긴 한국어 라벨 데이터를 overview, standard, detail로 비교합니다. overview는 현재 진행 문맥만, standard는 주요 point 이름을 한 줄로 축약하며, detail은 완료 구간·lane·region까지 후보에 포함합니다. 모든 단계에서 경로선·지도 chrome·16px 안전 여백과 충돌하면 낮은 우선순위 라벨을 숨깁니다.',
+  ),
+  render: () => (
+    <main style={{ display: 'grid', gap: 'var(--space-4)', width: '100%', maxWidth: 720 }}>
+      {['overview', 'standard', 'detail'].map((detailMode) => (
+        <AnnotationMap
+          key={detailMode}
+          label={`${detailMode} 라벨 밀도 지도`}
+          testId={`annotation-density-${detailMode}`}
+          eyebrow={`DENSITY · ${detailMode.toUpperCase()}`}
+        >
+          {({ viewportScale }) => (
+            <NavigationAnnotationLayer detailMode={detailMode}>
+              {densityFixtures(viewportScale)}
+            </NavigationAnnotationLayer>
+          )}
+        </AnnotationMap>
+      ))}
+    </main>
+  ),
+  play: async ({ canvasElement }) => {
+    await waitFor(() => {
+      const visibleCounts = ['overview', 'standard', 'detail'].map((detailMode) => {
+        const map = canvasElement.querySelector(`[data-testid="annotation-density-${detailMode}"]`);
+        const layer = map?.querySelector('[data-lk-navigation-annotation-layer]');
+        if (layer?.getAttribute('data-annotation-detail-mode') !== detailMode) {
+          throw new Error(`${detailMode} must remain an explicit density contract.`);
+        }
+        assertNoLabelCollisions(map, `Density ${detailMode}`, 8);
+        return collectAnnotationLabels(map).length;
+      });
+      if (!(visibleCounts[0] <= visibleCounts[1] && visibleCounts[0] < visibleCounts[2])) {
+        throw new Error(`Expanded detail eligibility must not reduce overview context: ${visibleCounts.join(' ≤ ')}.`);
+      }
+
+      const overview = canvasElement.querySelector('[data-testid="annotation-density-overview"]');
+      const completed = overview?.querySelector('[data-annotation-id*="seg-completed"]');
+      if (completed?.getAttribute('data-annotation-suppressed-reason') !== 'density') {
+        throw new Error('Completed segment context must be density-suppressed in overview mode.');
+      }
+    });
+  },
+};
+
 export const CrossEntityLabelCollisions = {
   name: '변형·상태 · 교차 개체 라벨 충돌',
   parameters: storyDescription(
-    '자연 anchor에서 서로 다른 개체의 라벨이 겹치는 두 실측 사례 — route 진행 라벨 위의 trajectory 라벨, 인접 자동문 라벨 쌍 — 를 한 지도에 재현합니다. layer가 라벨만 수직으로 분리하고 실제 anchor 좌표와 마커는 보존해야 합니다.',
+    '자연 anchor에서 서로 다른 개체의 라벨이 겹치는 두 실측 사례 — route 진행 라벨 위의 trajectory 라벨, 인접 자동문 라벨 쌍 — 를 한 지도에 재현합니다. layer가 종류별 후보 위치와 제한된 2D 미세 조정으로 라벨만 분리하고 실제 anchor 좌표와 마커는 보존해야 합니다.',
   ),
   render: () => (
     <main style={{ display: 'grid', gap: 'var(--space-4)', width: '100%', maxWidth: 720 }}>
@@ -331,20 +431,22 @@ export const CrossEntityLabelCollisions = {
   },
 };
 
-const CLUSTER_WAYPOINTS = Array.from({ length: 8 }, (_, index) => ({
+const CLUSTER_WAYPOINTS = Array.from({ length: 14 }, (_, index) => ({
   id: `annotation-wp-cluster-${index + 1}`,
   label: `밀집 지점 ${index + 1}`,
   mapId: 'L1',
   position: { x: 240, y: 150 },
   roles: [],
-  availability: 'available',
+  availability: index === 0 ? 'unavailable' : 'available',
 }));
 const CLUSTER_SELECTED_ID = 'annotation-wp-cluster-4';
+const CLUSTER_FOCUSED_ID = 'annotation-wp-cluster-2';
+const CLUSTER_ALARM_ID = 'annotation-wp-cluster-1';
 
 export const LabelSuppressionPriority = {
   name: '변형·상태 · 라벨 숨김 우선순위',
   parameters: storyDescription(
-    '수직 이동 한계 안에 빈 슬롯이 부족할 만큼 라벨이 밀집된 경우입니다. 선택된 개체의 라벨은 자연 위치에 남고, 우선순위 낮은 라벨만 숨겨지며, 숨겨진 개체의 마커와 접근 가능한 이름은 그대로 유지됩니다.',
+    '후보 위치와 24px 미세 조정 안에 빈 슬롯이 부족할 만큼 라벨이 밀집된 경우입니다. danger > focus > selection 순으로 라벨을 보존하고 우선순위 낮은 라벨만 숨기며, 숨겨진 개체의 마커와 접근 가능한 이름은 그대로 유지됩니다.',
   ),
   render: () => (
     <main style={{ display: 'grid', gap: 'var(--space-4)', width: '100%', maxWidth: 720 }}>
@@ -357,6 +459,7 @@ export const LabelSuppressionPriority = {
                 waypoint={waypoint}
                 viewportScale={viewportScale}
                 selected={waypoint.id === CLUSTER_SELECTED_ID}
+                focused={waypoint.id === CLUSTER_FOCUSED_ID}
                 onActivate={() => {}}
               />
             ))}
@@ -376,15 +479,22 @@ export const LabelSuppressionPriority = {
         if (view.getComputedStyle(label).visibility !== 'hidden') {
           throw new Error('Suppressed labels must hide via visibility, keeping measurable geometry.');
         }
-        if (label.getAttribute('data-annotation-id') === `waypoint:${CLUSTER_SELECTED_ID}:label`) {
-          throw new Error('The selected entity must never lose its label.');
+        if ([CLUSTER_SELECTED_ID, CLUSTER_FOCUSED_ID, CLUSTER_ALARM_ID]
+          .some((id) => label.getAttribute('data-annotation-id') === `waypoint:${id}:label`)) {
+          throw new Error('Danger, focused, and selected entities must not lose their labels.');
         }
       });
-      const selectedLabel = map.querySelector(`[data-annotation-id="waypoint:${CLUSTER_SELECTED_ID}:label"]`);
-      if (!selectedLabel
-        || selectedLabel.getAttribute('data-annotation-suppressed') === 'true'
-        || selectedLabel.getAttribute('data-annotation-displaced') === 'true') {
-        throw new Error('The selected label must stay visible at its natural position.');
+      const protectedLabels = [CLUSTER_ALARM_ID, CLUSTER_FOCUSED_ID, CLUSTER_SELECTED_ID]
+        .map((id) => map.querySelector(`[data-annotation-id="waypoint:${id}:label"]`));
+      if (protectedLabels.some((label) => !label || label.getAttribute('data-annotation-suppressed') === 'true')) {
+        throw new Error('Danger, focused, and selected labels must survive density suppression.');
+      }
+      const priorities = protectedLabels.map((label) => Number(label.getAttribute('data-annotation-priority')));
+      if (!(priorities[0] > priorities[1] && priorities[1] > priorities[2])) {
+        throw new Error(`Priority must be danger > focus > selection, received ${priorities.join(' > ')}.`);
+      }
+      if (protectedLabels[0].getAttribute('data-annotation-displaced') === 'true') {
+        throw new Error('The highest-priority danger label must keep the natural position.');
       }
       suppressed.forEach((label) => {
         const marker = label.closest('[data-waypoint-marker]');
@@ -431,7 +541,7 @@ export const NoProviderBaseline = {
 export const NarrowWidth = {
   name: '반응형 · 320px 좁은 폭',
   parameters: storyDescription(
-    '320px 지도에서도 layer 조정은 카드나 여러 줄 래핑을 만들지 않고 라벨 수직 분리만 수행하며, 페이지 가로 overflow를 만들지 않아야 합니다.',
+    '320px 지도에서도 layer 조정은 카드나 여러 줄 래핑을 만들지 않고 후보 위치와 제한된 2D 미세 조정만 수행하며, 페이지 가로 overflow를 만들지 않아야 합니다.',
   ),
   render: () => (
     <div data-testid="annotation-narrow-shell" style={{ width: 320, maxWidth: '100%', minWidth: 0 }}>

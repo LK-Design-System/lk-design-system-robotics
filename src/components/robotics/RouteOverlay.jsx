@@ -1,15 +1,23 @@
 import React from 'react';
+import {
+  isNavigationGeometryCompatible,
+  useNavigationCoordinateBoundary,
+} from './NavigationCoordinateBoundary.jsx';
 import { isFocusVisibleTarget } from './_NavigationFocus.js';
 import { NavigationStateGlyph } from './_NavigationStateGlyph.js';
-import { NAVIGATION_DIRECTION_PATH } from './_navigationVectorGlyph.js';
 import {
   NavigationProgressHeadDefs,
   ProgressHeadObstacle,
   progressCarrierPath,
   routeProgressGeometry,
 } from './_navigationProgressHead.js';
-import { NavigationAnnotationBlock, annotationPriority, useNavigationObstacles } from './_navigationAnnotations.js';
-import { navStateOpacity, NAV_DASH, NAV_PATH_DASH, NAV_HIT, NAV_STATE_BADGE, NAV_PROGRESS_HEAD, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION } from './_navigationVocabulary.js';
+import {
+  ANNOTATION_IMPORTANCE,
+  NavigationAnnotationBlock,
+  annotationPriority,
+  useNavigationObstacles,
+} from './_navigationAnnotations.js';
+import { navStateOpacity, NAV_DASH, NAV_PATH_DASH, NAV_HIT, NAV_STATE_BADGE, NAV_PROGRESS_HEAD, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION, NAV_LINE_ROLE } from './_navigationVocabulary.js';
 
 // 'active' reads 주행 중, not 이동 중: a route is a PLAN being traversed, while
 // 이동 중 is the trajectory/robot's own motion state — two different claims
@@ -226,6 +234,7 @@ export function RouteOverlay({
 }) {
   const [focusedSegment, setFocusedSegment] = React.useState(null);
   const [hasRootFocus, setHasRootFocus] = React.useState(false);
+  const coordinateBoundary = useNavigationCoordinateBoundary();
   const obstacle = useNavigationObstacles();
   const progressHeadId = `lk-route-progress-${React.useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
   const scale = Number.isFinite(viewportScale) && viewportScale > 0 ? viewportScale : 1;
@@ -235,6 +244,8 @@ export function RouteOverlay({
   const pointerOnly = interactive && hiddenFromAccessibility;
   const visibleSegments = (route?.segments ?? []).filter((segment) => (
     segment.mapId === activeMapId
+    && (!segment.source || segment.source.mapId === segment.mapId)
+    && isNavigationGeometryCompatible(segment, coordinateBoundary)
     && (segment.points ?? []).filter(finitePoint).length >= 2
   ));
   const routeProgress = normalizedProgress(route);
@@ -330,8 +341,13 @@ export function RouteOverlay({
     <g
       {...rest}
       data-lk-route-overlay=""
+      data-navigation-line-role="route"
+      data-line-encoding="graph-plan"
       data-route-id={route?.id}
       data-active-map-id={activeMapId}
+      data-source-frame-ids={[...new Set(visibleSegments.map((segment) => segment.source?.frameId).filter(Boolean))].join(' ') || undefined}
+      data-source-map-versions={[...new Set(visibleSegments.map((segment) => segment.source?.mapVersion).filter(Boolean))].join(' ') || undefined}
+      data-coordinate-space={[...new Set(visibleSegments.map((segment) => segment.coordinateSpace).filter(Boolean))].join(' ') || undefined}
       data-route-status={route?.status}
       data-visible-segment-count={visibleSegments.length}
       data-viewport-scale={scale}
@@ -370,7 +386,6 @@ export function RouteOverlay({
         const points = (segment.points ?? []).filter(finitePoint);
         const pathData = pathFromPoints(points);
         const midpoint = pointAlong(points, 0.5);
-        const directionPoint = pointAlong(points, 0.7);
         const segmentSelected = selected || segment.id === selectedSegmentId;
         const segmentFocused = !pointerOnly && (focused || hasRootFocus || focusedSegment === segment.id);
         const condition = ['normal', 'waiting', 'blocked', 'conflict'].includes(segment.condition)
@@ -440,27 +455,15 @@ export function RouteOverlay({
                 pointerEvents="none"
               />
             )}
-            {segmentSelected && pathData && (
-              <path
-                data-route-selection-halo=""
-                d={pathData}
-                fill="none"
-                stroke="var(--viewer-accent, var(--color-semantic-primary-normal))"
-                strokeWidth={NAV_SELECTION.routeHaloWidth}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                opacity={NAV_SELECTION.haloOpacity}
-                vectorEffect="non-scaling-stroke"
-                pointerEvents="none"
-              />
-            )}
-            {pathData && !segmentSelected && !segmentFocused && (
+            {pathData && (
               <path
                 data-route-casing=""
+                data-route-selection-casing={segmentSelected ? '' : undefined}
+                data-navigation-selection-geometry=""
                 d={pathData}
                 fill="none"
                 stroke="var(--viewer-surface-elevated, var(--color-semantic-background-elevated-normal))"
-                strokeWidth="6.5"
+                strokeWidth={segmentSelected ? NAV_SELECTION.routeCasingWidth : NAV_LINE_ROLE.route.casingWidth}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 vectorEffect="non-scaling-stroke"
@@ -470,10 +473,16 @@ export function RouteOverlay({
             {pathData && (
               <path
                 data-route-path=""
+                data-navigation-annotation-path-obstacle=""
                 d={pathData}
                 fill="none"
                 stroke={tone}
-                strokeWidth={isProgressSegment ? 3 : phase === 'current' || segmentSelected ? 4 : 3}
+                strokeWidth={segmentSelected
+                  ? NAV_SELECTION.routeStrokeWidth
+                  : phase === 'current'
+                    ? NAV_LINE_ROLE.route.currentWidth
+                    : NAV_LINE_ROLE.route.coreWidth}
+                data-navigation-selection-geometry=""
                 strokeDasharray={dash}
                 opacity={isProgressSegment ? NAV_PROGRESS_HEAD.route.futureOpacity : undefined}
                 strokeLinecap="round"
@@ -583,26 +592,6 @@ export function RouteOverlay({
                 />
               </>
             )}
-            {/* The progress head already points the travel direction on its
-                segment — drawing the chevron there too would say "direction"
-                twice, at full tone on top of the future-faded remainder. One
-                arrow per stretch of line: head where it exists, chevron
-                elsewhere. */}
-            {pathData && !(isProgressSegment && progressHeadVisible) && (
-              <path
-                data-route-direction=""
-                data-navigation-vector-glyph="direction"
-                d={NAVIGATION_DIRECTION_PATH}
-                transform={`translate(${directionPoint.x} ${directionPoint.y}) rotate(${directionPoint.angle}) scale(${inverseScale})`}
-                fill={tone}
-                stroke="var(--viewer-surface-elevated, var(--color-semantic-background-elevated-normal))"
-                strokeWidth="1"
-                strokeLinejoin="round"
-                vectorEffect="non-scaling-stroke"
-                opacity={isProgressSegment ? NAV_PROGRESS_HEAD.route.futureOpacity : undefined}
-                pointerEvents="none"
-              />
-            )}
             {[
               segment.entryTransitionId && points[0] ? { kind: 'entry', id: segment.entryTransitionId, point: points[0] } : null,
               segment.exitTransitionId && points[points.length - 1] ? { kind: 'exit', id: segment.exitTransitionId, point: points[points.length - 1] } : null,
@@ -646,11 +635,16 @@ export function RouteOverlay({
                 kind="route-segment-label"
                 anchor={midpoint}
                 nudgeDirection="up"
+                detailLevel={phase === 'current' ? 'overview' : phase === 'upcoming' ? 'standard' : 'detail'}
                 priority={annotationPriority({
                   selected: segmentSelected,
                   focused: segmentFocused,
                   alarm: invalid || condition === 'blocked' || condition === 'conflict',
-                  emphasized: phase === 'current',
+                  importance: phase === 'current'
+                    ? ANNOTATION_IMPORTANCE['current-segment']
+                    : phase === 'upcoming'
+                      ? ANNOTATION_IMPORTANCE.context
+                      : ANNOTATION_IMPORTANCE.background,
                 })}
               >
                 <text
@@ -724,11 +718,12 @@ export function RouteOverlay({
           kind="route-progress-label"
           anchor={progressPoint}
           nudgeDirection="down"
+          detailLevel="overview"
           priority={annotationPriority({
             selected,
             focused: focused || hasRootFocus || focusedSegment != null,
             alarm: invalid,
-            emphasized: route.status === 'active',
+            importance: ANNOTATION_IMPORTANCE['current-progress'],
           })}
         >
           <text
@@ -736,7 +731,7 @@ export function RouteOverlay({
             data-route-label-anchor-x={progressPoint.x}
             data-route-label-anchor-y={progressPoint.y}
             x="0"
-            y="24"
+            y="28"
             textAnchor="middle"
             transform={markerTransform(progressPoint, inverseScale)}
             fill="var(--viewer-foreground, var(--color-semantic-label-strong))"

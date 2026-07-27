@@ -5,7 +5,7 @@ import {
   isAttachedUnit,
   normalizeUnit,
   normalizeValueText,
-} from '@lk-robotics/lds-robotics-ui/components/internal/unit-format';
+} from '@lk-robotics/lds-core/components/internal/unit-format';
 import { storyDescription } from './StoryGuide.shared.jsx';
 
 // Cross-area value/unit lockup rule, shared across the Robotics areas. The
@@ -114,12 +114,15 @@ function UnitFormatCatalog() {
 
 const meta = {
   title: 'LDS Robotics/Foundation/Unit Format',
+  tags: ['autodocs'],
   parameters: {
     storyGuide: {
       storyId: 'lds-robotics-foundation-unit-format--overview',
       eyebrow: 'Foundation / Unit Format',
       title: '값과 단위를 결합하는 규칙을 원자 단위로 문서화합니다',
       description:
+        'Status와 Editor에서 숫자와 단위를 동일한 규칙으로 표시할 때 사용합니다. %·‰·°는 값에 붙이고 나머지 단위는 한 칸 띄우며, 날짜·통화·자유 형식 문자열에는 적용하지 않습니다.',
+      docsDescription:
         'Status와 Editor의 여러 컴포넌트(TelemetryGauge·TelemetryValue·ViewportStatusBar·SelectionInspector)가 숫자 값과 단위를 한 지도에서 동일하게 조판하도록, 결합 규칙을 내부 모듈 unit-format이 단일 소스로 소유합니다. %·‰·° 세 기호만 숫자에 부착되고 나머지 단위는 한 칸 띄우며, ℃는 ° 와 달리 분리됩니다. 로보틱스 상태·편집기 표면의 값과 단위 조판을 통일할 때 사용합니다. 날짜·통화·로케일 변환이나 사용자가 입력한 자유 형식 문자열에는 사용하지 마세요. 이 페이지는 그 규칙을 모듈 함수(isAttachedUnit·getUnitSeparator·formatValueWithUnit)에서 그대로 렌더해, 모듈 자체가 회귀 기준이 되도록 합니다. 공개 API가 아닌 내부 모듈이며, Navigation에 국한되지 않는 교차영역 원자입니다.',
     },
     docs: {

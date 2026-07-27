@@ -1,11 +1,12 @@
 import React from 'react';
 import { userEvent, waitFor } from 'storybook/test';
-import { TopicTree } from './lds.js';
+import { TopicTree } from '../src/index.js';
 import { TopicTreeCard as TopicTreeCardStory } from './RoboticsAndViz.shared.jsx';
 import { storyDescription } from './StoryGuide.shared.jsx';
 
 const meta = {
   title: 'LDS Robotics/Data/Topic Tree',
+  tags: ['autodocs'],
   parameters: {
     storyGuide: {
       storyId: 'lds-robotics-data-topic-tree--topic-tree-pattern',
@@ -42,7 +43,7 @@ export const TopicTreePattern = {
     'fleet 네임스페이스 아래 상태·스캔·배터리 토픽을 탐색하는 상황입니다. 계층, 메시지 타입, 주기와 구독 상태가 한 행에서 구분되는지 확인하세요.',
   ),
   render: () => (
-    <main style={{ maxWidth: 520, border: '1px solid var(--color-semantic-line-normal-normal)', borderRadius: 'var(--radius-lg)', background: 'var(--color-semantic-background-elevated-normal)', padding: 'var(--space-2)' }}>
+    <main style={{ maxWidth: 520 }}>
       <TopicTree nodes={topicNodes} />
     </main>
   ),
@@ -82,7 +83,9 @@ export const KeyboardNavigationContract = {
     const tree = host?.querySelector('[role="tree"]');
     if (!tree || !(tree.getAttribute('aria-label') || '').length) throw new Error('TopicTree must render a named role=tree.');
     const rows = () => Array.from(tree.querySelectorAll('[role="treeitem"]'));
-    const rowByText = (text) => rows().find((row) => (row.textContent || '').includes(text));
+    const rowByText = (text) => rows().find((row) => (
+      (row.getAttribute('aria-label') || '').split(',')[0] === text
+    ));
 
     if (!rows().every((row) => row.hasAttribute('tabindex'))) {
       throw new Error('Every treeitem — leaves included — must be focusable via a roving tabindex.');

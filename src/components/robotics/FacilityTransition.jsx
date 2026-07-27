@@ -1,9 +1,19 @@
 import React from 'react';
+import {
+  isNavigationSourceCompatible,
+  useNavigationCoordinateBoundary,
+} from './NavigationCoordinateBoundary.jsx';
 import { isFocusVisibleTarget } from './_NavigationFocus.js';
 import { NavigationStateGlyph } from './_NavigationStateGlyph.js';
 import { FacilityGlyph } from './_FacilityGlyph.js';
-import { NavigationAnnotationBlock, annotationPriority, useNavigationObstacles } from './_navigationAnnotations.js';
-import { navStateOpacity, NAV_DASH, NAV_PIN, NAV_HIT, NAV_STATE_BADGE, NAV_LABEL_HALO } from './_navigationVocabulary.js';
+import {
+  ANNOTATION_IMPORTANCE,
+  NavigationAnnotationBlock,
+  annotationPriority,
+  useNavigationAnnotationDetailMode,
+  useNavigationObstacles,
+} from './_navigationAnnotations.js';
+import { navStateOpacity, NAV_PIN, NAV_HIT, NAV_STATE_BADGE, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION } from './_navigationVocabulary.js';
 
 const AVAILABILITY_PRESENTATION = {
   available: {
@@ -174,6 +184,11 @@ function visibleDetailRows(transition, availabilityLabel) {
   return [availabilityLabel].filter(Boolean);
 }
 
+function compactLabel(label, limit = 18) {
+  if (typeof label !== 'string' || label.length <= limit) return label;
+  return `${label.slice(0, limit - 1).trimEnd()}…`;
+}
+
 function computedAccessibleLabel(transition, availabilityLabel) {
   const from = transition.from.label ?? transition.from.mapId;
   const endpointDescription = transition.to
@@ -196,9 +211,8 @@ function computedAccessibleLabel(transition, availabilityLabel) {
 
 // Map-pin silhouette: a round head centered at the origin (so the glyph, hit
 // target, rings and state badges all stay centered) tapering to a point that
-// marks the coordinate. Shared by the marker fill AND the shape-following
-// selection/focus outlines, so a selected/focused pin reads as the same pin
-// with a highlight — not a competing circular target ringed around it.
+// marks the coordinate. Focus follows this silhouette; selection enlarges the
+// same filled body, so both states preserve facility identity and paint.
 const PIN_PATH = NAV_PIN.path;
 
 /**
@@ -230,6 +244,8 @@ export function FacilityTransition({
   ...rest
 }) {
   const [focusVisible, setFocusVisible] = React.useState(false);
+  const coordinateBoundary = useNavigationCoordinateBoundary();
+  const annotationDetailMode = useNavigationAnnotationDetailMode();
   const obstacle = useNavigationObstacles();
   const endpoint = endpointForMap(transition, activeMapId);
   const availability = AVAILABILITY_PRESENTATION[transition.availability]
@@ -239,12 +255,18 @@ export function FacilityTransition({
   const activeFocus = !pointerOnly && (focused || focusVisible);
   const scale = safeScale(viewportScale);
   const inverseScale = 1 / scale;
+  const focusSurface = 'var(--viewer-surface-elevated, var(--color-semantic-background-elevated-normal))';
   const stroke = invalid
     ? 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))'
     : disabled
       ? 'var(--viewer-muted, var(--color-semantic-label-alternative))'
       : availability.stroke;
-  const rows = visibleDetailRows(transition, availability.label);
+  const detailRowsVisible = visibleDetailRows(transition, availability.label);
+  const coordinated = annotationDetailMode != null;
+  const visualLabel = coordinated ? compactLabel(transition.label) : transition.label;
+  const rows = coordinated
+    ? detailRowsVisible.slice(0, 1)
+    : detailRowsVisible;
   const computedLabel = [
     computedAccessibleLabel(transition, availability.label),
     selected ? '선택됨' : undefined,
@@ -253,22 +275,22 @@ export function FacilityTransition({
     stale ? '데이터 지연' : undefined,
     disabled ? '선택할 수 없음' : undefined,
   ].filter(Boolean).join(' · ');
-  const stateBadges = [
-    transition.availability === 'unknown'
-      ? { kind: 'unknown', tone: 'var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))' }
-      : null,
-    invalid
-      ? { kind: 'invalid', tone: 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))' }
-      : null,
-    stale
-      ? { kind: 'stale', tone: 'var(--viewer-muted, var(--color-semantic-label-alternative))', dash: NAV_DASH.staleRing }
-      : null,
-  ].filter(Boolean).map((state, index, states) => ({
-    ...state,
-    x: (index - (states.length - 1) / 2) * 16,
-  }));
+  // Marker-family contract: one attached solid status badge. All raw states
+  // remain in the accessible name, while the visual slot resolves by priority.
+  const stateBadge = invalid
+    ? { kind: 'invalid', tone: 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))' }
+    : stale
+      ? { kind: 'stale', tone: 'var(--viewer-muted, var(--color-semantic-label-alternative))' }
+      : transition.availability === 'unknown'
+        ? { kind: 'unknown', tone: 'var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))' }
+        : null;
 
-  if (hidden || !endpoint) return null;
+  if (
+    hidden
+    || !endpoint
+    || (endpoint.source && endpoint.source.mapId !== endpoint.mapId)
+    || !isNavigationSourceCompatible(endpoint?.source, coordinateBoundary)
+  ) return null;
 
   const endpointLabel = endpoint.side === 'from'
     ? '출발'
@@ -310,6 +332,8 @@ export function FacilityTransition({
       data-from-map-id={transition.from.mapId}
       data-to-map-id={transition.to?.mapId}
       data-visible-endpoint={endpoint.side}
+      data-source-frame-id={endpoint.source?.frameId}
+      data-source-map-version={endpoint.source?.mapVersion}
       data-door-state={transition.doorState}
       data-door-event={transition.kind === 'door' ? transition.event : undefined}
       data-lift-phase={transition.kind === 'lift' ? transition.phase : undefined}
@@ -347,15 +371,13 @@ export function FacilityTransition({
       }}
     >
       <g transform={`scale(${inverseScale})`} data-transition-screen-space="">
-        {/* Cast shadow + selection/focus outlines all trace the SAME pin
-            silhouette, so every state reads as one marker instead of a pin that
-            grows a mismatched circular ring when selected. */}
-        <path d={PIN_PATH} transform={NAV_PIN.shadow.transform} fill={NAV_PIN.shadow.fill} opacity={NAV_PIN.shadow.opacity} pointerEvents="none" data-transition-shadow="" />
+        {/* Focus traces the pin silhouette. Selection enlarges the complete pin
+            body without changing availability color or scaling state badges. */}
         {activeFocus && (
-          <path d={PIN_PATH} transform={`scale(${NAV_PIN.focusRing.scale})`} fill="none" stroke="var(--color-semantic-focus-indicator)" strokeWidth={NAV_PIN.focusRing.strokeWidth} strokeLinejoin="round" vectorEffect="non-scaling-stroke" pointerEvents="none" data-transition-focus-ring="" />
-        )}
-        {selected && (
-          <path d={PIN_PATH} transform={`scale(${NAV_PIN.selectionRing.scale})`} fill="none" stroke="var(--viewer-accent, var(--color-semantic-primary-normal))" strokeWidth={NAV_PIN.selectionRing.strokeWidth} strokeLinejoin="round" vectorEffect="non-scaling-stroke" pointerEvents="none" data-transition-selection-ring="" />
+          <>
+            <path d={PIN_PATH} transform={`scale(${NAV_PIN.focusRing.scale})`} fill="none" stroke={focusSurface} strokeWidth={NAV_FOCUS.contrastStrokeWidth} strokeLinejoin="round" vectorEffect="non-scaling-stroke" pointerEvents="none" data-transition-focus-contrast="" />
+            <path d={PIN_PATH} transform={`scale(${NAV_PIN.focusRing.scale})`} fill="none" stroke="var(--color-semantic-focus-indicator)" strokeWidth={NAV_PIN.focusRing.strokeWidth} strokeLinejoin="round" vectorEffect="non-scaling-stroke" pointerEvents="none" data-transition-focus-ring="" />
+          </>
         )}
         <circle
           r={NAV_HIT.radius}
@@ -365,53 +387,58 @@ export function FacilityTransition({
           data-transition-hit-area=""
           data-screen-target-size={NAV_HIT.screenTargetSize}
         />
-        <path
-          {...obstacle(`facility:${transition.id}:pin`)}
-          d={PIN_PATH}
-          fill={stroke}
-          vectorEffect="non-scaling-stroke"
-          data-transition-marker=""
-        />
-        <FacilityGlyph
-          kind={transition.kind}
-          color="var(--viewer-surface-elevated, var(--color-semantic-static-white))"
-          badge={stroke}
-        />
+        <g
+          data-navigation-selection-scale=""
+          data-transition-selection-visual=""
+          data-transition-selected-scale={selected ? NAV_SELECTION.pinScale : undefined}
+          style={{ transform: `scale(${selected ? NAV_SELECTION.pinScale : 1})` }}
+        >
+          <path d={PIN_PATH} transform={NAV_PIN.shadow.transform} fill={NAV_PIN.shadow.fill} opacity={NAV_PIN.shadow.opacity} pointerEvents="none" data-transition-shadow="" />
+          <path
+            {...obstacle(`facility:${transition.id}:pin`)}
+            d={PIN_PATH}
+            fill={stroke}
+            vectorEffect="non-scaling-stroke"
+            data-transition-marker=""
+          />
+          <FacilityGlyph
+            kind={transition.kind}
+            color="var(--viewer-surface-elevated, var(--color-semantic-static-white))"
+            badge={stroke}
+          />
 
-        {transition.availability === 'unavailable' && (
-          <g pointerEvents="none" data-transition-unavailable-mark="">
-            {/* Badge-color halo cuts a gap through the white knockout glyph so the
-                white slash core reads cleanly over BOTH the glyph and the badge. */}
-            <path d="M-6.5 6.5L6.5-6.5" fill="none" stroke={stroke} strokeWidth="5" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-            <path d="M-6.5 6.5L6.5-6.5" fill="none" stroke="var(--color-semantic-static-white)" strokeWidth="2" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-          </g>
-        )}
-        {stateBadges.length > 0 && (
+          {transition.availability === 'unavailable' && (
+            <g pointerEvents="none" data-transition-unavailable-mark="">
+              {/* Badge-color halo cuts a gap through the white knockout glyph so the
+                  white slash core reads cleanly over BOTH the glyph and the badge. */}
+              <path d="M-6.5 6.5L6.5-6.5" fill="none" stroke={stroke} strokeWidth="5" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+              <path d="M-6.5 6.5L6.5-6.5" fill="none" stroke="var(--color-semantic-static-white)" strokeWidth="2" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+            </g>
+          )}
+        </g>
+        {stateBadge && (
           <g {...obstacle(`facility:${transition.id}:states`)} data-transition-state-slot-layer="" pointerEvents="none">
-            {stateBadges.map((state) => (
-              <g
-                key={state.kind}
-                transform={`translate(${state.x} -28)`}
-                data-transition-state-slot={state.kind}
-                data-transition-unknown-mark={state.kind === 'unknown' ? '' : undefined}
-                data-transition-invalid-mark={state.kind === 'invalid' ? '' : undefined}
-                data-transition-stale-mark={state.kind === 'stale' ? '' : undefined}
-              >
-                <circle
-                  r={NAV_STATE_BADGE.radius}
-                  fill="var(--viewer-surface-elevated, var(--color-semantic-background-elevated-normal))"
-                  stroke={state.tone}
-                  strokeWidth={NAV_STATE_BADGE.strokeWidth}
-                  strokeDasharray={state.dash}
-                  vectorEffect="non-scaling-stroke"
-                />
-                <NavigationStateGlyph
-                  kind={state.kind}
-                  size={10}
-                  color="var(--viewer-foreground, var(--color-semantic-label-strong))"
-                />
-              </g>
-            ))}
+            <g
+              transform="translate(9 -9)"
+              data-transition-state-slot={stateBadge.kind}
+              data-transition-status-badge-style="solid"
+              data-transition-unknown-mark={stateBadge.kind === 'unknown' ? '' : undefined}
+              data-transition-invalid-mark={stateBadge.kind === 'invalid' ? '' : undefined}
+              data-transition-stale-mark={stateBadge.kind === 'stale' ? '' : undefined}
+            >
+              <circle
+                r={NAV_STATE_BADGE.radius}
+                fill={stateBadge.tone}
+                stroke={focusSurface}
+                strokeWidth={NAV_STATE_BADGE.strokeWidth}
+                vectorEffect="non-scaling-stroke"
+              />
+              <NavigationStateGlyph
+                kind={stateBadge.kind}
+                size={10}
+                color={focusSurface}
+              />
+            </g>
           </g>
         )}
 
@@ -420,10 +447,12 @@ export function FacilityTransition({
             id={`facility:${transition.id}:label`}
             kind="facility-label"
             anchor={endpoint.position}
+            detailLevel="standard"
             priority={annotationPriority({
               selected,
               focused: activeFocus,
               alarm: invalid || transition.availability === 'unavailable',
+              importance: ANNOTATION_IMPORTANCE.context,
             })}
           >
             <text
@@ -439,7 +468,9 @@ export function FacilityTransition({
               data-transition-label=""
               style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--caption1-size)', fontWeight: 'var(--fw-bold)' }}
             >
-              <tspan x="20" dy="0">{endpointLabel} · {transition.label}</tspan>
+              <tspan x="20" dy="0">
+                {annotationDetailMode === 'standard' ? '' : `${endpointLabel} · `}{visualLabel}
+              </tspan>
               {rows.map((row, index) => (
                 <tspan key={`${transition.id}-row-${index}`} x="20" dy="13" style={{ fontSize: 'var(--caption2-size)', fontWeight: 'var(--fw-semibold)' }}>
                   {row}

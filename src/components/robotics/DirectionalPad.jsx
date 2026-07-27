@@ -1,5 +1,6 @@
 import React from 'react';
 import { Icon } from '@lk-robotics/lds-core/components/icon/Icon';
+import { IconButton } from '@lk-robotics/lds-core/components/buttons/IconButton';
 
 /**
  * LK ROBOTICS — DirectionalPad
@@ -43,7 +44,6 @@ export function DirectionalPad({ onStep, rate = 8, size = 48, disabled = false, 
   const onStepRef = React.useRef(onStep);
   onStepRef.current = onStep;
   const [activeDirection, setActiveDirection] = React.useState(null);
-  const [hoveredControl, setHoveredControl] = React.useState(null);
   const [centerActive, setCenterActive] = React.useState(false);
 
   const controlSize = Math.max(36, normalizeNumber(size, 48));
@@ -103,56 +103,36 @@ export function DirectionalPad({ onStep, rate = 8, size = 48, disabled = false, 
     stop();
   };
 
-  const getButtonStyle = (key, isActive, isDisabled, round = false) => {
-    const isHovered = hoveredControl === key && !isDisabled;
+  const getButtonStyle = (key, isActive) => {
     return {
       boxSizing: 'border-box',
       gridArea: DIRS[key]?.gridArea || '2 / 2',
-      width: controlSize,
-      height: controlSize,
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: 0,
-      border: `1px solid ${isActive ? 'var(--color-semantic-primary-normal)' : isHovered ? 'var(--color-semantic-line-solid-normal)' : 'var(--color-semantic-line-normal-normal)'}`,
-      borderRadius: round ? 'var(--radius-pill)' : 'var(--radius-md)',
-      cursor: isDisabled ? 'not-allowed' : 'pointer',
-      background: isDisabled
-        ? 'var(--color-semantic-fill-normal)'
-        : isActive
-          ? 'var(--color-semantic-primary-surface-strong)'
-          : isHovered
-            ? 'var(--color-semantic-fill-normal)'
-            : 'var(--color-semantic-background-elevated-normal)',
-      color: isDisabled
-        ? 'var(--color-semantic-label-disable)'
-        : isActive
-          ? 'var(--color-semantic-primary-normal)'
-          : 'var(--color-semantic-label-neutral)',
       touchAction: 'none',
-      fontFamily: 'var(--font-sans)',
-      fontSize: 'var(--caption1-size)',
-      fontWeight: 'var(--fw-bold)',
-      lineHeight: 1,
-      whiteSpace: 'nowrap',
-      overflow: 'hidden',
-      WebkitTapHighlightColor: 'transparent',
-      transition: 'background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out)',
+      ...(isActive ? {
+        background: 'var(--color-semantic-primary-surface-strong)',
+        borderColor: 'var(--color-semantic-primary-normal)',
+        color: 'var(--color-semantic-primary-normal)',
+      } : {}),
     };
   };
 
   const btn = (dir) => (
-    <button type="button" aria-label={labels[dir] || dir} disabled={!canStep}
+    <IconButton
+      label={labels[dir] || dir}
+      variant="ghost"
+      size={controlSize}
+      round={false}
+      disabled={!canStep}
       data-direction={dir}
       onPointerDown={(e) => { e.preventDefault(); try { e.currentTarget.setPointerCapture?.(e.pointerId); } catch { /* synthetic pointers expose no capturable pointer */ } start(dir); }}
       onPointerUp={handlePointerUp} onPointerLeave={stop} onPointerCancel={stop}
-      onMouseEnter={() => setHoveredControl(dir)} onMouseLeave={() => setHoveredControl(null)}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); start(dir); } }}
       onKeyUp={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); stop(); } }}
       onBlur={stop}
-      style={getButtonStyle(dir, activeDirection === dir, !canStep)}>
+      style={getButtonStyle(dir, activeDirection === dir)}
+    >
       <Icon name={DIRS[dir].icon} size={iconSize} aria-hidden="true" />
-    </button>
+    </IconButton>
   );
 
   return (
@@ -162,24 +142,27 @@ export function DirectionalPad({ onStep, rate = 8, size = 48, disabled = false, 
       onKeyDown={handleDirectionalKeyDown}
       onKeyUp={handleDirectionalKeyUp}
       onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) stop(); }}
-      style={{ display: 'grid', gridTemplateColumns: `repeat(3, ${controlSize}px)`, gridTemplateRows: `repeat(3, ${controlSize}px)`, gap: 6, width: 'fit-content', ...style }} {...rest}>
+      style={{ display: 'grid', gridTemplateColumns: `repeat(3, ${controlSize}px)`, gridTemplateRows: `repeat(3, ${controlSize}px)`, gap: 'var(--space-1-5)', width: 'fit-content', ...style }} {...rest}>
       {btn('up')}
       {btn('left')}
       {showCenter ? (
-        <button type="button" aria-label={centerLabel} disabled={!canCenter}
+        <IconButton
+          label={centerLabel}
+          variant="ghost"
+          size={controlSize}
+          disabled={!canCenter}
           onClick={() => onCenter && onCenter()}
           onPointerDown={() => { if (canCenter) setCenterActive(true); }}
           onPointerUp={() => setCenterActive(false)}
           onPointerLeave={() => setCenterActive(false)}
           onPointerCancel={() => setCenterActive(false)}
-          onMouseEnter={() => setHoveredControl('center')}
-          onMouseLeave={() => setHoveredControl(null)}
           onKeyDown={(e) => { if (canCenter && (e.key === 'Enter' || e.key === ' ')) setCenterActive(true); }}
           onKeyUp={(e) => { if (e.key === 'Enter' || e.key === ' ') setCenterActive(false); }}
           onBlur={() => setCenterActive(false)}
-          style={getButtonStyle('center', centerActive, !canCenter, true)}>
+          style={getButtonStyle('center', centerActive)}
+        >
           {center ?? <Icon name="home" size={iconSize} aria-hidden="true" />}
-        </button>
+        </IconButton>
       ) : (
         <span aria-hidden="true" style={{ gridArea: '2 / 2', width: controlSize, height: controlSize }} />
       )}

@@ -1,9 +1,18 @@
 import React from 'react';
+import {
+  isNavigationGeometryCompatible,
+  useNavigationCoordinateBoundary,
+} from './NavigationCoordinateBoundary.jsx';
 import { isFocusVisibleTarget } from './_NavigationFocus.js';
 import { NavigationStateGlyph } from './_NavigationStateGlyph.js';
 import { NAVIGATION_DIRECTION_PATH, NAVIGATION_ENDPOINT_ORIENTATION_PATH } from './_navigationVectorGlyph.js';
-import { NavigationAnnotationBlock, annotationPriority, useNavigationObstacles } from './_navigationAnnotations.js';
-import { navStateOpacity, NAV_PATH_DASH, NAV_NODE, NAV_HIT, NAV_STATE_BADGE, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION } from './_navigationVocabulary.js';
+import {
+  ANNOTATION_IMPORTANCE,
+  NavigationAnnotationBlock,
+  annotationPriority,
+  useNavigationObstacles,
+} from './_navigationAnnotations.js';
+import { navStateOpacity, NAV_PATH_DASH, NAV_NODE, NAV_HIT, NAV_STATE_BADGE, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION, NAV_LINE_ROLE } from './_navigationVocabulary.js';
 
 const VIEWER_FOREGROUND = 'var(--viewer-foreground, var(--color-semantic-label-strong))';
 const VIEWER_MUTED = 'var(--viewer-muted, var(--color-semantic-label-neutral))';
@@ -142,9 +151,9 @@ function endpointMarker(point, endpoint, kind, fallbackAngle, inverseScale) {
       aria-hidden="true"
       pointerEvents="none"
     >
-      <polygon
+      <rect
         data-lane-endpoint-point={kind}
-        points={NAV_NODE.points(NAV_NODE.endpointRadius)}
+        {...NAV_NODE.rect(NAV_NODE.endpointRadius, NAV_NODE.endpointCornerRadius)}
         fill={VIEWER_SURFACE}
         stroke={VIEWER_MUTED}
         strokeWidth="1.5"
@@ -226,7 +235,7 @@ export function LaneOverlay({
   stale = false,
   showLabel = true,
   showEndpoints = true,
-  showDirection = true,
+  showDirection = false,
   onActivate,
   role,
   'aria-label': ariaLabel,
@@ -239,6 +248,7 @@ export function LaneOverlay({
   ...rest
 }) {
   const [hasFocus, setHasFocus] = React.useState(false);
+  const coordinateBoundary = useNavigationCoordinateBoundary();
   const obstacle = useNavigationObstacles();
   const pointerOnly = ariaHidden === true || ariaHidden === 'true';
   const scale = Number.isFinite(viewportScale) && viewportScale > 0 ? viewportScale : 1;
@@ -248,6 +258,10 @@ export function LaneOverlay({
     : 'available';
   const hasConflict = Boolean(conflict);
   const points = (lane?.points ?? []).filter(finitePoint);
+  if (
+    (lane?.source && lane.source.mapId !== lane.mapId)
+    || !isNavigationGeometryCompatible(lane, coordinateBoundary)
+  ) return null;
   if (points.length < 2) return null;
 
   const pathData = pathFromPoints(points);
@@ -266,9 +280,7 @@ export function LaneOverlay({
       : undefined;
   const baseColor = invalid
     ? 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))'
-    : resolvedAvailability === 'available'
-      ? 'var(--viewer-accent, var(--color-semantic-primary-normal))'
-      : 'var(--viewer-muted, var(--color-semantic-label-alternative))';
+    : 'var(--viewer-muted, var(--color-semantic-label-alternative))';
   // Availability and conflict live on the LINE itself — the NAV_PATH_DASH
   // availability dashes, the muted tone, and the danger conflict pattern.
   // Badges are point-vocabulary; the only glyph badges a lane keeps are the
@@ -332,8 +344,13 @@ export function LaneOverlay({
     <g
       {...rest}
       data-lk-lane-overlay=""
+      data-navigation-line-role="lane"
+      data-line-encoding="topology"
       data-lane-id={lane?.id}
       data-map-id={lane?.mapId}
+      data-source-frame-id={lane?.source?.frameId}
+      data-source-map-version={lane?.source?.mapVersion}
+      data-coordinate-space={lane?.coordinateSpace}
       data-availability={resolvedAvailability}
       data-conflict={hasConflict ? 'true' : 'false'}
       data-relation={relation}
@@ -394,27 +411,15 @@ export function LaneOverlay({
           pointerEvents="none"
         />
       )}
-      {selected && pathData && (
-        <path
-          data-lane-selection-halo=""
-          d={pathData}
-          fill="none"
-          stroke="var(--viewer-accent, var(--color-semantic-primary-normal))"
-          strokeWidth={NAV_SELECTION.pathHaloWidth}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          opacity={NAV_SELECTION.haloOpacity}
-          vectorEffect="non-scaling-stroke"
-          pointerEvents="none"
-        />
-      )}
-      {pathData && !selected && !visibleFocus && (
+      {pathData && (
         <path
           data-lane-casing=""
+          data-lane-selection-casing={selected ? '' : undefined}
+          data-navigation-selection-geometry=""
           d={pathData}
           fill="none"
           stroke={VIEWER_SURFACE}
-          strokeWidth="6"
+          strokeWidth={selected ? NAV_LINE_ROLE.lane.selectedCasingWidth : NAV_LINE_ROLE.lane.casingWidth}
           strokeLinecap="round"
           strokeLinejoin="round"
           vectorEffect="non-scaling-stroke"
@@ -424,10 +429,12 @@ export function LaneOverlay({
       {pathData && (
         <path
           data-lane-path=""
+          data-navigation-annotation-path-obstacle=""
           d={pathData}
           fill="none"
           stroke={baseColor}
-          strokeWidth={selected ? 3.5 : 2.5}
+          strokeWidth={selected ? NAV_LINE_ROLE.lane.selectedCoreWidth : NAV_LINE_ROLE.lane.coreWidth}
+          data-navigation-selection-geometry=""
           strokeDasharray={availabilityDash}
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -473,10 +480,9 @@ export function LaneOverlay({
           />
         </>
       )}
-      {/* One direction arrow per corridor: a composed viewer whose route or
-          trajectory rides this lane already points the travel direction on a
-          HIGHER layer, so the composer turns this chevron off rather than
-          leaving it half-buried under the overlay painted above. */}
+      {/* Direction is opt-in for topology/debug views that hide endpoint
+          identity. Normal maps already expose entry/exit semantics and avoid
+          repeating them with an extra on-line triangle. */}
       {pathData && showDirection && (
         <path
           data-lane-direction="entry-to-exit"
@@ -484,9 +490,10 @@ export function LaneOverlay({
           data-lane-direction-anchor-y={directionPoint.y}
           d={NAVIGATION_DIRECTION_PATH}
           transform={`translate(${directionPoint.x} ${directionPoint.y}) rotate(${directionPoint.angle}) scale(${inverseScale})`}
-          fill={baseColor}
-          stroke={VIEWER_SURFACE}
-          strokeWidth="1"
+          fill="none"
+          stroke={baseColor}
+          strokeWidth="1.5"
+          strokeLinecap="round"
           strokeLinejoin="round"
           vectorEffect="non-scaling-stroke"
           pointerEvents="none"
@@ -547,10 +554,12 @@ export function LaneOverlay({
           id={`lane:${lane.id}:label`}
           kind="lane-label"
           anchor={midpoint}
+          detailLevel="detail"
           priority={annotationPriority({
             selected,
             focused: visibleFocus,
             alarm: invalid || hasConflict || resolvedAvailability === 'closed',
+            importance: ANNOTATION_IMPORTANCE.background,
           })}
         >
         <g

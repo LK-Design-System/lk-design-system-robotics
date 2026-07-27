@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavigationStateGlyph } from '@lk-robotics/lds-robotics-ui/components/robotics/_NavigationStateGlyph';
-import { NAV_STATE_BADGE } from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationVocabulary';
+import { FacilityTransition, WaypointMarker } from '../src/index.js';
+import { NAV_WAYPOINT_STATUS_BADGE } from '../src/components/robotics/_navigationVocabulary.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
 
 // These render the real NavigationStateGlyph — no hand-drawn geometry. In
@@ -30,18 +31,21 @@ const STATES = [
 
 const meta = {
   title: 'LDS Robotics/Foundation/State Badge',
+  tags: ['autodocs'],
   parameters: {
     storyGuide: {
       storyId: 'lds-robotics-foundation-state-badge--overview',
       eyebrow: 'Foundation / State Badge',
       title: '상태 글리프는 내비게이션 상태 어휘의 표준 도형이며, 점 요소는 배지로·선 요소는 대시로 표현합니다',
       description:
-        '내부 모듈 NavigationStateGlyph가 Material Symbols(Apache 2.0)에서 가져온 11종의 상태 도형을 렌더합니다. 이 도형들은 두 채널로 나뉘어 실제 지도에 나타납니다. (1) 점 요소 — 웨이포인트·설비 핀·구역 마커 — 는 unknown·invalid·stale를 모서리 배지로 그립니다(WaypointMarker·FacilityTransition·SpatialRegion). (2) 선 요소 — 경로·차선·궤적 — 는 수명주기·가용성·조건 상태(planned·active·waiting·rerouting·completed·blocked·closed·conflict)를 배지가 아니라 선의 톤과 NAV_PATH_DASH 대시 패턴으로 표현하고, invalid·stale 데이터 품질만 점 배지로 남깁니다. 즉 이 페이지의 도형은 선에서 대시로 인코딩되는 상태의 의미 기준이자, 점 배지가 실제로 그리는 자산입니다. 독립적인 상태 라벨이나 완성된 마커를 이 배지로 대신하지 마세요. 이 페이지는 도형 세트를 검토·회귀하고, 한 점 요소에 여러 상태가 겹칠 때 배지가 오프셋 스택되는 복합 상태 규칙과 렌더러별 스택 축도 함께 보여줍니다. 선의 대시 어휘는 State Badge가 아니라 각 선 렌더러의 상태 스토리를, 배지 컨텍스트의 실제 합성은 Facility Glyph의 상태 표기 스토리를 참고하세요. 배지 원 기하는 내부 모듈 _navigationVocabulary의 NAV_STATE_BADGE(r=7)가 소유합니다. 공개 API가 아닌 내부 모듈입니다.',
+        '점 요소의 상태 배지와 선 요소의 대시 패턴이 같은 내비게이션 상태 어휘를 사용하는지 검토할 때 사용합니다. 독립 상태 라벨이나 완성된 마커를 이 글리프로 대신하지 마세요.',
+      docsDescription:
+        '내부 모듈 NavigationStateGlyph가 Material Symbols(Apache 2.0)에서 가져온 11종의 상태 도형을 렌더합니다. 마커 계열은 가용성을 본체에 두고 렌더러 우선순위에 따른 solid badge 한 개만 겹칩니다. Waypoint는 invalid > stale, FacilityTransition은 invalid > stale > unknown 순서입니다. 모든 원시 상태는 접근성 이름에 유지합니다. 선과 영역은 작은 마커가 아니므로 각각 stroke/dash와 면·외곽선 채널을 사용합니다. 독립 상태 라벨이나 완성된 마커를 이 글리프로 대신하지 마세요.',
     },
     docs: {
       description: {
         component:
-          'NavigationStateGlyph의 상태 도형 11종을 실제 컴포넌트로 나열합니다. 점 요소(웨이포인트·설비 핀·구역)는 unknown·invalid·stale를 배지로 그리고, 선 요소(경로·차선·궤적)는 나머지 수명주기·가용성·조건 상태를 배지가 아니라 NAV_PATH_DASH 대시로 표현합니다. 이 페이지는 그 도형 어휘의 기준입니다. 공개 API가 아닌 내부 자산이며, 배지 원·톤은 마커가 합성하므로 여기서는 도형만 보여줍니다.',
+          'NavigationStateGlyph의 상태 도형 11종을 실제 컴포넌트로 나열합니다. Waypoint와 FacilityTransition 같은 마커는 가용성 본체 위에 단일 solid badge를 합성하고, 선·영역은 자체 geometry 채널을 사용합니다. 이 페이지는 도형 어휘와 마커 단일 배지 규칙의 기준입니다.',
       },
     },
   },
@@ -75,40 +79,41 @@ function GlyphTile({ kind, label, note }) {
   );
 }
 
-const SURFACE = 'var(--color-semantic-background-elevated-normal)';
-const WARNING = 'var(--color-semantic-status-cautionary-foreground)';
-const DANGER = 'var(--color-semantic-status-negative-foreground)';
-const FOREGROUND = 'var(--color-semantic-label-strong)';
+const COMPOUND_WAYPOINT = {
+  id: 'state-badge-compound-waypoint',
+  label: '복합 상태 웨이포인트',
+  mapId: 'L1',
+  position: { x: 0, y: 0 },
+  roles: ['charger'],
+  availability: 'unknown',
+};
 
-// One state badge = the NAV_STATE_BADGE circle + a NavigationStateGlyph. When a
-// single object carries MORE THAN ONE state at once (e.g. availability unknown
-// AND invalid data), the badges do not overlap — they offset-stack so both stay
-// readable. The stacking AXIS differs per renderer because each marker's shape
-// and orientation differ, so this is a documented rule with per-renderer axes,
-// not one shared offset constant.
-function StateBadgeMark({ kind, tone, transform }) {
-  return (
-    <g transform={transform} data-compound-badge={kind}>
-      <circle r={NAV_STATE_BADGE.radius} fill={SURFACE} stroke={tone} strokeWidth={NAV_STATE_BADGE.strokeWidth} vectorEffect="non-scaling-stroke" />
-      <NavigationStateGlyph kind={kind} size={10} color={FOREGROUND} />
-    </g>
-  );
-}
+const COMPOUND_FACILITY = {
+  id: 'state-badge-compound-facility',
+  kind: 'charging',
+  label: '복합 상태 충전 지점',
+  facilityId: 'charger-1',
+  from: {
+    mapId: 'L1',
+    position: { x: 0, y: 0 },
+    label: '충전 지점',
+  },
+  availability: 'unknown',
+};
 
-// Per-renderer stacking axes, read straight from each renderer's compound-badge
-// transform (WaypointMarker translate(-8 ±8); LaneOverlay tangent 18 / normal
-// 32; FacilityTransition x 16; SpatialRegion vertical ±18).
-const COMPOUND_AXES = [
-  { renderer: '웨이포인트', axis: 'x −8 고정 · y ±8 (좌측 세로 스택)' },
-  { renderer: '레인', axis: '접선 18 간격 · 법선 32 오프셋' },
-  { renderer: '시설 전이', axis: '수평 16 간격' },
-  { renderer: '영역', axis: '수직 ±18' },
+// Marker renderers share one prioritized solid badge. Lines and regions spend
+// their own stroke/fill channel on state because their geometry is not a small
+// attached marker.
+const COMPOUND_CHANNELS = [
+  { renderer: '마커', channel: '가용성은 본체 · renderer priority solid badge 1슬롯' },
+  { renderer: '선', channel: '가용성·충돌은 stroke/dash · 데이터 품질은 path anchor 표식' },
+  { renderer: '영역', channel: '상태는 면·외곽선 · 데이터 품질은 area anchor 표식' },
 ];
 
 export const Overview = {
   name: '개요',
   parameters: storyDescription(
-    '상태 글리프 11종을 실제 컴포넌트로 비교합니다. ~13px 배지 크기에서 각 도형이 서로 구분되는지, invalid/conflict("!")와 closed/blocked("×")처럼 도형을 공유하는 상태쌍이 있는지 확인하세요. 아래 복합 상태 프레임은 한 개체에 여러 상태가 겹칠 때 배지가 어떻게 오프셋 스택되는지 보여줍니다. 배지 원·톤을 포함한 실제 표기는 Facility Glyph › 상태 표기에서 확인할 수 있습니다.',
+    '상태 글리프 11종과 실제 마커의 단일 solid badge 합성을 비교합니다. 마커는 여러 원시 상태를 접근성 이름에 유지하면서 invalid > stale > unknown 중 하나만 표시하고, 선·영역은 자체 geometry 채널을 사용합니다.',
   ),
   render: () => (
     <main data-state-badge-catalog style={{ width: 'min(880px, 100%)', display: 'grid', gap: 16 }}>
@@ -120,7 +125,7 @@ export const Overview = {
       <section
         style={{
           display: 'grid',
-          gridTemplateColumns: 'auto minmax(0, 1fr)',
+          gridTemplateColumns: 'minmax(180px, auto) minmax(0, 1fr)',
           gap: 'var(--space-4)',
           alignItems: 'center',
           padding: 16,
@@ -129,24 +134,54 @@ export const Overview = {
           background: 'var(--color-semantic-background-elevated-normal)',
         }}
       >
-        <svg data-compound-stack width={96} height={96} viewBox="-24 -24 48 48" role="img" aria-label="복합 상태: 미확인과 데이터 오류가 겹친 배지 오프셋 스택">
-          {/* the marker body the badges ride on, drawn faint for context */}
-          <rect x="-9" y="-9" width="18" height="18" rx="3" transform="rotate(45)" fill="var(--color-semantic-fill-normal)" stroke="var(--color-semantic-line-normal-normal)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
-          <StateBadgeMark kind="unknown" tone={WARNING} transform="translate(-8 -8)" />
-          <StateBadgeMark kind="invalid" tone={DANGER} transform="translate(-8 8)" />
-        </svg>
+        <div
+          aria-label="복합 상태 채널 비교"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, minmax(80px, 1fr))',
+            gap: 'var(--space-3)',
+          }}
+        >
+          <figure style={{ margin: 0, display: 'grid', justifyItems: 'center', gap: 6 }}>
+            <svg width={88} height={72} viewBox="-24 -24 48 48" role="img" aria-label="미확인 가용성과 데이터 오류를 채움·단일 solid badge로 표현한 웨이포인트">
+              <WaypointMarker
+                waypoint={COMPOUND_WAYPOINT}
+                invalid
+                stale
+                showLabel={false}
+              />
+            </svg>
+            <figcaption style={{ fontSize: 'var(--caption2-size)', color: 'var(--color-semantic-label-neutral)' }}>
+              웨이포인트 · 채움 + 배지
+            </figcaption>
+          </figure>
+          <figure style={{ margin: 0, display: 'grid', justifyItems: 'center', gap: 6 }}>
+            <svg width={88} height={72} viewBox="-24 -24 48 48" role="img" aria-label="여러 상태를 단일 solid 배지로 정리한 시설 전이">
+              <FacilityTransition
+                transition={COMPOUND_FACILITY}
+                activeMapId="L1"
+                invalid
+                stale
+                showLabel={false}
+              />
+            </svg>
+            <figcaption style={{ fontSize: 'var(--caption2-size)', color: 'var(--color-semantic-label-neutral)' }}>
+              시설 전이 · 단일 배지
+            </figcaption>
+          </figure>
+        </div>
         <div style={{ display: 'grid', gap: 10, minWidth: 0 }}>
           <div style={{ display: 'grid', gap: 4 }}>
-            <h2 style={{ margin: 0, fontSize: 'var(--label1-size)', color: 'var(--color-semantic-label-strong)' }}>복합 상태 오프셋 스택</h2>
+            <h2 style={{ margin: 0, fontSize: 'var(--label1-size)', color: 'var(--color-semantic-label-strong)' }}>상태 표현 채널</h2>
             <p style={{ margin: 0, fontSize: 'var(--caption1-size)', color: 'var(--color-semantic-label-neutral)', lineHeight: 1.6 }}>
-              한 개체에 상태가 둘 이상 동시에 적용되면(예: 미확인 + 데이터 오류) 배지가 겹치지 않고 오프셋 스택합니다. 스택 축은 마커 모양·방향에 따라 렌더러마다 다릅니다 — 하나의 공유 상수가 아니라 정의된 규칙입니다.
+              Waypoint와 FacilityTransition 같은 마커는 가용성을 본체로 표시하고 렌더러 우선순위에 따라 우측 상단 solid badge 하나만 사용합니다. 선과 영역은 자체 stroke·fill과 anchor 표식을 사용하며, 모든 원시 상태는 접근성 이름에 남습니다.
             </p>
           </div>
           <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: 4 }}>
-            {COMPOUND_AXES.map((row) => (
+            {COMPOUND_CHANNELS.map((row) => (
               <li key={row.renderer} style={{ display: 'grid', gridTemplateColumns: 'minmax(64px, auto) 1fr', gap: 'var(--space-3)', fontSize: 'var(--caption1-size)' }}>
                 <span style={{ color: 'var(--color-semantic-label-normal)', fontWeight: 'var(--fw-semibold)' }}>{row.renderer}</span>
-                <code style={{ color: 'var(--color-semantic-label-neutral)' }}>{row.axis}</code>
+                <code style={{ color: 'var(--color-semantic-label-neutral)' }}>{row.channel}</code>
               </li>
             ))}
           </ul>
@@ -155,23 +190,48 @@ export const Overview = {
     </main>
   ),
   play: async ({ canvasElement }) => {
-    const stack = canvasElement.querySelector('[data-compound-stack]');
-    if (!stack) throw new Error('The compound-state stack example must render.');
-    const badges = Array.from(stack.querySelectorAll('[data-compound-badge]'));
-    if (badges.length !== 2) {
-      throw new Error('The compound example must stack exactly two state badges.');
+    const waypoint = canvasElement.querySelector('[data-waypoint-id="state-badge-compound-waypoint"]');
+    const waypointPoint = waypoint?.querySelector('[data-waypoint-point][data-waypoint-status-kind="unknown"]');
+    const waypointBadge = waypoint?.querySelector('[data-waypoint-status-badge="invalid"]');
+    if (!waypoint || !waypointPoint || !waypointBadge) {
+      throw new Error('The compound waypoint must keep unknown on its fill and resolve invalid + stale to one invalid solid badge.');
     }
-    // The two badges must be vertically offset (not overlapping) — the waypoint
-    // axis stacks them along y at a fixed x.
-    const [y1, y2] = badges.map((b) => b.getBoundingClientRect().top);
-    if (Math.abs(y1 - y2) < 4) {
-      throw new Error('Compound-state badges must offset-stack, not overlap.');
+    if (
+      waypoint.querySelectorAll('[data-waypoint-status-badge]').length !== 1
+      || !waypointBadge.querySelector('[data-navigation-state-glyph="invalid"]')
+    ) {
+      throw new Error('The compact waypoint must render one prioritized invalid solid badge without stacking stale.');
     }
-    // Each badge renders the shared NAV_STATE_BADGE circle geometry.
-    for (const badge of badges) {
-      const circle = badge.querySelector('circle');
-      if (circle?.getAttribute('r') !== String(NAV_STATE_BADGE.radius)) {
-        throw new Error('Each stacked badge must render the NAV_STATE_BADGE circle.');
+    const waypointBadgeCircle = waypointBadge.querySelector('[data-waypoint-status-badge-circle]');
+    if (
+      waypointBadgeCircle?.getAttribute('r') !== String(NAV_WAYPOINT_STATUS_BADGE.radius)
+      || waypointBadge.getAttribute('data-waypoint-status-badge-style') !== 'solid'
+      || waypointBadgeCircle.hasAttribute('stroke-dasharray')
+    ) {
+      throw new Error('The compact waypoint must use the shared solid waypoint badge geometry.');
+    }
+    const waypointName = waypoint.getAttribute('aria-label') ?? '';
+    for (const stateName of ['가용성 상태 미확인', '데이터 오류', '오래된 데이터']) {
+      if (!waypointName.includes(stateName)) {
+        throw new Error(`The compound waypoint accessible name is missing ${stateName}.`);
+      }
+    }
+
+    const facility = canvasElement.querySelector('[data-transition-id="state-badge-compound-facility"]');
+    const facilityBadge = facility?.querySelector('[data-transition-state-slot="invalid"]');
+    if (
+      !facility
+      || !facilityBadge
+      || facility.querySelectorAll('[data-transition-state-slot]').length !== 1
+      || facilityBadge.getAttribute('data-transition-status-badge-style') !== 'solid'
+      || facility.querySelector('[data-transition-unknown-mark], [data-transition-stale-mark]')
+    ) {
+      throw new Error('Facility marker must resolve invalid > stale > unknown into one solid badge.');
+    }
+    const facilityName = facility.getAttribute('aria-label') ?? '';
+    for (const stateName of ['가용성 미확인', '잘못된 설비 전이', '데이터 지연']) {
+      if (!facilityName.includes(stateName)) {
+        throw new Error(`The compound facility accessible name is missing ${stateName}.`);
       }
     }
   },

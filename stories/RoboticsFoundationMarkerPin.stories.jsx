@@ -1,17 +1,16 @@
 import React from 'react';
-import { FacilityTransition, HazardMarker, WaypointMarker } from './lds.js';
+import { FacilityTransition, HazardMarker, WaypointMarker } from '../src/index.js';
 import { NAV_PIN } from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationVocabulary';
 import { storyDescription } from './StoryGuide.shared.jsx';
 
 // The shared map-pin BODY, shown where it actually appears: the real
 // FacilityTransition and HazardMarker are both knocked out of the SAME NAV_PIN
 // silhouette (severity/accent fill + a knockout glyph distinguish them, not the
-// shape), and the contrasting diamond graph node sits alongside to show
+// shape), and the contrasting rounded-square graph node sits alongside to show
 // what is deliberately NOT a pin. Rendered from production components — the
 // catalog IS the atom in context — and the play asserts the hazard marker
-// consumes NAV_PIN.path. The shadow and the focus/selection rings all trace this
-// same silhouette (focus scale 1.34, selection 1.16, applied with
-// vector-effect="non-scaling-stroke").
+// consumes NAV_PIN.path. Focus traces the silhouette at scale 1.34; selection
+// enlarges the complete pin body to 1.12 without recoloring it.
 const STAGE = 'stage';
 
 const INK = 'var(--color-semantic-label-strong)';
@@ -20,7 +19,7 @@ const LINE = 'var(--color-semantic-line-normal-normal)';
 const SURFACE = 'var(--color-semantic-background-elevated-normal)';
 
 // Facility + Hazard render the shared NAV_PIN body; the waypoint origin is the
-// contrasting diamond graph node, not a pin.
+// contrasting rounded-square graph node, not a pin.
 const ORIGIN_WAYPOINT = {
   id: 'pin-wp',
   label: '원점',
@@ -103,7 +102,7 @@ function PinFamily() {
           <HazardMarker hazard={HAZARD_PIN} showLabel={false} />
         </svg>
       </Tile>
-      <Tile label="웨이포인트 원점 (다이아몬드 그래프 노드 · 핀 아님)" mono="diamond">
+      <Tile label="웨이포인트 원점 (라운드 스퀘어 그래프 노드 · 핀 아님)" mono="rounded square">
         <svg width={88} height={92} viewBox="0 0 56 52" aria-hidden="true" style={{ display: 'block' }}>
           <WaypointMarker waypoint={ORIGIN_WAYPOINT} showLabel={false} />
         </svg>
@@ -117,7 +116,7 @@ function MarkerPinCatalog() {
     <main data-marker-pin-catalog style={{ width: 'min(880px, 100%)', display: 'grid', gap: 16 }}>
       <Card
         title="핀 패밀리"
-        hint="설비·해저드 마커는 같은 map-pin 실루엣(NAV_PIN)을 공유하고, 형태가 아니라 accent·severity 색과 knockout 글리프로만 구분됩니다. 그림자와 focus·selection 링도 같은 실루엣을 scale()로 따라 그립니다. 웨이포인트 원점은 대비를 위해 나란히 둔 다이아몬드 그래프 노드로, 핀이 아닙니다. 배지 글리프 세트는 State Badge, 핀 위 knockout 글리프는 Facility·Hazard Glyph 페이지를 참고하세요."
+        hint="설비·해저드 마커는 같은 map-pin 실루엣(NAV_PIN)을 공유하고, 형태가 아니라 accent·severity 색과 knockout 글리프로만 구분됩니다. focus는 같은 실루엣을 따라가고 selection은 상태색을 유지한 핀 본체를 확대합니다. 웨이포인트 원점은 대비를 위해 나란히 둔 라운드 스퀘어 그래프 노드로, 핀이 아닙니다. 배지 글리프 세트는 State Badge, 핀 위 knockout 글리프는 Facility·Hazard Glyph 페이지를 참고하세요."
       >
         <PinFamily />
       </Card>
@@ -127,18 +126,21 @@ function MarkerPinCatalog() {
 
 const meta = {
   title: 'LDS Robotics/Foundation/Marker Pin',
+  tags: ['autodocs'],
   parameters: {
     storyGuide: {
       storyId: 'lds-robotics-foundation-marker-pin--overview',
       eyebrow: 'Foundation / Marker Pin',
       title: '설비·해저드 마커가 공유하는 map-pin 몸통을 원자 단위로 문서화합니다',
       description:
-        '설비 전이·해저드 마커가 한 지도에서 하나의 마커 패밀리로 읽히도록, 두 마커는 같은 map-pin 실루엣(NAV_PIN)을 몸통으로 공유하고 severity·accent 색과 knockout 글리프로만 구분됩니다. 설비·해저드가 공유하는 핀 몸통과 웨이포인트의 다이아몬드 그래프 노드를 구분할 때 사용합니다. 웨이포인트·로봇 위치·임의 지점을 map-pin으로 통일하는 용도에는 사용하지 마세요. 이 페이지는 그 몸통을 실제 FacilityTransition·HazardMarker로 그대로 렌더하고, 대비되는 다이아몬드 웨이포인트 원점을 나란히 놓아 무엇이 핀이고 무엇이 아닌지 보입니다. NAV_PIN의 path·그림자·focus/selection 링 기하는 내부 모듈 _navigationVocabulary가 단일 소스로 소유하며, play-test는 실제 해저드 마커가 NAV_PIN.path 실루엣을 소비함을 단언합니다. 공개 API가 아닌 내부 모듈입니다.',
+        'FacilityTransition과 HazardMarker가 공유하는 map-pin 몸통과 Waypoint의 그래프 노드를 구분할 때 사용합니다. 웨이포인트·로봇 위치·임의 지점을 map-pin으로 통일하지 마세요.',
+      docsDescription:
+        '설비 전이·해저드 마커가 한 지도에서 하나의 마커 패밀리로 읽히도록, 두 마커는 같은 map-pin 실루엣(NAV_PIN)을 몸통으로 공유하고 severity·accent 색과 knockout 글리프로만 구분됩니다. 설비·해저드가 공유하는 핀 몸통과 웨이포인트의 라운드 스퀘어 그래프 노드를 구분할 때 사용합니다. 웨이포인트·로봇 위치·임의 지점을 map-pin으로 통일하는 용도에는 사용하지 마세요. 이 페이지는 그 몸통을 실제 FacilityTransition·HazardMarker로 그대로 렌더하고, 대비되는 라운드 스퀘어 웨이포인트 원점을 나란히 놓아 무엇이 핀이고 무엇이 아닌지 보입니다. NAV_PIN의 path·그림자·focus 링과 selection 확대 기하는 내부 모듈 _navigationVocabulary가 단일 소스로 소유하며, play-test는 실제 해저드 마커가 NAV_PIN.path 실루엣을 소비함을 단언합니다. 공개 API가 아닌 내부 모듈입니다.',
     },
     docs: {
       description: {
         component:
-          '설비·해저드 마커가 공유하는 map-pin 몸통(NAV_PIN)을 실제 마커로 렌더해 문서화·회귀합니다. 두 마커는 같은 실루엣을 쓰고 색·knockout 글리프로만 구분되며, 웨이포인트 원점은 대비되는 다이아몬드 그래프 노드입니다. NAV_PIN 기하는 내부 모듈 _navigationVocabulary가 소유하고, 핀 위에 얹히는 상태·설비·해저드 글리프 세트는 각 글리프 카탈로그 페이지가 별도로 다룹니다. 공개 API가 아닌 내부 모듈입니다.',
+          '설비·해저드 마커가 공유하는 map-pin 몸통(NAV_PIN)을 실제 마커로 렌더해 문서화·회귀합니다. 두 마커는 같은 실루엣을 쓰고 색·knockout 글리프로만 구분되며, 웨이포인트 원점은 대비되는 라운드 스퀘어 그래프 노드입니다. NAV_PIN 기하는 내부 모듈 _navigationVocabulary가 소유하고, 핀 위에 얹히는 상태·설비·해저드 글리프 세트는 각 글리프 카탈로그 페이지가 별도로 다룹니다. 공개 API가 아닌 내부 모듈입니다.',
       },
     },
   },
@@ -149,7 +151,7 @@ export default meta;
 export const Overview = {
   name: '개요',
   parameters: storyDescription(
-    '공유 map-pin 몸통을 실제 마커 위에서 봅니다. 설비·해저드 핀은 같은 NAV_PIN 실루엣을 쓰고, 웨이포인트 원점은 대비되는 다이아몬드 그래프 노드입니다. play-test가 실제 해저드 마커의 실루엣 d가 NAV_PIN.path와 일치함을 단언하므로 이 페이지가 곧 몸통 기하의 회귀 기준입니다.',
+    '공유 map-pin 몸통을 실제 마커 위에서 봅니다. 설비·해저드 핀은 같은 NAV_PIN 실루엣을 쓰고, 웨이포인트 원점은 대비되는 라운드 스퀘어 그래프 노드입니다. play-test가 실제 해저드 마커의 실루엣 d가 NAV_PIN.path와 일치함을 단언하므로 이 페이지가 곧 몸통 기하의 회귀 기준입니다.',
   ),
   render: () => <MarkerPinCatalog />,
   play: async ({ canvasElement }) => {

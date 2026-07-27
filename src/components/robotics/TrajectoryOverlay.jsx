@@ -1,15 +1,21 @@
 import React from 'react';
+import {
+  isNavigationGeometryCompatible,
+  useNavigationCoordinateBoundary,
+} from './NavigationCoordinateBoundary.jsx';
 import { isFocusVisibleTarget } from './_NavigationFocus.js';
 import { NavigationStateGlyph } from './_NavigationStateGlyph.js';
 import {
-  NavigationProgressHeadDefs,
-  ProgressHeadObstacle,
-  progressCarrierPath,
   trajectoryProgressGeometry,
 } from './_navigationProgressHead.js';
-import { NavigationAnnotationBlock, annotationPriority, useNavigationObstacles } from './_navigationAnnotations.js';
-import { NAVIGATION_DIRECTION_PATH } from './_navigationVectorGlyph.js';
-import { navStateOpacity, NAV_DASH, NAV_PATH_DASH, NAV_HIT, NAV_STATE_BADGE, NAV_PROGRESS_HEAD, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION } from './_navigationVocabulary.js';
+import {
+  ANNOTATION_IMPORTANCE,
+  NavigationAnnotationBlock,
+  annotationPriority,
+  useNavigationAnnotationDetailMode,
+  useNavigationObstacles,
+} from './_navigationAnnotations.js';
+import { navStateOpacity, NAV_DASH, NAV_PATH_DASH, NAV_HIT, NAV_STATE_BADGE, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION, NAV_LINE_ROLE, NAV_TRAJECTORY_SAMPLE } from './_navigationVocabulary.js';
 
 const STATUS_LABEL = {
   planned: '계획됨',
@@ -38,6 +44,19 @@ function finitePoint(point) {
 function pathFromPoints(points) {
   if (points.length < 2) return '';
   return points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`).join(' ');
+}
+
+function visibleSampleIndexes(sampleCount, currentIndex) {
+  if (sampleCount <= NAV_TRAJECTORY_SAMPLE.maxVisible) {
+    return Array.from({ length: sampleCount }, (_, index) => index);
+  }
+  const indexes = new Set();
+  const step = (sampleCount - 1) / (NAV_TRAJECTORY_SAMPLE.maxVisible - 1);
+  for (let index = 0; index < NAV_TRAJECTORY_SAMPLE.maxVisible; index += 1) {
+    indexes.add(Math.round(index * step));
+  }
+  if (currentIndex >= 0) indexes.add(currentIndex);
+  return [...indexes].sort((first, second) => first - second);
 }
 
 function markerTransform(point, inverseScale, screenSlot) {
@@ -140,22 +159,6 @@ function pointAlong(points, ratio) {
 // anchors here instead of at a fixed path fraction: a fraction can land on a
 // bend vertex, where the rotated chevron juts off the corner and reads as
 // detached from its own line.
-function longestSegmentMidpoint(points) {
-  let best;
-  for (let index = 1; index < points.length; index += 1) {
-    const start = points[index - 1];
-    const end = points[index];
-    const length = Math.hypot(end.x - start.x, end.y - start.y);
-    if (!best || length > best.length) best = { start, end, length };
-  }
-  if (!best || best.length === 0) return undefined;
-  return {
-    x: (best.start.x + best.end.x) / 2,
-    y: (best.start.y + best.end.y) / 2,
-    angle: Math.atan2(best.end.y - best.start.y, best.end.x - best.start.x) * 180 / Math.PI,
-  };
-}
-
 // Lifecycle status drives the line + head tone. `invalid` (a data-quality flag)
 // is carried by its own red badge, not by repainting the whole path + progress
 // head red — that stacked two red signals and made an invalid-but-active
@@ -205,6 +208,11 @@ function trajectoryAccessibleName(trajectory, selected, focused, disabled, inval
   return parts.join(', ');
 }
 
+function compactLabel(label, limit = 16) {
+  if (typeof label !== 'string' || label.length <= limit) return label;
+  return `${label.slice(0, limit - 1).trimEnd()}…`;
+}
+
 /** SVG fragment for one dense, single-map trajectory supplied by the runtime. */
 export function TrajectoryOverlay({
   trajectory,
@@ -227,8 +235,9 @@ export function TrajectoryOverlay({
   ...rest
 }) {
   const [hasDomFocus, setHasDomFocus] = React.useState(false);
+  const coordinateBoundary = useNavigationCoordinateBoundary();
+  const annotationDetailMode = useNavigationAnnotationDetailMode();
   const obstacle = useNavigationObstacles();
-  const progressHeadId = `lk-trajectory-progress-${React.useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
   const scale = Number.isFinite(viewportScale) && viewportScale > 0 ? viewportScale : 1;
   const inverseScale = 1 / scale;
   const interactive = typeof onActivate === 'function';
@@ -242,6 +251,10 @@ export function TrajectoryOverlay({
   })).filter(({ point }) => finitePoint(point));
   const points = finiteSamples.map(({ point }) => point);
   const pathData = pathFromPoints(points);
+  if (
+    (trajectory?.source && trajectory.source.mapId !== trajectory.mapId)
+    || !isNavigationGeometryCompatible(trajectory, coordinateBoundary)
+  ) return null;
   if (points.length < 2) return null;
   const currentIndex = Number.isInteger(trajectory?.currentSampleIndex)
     && trajectory.currentSampleIndex >= 0
@@ -254,14 +267,11 @@ export function TrajectoryOverlay({
   const currentProgress = trajectoryProgressGeometry(points, currentPointIndex);
   const markerPoint = currentProgress?.point ?? pointAlong(points, 0.5);
   const currentPrefixPath = currentProgress ? pathFromPoints(currentProgress.prefixPoints) : '';
-  const currentCarrier = currentProgress?.usesCarrier
-    ? progressCarrierPath(currentProgress.point, currentProgress.angle, inverseScale)
-    : '';
   const statePoint = pointAlong(points, 0.12);
   // Heading chevron anchor — longest-segment midpoint, so a trajectory without
   // a progress head still reads a travel direction, matching the Route/Lane
   // direction chevron.
-  const directionPoint = longestSegmentMidpoint(points);
+  const sampleIndexes = visibleSampleIndexes(points.length, currentPointIndex);
   const tone = statusTone(trajectory?.status);
   const dash = statusDash(trajectory?.status);
   const foreground = 'var(--viewer-foreground, var(--color-semantic-label-strong))';
@@ -293,7 +303,7 @@ export function TrajectoryOverlay({
   const fixedProgressMarkers = currentProgress ? [{
     name: 'current',
     point: currentProgress.point,
-    radius: NAV_PROGRESS_HEAD.collisionRadius,
+    radius: NAV_TRAJECTORY_SAMPLE.cursorCollisionRadius,
   }] : [];
   const markerLayout = markerCollisionLayout(naturalMarkers, scale, fixedProgressMarkers);
   const trajectoryMarkerSlot = (name) => markerLayout?.slots[name];
@@ -326,8 +336,13 @@ export function TrajectoryOverlay({
     <g
       {...rest}
       data-lk-trajectory-overlay=""
+      data-navigation-line-role="trajectory"
+      data-line-encoding="temporal-samples"
       data-trajectory-id={trajectory?.id}
       data-map-id={trajectory?.mapId}
+      data-source-frame-id={trajectory?.source?.frameId}
+      data-source-map-version={trajectory?.source?.mapVersion}
+      data-coordinate-space={trajectory?.coordinateSpace}
       data-trajectory-status={trajectory?.status}
       data-current-sample-index={currentIndex}
       data-viewport-scale={scale}
@@ -381,27 +396,15 @@ export function TrajectoryOverlay({
           pointerEvents="none"
         />
       )}
-      {selected && pathData && (
-        <path
-          data-trajectory-selected-indicator=""
-          d={pathData}
-          fill="none"
-          stroke="var(--viewer-accent, var(--color-semantic-primary-normal))"
-          strokeWidth={NAV_SELECTION.pathHaloWidth}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          opacity={NAV_SELECTION.haloOpacity}
-          vectorEffect="non-scaling-stroke"
-          pointerEvents="none"
-        />
-      )}
-      {pathData && !selected && !focusVisible && (
+      {pathData && (
         <path
           data-trajectory-casing=""
+          data-trajectory-selection-casing={selected ? '' : undefined}
+          data-navigation-selection-geometry=""
           d={pathData}
           fill="none"
           stroke={surface}
-          strokeWidth="5"
+          strokeWidth={selected ? NAV_SELECTION.pathCasingWidth : NAV_LINE_ROLE.trajectory.casingWidth}
           strokeLinecap="round"
           strokeLinejoin="round"
           vectorEffect="non-scaling-stroke"
@@ -411,25 +414,22 @@ export function TrajectoryOverlay({
       {pathData && (
         <path
           data-trajectory-path=""
+          data-navigation-annotation-path-obstacle=""
           d={pathData}
           fill="none"
           stroke={tone}
-          strokeWidth={currentProgress ? 2.5 : selected || trajectory?.status === 'active' ? 3.5 : 2.5}
+          strokeWidth={selected
+            ? NAV_SELECTION.trajectoryStrokeWidth
+            : trajectory?.status === 'active'
+              ? NAV_LINE_ROLE.trajectory.activeWidth
+              : NAV_LINE_ROLE.trajectory.coreWidth}
+          data-navigation-selection-geometry=""
           strokeDasharray={dash}
-          opacity={currentProgress ? NAV_PROGRESS_HEAD.trajectory.futureOpacity : undefined}
+          opacity={currentProgress ? NAV_LINE_ROLE.trajectory.futureOpacity : undefined}
           strokeLinecap="round"
           strokeLinejoin="round"
           vectorEffect="non-scaling-stroke"
           pointerEvents="none"
-        />
-      )}
-      {currentProgress && (
-        <NavigationProgressHeadDefs
-          idPrefix={progressHeadId}
-          tone={tone}
-          surface={surface}
-          inverseScale={inverseScale}
-          role="trajectory"
         />
       )}
       {currentProgress && currentPrefixPath && (
@@ -439,67 +439,79 @@ export function TrajectoryOverlay({
             d={currentPrefixPath}
             fill="none"
             stroke={surface}
-            strokeWidth={NAV_PROGRESS_HEAD.trajectory.casingWidth}
+            strokeWidth={NAV_LINE_ROLE.trajectory.casingWidth}
             strokeLinecap="round"
             strokeLinejoin="round"
             vectorEffect="non-scaling-stroke"
-            markerEnd={currentCarrier ? undefined : `url(#${progressHeadId}-casing)`}
             pointerEvents="none"
           />
           <path
             data-trajectory-progress-past=""
-            data-trajectory-current-marker={currentCarrier ? undefined : ''}
-            data-trajectory-progress-marker={currentCarrier ? undefined : ''}
-            data-navigation-progress-head={currentCarrier ? undefined : 'trajectory'}
-            data-head-rendering={currentCarrier ? undefined : 'marker-end'}
-            data-trajectory-anchor-x={currentCarrier ? undefined : currentProgress.point.x}
-            data-trajectory-anchor-y={currentCarrier ? undefined : currentProgress.point.y}
             d={currentPrefixPath}
             fill="none"
             stroke={tone}
-            strokeWidth={NAV_PROGRESS_HEAD.trajectory.coreWidth}
+            strokeWidth={NAV_LINE_ROLE.trajectory.activeWidth}
             strokeLinecap="round"
             strokeLinejoin="round"
             vectorEffect="non-scaling-stroke"
-            markerEnd={currentCarrier ? undefined : `url(#${progressHeadId}-core)`}
             pointerEvents="none"
           />
         </>
       )}
-      {currentProgress && currentCarrier && (
-        <>
-          <path
-            data-trajectory-progress-carrier="casing"
-            data-trajectory-progress-casing=""
-            d={currentCarrier}
-            fill="none"
+      {pathData && sampleIndexes.map((sampleIndex) => {
+        if (sampleIndex === currentPointIndex) return null;
+        const sample = points[sampleIndex];
+        const phase = currentPointIndex < 0
+          ? 'planned'
+          : sampleIndex < currentPointIndex
+            ? 'past'
+            : 'future';
+        return (
+          <circle
+            key={`sample-${sampleIndex}`}
+            data-trajectory-sample=""
+            data-sample-index={sampleIndex}
+            data-sample-phase={phase}
+            cx={sample.x}
+            cy={sample.y}
+            r={NAV_TRAJECTORY_SAMPLE.radius * inverseScale}
+            fill={tone}
             stroke={surface}
-            strokeWidth={NAV_PROGRESS_HEAD.trajectory.casingWidth}
-            strokeLinecap="round"
-            strokeLinejoin="round"
+            strokeWidth="0.75"
+            opacity={phase === 'past'
+              ? NAV_TRAJECTORY_SAMPLE.pastOpacity
+              : NAV_TRAJECTORY_SAMPLE.futureOpacity}
             vectorEffect="non-scaling-stroke"
-            markerEnd={`url(#${progressHeadId}-casing)`}
             pointerEvents="none"
           />
-          <path
-            data-trajectory-progress-carrier="core"
-            data-trajectory-current-marker=""
-            data-trajectory-progress-marker=""
-            data-navigation-progress-head="trajectory"
-            data-head-rendering="marker-end"
-            data-trajectory-anchor-x={currentProgress.point.x}
-            data-trajectory-anchor-y={currentProgress.point.y}
-            d={currentCarrier}
-            fill="none"
+        );
+      })}
+      {currentProgress && (
+        <g
+          {...obstacle(`trajectory:${trajectory.id}:time-cursor`)}
+          data-trajectory-time-cursor=""
+          data-navigation-temporal-cursor="trajectory"
+          data-trajectory-current-marker=""
+          data-trajectory-anchor-x={currentProgress.point.x}
+          data-trajectory-anchor-y={currentProgress.point.y}
+          transform={`translate(${currentProgress.point.x} ${currentProgress.point.y}) scale(${inverseScale})`}
+          aria-hidden="true"
+          pointerEvents="none"
+        >
+          <circle
+            data-trajectory-cursor-surface=""
+            r={NAV_TRAJECTORY_SAMPLE.cursorOuterRadius}
+            fill={surface}
             stroke={tone}
-            strokeWidth={NAV_PROGRESS_HEAD.trajectory.coreWidth}
-            strokeLinecap="round"
-            strokeLinejoin="round"
+            strokeWidth="1.5"
             vectorEffect="non-scaling-stroke"
-            markerEnd={`url(#${progressHeadId}-core)`}
-            pointerEvents="none"
           />
-        </>
+          <circle
+            data-trajectory-cursor-core=""
+            r={NAV_TRAJECTORY_SAMPLE.cursorInnerRadius}
+            fill={tone}
+          />
+        </g>
       )}
       {pathData && interactive && (
         <>
@@ -528,30 +540,6 @@ export function TrajectoryOverlay({
       )}
       {/* The progress head already points the travel direction — one arrow per
           line, so the chevron renders only on head-less trajectories. */}
-      {pathData && !currentProgress && directionPoint && (
-        <path
-          data-trajectory-direction=""
-          data-navigation-vector-glyph="direction"
-          d={NAVIGATION_DIRECTION_PATH}
-          transform={`translate(${directionPoint.x} ${directionPoint.y}) rotate(${directionPoint.angle}) scale(${inverseScale})`}
-          fill={tone}
-          stroke={surface}
-          strokeWidth="1"
-          strokeLinejoin="round"
-          vectorEffect="non-scaling-stroke"
-          pointerEvents="none"
-        />
-      )}
-      {currentProgress && (
-        <ProgressHeadObstacle
-          obstacle={obstacle}
-          id={`trajectory:${trajectory.id}:progress-head`}
-          point={currentProgress.point}
-          angle={currentProgress.angle}
-          inverseScale={inverseScale}
-          dataPrefix="trajectory"
-        />
-      )}
       {pathData && trajectoryStateMarkers.map((item) => {
         const point = item.point;
         const stateSlot = trajectoryMarkerSlot(item.state);
@@ -587,11 +575,14 @@ export function TrajectoryOverlay({
           kind="trajectory-label"
           anchor={markerPoint}
           nudgeDirection="up"
+          detailLevel={trajectory?.status === 'active' ? 'overview' : 'standard'}
           priority={annotationPriority({
             selected,
             focused: focusVisible,
             alarm: invalid || trajectory?.status === 'blocked',
-            emphasized: trajectory?.status === 'active',
+            importance: trajectory?.status === 'active'
+              ? ANNOTATION_IMPORTANCE['active-trajectory']
+              : ANNOTATION_IMPORTANCE.background,
           })}
         >
           <text
@@ -615,7 +606,9 @@ export function TrajectoryOverlay({
             aria-hidden="true"
             pointerEvents="none"
           >
-            {trajectory.label}
+            {annotationDetailMode == null || annotationDetailMode === 'detail'
+              ? trajectory.label
+              : compactLabel(trajectory.label)}
           </text>
         </NavigationAnnotationBlock>
       )}

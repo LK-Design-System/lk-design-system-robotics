@@ -5,10 +5,13 @@ import type {
   NavigationPoint,
   NavigationSvgFeatureProps,
 } from './WaypointMarker';
+import type { NavigationFrameRef } from './NavigationCoordinateSystem';
 
 export interface FacilityTransitionEndpoint {
   readonly mapId: string;
   readonly position: NavigationPoint;
+  /** Source frame/version/time retained after projection into SVG map space. */
+  readonly source?: NavigationFrameRef;
   readonly label?: string;
   /** Optional graph identity; no renderer behavior is inferred from it. */
   readonly waypointId?: string;
