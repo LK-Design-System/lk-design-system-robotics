@@ -33,21 +33,21 @@ const APPEARANCES = [
 ];
 
 // The tone vocabulary is shared, but each renderer owns its semantic mapping
-// (RouteOverlay segmentTone and TrajectoryOverlay statusTone color the line,
+// (RouteOverlay and TrajectoryOverlay each keep one identity tone,
 // SpatialRegion strokeForRegion, HazardMarker severity, FacilityTransition
-// availability, and so on). On the line renderers the lifecycle/condition state
-// is carried by tone + NAV_PATH_DASH, not a badge. These are component-qualified
+// availability, and so on). Route and Trajectory lifecycle state remains in
+// label/detail text rather than changing operational line geometry. These are component-qualified
 // examples, not one universal state -> tone table. Color is a redundant cue on
 // top of the glyph badge and the dash — never the only signal.
 // Color hierarchy: danger red = 위험·금지·데이터 오류 (real alarms). Operational
 // "사용 불가"는 danger가 아니라 muted(회색)로 desaturate하고, 도형(슬래시)이 의미를
 // 전달합니다 — 진짜 경보와 색이 경쟁하지 않도록.
 const STATE_TONE_MAP = [
-  { tone: '--viewer-danger', meaning: '대표: 위험 · 금지 · 차단 · 데이터 오류', states: ['해저드 위험', '경로·궤적 차단', '구역 진입 금지', '데이터 오류(invalid)'] },
-  { tone: '--viewer-warning', meaning: '대표: 주의 · 대기 · 제한', states: ['해저드 주의', '경로·궤적 대기·재계산', '구역 속도 제한', '웨이포인트 가용성 미확인'] },
-  { tone: '--viewer-positive', meaning: '대표: 완료', states: ['경로·궤적 완료', '경로 완료 구간'] },
-  { tone: '--viewer-accent', meaning: '대표: 현재 · 활성 · 시설 가용', states: ['시설 사용 가능', '경로·궤적 현재·활성', '선택은 색이 아닌 기하 강조'] },
-  { tone: '--viewer-muted', meaning: '대표: 사용 불가 · 미확인 · 비활성', states: ['시설·웨이포인트 사용 불가(+슬래시)', '가용성 미확인 몸통', '구역 통과 미확인 외곽선', '경로·궤적 계획됨', '비활성·지연'] },
+  { tone: '--viewer-danger', meaning: '대표: 위험 · 금지 · 차단 · 데이터 오류', states: ['해저드 위험', '궤적 차단', '구역 진입 금지', '데이터 오류(invalid)'] },
+  { tone: '--viewer-warning', meaning: '대표: 주의 · 대기 · 제한', states: ['해저드 주의', '궤적 대기·재계산', '구역 속도 제한', '웨이포인트 가용성 미확인'] },
+  { tone: '--viewer-positive', meaning: '대표: 완료', states: ['궤적 완료'] },
+  { tone: '--viewer-accent', meaning: '대표: 현재 · 활성 · 시설 가용', states: ['시설 사용 가능', '궤적 현재·활성', 'Route는 별도 identity tone', '선택은 색이 아닌 기하 강조'] },
+  { tone: '--viewer-muted', meaning: '대표: 사용 불가 · 미확인 · 비활성', states: ['시설·웨이포인트 사용 불가(+슬래시)', '가용성 미확인 몸통', '구역 통과 미확인 외곽선', '궤적 계획됨', '비활성·지연'] },
 ];
 
 function Card({ title, hint, children }) {

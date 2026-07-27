@@ -112,6 +112,20 @@ export function adaptWorldTrajectoryToTrajectory(trajectory, options = {}) {
   });
 }
 
+export function adaptWorldRobotPoseToPose(pose, options = {}) {
+  const transform = resolveTransform(pose?.mapId, options, 'Robot pose');
+  return Object.freeze({
+    ...pose,
+    mapId: transform.metadata.mapId,
+    source: projectedFrame(pose?.source, transform, 'Robot pose'),
+    coordinateSpace: NAVIGATION_GEOMETRY_SPACE,
+    position: transform.worldToSvg(pose?.position),
+    headingRad: Number.isFinite(pose?.headingRad)
+      ? transform.worldHeadingToSvg(pose.headingRad)
+      : undefined,
+  });
+}
+
 export function adaptWorldLaneToLane(lane, options = {}) {
   const transform = resolveTransform(lane?.mapId, options, 'Lane');
   return Object.freeze({

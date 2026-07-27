@@ -13,6 +13,7 @@ import {
 } from '../src/components/robotics/NavigationRosAdapters.js';
 import {
   adaptWorldLaneToLane,
+  adaptWorldRobotPoseToPose,
   adaptWorldRouteToRoute,
   adaptWorldTrajectoryToTrajectory,
 } from '../src/components/robotics/NavigationGeometryAdapters.js';
@@ -93,6 +94,23 @@ close(
   projectedTrajectory.samples[0].headingRad,
   transform.worldHeadingToSvg(Math.PI / 2),
   'trajectory heading projection',
+);
+
+const projectedRobotPose = adaptWorldRobotPoseToPose({
+  id: 'robot-world-1',
+  label: 'Robot 1',
+  mapId: 'warehouse-L1',
+  position: { x: 9.5, y: -1.5 },
+  headingRad: Math.PI / 2,
+  state: 'moving',
+}, { transform });
+assert.equal(projectedRobotPose.coordinateSpace, 'svg-map');
+assert.equal(projectedRobotPose.source.frameId, 'warehouse_L1/map');
+pointClose(projectedRobotPose.position, transform.worldToSvg({ x: 9.5, y: -1.5 }), 'robot pose world projection');
+close(
+  projectedRobotPose.headingRad,
+  transform.worldHeadingToSvg(Math.PI / 2),
+  'robot pose heading projection',
 );
 
 const projectedLane = adaptWorldLaneToLane({

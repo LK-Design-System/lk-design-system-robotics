@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  isNavigationSourceCompatible,
+  isNavigationGeometryCompatible,
   useNavigationCoordinateBoundary,
 } from './NavigationCoordinateBoundary.jsx';
 import { isFocusVisibleTarget } from './_NavigationFocus.js';
@@ -8,6 +8,7 @@ import {
   ANNOTATION_IMPORTANCE,
   NavigationAnnotationBlock,
   annotationPriority,
+  useNavigationLabelDisclosure,
   useNavigationObstacles,
 } from './_navigationAnnotations.js';
 import {
@@ -109,6 +110,7 @@ function accessibleName(pose, stateLabel, {
  */
 export function RobotPoseMarker({
   pose,
+  context = 'live',
   viewportScale = 1,
   selected = false,
   focused = false,
@@ -116,11 +118,15 @@ export function RobotPoseMarker({
   invalid = false,
   stale = false,
   showLabel,
+  labelVisibility,
+  detailVisibility,
   onActivate,
   role,
   tabIndex,
   onFocus,
   onBlur,
+  onPointerEnter,
+  onPointerLeave,
   onMouseDown,
   style,
   'aria-label': ariaLabel,
@@ -135,8 +141,9 @@ export function RobotPoseMarker({
   const interactive = typeof onActivate === 'function';
   const pointerOnly = ariaHidden === true || ariaHidden === 'true';
   const focusVisible = !pointerOnly && (focused || hasDomFocus);
+  const poseContext = context === 'replay' ? 'replay' : 'live';
   const state = STATE_LABEL[pose.state] ? pose.state : 'unknown';
-  const stateLabel = STATE_LABEL[state];
+  const stateLabel = poseContext === 'replay' ? '기록 재생' : STATE_LABEL[state];
   const angle = headingDegrees(pose.headingRad);
   const label = ariaLabel ?? accessibleName(pose, stateLabel, {
     selected,
@@ -151,8 +158,26 @@ export function RobotPoseMarker({
   const fleetColor = pose.color ?? 'var(--color-semantic-primary-normal)';
   const badgeKind = statusBadgeKind(state, invalid, stale);
   const badge = BADGE_PRESENTATION[badgeKind];
-  const motionVisible = state === 'moving' && !disabled && !invalid && !stale;
-  const labelVisible = showLabel ?? (selected || focusVisible);
+  const motionVisible = poseContext !== 'replay' && state === 'moving' && !disabled && !invalid && !stale;
+  const {
+    hovered,
+    labelVisibility: resolvedLabelVisibility,
+    detailVisibility: resolvedDetailVisibility,
+    labelVisible,
+    detailsVisible,
+    onPointerEnter: handleLabelPointerEnter,
+    onPointerLeave: handleLabelPointerLeave,
+  } = useNavigationLabelDisclosure({
+    showLabel,
+    labelVisibility,
+    detailVisibility,
+    selected,
+    focused: focusVisible,
+    priority: ['fault', 'invalid', 'offline', 'stale'].includes(badgeKind),
+    hasDetails: true,
+    onPointerEnter,
+    onPointerLeave,
+  });
   const localizationEllipse = pose?.localization?.ellipse;
   const ellipseVisible = Number.isFinite(localizationEllipse?.majorRadius)
     && localizationEllipse.majorRadius > 0
@@ -177,7 +202,7 @@ export function RobotPoseMarker({
 
   if (
     (pose?.source && pose.source.mapId !== pose.mapId)
-    || !isNavigationSourceCompatible(pose?.source, coordinateBoundary)
+    || !isNavigationGeometryCompatible(pose, coordinateBoundary)
   ) return null;
 
   return (
@@ -188,7 +213,9 @@ export function RobotPoseMarker({
       data-map-id={pose.mapId}
       data-source-frame-id={pose?.source?.frameId}
       data-source-map-version={pose?.source?.mapVersion}
+      data-coordinate-space={pose?.coordinateSpace}
       data-robot-state={state}
+      data-robot-pose-context={poseContext}
       data-selected={selected ? 'true' : 'false'}
       data-focused={focusVisible ? 'true' : 'false'}
       data-disabled={disabled ? 'true' : 'false'}
@@ -196,7 +223,11 @@ export function RobotPoseMarker({
       data-stale={stale ? 'true' : 'false'}
       data-status-badge-kind={badgeKind}
       data-motion-visible={motionVisible ? 'true' : 'false'}
+      data-hovered={hovered ? 'true' : 'false'}
+      data-label-visibility={resolvedLabelVisibility}
       data-label-visible={labelVisible ? 'true' : 'false'}
+      data-detail-visibility={resolvedDetailVisibility}
+      data-detail-visible={detailsVisible ? 'true' : 'false'}
       data-heading-degrees={angle}
       transform={`translate(${pose.position.x} ${pose.position.y})`}
       role={pointerOnly ? undefined : role ?? (interactive ? 'button' : 'img')}
@@ -221,6 +252,8 @@ export function RobotPoseMarker({
         setHasDomFocus(false);
         onBlur?.(event);
       }}
+      onPointerEnter={handleLabelPointerEnter}
+      onPointerLeave={handleLabelPointerLeave}
       style={{
         cursor: disabled ? 'not-allowed' : interactive ? 'pointer' : 'default',
         opacity: navStateOpacity(disabled, false),
@@ -320,7 +353,9 @@ export function RobotPoseMarker({
             />
             <path
               data-robot-pose-heading=""
+              data-heading-anchor="center"
               d="M12 0 L-3 -6 L0 0 L-3 6 Z"
+              transform="translate(-3 0)"
               fill="var(--color-semantic-static-white)"
               pointerEvents="none"
             />
@@ -383,7 +418,7 @@ export function RobotPoseMarker({
             <g data-robot-pose-label="" pointerEvents="none" aria-hidden="true">
               <text
                 x="20"
-                y="-1.5"
+                y={detailsVisible ? '-1.5' : '3.5'}
                 fill={foreground}
                 stroke={surface}
                 strokeWidth={NAV_LABEL_HALO.primary}
@@ -396,21 +431,23 @@ export function RobotPoseMarker({
               >
                 {pose.label}
               </text>
-              <text
-                x="20"
-                y="10"
-                fill={muted}
-                stroke={surface}
-                strokeWidth={NAV_LABEL_HALO.secondary}
-                strokeLinejoin="round"
-                paintOrder="stroke"
-                vectorEffect="non-scaling-stroke"
-                fontFamily="var(--font-sans)"
-                fontSize="var(--caption2-size)"
-                fontWeight="var(--fw-semibold)"
-              >
-                {stateLabel}
-              </text>
+              {detailsVisible && (
+                <text
+                  x="20"
+                  y="10"
+                  fill={muted}
+                  stroke={surface}
+                  strokeWidth={NAV_LABEL_HALO.secondary}
+                  strokeLinejoin="round"
+                  paintOrder="stroke"
+                  vectorEffect="non-scaling-stroke"
+                  fontFamily="var(--font-sans)"
+                  fontSize="var(--caption2-size)"
+                  fontWeight="var(--fw-semibold)"
+                >
+                  {stateLabel}
+                </text>
+              )}
             </g>
           </NavigationAnnotationBlock>
         )}

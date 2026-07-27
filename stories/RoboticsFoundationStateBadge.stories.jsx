@@ -40,7 +40,7 @@ const meta = {
       description:
         '점 요소의 상태 배지와 선 요소의 대시 패턴이 같은 내비게이션 상태 어휘를 사용하는지 검토할 때 사용합니다. 독립 상태 라벨이나 완성된 마커를 이 글리프로 대신하지 마세요.',
       docsDescription:
-        '내부 모듈 NavigationStateGlyph가 Material Symbols(Apache 2.0)에서 가져온 11종의 상태 도형을 렌더합니다. 마커 계열은 가용성을 본체에 두고 렌더러 우선순위에 따른 solid badge 한 개만 겹칩니다. Waypoint는 invalid > stale, FacilityTransition은 invalid > stale > unknown 순서입니다. 모든 원시 상태는 접근성 이름에 유지합니다. 선과 영역은 작은 마커가 아니므로 각각 stroke/dash와 면·외곽선 채널을 사용합니다. 독립 상태 라벨이나 완성된 마커를 이 글리프로 대신하지 마세요.',
+          '내부 모듈 NavigationStateGlyph가 Material Symbols(Apache 2.0)에서 가져온 11종의 상태 도형을 렌더합니다. 마커 계열은 가용성을 본체에 두고 렌더러 우선순위에 따른 solid badge 한 개만 겹칩니다. Waypoint는 invalid > stale, FacilityTransition은 invalid > stale > unknown 순서입니다. 모든 원시 상태는 접근성 이름에 유지합니다. 선은 stroke/dash, 영역은 category pattern과 상태색 면·외곽선 채널을 사용하며 영역에는 badge를 올리지 않습니다. 독립 상태 라벨이나 완성된 마커를 이 글리프로 대신하지 마세요.',
     },
     docs: {
       description: {
@@ -107,7 +107,7 @@ const COMPOUND_FACILITY = {
 const COMPOUND_CHANNELS = [
   { renderer: '마커', channel: '가용성은 본체 · renderer priority solid badge 1슬롯' },
   { renderer: '선', channel: '가용성·충돌은 stroke/dash · 데이터 품질은 path anchor 표식' },
-  { renderer: '영역', channel: '상태는 면·외곽선 · 데이터 품질은 area anchor 표식' },
+  { renderer: '영역', channel: '종류는 pattern · 상태는 면·외곽선 색 · badge 없음' },
 ];
 
 export const Overview = {
@@ -174,7 +174,7 @@ export const Overview = {
           <div style={{ display: 'grid', gap: 4 }}>
             <h2 style={{ margin: 0, fontSize: 'var(--label1-size)', color: 'var(--color-semantic-label-strong)' }}>상태 표현 채널</h2>
             <p style={{ margin: 0, fontSize: 'var(--caption1-size)', color: 'var(--color-semantic-label-neutral)', lineHeight: 1.6 }}>
-              Waypoint와 FacilityTransition 같은 마커는 가용성을 본체로 표시하고 렌더러 우선순위에 따라 우측 상단 solid badge 하나만 사용합니다. 선과 영역은 자체 stroke·fill과 anchor 표식을 사용하며, 모든 원시 상태는 접근성 이름에 남습니다.
+              Waypoint와 FacilityTransition 같은 마커는 가용성을 본체로 표시하고 렌더러 우선순위에 따라 우측 상단 solid badge 하나만 사용합니다. 선은 자체 stroke와 anchor 표식을 사용하고, 영역은 category pattern 위에 상태색 면·외곽선만 사용합니다. 모든 원시 상태는 접근성 이름에 남습니다.
             </p>
           </div>
           <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gap: 4 }}>

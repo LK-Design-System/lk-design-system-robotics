@@ -23,8 +23,27 @@ const meta = {
     docs: {
       description: {
         component:
-          'WaypointMarker는 renderer-neutral WaypointData를 한 SVG g 조각으로 표현합니다. 가장 구체적인 역할은 20px 라운드 스퀘어 내부 벡터 아이콘, 가용성은 본체 채움, invalid·stale 데이터 품질은 RobotPoseMarker와 같은 우측 상단 12px solid badge 하나, 선택은 25px 정적 확대, 키보드 포커스는 고대비 외곽 링으로 분리합니다. 모든 역할과 상태는 접근 가능한 이름에 보존됩니다.',
+          'WaypointMarker는 renderer-neutral WaypointData를 한 SVG g 조각으로 표현합니다. 가장 구체적인 역할은 20px 라운드 스퀘어 내부 벡터 아이콘, 가용성은 본체 채움, invalid·stale 데이터 품질은 RobotPoseMarker와 같은 우측 상단 12px solid badge 하나로 표현합니다. 기본 priority 라벨은 평소 숨고 hover·focus·selection 또는 주의 상태에서 이름을 공개하며, 시설 주석은 선택된 지점에만 표시합니다. 모든 역할과 상태는 라벨 가시성과 무관하게 접근 가능한 이름에 보존됩니다.',
       },
+    },
+  },
+  argTypes: {
+    labelVisibility: {
+      control: 'inline-radio',
+      options: ['priority', 'interaction', 'always', 'hidden'],
+      description: '이름 라벨 공개 정책. 기본 priority는 상호작용·선택·주의 상태만 표시합니다.',
+      table: { defaultValue: { summary: 'interaction' } },
+    },
+    detailVisibility: {
+      control: 'inline-radio',
+      options: ['selected', 'always', 'hidden'],
+      description: '시설 주석 등 보조 상세의 공개 정책.',
+      table: { defaultValue: { summary: 'selected' } },
+    },
+    showLabel: {
+      control: 'boolean',
+      description: '이전 호환용 스위치입니다. 새 사용처는 labelVisibility를 사용합니다.',
+      table: { category: 'Deprecated' },
     },
   },
 };
@@ -300,6 +319,8 @@ function WaypointGraphic({
   selectedId,
   markerStates = {},
   onActivate,
+  labelVisibility,
+  detailVisibility,
   width = 700,
   height = 260,
   label = '내비게이션 그래프 웨이포인트',
@@ -325,6 +346,8 @@ function WaypointGraphic({
             disabled={markerStates[waypoint.id]?.disabled}
             invalid={markerStates[waypoint.id]?.invalid}
             stale={markerStates[waypoint.id]?.stale}
+            labelVisibility={labelVisibility}
+            detailVisibility={detailVisibility}
             onActivate={onActivate}
           />
         ))}
@@ -338,6 +361,8 @@ function MapSurface({
   selectedId,
   markerStates,
   onActivate,
+  labelVisibility,
+  detailVisibility,
   appearance = 'light',
   width = 700,
   height = 300,
@@ -358,6 +383,8 @@ function MapSurface({
           selectedId={selectedId}
           markerStates={markerStates}
           onActivate={onActivate}
+          labelVisibility={labelVisibility}
+          detailVisibility={detailVisibility}
           width={width}
           height={height}
         />
@@ -392,10 +419,14 @@ function MarkerSelectionFixture() {
 }
 
 function OverviewMapFixture() {
+  const [selectedId, setSelectedId] = React.useState('wp-charger');
+
   return (
     <main style={{ display: 'grid', gap: 'var(--space-5)', width: '100%', maxWidth: 900, minWidth: 0 }}>
       <MapSurface
         waypoints={overviewWaypoints}
+        selectedId={selectedId}
+        onActivate={setSelectedId}
         height={300}
         label="1층 웨이포인트 역할 지도"
       />
@@ -403,6 +434,7 @@ function OverviewMapFixture() {
         roles={['holding', 'passthrough', 'parking', 'charger']}
         annotations={['dock']}
         states={['available', 'unknown']}
+        statePresentation="waypoint"
       />
     </main>
   );
@@ -411,7 +443,7 @@ function OverviewMapFixture() {
 export const Overview = {
   name: '개요',
   parameters: storyDescription(
-    '같은 내비게이션 그래프에서 대기·통과·주차·충전 역할과 상태를 비교하는 대표 뷰입니다. 일시정지·진행·주차·충전 아이콘은 20px 라운드 스퀘어 안에, 가용성은 solid 채움에 나타나며 시설 주석만 보조 라벨에 남는지 확인하세요.',
+    '같은 내비게이션 그래프에서 대기·통과·주차·충전 역할과 상태를 비교하는 대표 뷰입니다. 평상시에는 마커가 역할과 가용성을 전달하고, hover·키보드 focus에는 이름 한 줄, 선택에는 이름과 시설 주석을 지속 표시합니다. 오류·오래된 데이터·사용 불가는 직접 주의가 필요한 우선 라벨로 남습니다.',
   ),
   render: () => <OverviewMapFixture />,
   play: async ({ canvasElement }) => {
@@ -431,9 +463,62 @@ export const Overview = {
     assertWaypointRoleSlot(charger, 'charger', 'Charger waypoint');
     assertWaypointStateChannels(holding, 'available', 'Available waypoint');
     assertWaypointStateChannels(charger, 'unknown', 'Unknown waypoint');
+    if (holding.querySelector('[data-navigation-role-glyph="holding"]')?.getAttribute('data-navigation-role-glyph-form') !== 'plain-flag') {
+      throw new Error('Holding waypoint must use the plain flag role glyph.');
+    }
+    if (passthrough.querySelector('[data-navigation-role-glyph="passthrough"]')?.getAttribute('data-navigation-role-glyph-form') !== 'double-chevron') {
+      throw new Error('Passthrough waypoint must use the double-chevron role glyph.');
+    }
+    if (
+      holding.getAttribute('data-label-visibility') !== 'priority'
+      || holding.querySelector('[data-waypoint-label]')
+    ) {
+      throw new Error('Ordinary waypoint labels must stay quiet until direct interaction.');
+    }
+    const selectedLabel = charger.querySelector('[data-waypoint-label]');
     const chargerDetails = charger.querySelector('[data-waypoint-details]')?.textContent ?? '';
-    if (chargerDetails !== 'dock') {
-      throw new Error(`Charger label must retain only its facility annotation, received ${chargerDetails}.`);
+    if (!selectedLabel || chargerDetails !== 'dock') {
+      throw new Error(`Selected charger must retain its name and facility detail, received ${chargerDetails}.`);
+    }
+
+    await userEvent.hover(holding);
+    await waitFor(() => {
+      if (
+        holding.getAttribute('data-hovered') !== 'true'
+        || !holding.querySelector('[data-waypoint-primary-label]')
+        || holding.querySelector('[data-waypoint-details]')
+      ) {
+        throw new Error('Hovered waypoint must reveal only its primary name.');
+      }
+    });
+    await userEvent.unhover(holding);
+    await waitFor(() => {
+      if (holding.querySelector('[data-waypoint-label]')) {
+        throw new Error('Ordinary waypoint label must close when hover leaves.');
+      }
+    });
+
+    await userEvent.click(holding);
+    await waitFor(() => {
+      if (
+        holding.getAttribute('aria-pressed') !== 'true'
+        || !holding.querySelector('[data-waypoint-primary-label]')
+        || charger.querySelector('[data-waypoint-label]')
+      ) {
+        throw new Error('Selection must persist one waypoint label and release the previous detail label.');
+      }
+    });
+    if (holding.getAttribute('aria-label')?.includes('선택됨') !== true) {
+      throw new Error('Selected waypoint accessible name must announce persistent selection.');
+    }
+    const availableLegend = canvasElement.querySelector('[data-waypoint-legend-state="available"] rect:last-child');
+    const unknownLegend = canvasElement.querySelector('[data-waypoint-legend-state="unknown"] rect:last-child');
+    if (
+      !availableLegend?.getAttribute('fill')?.includes('positive')
+      || !unknownLegend?.getAttribute('fill')?.includes('--viewer-warning')
+      || canvasElement.querySelector('[data-navigation-legend] [data-navigation-state-glyph="unknown"]')
+    ) {
+      throw new Error('Waypoint availability legend must mirror the rounded-square body fill instead of a generic state glyph.');
     }
   },
 };
@@ -610,11 +695,11 @@ export const LightAndDark = {
     <main style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', gap: 'var(--space-4)', width: '100%', maxWidth: 940 }}>
       <section aria-labelledby="waypoint-light" style={{ display: 'grid', gap: 'var(--space-2)', minWidth: 0 }}>
         <strong id="waypoint-light">Light</strong>
-        <MapSurface waypoints={comparisonWaypoints} markerStates={comparisonMarkerStates} appearance="light" width={460} height={260} />
+        <MapSurface waypoints={comparisonWaypoints} markerStates={comparisonMarkerStates} detailVisibility="always" appearance="light" width={460} height={260} />
       </section>
       <section aria-labelledby="waypoint-dark" style={{ display: 'grid', gap: 'var(--space-2)', minWidth: 0 }}>
         <strong id="waypoint-dark">Dark</strong>
-        <MapSurface waypoints={comparisonWaypoints} markerStates={comparisonMarkerStates} appearance="dark" width={460} height={260} />
+        <MapSurface waypoints={comparisonWaypoints} markerStates={comparisonMarkerStates} detailVisibility="always" appearance="dark" width={460} height={260} />
       </section>
     </main>
   ),

@@ -4,14 +4,13 @@ import {
   useNavigationCoordinateBoundary,
 } from './NavigationCoordinateBoundary.jsx';
 import { isFocusVisibleTarget } from './_NavigationFocus.js';
-import { NavigationStateGlyph } from './_NavigationStateGlyph.js';
 import {
   ANNOTATION_IMPORTANCE,
   NavigationAnnotationBlock,
   annotationPriority,
-  useNavigationObstacles,
+  useNavigationLabelDisclosure,
 } from './_navigationAnnotations.js';
-import { navStateOpacity, NAV_DASH, NAV_STATE_BADGE, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION } from './_navigationVocabulary.js';
+import { navStateOpacity, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION } from './_navigationVocabulary.js';
 
 // facility uses a DOT field rather than a grid: the map canvas already draws a
 // square grid, so a region grid pattern reads as "empty map", not "facility
@@ -229,9 +228,9 @@ function regionKind(region) {
   return region.category === 'behavior' ? region.rule.kind : region.kind;
 }
 
-function strokeForRegion(region, { disabled, invalid }) {
+function strokeForRegion(region, { disabled, invalid, stale }) {
   if (invalid) return 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))';
-  if (disabled) return 'var(--viewer-muted, var(--color-semantic-label-alternative))';
+  if (disabled || stale) return 'var(--viewer-muted, var(--color-semantic-label-alternative))';
 
   if (region.category === 'behavior') {
     if (region.rule.kind === 'keep-out') return 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))';
@@ -282,6 +281,37 @@ function semanticLabel(region) {
   ].filter(Boolean).join(' · ');
 }
 
+function visualDetail(region) {
+  if (region.category === 'behavior') {
+    const kind = region.rule.kind === 'custom'
+      ? region.rule.label
+      : BEHAVIOR_LABELS[region.rule.kind];
+    const detail = region.rule.kind === 'speed-limit'
+      ? `${region.rule.speedLimitMps} m/s`
+      : region.rule.kind === 'operation-area'
+        ? region.rule.operation
+        : undefined;
+    return [kind, detail].filter(Boolean).join(' · ');
+  }
+  if (region.category === 'facility') return FACILITY_LABELS[region.kind];
+  const grade = region.grade
+    ? `${region.grade.value}${region.grade.unit === 'percent' ? '%' : '°'}`
+    : undefined;
+  return [
+    TERRAIN_LABELS[region.kind],
+    grade,
+    TRAVERSABILITY_LABELS[region.traversability],
+  ].filter(Boolean).join(' · ');
+}
+
+function isSafetyCriticalRegion(region) {
+  if (region.category === 'behavior') {
+    return region.rule.kind === 'keep-out' || region.rule.kind === 'speed-limit';
+  }
+  return region.category === 'terrain'
+    && (region.traversability === 'blocked' || region.traversability === 'restricted');
+}
+
 /**
  * LK Robotics — SpatialRegion
  *
@@ -297,7 +327,9 @@ export function SpatialRegion({
   disabled = false,
   invalid = false,
   stale = false,
-  showLabel = true,
+  showLabel,
+  labelVisibility,
+  detailVisibility,
   onActivate,
   style,
   role,
@@ -306,13 +338,14 @@ export function SpatialRegion({
   'aria-hidden': ariaHidden,
   onFocus,
   onBlur,
+  onPointerEnter,
+  onPointerLeave,
   onMouseDown,
   ...rest
 }) {
   const reactId = React.useId();
   const [focusVisible, setFocusVisible] = React.useState(false);
   const coordinateBoundary = useNavigationCoordinateBoundary();
-  const obstacle = useNavigationObstacles();
   const kind = regionKind(region);
   const pattern = CATEGORY_PATTERNS[region.category] ?? CATEGORY_PATTERNS.behavior;
   const safeId = `${region.id}-${reactId}`.replace(/[^a-zA-Z0-9_-]/g, '');
@@ -322,6 +355,32 @@ export function SpatialRegion({
   const interactive = typeof onActivate === 'function';
   const pointerOnly = ariaHidden === true || ariaHidden === 'true';
   const activeFocus = !pointerOnly && (focused || focusVisible);
+  const safetyCritical = isSafetyCriticalRegion(region);
+  const priorityCritical = safetyCritical || invalid || stale;
+  const visualDetails = [
+    visualDetail(region),
+    invalid ? '잘못된 영역' : undefined,
+    stale ? '데이터 지연' : undefined,
+  ].filter(Boolean).join(' · ');
+  const {
+    hovered,
+    labelVisibility: resolvedLabelVisibility,
+    detailVisibility: resolvedDetailVisibility,
+    labelVisible,
+    detailsVisible,
+    onPointerEnter: handleLabelPointerEnter,
+    onPointerLeave: handleLabelPointerLeave,
+  } = useNavigationLabelDisclosure({
+    showLabel,
+    labelVisibility,
+    detailVisibility,
+    selected,
+    focused: activeFocus,
+    priority: priorityCritical,
+    hasDetails: Boolean(visualDetails),
+    onPointerEnter,
+    onPointerLeave,
+  });
   const computedLabel = [
     semanticLabel(region),
     selected ? '선택됨' : undefined,
@@ -330,9 +389,7 @@ export function SpatialRegion({
     stale ? '데이터 지연' : undefined,
     disabled ? '선택할 수 없음' : undefined,
   ].filter(Boolean).join(' · ');
-  const stroke = strokeForRegion(region, { disabled, invalid });
-  const unknownTerrain = region.category === 'terrain' && region.traversability === 'unknown';
-  const stateDash = invalid ? NAV_DASH.invalid : stale ? NAV_DASH.staleShape : unknownTerrain ? NAV_DASH.unknown : undefined;
+  const stroke = strokeForRegion(region, { disabled, invalid, stale });
 
   if (
     hidden
@@ -380,6 +437,12 @@ export function SpatialRegion({
       data-invalid={invalid || undefined}
       data-stale={stale || undefined}
       data-disabled={disabled || undefined}
+      data-hovered={hovered || undefined}
+      data-label-visibility={resolvedLabelVisibility}
+      data-label-visible={labelVisible ? 'true' : 'false'}
+      data-detail-visibility={resolvedDetailVisibility}
+      data-detail-visible={detailsVisible ? 'true' : 'false'}
+      data-region-safety-critical={safetyCritical || undefined}
       onClick={activate}
       onKeyDown={handleKeyDown}
       onMouseDown={(event) => {
@@ -394,6 +457,8 @@ export function SpatialRegion({
         setFocusVisible(false);
         onBlur?.(event);
       }}
+      onPointerEnter={handleLabelPointerEnter}
+      onPointerLeave={handleLabelPointerLeave}
       style={{
         cursor: interactive && !disabled ? 'pointer' : disabled ? 'not-allowed' : 'default',
         opacity: navStateOpacity(disabled, stale),
@@ -439,44 +504,19 @@ export function SpatialRegion({
         shape={region.shape}
         fill={`url(#${patternId})`}
         stroke={stroke}
-        strokeWidth={selected ? NAV_SELECTION.regionStrokeWidth : 1.5}
-        strokeDasharray={stateDash}
+        strokeWidth={selected ? NAV_SELECTION.regionStrokeWidth : hovered ? 2 : 1.5}
         vectorEffect="non-scaling-stroke"
         data-region-geometry={region.shape.kind}
         data-region-selection-geometry={selected ? '' : undefined}
         data-navigation-selection-geometry=""
       />
 
-      {(invalid || stale) && (
-        <g
-          {...obstacle(`region:${region.id}:states`)}
-          transform={`translate(${anchor.x} ${anchor.y}) scale(${inverseScale})`}
-          pointerEvents="none"
-          data-region-state-anchor=""
-          data-region-anchor-x={anchor.x}
-          data-region-anchor-y={anchor.y}
-        >
-          {invalid && (
-            <g transform="translate(0 -18)" data-region-invalid-mark="">
-              <circle r={NAV_STATE_BADGE.radius} fill="var(--viewer-surface-elevated, var(--color-semantic-background-elevated-normal))" stroke="var(--viewer-danger, var(--color-semantic-status-negative-foreground))" strokeWidth={NAV_STATE_BADGE.strokeWidth} vectorEffect="non-scaling-stroke" />
-              <NavigationStateGlyph kind="invalid" size={10.5} color="var(--viewer-foreground, var(--color-semantic-label-strong))" />
-            </g>
-          )}
-          {stale && (
-            <g transform={`translate(0 ${invalid ? 18 : -18})`} data-region-stale-mark="">
-              <circle r={NAV_STATE_BADGE.radius} fill="var(--viewer-surface-elevated, var(--color-semantic-background-elevated-normal))" stroke="var(--viewer-muted, var(--color-semantic-label-alternative))" strokeWidth={NAV_STATE_BADGE.strokeWidth} strokeDasharray={NAV_DASH.staleRing} vectorEffect="non-scaling-stroke" />
-              <NavigationStateGlyph kind="stale" size={10.5} color="var(--viewer-foreground, var(--color-semantic-label-strong))" />
-            </g>
-          )}
-        </g>
-      )}
-
-      {showLabel && (
+      {labelVisible && (
         <NavigationAnnotationBlock
           id={`region:${region.id}:label`}
           kind="region-label"
           anchor={anchor}
-          detailLevel="detail"
+          detailLevel={priorityCritical ? 'overview' : 'detail'}
           priority={annotationPriority({
             selected,
             focused: activeFocus,
@@ -493,7 +533,7 @@ export function SpatialRegion({
           >
             <text
               x="0"
-              y="0"
+              y={detailsVisible ? '-5' : '0'}
               textAnchor="middle"
               dominantBaseline="central"
               fill="var(--viewer-foreground, var(--color-semantic-label-strong))"
@@ -505,6 +545,23 @@ export function SpatialRegion({
             >
               {region.label?.trim() || semanticLabel(region)}
             </text>
+            {detailsVisible && (
+              <text
+                x="0"
+                y="9"
+                textAnchor="middle"
+                dominantBaseline="central"
+                fill="var(--viewer-muted, var(--color-semantic-label-neutral))"
+                stroke="var(--viewer-surface, var(--color-semantic-background-normal-normal))"
+                strokeWidth={NAV_LABEL_HALO.secondary}
+                paintOrder="stroke"
+                vectorEffect="non-scaling-stroke"
+                data-region-details=""
+                style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--caption2-size)', fontWeight: 'var(--fw-semibold)' }}
+              >
+                {visualDetails}
+              </text>
+            )}
           </g>
         </NavigationAnnotationBlock>
       )}

@@ -11,6 +11,7 @@ import {
   NavigationAnnotationBlock,
   annotationPriority,
   useNavigationAnnotationDetailMode,
+  useNavigationLabelDisclosure,
   useNavigationObstacles,
 } from './_navigationAnnotations.js';
 import { navStateOpacity, NAV_PIN, NAV_HIT, NAV_STATE_BADGE, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION } from './_navigationVocabulary.js';
@@ -231,7 +232,9 @@ export function FacilityTransition({
   disabled = false,
   invalid = false,
   stale = false,
-  showLabel = true,
+  showLabel,
+  labelVisibility,
+  detailVisibility,
   onActivate,
   style,
   role,
@@ -240,6 +243,8 @@ export function FacilityTransition({
   'aria-hidden': ariaHidden,
   onFocus,
   onBlur,
+  onPointerEnter,
+  onPointerLeave,
   onMouseDown,
   ...rest
 }) {
@@ -284,6 +289,25 @@ export function FacilityTransition({
       : transition.availability === 'unknown'
         ? { kind: 'unknown', tone: 'var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))' }
         : null;
+  const {
+    hovered,
+    labelVisibility: resolvedLabelVisibility,
+    detailVisibility: resolvedDetailVisibility,
+    labelVisible,
+    detailsVisible,
+    onPointerEnter: handleLabelPointerEnter,
+    onPointerLeave: handleLabelPointerLeave,
+  } = useNavigationLabelDisclosure({
+    showLabel,
+    labelVisibility,
+    detailVisibility,
+    selected,
+    focused: activeFocus,
+    priority: invalid || stale || transition.availability === 'unavailable',
+    hasDetails: rows.length > 0,
+    onPointerEnter,
+    onPointerLeave,
+  });
 
   if (
     hidden
@@ -349,6 +373,11 @@ export function FacilityTransition({
       data-stale={stale || undefined}
       data-disabled={disabled || undefined}
       data-viewport-scale={scale}
+      data-hovered={hovered || undefined}
+      data-label-visibility={resolvedLabelVisibility}
+      data-label-visible={labelVisible ? 'true' : 'false'}
+      data-detail-visibility={resolvedDetailVisibility}
+      data-detail-visible={detailsVisible ? 'true' : 'false'}
       onClick={activate}
       onKeyDown={handleKeyDown}
       onMouseDown={(event) => {
@@ -363,6 +392,8 @@ export function FacilityTransition({
         setFocusVisible(false);
         onBlur?.(event);
       }}
+      onPointerEnter={handleLabelPointerEnter}
+      onPointerLeave={handleLabelPointerLeave}
       style={{
         cursor: interactive && !disabled ? 'pointer' : disabled ? 'not-allowed' : 'default',
         opacity: navStateOpacity(disabled, stale),
@@ -442,7 +473,7 @@ export function FacilityTransition({
           </g>
         )}
 
-        {showLabel && (
+        {labelVisible && (
           <NavigationAnnotationBlock
             id={`facility:${transition.id}:label`}
             kind="facility-label"
@@ -471,7 +502,7 @@ export function FacilityTransition({
               <tspan x="20" dy="0">
                 {annotationDetailMode === 'standard' ? '' : `${endpointLabel} · `}{visualLabel}
               </tspan>
-              {rows.map((row, index) => (
+              {detailsVisible && rows.map((row, index) => (
                 <tspan key={`${transition.id}-row-${index}`} x="20" dy="13" style={{ fontSize: 'var(--caption2-size)', fontWeight: 'var(--fw-semibold)' }}>
                   {row}
                 </tspan>

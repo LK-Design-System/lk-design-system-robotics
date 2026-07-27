@@ -12,6 +12,7 @@ import {
   NavigationAnnotationBlock,
   annotationPriority,
   useNavigationAnnotationDetailMode,
+  useNavigationLabelDisclosure,
   useNavigationObstacles,
 } from './_navigationAnnotations.js';
 import {
@@ -22,6 +23,7 @@ import {
   NAV_FOCUS,
   NAV_SELECTION,
   NAV_WAYPOINT_STATUS_BADGE,
+  NAV_WAYPOINT_AVAILABILITY_FILL,
 } from './_navigationVocabulary.js';
 
 // Accessible-name copy is Korean to match every sibling navigation overlay
@@ -121,12 +123,16 @@ export function WaypointMarker({
   disabled = false,
   invalid = false,
   stale = false,
-  showLabel = true,
+  showLabel,
+  labelVisibility,
+  detailVisibility,
   onActivate,
   role,
   tabIndex,
   onFocus,
   onBlur,
+  onPointerEnter,
+  onPointerLeave,
   onMouseDown,
   style,
   'aria-label': ariaLabel,
@@ -145,6 +151,25 @@ export function WaypointMarker({
   const availability = waypoint.availability || 'unknown';
   const primaryRole = primaryVisualRole(waypoint);
   const details = annotationSummary(waypoint);
+  const {
+    hovered,
+    labelVisibility: resolvedLabelVisibility,
+    detailVisibility: resolvedDetailVisibility,
+    labelVisible,
+    detailsVisible,
+    onPointerEnter: handleLabelPointerEnter,
+    onPointerLeave: handleLabelPointerLeave,
+  } = useNavigationLabelDisclosure({
+    showLabel,
+    labelVisibility,
+    detailVisibility,
+    selected,
+    focused: focusVisible,
+    priority: invalid || stale || availability === 'unavailable',
+    hasDetails: Boolean(details),
+    onPointerEnter,
+    onPointerLeave,
+  });
   const visualLabel = annotationDetailMode === 'standard'
     ? compactLabel(waypoint.label)
     : waypoint.label;
@@ -159,10 +184,6 @@ export function WaypointMarker({
   const muted = 'var(--viewer-muted, var(--color-semantic-label-neutral))';
   const surface = 'var(--viewer-surface-elevated, var(--color-semantic-background-elevated-normal))';
   const danger = 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))';
-  const warning = 'var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))';
-  const positive = 'var(--color-semantic-status-positive-foreground)';
-  const warningState = `color-mix(in srgb, ${warning} 70%, ${foreground})`;
-  const positiveState = `color-mix(in srgb, ${positive} 72%, ${foreground})`;
   // Availability remains on the body. Exceptional data quality uses one
   // top-right solid micro badge, matching the RobotPoseMarker attachment grammar.
   // Invalid wins over stale visually; the accessible name still announces
@@ -172,11 +193,8 @@ export function WaypointMarker({
     : stale
       ? 'stale'
       : null;
-  const stateFill = availability === 'unavailable'
-    ? muted
-    : availability === 'unknown'
-      ? warningState
-      : positiveState;
+  const stateFill = NAV_WAYPOINT_AVAILABILITY_FILL[availability]
+    ?? NAV_WAYPOINT_AVAILABILITY_FILL.unknown;
   const statusBadgeTone = statusBadgeKind === 'invalid' ? danger : muted;
   const activate = (event) => {
     if (disabled || !interactive) return;
@@ -210,6 +228,11 @@ export function WaypointMarker({
       data-disabled={disabled ? 'true' : 'false'}
       data-invalid={invalid ? 'true' : 'false'}
       data-stale={stale ? 'true' : 'false'}
+      data-hovered={hovered ? 'true' : 'false'}
+      data-label-visibility={resolvedLabelVisibility}
+      data-label-visible={labelVisible ? 'true' : 'false'}
+      data-detail-visibility={resolvedDetailVisibility}
+      data-detail-visible={detailsVisible ? 'true' : 'false'}
       data-role-codes={(waypoint.roles || []).map((role) => ROLE_CODES[role]).filter(Boolean).join('')}
       data-annotation-count={(waypoint.annotations || []).length}
       transform={`translate(${waypoint.position.x} ${waypoint.position.y})`}
@@ -235,6 +258,8 @@ export function WaypointMarker({
         setHasDomFocus(false);
         onBlur?.(event);
       }}
+      onPointerEnter={handleLabelPointerEnter}
+      onPointerLeave={handleLabelPointerLeave}
       style={{
         cursor: disabled ? 'not-allowed' : interactive ? 'pointer' : 'default',
         opacity: navStateOpacity(disabled, stale && !invalid),
@@ -372,7 +397,7 @@ export function WaypointMarker({
           </g>
         )}
 
-        {showLabel && (
+        {labelVisible && (
           <NavigationAnnotationBlock
             id={`waypoint:${waypoint.id}:label`}
             kind="waypoint-label"
@@ -389,7 +414,7 @@ export function WaypointMarker({
               <text
                 data-waypoint-primary-label=""
                 x={NAV_NODE.labelOffsetX}
-                y={details ? '-1.5' : '3.5'}
+                y={detailsVisible ? '-1.5' : '3.5'}
                 fill={foreground}
                 stroke={surface}
                 strokeWidth={NAV_LABEL_HALO.primary}
@@ -402,7 +427,7 @@ export function WaypointMarker({
               >
                 {visualLabel}
               </text>
-              {details && (
+              {detailsVisible && (
                 <text
                   data-waypoint-details=""
                   x={NAV_NODE.labelOffsetX}

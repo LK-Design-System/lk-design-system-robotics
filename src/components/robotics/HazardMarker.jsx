@@ -10,6 +10,7 @@ import {
   ANNOTATION_IMPORTANCE,
   NavigationAnnotationBlock,
   annotationPriority,
+  useNavigationLabelDisclosure,
   useNavigationObstacles,
 } from './_navigationAnnotations.js';
 import { navStateOpacity, NAV_PIN, NAV_HIT, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION } from './_navigationVocabulary.js';
@@ -88,12 +89,16 @@ export function HazardMarker({
   disabled = false,
   invalid = false,
   stale = false,
-  showLabel = true,
+  showLabel,
+  labelVisibility,
+  detailVisibility,
   onActivate,
   role,
   tabIndex,
   onFocus,
   onBlur,
+  onPointerEnter,
+  onPointerLeave,
   onMouseDown,
   style,
   'aria-label': ariaLabel,
@@ -112,6 +117,25 @@ export function HazardMarker({
   const glyph = HAZARD_GLYPHS[hazard.kind] ?? HAZARD_GLYPHS.stairs;
   const surface = 'var(--viewer-surface-elevated, var(--color-semantic-static-white))';
   const label = ariaLabel ?? accessibleName(hazard, severity, { selected, focused: focusVisible, disabled });
+  const {
+    hovered,
+    labelVisibility: resolvedLabelVisibility,
+    detailVisibility: resolvedDetailVisibility,
+    labelVisible,
+    detailsVisible,
+    onPointerEnter: handleLabelPointerEnter,
+    onPointerLeave: handleLabelPointerLeave,
+  } = useNavigationLabelDisclosure({
+    showLabel,
+    labelVisibility,
+    detailVisibility,
+    selected,
+    focused: focusVisible,
+    priority: invalid || stale || hazard.severity === 'danger',
+    hasDetails: true,
+    onPointerEnter,
+    onPointerLeave,
+  });
 
   const activate = (event) => {
     if (disabled || !interactive) return;
@@ -155,6 +179,11 @@ export function HazardMarker({
       aria-invalid={!pointerOnly && invalid ? true : undefined}
       data-invalid={invalid ? 'true' : 'false'}
       data-stale={stale ? 'true' : 'false'}
+      data-hovered={hovered ? 'true' : 'false'}
+      data-label-visibility={resolvedLabelVisibility}
+      data-label-visible={labelVisible ? 'true' : 'false'}
+      data-detail-visibility={resolvedDetailVisibility}
+      data-detail-visible={detailsVisible ? 'true' : 'false'}
       onClick={activate}
       onKeyDown={handleKeyDown}
       onMouseDown={(event) => {
@@ -169,6 +198,8 @@ export function HazardMarker({
         setHasDomFocus(false);
         onBlur?.(event);
       }}
+      onPointerEnter={handleLabelPointerEnter}
+      onPointerLeave={handleLabelPointerLeave}
       style={{
         cursor: disabled ? 'not-allowed' : interactive ? 'pointer' : 'default',
         opacity: navStateOpacity(disabled, stale),
@@ -207,7 +238,7 @@ export function HazardMarker({
           </g>
         </g>
 
-        {showLabel && (
+        {labelVisible && (
           <NavigationAnnotationBlock
             id={`hazard:${hazard.id}:label`}
             kind="hazard-label"
@@ -233,7 +264,7 @@ export function HazardMarker({
               data-hazard-label=""
               style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--caption1-size)', fontWeight: 'var(--fw-bold)' }}
             >
-              {hazard.label} · {severity.label}
+              {hazard.label}{detailsVisible ? ` · ${severity.label}` : ''}
             </text>
           </NavigationAnnotationBlock>
         )}

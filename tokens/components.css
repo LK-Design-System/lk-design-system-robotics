@@ -44,6 +44,22 @@
   transform-origin: center;
 }
 
+@keyframes lds-navigation-freshness-pulse {
+  0% {
+    opacity: 0.42;
+  }
+
+  70%,
+  100% {
+    opacity: 0;
+  }
+}
+
+[data-route-freshness-pulse],
+[data-trajectory-freshness-pulse] {
+  animation: lds-navigation-freshness-pulse 1.7s var(--ease-out) infinite;
+}
+
 [data-navigation-selection-scale] {
   transform: scale(1);
   transform-box: view-box;
@@ -57,6 +73,11 @@
 
 @media (prefers-reduced-motion: reduce) {
   [data-robot-pose-motion-indicator] {
+    display: none;
+  }
+
+  [data-route-freshness-pulse],
+  [data-trajectory-freshness-pulse] {
     display: none;
   }
 

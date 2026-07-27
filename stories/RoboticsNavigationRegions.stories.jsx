@@ -28,31 +28,6 @@ const meta = {
 
 export default meta;
 
-function assertCenteredStateGlyph(mark, expectedKind) {
-  const glyph = mark?.querySelector('[data-navigation-state-glyph]');
-  const badge = mark?.querySelector(':scope > circle');
-  if (!glyph || !badge) throw new Error(`State badge is missing SVG geometry for ${expectedKind}.`);
-  if (mark.querySelector('text')) throw new Error(`${expectedKind} state badge must not use a font glyph.`);
-  if (glyph.dataset.navigationStateGlyph !== expectedKind || !glyph.dataset.navigationStateGlyphSource?.startsWith('lds-icon:')) {
-    throw new Error(`${expectedKind} state badge must expose its LDS SVG source.`);
-  }
-
-  const matrix = glyph.getScreenCTM();
-  const badgeBounds = badge.getBoundingClientRect();
-  const glyphBounds = glyph.getBoundingClientRect();
-  if (!matrix || !badgeBounds.width || !glyphBounds.width || !glyphBounds.height) {
-    throw new Error(`${expectedKind} state badge bounds are unavailable.`);
-  }
-  const badgeCenter = { x: badgeBounds.left + badgeBounds.width / 2, y: badgeBounds.top + badgeBounds.height / 2 };
-  if (Math.abs(matrix.e - badgeCenter.x) > 0.75 || Math.abs(matrix.f - badgeCenter.y) > 0.75) {
-    throw new Error(`${expectedKind} SVG origin must remain centered in its badge.`);
-  }
-  if (glyphBounds.left < badgeBounds.left + 0.5 || glyphBounds.right > badgeBounds.right - 0.5
-    || glyphBounds.top < badgeBounds.top + 0.5 || glyphBounds.bottom > badgeBounds.bottom - 0.5) {
-    throw new Error(`${expectedKind} SVG geometry must retain visible inset inside its badge.`);
-  }
-}
-
 const keepOutRegion = {
   id: 'keep-out-west',
   mapId: 'warehouse-1f',
@@ -133,13 +108,6 @@ function pointInsidePolygon(point, points) {
   return inside;
 }
 
-function boundsOverlap(first, second) {
-  return first.left < second.right
-    && first.right > second.left
-    && first.top < second.bottom
-    && first.bottom > second.top;
-}
-
 function OverviewFixture() {
   const [selectedId, setSelectedId] = React.useState(liftCabinRegion.id);
   return (
@@ -204,7 +172,7 @@ export const DarkPatternsAndStates = {
   name: '변형·상태 · 다크와 패턴',
   parameters: {
     ...storyDescription(
-      '다크 지도에서 0.8m/s 속도 제한, 상태 미확인 지형, 선택·지연·오류 설비 영역을 비교합니다. category 자체가 성공/경고색이 되지 않고 실제 rule과 traversability가 상태 tone을 결정하는지 확인하세요.',
+      '다크 지도에서 0.8m/s 속도 제한, 상태 미확인 지형, 선택·지연·오류 설비 영역을 비교합니다. category는 pattern으로, 상태는 면·외곽선 색으로 구분하며 영역 위에는 badge나 지속 pulse를 올리지 않습니다.',
     ),
     backgrounds: { default: 'Navy' },
   },
@@ -218,7 +186,7 @@ export const DarkPatternsAndStates = {
           region={{
             ...liftCabinRegion,
             id: 'invalid-door-area',
-            label: '좌표 검증 필요',
+            label: '출입문 A',
             kind: 'door-area',
             shape: { kind: 'circle', center: { x: 420, y: 214 }, radius: 30 },
           }}
@@ -227,6 +195,27 @@ export const DarkPatternsAndStates = {
       </RegionMap>
     </main>
   ),
+  play: async ({ canvasElement }) => {
+    const staleRegion = canvasElement.querySelector('[data-region-id="lift-cabin-a"]');
+    const invalidRegion = canvasElement.querySelector('[data-region-id="invalid-door-area"]');
+    const staleGeometry = staleRegion?.querySelector('[data-region-geometry]');
+    const invalidGeometry = invalidRegion?.querySelector('[data-region-geometry]');
+    if (!staleRegion || !invalidRegion || !staleGeometry || !invalidGeometry) {
+      throw new Error('Dark region state fixtures are incomplete.');
+    }
+    if (staleGeometry.getAttribute('stroke') !== 'var(--viewer-muted, var(--color-semantic-label-alternative))') {
+      throw new Error('Stale area must use the muted boundary/fill tone.');
+    }
+    if (invalidGeometry.getAttribute('stroke') !== 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))') {
+      throw new Error('Invalid area must use the danger boundary/fill tone.');
+    }
+    if (canvasElement.querySelector('[data-region-invalid-mark], [data-region-stale-mark]')) {
+      throw new Error('Area state must not render a floating badge.');
+    }
+    if (staleGeometry.hasAttribute('stroke-dasharray') || invalidGeometry.hasAttribute('stroke-dasharray')) {
+      throw new Error('Area state must remain color-only on top of its category pattern.');
+    }
+  },
 };
 
 const concaveKeepOutRegion = {
@@ -251,7 +240,7 @@ const concaveKeepOutRegion = {
 export const ConcaveGeometryAndCompoundStates = {
   name: '변형·상태 · 오목 영역의 내부 앵커',
   parameters: storyDescription(
-    '단순 꼭짓점 평균이 영역 밖의 빈 공간에 놓이는 C형 polygon입니다. point-on-surface 앵커는 실제 면 내부에 남고, 수동 선택·포커스·오류·지연 상태와 라벨이 서로 겹치지 않으면서 접근 가능한 이름과 일치해야 합니다.',
+    '단순 꼭짓점 평균이 영역 밖의 빈 공간에 놓이는 C형 polygon입니다. point-on-surface 라벨은 실제 면 내부에 남고, 선택은 경계 굵기·포커스는 파란 외곽선·오류와 지연은 면과 외곽선 상태색으로 분리됩니다.',
   ),
   render: () => (
     <main style={{ width: 'min(100%, 520px)' }}>
@@ -262,9 +251,10 @@ export const ConcaveGeometryAndCompoundStates = {
   ),
   play: async ({ canvasElement }) => {
     const region = canvasElement.querySelector('[data-region-id="concave-keep-out"]');
-    const stateAnchor = region?.querySelector('[data-region-state-anchor]');
     const label = region?.querySelector('[data-region-label]');
-    if (!region || !stateAnchor || !label) throw new Error('Concave region state fixture is incomplete.');
+    const geometry = region?.querySelector('[data-region-geometry]');
+    const tint = region?.querySelector('[data-region-tint]');
+    if (!region || !label || !geometry || !tint) throw new Error('Concave region state fixture is incomplete.');
     if (region.getAttribute('role') !== 'img' || region.hasAttribute('aria-pressed')) {
       throw new Error('Passive selected region must remain an image without aria-pressed.');
     }
@@ -277,13 +267,19 @@ export const ConcaveGeometryAndCompoundStates = {
     for (const selector of [
       '[data-region-selection-geometry]',
       '[data-region-focus-ring]',
-      '[data-region-invalid-mark]',
-      '[data-region-stale-mark]',
     ]) {
-      if (!region.querySelector(selector)) throw new Error(`Concave compound-state glyph is missing: ${selector}.`);
+      if (!region.querySelector(selector)) throw new Error(`Concave compound-state geometry is missing: ${selector}.`);
     }
-    assertCenteredStateGlyph(region.querySelector('[data-region-invalid-mark]'), 'invalid');
-    assertCenteredStateGlyph(region.querySelector('[data-region-stale-mark]'), 'stale');
+    if (region.querySelector('[data-region-invalid-mark], [data-region-stale-mark], [data-navigation-state-glyph]')) {
+      throw new Error('Area state must stay in its stroke/fill channels without a floating badge.');
+    }
+    if (geometry.getAttribute('stroke') !== 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))'
+      || tint.getAttribute('fill') !== 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))') {
+      throw new Error('Invalid region must apply the danger tone to both boundary and faint area tint.');
+    }
+    if (geometry.hasAttribute('stroke-dasharray')) {
+      throw new Error('Region state must not add a dash channel; category pattern and state color are sufficient.');
+    }
     assertSharedFocusIndicator(region.querySelector('[data-region-focus-ring]'), 'Region');
     const focusWidth = Number(region.querySelector('[data-region-focus-ring]')?.getAttribute('stroke-width'));
     const selectionWidth = Number(region.querySelector('[data-region-selection-geometry]')?.getAttribute('stroke-width'));
@@ -299,22 +295,11 @@ export const ConcaveGeometryAndCompoundStates = {
     if (pointInsidePolygon(naiveAverage, points)) throw new Error('Stress polygon must keep its naive vertex average outside the visible surface.');
 
     const anchor = {
-      x: Number(stateAnchor.dataset.regionAnchorX),
-      y: Number(stateAnchor.dataset.regionAnchorY),
+      x: Number(label.dataset.regionAnchorX),
+      y: Number(label.dataset.regionAnchorY),
     };
     if (!Number.isFinite(anchor.x) || !Number.isFinite(anchor.y) || !pointInsidePolygon(anchor, points)) {
       throw new Error(`Point-on-surface anchor must remain inside the concave polygon: ${JSON.stringify(anchor)}.`);
-    }
-    if (label.dataset.regionAnchorX !== stateAnchor.dataset.regionAnchorX || label.dataset.regionAnchorY !== stateAnchor.dataset.regionAnchorY) {
-      throw new Error('Visible label and compound state glyphs must share the same point-on-surface anchor.');
-    }
-
-    const invalidBounds = region.querySelector('[data-region-invalid-mark] circle')?.getBoundingClientRect();
-    const staleBounds = region.querySelector('[data-region-stale-mark] circle')?.getBoundingClientRect();
-    const labelBounds = label.querySelector('text')?.getBoundingClientRect();
-    if (!invalidBounds || !staleBounds || !labelBounds) throw new Error('Region screen-space bounds are unavailable.');
-    if (boundsOverlap(invalidBounds, labelBounds) || boundsOverlap(staleBounds, labelBounds) || boundsOverlap(invalidBounds, staleBounds)) {
-      throw new Error('Region label, invalid indicator, and stale glyph need distinct screen-space bounds.');
     }
 
     const opacity = Number(canvasElement.ownerDocument.defaultView.getComputedStyle(region).opacity);
@@ -338,7 +323,7 @@ const disabledRegion = {
   id: 'disabled-region',
   label: '권한 없는 충전 구역',
   kind: 'charger-area',
-  shape: { kind: 'circle', center: { x: 370, y: 210 }, radius: 42 },
+  shape: { kind: 'circle', center: { x: 370, y: 110 }, radius: 42 },
 };
 
 const pointerOnlyRegion = {
@@ -346,7 +331,7 @@ const pointerOnlyRegion = {
   id: 'pointer-only-region',
   label: '목록 소유 영역',
   kind: 'dock-area',
-  shape: { kind: 'circle', center: { x: 250, y: 210 }, radius: 32 },
+  shape: { kind: 'circle', center: { x: 250, y: 110 }, radius: 32 },
 };
 
 function InteractionFixture() {
@@ -433,6 +418,20 @@ export const InteractionAndMapFiltering = {
     if (pointerOnly.hasAttribute('role') || pointerOnly.hasAttribute('tabindex') || pointerOnly.hasAttribute('aria-label')
       || pointerOnly.getAttribute('focusable') !== 'false' || pointerOnly.getAttribute('aria-hidden') !== 'true') {
       throw new Error('Pointer-only region must be hidden from AT and non-focusable without duplicate control semantics.');
+    }
+    if (pointerOnly.querySelector('[data-region-label]')) {
+      throw new Error('A list-owned pointer-only region must not duplicate its label on the map.');
+    }
+    const pointerBounds = pointerOnly.querySelector('[data-region-geometry]')?.getBoundingClientRect();
+    const visibleLabelBounds = Array.from(canvasElement.querySelectorAll('[data-region-label] text'))
+      .map((label) => label.getBoundingClientRect());
+    if (!pointerBounds || visibleLabelBounds.some((label) => (
+      pointerBounds.left < label.right
+      && pointerBounds.right > label.left
+      && pointerBounds.top < label.bottom
+      && pointerBounds.bottom > label.top
+    ))) {
+      throw new Error('A pointer-only region must not visually capture another region label.');
     }
     await userEvent.click(pointerOnly.querySelector('[data-region-geometry]'));
     await waitForRender();

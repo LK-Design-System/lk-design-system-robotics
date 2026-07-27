@@ -1,47 +1,48 @@
 import React from 'react';
-import { userEvent, waitFor } from 'storybook/test';
+import { userEvent } from 'storybook/test';
 import { SegmentedControl } from '@lk-robotics/lds-core';
 import {
-  RouteOverlay,
-  TrajectoryOverlay,
   NavigationAnnotationLayer,
   NavigationCoordinateBoundary,
+  RobotPoseMarker,
+  RouteOverlay,
+  TrajectoryOverlay,
 } from '../src/index.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
-import { assertNoLabelCollisions, assertPairwiseNonOverlap } from './RoboticsNavigationCollision.shared.jsx';
+import { assertNoLabelCollisions } from './RoboticsNavigationCollision.shared.jsx';
 import {
+  ACTIVE_ROBOT_POSE,
   ACTIVE_ROUTE,
   ACTIVE_TRAJECTORY,
   L2_TRAJECTORY,
   PROJECTED_FRAME_L1,
   PROJECTED_FRAME_L2,
-  StoryPage,
   PathMap,
-  nextRender,
-  assertNavigationProgressHead,
-  assertTrajectoryTemporalEncoding,
+  StoryPage,
   assertNavigationStateGlyphGeometry,
+  assertPathSystemVisualContract,
+  assertTrajectoryTemporalEncoding,
+  nextRender,
 } from './RoboticsNavigationRouteTrajectory.shared.jsx';
-import { assertSharedFocusIndicator } from './RoboticsNavigationAssert.shared.jsx';
 
 const meta = {
-  title: 'LDS Robotics/Navigation/Route',
+  title: 'LDS Robotics/Navigation/Path System/Route',
   tags: ['autodocs'],
   component: RouteOverlay,
   parameters: {
     storyGuide: {
-      storyId: 'lds-robotics-navigation-route--route-and-trajectory-overview',
-      eyebrow: 'Robotics / Navigation / Route',
-      title: '계획된 그래프 경로와 로봇의 조밀한 궤적은 서로 다른 계층입니다',
+      storyId: 'lds-robotics-navigation-path-system-route--route-and-trajectory-overview',
+      eyebrow: 'Robotics / Navigation / Path System / Route',
+      title: 'Route는 선택된 Lane을 같은 점선과 계획색으로 표시합니다',
       description:
-        'Route는 graph segment의 phase·condition을, Trajectory는 시간 순서의 조밀한 sample을 표시합니다. 정적 연결에는 Lane을 사용하며 두 선의 상태와 진행 의미를 합치지 마세요.',
+        '완료·현재·예정 phase, condition, executor progress는 데이터와 상세 패널에 남깁니다. 지도에서는 Route identity가 끊기거나 상태별 선 스타일로 분절되지 않습니다.',
       docsDescription:
-        'Route는 graph segment의 phase와 condition을, Trajectory는 한 지도에서 시간 순서로 이어진 조밀한 sample을 보여줍니다. 두 선이 비슷해 보여도 상태와 진행 의미를 합치지 마세요. 정적 그래프 연결에는 Lane이, 자유 공간의 조밀한 궤적에는 Trajectory가 적합합니다.',
+        'Route는 Lane sequence로 구성된 선택 계획입니다. 운영 지도에서는 Lane과 같은 1.5px·4 6 점선을 계획색으로 표시하고, 실제 현재 위치와 heading은 RobotPoseMarker만 소유합니다.',
     },
     docs: {
       description: {
         component:
-          '층별 planned graph segment와 single-map dense trajectory를 구분해 표현하는 LK Robotics Navigation Extension입니다.',
+          'activeMapId로 graph segment를 필터하고 선택된 Lane geometry를 계획색 점선으로 표시하는 RouteOverlay입니다.',
       },
     },
   },
@@ -52,8 +53,11 @@ export default meta;
 function ActivePathLayers({ viewportScale }) {
   return (
     <NavigationCoordinateBoundary frame={PROJECTED_FRAME_L1}>
-      <RouteOverlay route={ACTIVE_ROUTE} activeMapId="L1" viewportScale={viewportScale} />
-      <TrajectoryOverlay trajectory={ACTIVE_TRAJECTORY} viewportScale={viewportScale} />
+      <NavigationAnnotationLayer detailMode="overview">
+        <RouteOverlay route={ACTIVE_ROUTE} activeMapId="L1" viewportScale={viewportScale} />
+        <TrajectoryOverlay trajectory={ACTIVE_TRAJECTORY} viewportScale={viewportScale} />
+        <RobotPoseMarker pose={ACTIVE_ROBOT_POSE} viewportScale={viewportScale} />
+      </NavigationAnnotationLayer>
     </NavigationCoordinateBoundary>
   );
 }
@@ -61,605 +65,252 @@ function ActivePathLayers({ viewportScale }) {
 export const RouteAndTrajectoryOverview = {
   name: '개요',
   parameters: storyDescription(
-    '같은 이동을 표현하는 planned route와 dense trajectory를 light/dark 지도에서 비교합니다. Route는 굵은 graph 계획선과 방향 head, Trajectory는 얇은 시간선·sample 점·원형 cursor로 구분됩니다.',
+    '대표 지도 하나에서 Route·Trajectory·RobotPose의 계층을 설명합니다. 테마 반복은 회귀 검증으로 분리합니다.',
   ),
   render: () => (
     <StoryPage
-      title="Route는 선택된 graph 구간을, Trajectory는 시간 순 sample을 보여줍니다"
-      description="Route는 굵은 계획선과 방향 head로 graph 진행을 표시하고, Trajectory는 별도의 sample 점과 원형 시간 cursor로 구분합니다."
+      title="Route는 상태와 진행률 때문에 중간에서 끊기지 않습니다"
+      description="Route segment는 데이터 단위로 유지하지만 모든 casing을 먼저 그리고 모든 core를 그 위에 올려 하나의 연속된 계획선으로 읽히게 합니다."
+      maxWidth={720}
     >
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(360px, 100%), 1fr))', gap: 'var(--space-4)', minWidth: 0 }}>
-        <PathMap label="Light route와 trajectory 지도" annotationDetailMode="overview">
-          {(cssViewBoxScale) => <ActivePathLayers viewportScale={cssViewBoxScale} />}
-        </PathMap>
-        <PathMap appearance="dark" label="Dark route와 trajectory 지도" annotationDetailMode="overview">
-          {(cssViewBoxScale) => <ActivePathLayers viewportScale={cssViewBoxScale} />}
-        </PathMap>
-      </section>
+      <PathMap label="Route 대표 지도" eyebrow="ROUTE · L1">
+        {(viewportScale) => <ActivePathLayers viewportScale={viewportScale} />}
+      </PathMap>
     </StoryPage>
   ),
   play: async ({ canvasElement }) => {
     const routes = canvasElement.querySelectorAll('[data-lk-route-overlay]');
     const trajectories = canvasElement.querySelectorAll('[data-lk-trajectory-overlay]');
-    const annotationLayers = canvasElement.querySelectorAll('[data-lk-navigation-annotation-layer]');
-    const coordinateBoundaries = canvasElement.querySelectorAll('[data-navigation-coordinate-boundary]');
-    if (routes.length !== 2 || trajectories.length !== 2) {
-      throw new Error(`Light/dark layer parity failed: ${routes.length} routes, ${trajectories.length} trajectories.`);
+    const robotPoses = canvasElement.querySelectorAll('[data-robot-pose-marker]');
+    if (routes.length !== 1 || trajectories.length !== 1 || robotPoses.length !== 1) {
+      throw new Error('Route overview must render Route, Trajectory, and RobotPose once.');
     }
-    if (annotationLayers.length !== 2 || coordinateBoundaries.length !== 2) {
-      throw new Error('Each overview map must coordinate route, trajectory, and map chrome in one annotation layer.');
-    }
-    annotationLayers.forEach((layer) => {
-      if (layer.getAttribute('data-annotation-detail-mode') !== 'overview') {
-        throw new Error('Route overview maps must use the explicit overview density tier.');
-      }
-      const completed = layer.querySelector('[data-annotation-id*="segment-l1-completed"]');
-      const current = layer.querySelector('[data-annotation-id*="segment-l1-current"]');
-      const progress = layer.querySelector('[data-route-progress-label]');
-      const trajectoryLabel = layer.querySelector('[data-trajectory-label]');
-      const trajectoryAnnotation = trajectoryLabel?.closest('[data-navigation-annotation]');
-      if (completed?.getAttribute('data-annotation-suppressed-reason') !== 'density') {
-        throw new Error('Completed route labels must yield to current context in overview density.');
-      }
-      if (!progress || progress.closest('[data-navigation-annotation]')?.getAttribute('data-annotation-suppressed') === 'true') {
-        throw new Error('Overview density must preserve the highest-priority current progress label.');
-      }
-      for (const contextLabel of [current, trajectoryAnnotation]) {
-        if (
-          contextLabel?.getAttribute('data-annotation-suppressed') === 'true'
-          && contextLabel.getAttribute('data-annotation-suppressed-reason') !== 'collision'
-        ) {
-          throw new Error('Current route/trajectory context may yield only to a measured collision.');
-        }
-      }
-      assertNoLabelCollisions(layer, 'Route overview', 8);
-      [...layer.querySelectorAll('[data-annotation-displaced="true"]')].forEach((label) => {
-        const nudge = Math.hypot(
-          Number(label.getAttribute('data-annotation-nudge-x') || 0),
-          Number(label.getAttribute('data-annotation-nudge-y') || 0),
-        );
-        if (nudge > 24.5) throw new Error(`Leaderless label nudge exceeds 24px: ${nudge}.`);
-      });
-    });
     routes.forEach((route) => {
-      if (route.getAttribute('data-coordinate-space') !== 'svg-map') {
-        throw new Error('Overview route must be projected from world coordinates into SVG map space.');
+      if (route.querySelectorAll('[data-route-path]').length !== 2) {
+        throw new Error('L1 Route must render its two projected graph segments.');
       }
-      const paths = route.querySelectorAll('[data-route-path]');
-      if (paths.length !== 2) throw new Error('L1 route must render only its two L1 segments.');
-      if (!route.querySelector('[data-route-progress-marker][data-current-segment-id="segment-l1-current"]')) {
-        throw new Error('Explicit current-segment progress marker is missing.');
-      }
-      assertNavigationProgressHead(route, 'Overview Route', 'route');
-      assertNavigationStateGlyphGeometry(route, 'Overview Route');
+      assertNavigationStateGlyphGeometry(route, 'Route overview');
     });
-    trajectories.forEach((trajectory) => {
-      if (trajectory.getAttribute('data-coordinate-space') !== 'svg-map') {
-        throw new Error('Overview trajectory must be projected from world coordinates into SVG map space.');
-      }
-      const path = trajectory.querySelector('[data-trajectory-path]');
-      if (!path?.getAttribute('d')?.includes('L 468 164')) throw new Error('Dense trajectory geometry is incomplete.');
-      assertTrajectoryTemporalEncoding(trajectory, 'Overview Trajectory');
-      assertNavigationStateGlyphGeometry(trajectory, 'Overview Trajectory');
-    });
+    trajectories.forEach((trajectory) => assertTrajectoryTemporalEncoding(trajectory, 'Route overview Trajectory'));
+    const currentSegment = canvasElement.querySelector(
+      '[data-route-segment][data-phase="current"]',
+    );
+    const trajectory = trajectories[0];
+    const robotPose = robotPoses[0];
+    if (
+      currentSegment?.querySelector('[data-route-segment-label]')
+      || trajectory?.querySelector('[data-trajectory-label]')
+      || robotPose?.querySelector('[data-robot-pose-label]')
+    ) {
+      throw new Error('Ordinary map identity must stay hidden until direct interaction.');
+    }
+    await userEvent.hover(currentSegment?.querySelector('[data-route-hit-target-core]'));
+    await nextRender();
+    if (!currentSegment?.querySelector('[data-route-segment-label]')) {
+      throw new Error('Route hover must reveal only the directly inspected segment name.');
+    }
+    await userEvent.unhover(currentSegment?.querySelector('[data-route-hit-target-core]'));
+    await userEvent.hover(trajectory?.querySelector('[data-trajectory-hit-target-core]'));
+    await nextRender();
+    if (!trajectory?.querySelector('[data-trajectory-label]')) {
+      throw new Error('Trajectory hover must reveal its name.');
+    }
+    await userEvent.unhover(trajectory?.querySelector('[data-trajectory-hit-target-core]'));
+    await userEvent.hover(robotPose);
+    await nextRender();
+    if (!robotPose?.querySelector('[data-robot-pose-label]')) {
+      throw new Error('RobotPose hover must reveal its name.');
+    }
+    await userEvent.unhover(robotPose);
+    await nextRender();
+    if (
+      currentSegment?.querySelector('[data-route-segment-label]')
+      || trajectory?.querySelector('[data-trajectory-label]')
+      || robotPose?.querySelector('[data-robot-pose-label]')
+    ) {
+      throw new Error('Transient map identity must close after pointer exit.');
+    }
+    canvasElement.querySelectorAll('[data-lk-navigation-annotation-layer]').forEach((layer) => (
+      assertNoLabelCollisions(layer, 'Route overview', 8)
+    ));
+    assertPathSystemVisualContract(canvasElement, 'Route overview');
   },
 };
 
-const ROUTE_STATE_ROWS = [
-  ['planned', 'upcoming', 'normal', 48],
-  ['active', 'current', 'normal', 108],
-  ['waiting', 'current', 'waiting', 168],
-  ['blocked', 'current', 'blocked', 228],
-  ['rerouting', 'current', 'conflict', 288],
-  ['completed', 'completed', 'normal', 348],
-];
-
-const PHASE_LABEL_KO = { upcoming: '예정', current: '현재', completed: '완료' };
-const CONDITION_LABEL_KO = { normal: '정상', waiting: '대기', blocked: '차단', conflict: '충돌', stale: '지연' };
-const segmentStateLabel = (phase, condition) =>
-  `${PHASE_LABEL_KO[phase] ?? phase} · ${CONDITION_LABEL_KO[condition] ?? condition}`;
-
-function routeForState(status, phase, condition, y) {
-  return {
-    id: `route-${status}`,
-    label: status,
-    status,
-    segments: [{
-      id: `segment-${status}`,
-      mapId: 'L1',
-      label: segmentStateLabel(phase, condition),
-      points: [{ x: 48, y }, { x: 220, y }, { x: 310, y: y - 18 }, { x: 488, y: y - 18 }],
-      phase,
-      condition,
-    }],
-    progress: status === 'active' ? { segmentId: 'segment-active', fraction: 0.55 } : undefined,
-  };
-}
+const ROUTE_DETAIL_EXAMPLE = {
+  id: 'route-detail-example',
+  label: '선택된 계획 경로',
+  status: 'active',
+  segments: [{
+    id: 'segment-detail-example',
+    mapId: 'L1',
+    label: '현재 · 정상',
+    points: [{ x: 48, y: 132 }, { x: 220, y: 132 }, { x: 310, y: 114 }, { x: 488, y: 114 }],
+    phase: 'current',
+    condition: 'normal',
+  }],
+  progress: { segmentId: 'segment-detail-example', fraction: 0.55 },
+};
 
 export const RouteAndTrajectoryStates = {
-  name: '변형·상태 · 구간 조건과 궤적 수명주기',
+  name: '변형·상태 · 상세값과 데이터 품질',
   parameters: storyDescription(
-    'route status, segment phase, segment condition을 독립 조합합니다. 상태는 선 위에서 톤과 NAV_PATH_DASH 대시 패턴으로 전달하며(뱃지가 아니라), invalid·stale 데이터 품질만 점 뱃지로 남습니다. rerouting trajectory도 별도 dense layer로 유지합니다.',
+    'phase·condition·progress는 지도 밖 상세 정보로 묶고, 선이 실제로 달라지는 invalid·stale 품질 변형만 함께 비교합니다.',
   ),
   render: () => (
     <StoryPage
-      title="Route status와 segment phase·condition은 서로 다른 질문에 답합니다"
-      description="전체 경로가 rerouting이어도 특정 segment는 conflict이고, 현재 segment가 waiting이어도 route identity와 명시적 진행 위치는 보존됩니다. 상태를 하나의 색 enum으로 압축하지 않습니다."
-      maxWidth={820}
+      title="Route 상태는 상세값과 데이터 품질로 나눕니다"
+      description="phase·condition·progress는 지도 선을 바꾸지 않습니다. 오류와 오래됨처럼 선 자체의 신뢰도를 바꾸는 데이터 품질만 전체 Route에 적용합니다."
+      maxWidth={1000}
     >
-      <PathMap label="route 상태와 조건 지도" height={500} svgHeight={480}>
-        {(cssViewBoxScale) => (
-          <>
-            {ROUTE_STATE_ROWS.map(([status, phase, condition, y]) => (
-              <RouteOverlay
-                key={status}
-                route={routeForState(status, phase, condition, y)}
-                activeMapId="L1"
-                viewportScale={cssViewBoxScale}
-              />
-            ))}
-            <RouteOverlay
-              route={{
-                ...routeForState('active', 'current', 'normal', 426),
-                id: 'route-invalid-stale',
-                label: '무효 · 지연',
-                segments: [{
-                  ...routeForState('active', 'current', 'normal', 426).segments[0],
-                  id: 'segment-invalid-stale',
-                  label: '무효 · 지연',
-                }],
-              }}
-              activeMapId="L1"
-              viewportScale={cssViewBoxScale}
-              invalid
-              stale
-            />
-          </>
+      <PathMap label="Route 대표 지도" eyebrow="ROUTE · DATA IN DETAIL" height={250} svgHeight={230}>
+        {(viewportScale) => (
+          <RouteOverlay
+            route={ROUTE_DETAIL_EXAMPLE}
+            activeMapId="L1"
+            viewportScale={viewportScale}
+          />
         )}
       </PathMap>
-      <PathMap appearance="dark" label="rerouting trajectory 지도" height={220} svgHeight={200}>
-        {(cssViewBoxScale) => (
-          <TrajectoryOverlay
-            trajectory={{
-              ...ACTIVE_TRAJECTORY,
-              id: 'trajectory-rerouting',
-              label: '경로 재계산 중 궤적',
-              status: 'rerouting',
-              samples: ACTIVE_TRAJECTORY.samples.map((sample) => ({ ...sample, position: { x: sample.position.x, y: sample.position.y - 52 } })),
-            }}
-            viewportScale={cssViewBoxScale}
+      <aside
+        aria-label="Route 상세 상태 값"
+        style={{
+          display: 'grid',
+          gap: 'var(--space-2)',
+          padding: 'var(--space-4)',
+          border: '1px solid var(--color-semantic-line-normal-normal)',
+          borderRadius: 'var(--radius-4)',
+          background: 'var(--color-semantic-background-elevated-normal)',
+          color: 'var(--color-semantic-label-neutral)',
+          fontSize: 'var(--body2-size)',
+          lineHeight: 'var(--body2-line)',
+        }}
+      >
+        <strong style={{ color: 'var(--color-semantic-label-strong)' }}>지도 밖 상세 값</strong>
+        <span>phase · 예정 / 현재 / 완료</span>
+        <span>condition · 정상 / 대기 / 차단 / 충돌</span>
+        <span>lifecycle · 계획 / 주행 / 대기 / 차단 / 재계산 / 완료</span>
+      </aside>
+      <section style={{ display: 'grid', gap: 'var(--space-3)' }}>
+        <h3 style={{ margin: 0, color: 'var(--color-semantic-label-strong)', fontSize: 'var(--body1-size)' }}>
+          선 모양이 달라지는 예외
+        </h3>
+        <RouteQualityComparison />
+      </section>
+    </StoryPage>
+  ),
+  play: async ({ canvasElement }) => {
+    const paths = [...canvasElement.querySelectorAll('[data-route-id="route-detail-example"] [data-route-path]')];
+    if (
+      paths.length !== 1
+      || paths.some((path) => (
+        path.getAttribute('stroke-width') !== '1.5'
+        || path.getAttribute('opacity') !== '1'
+        || path.getAttribute('stroke-dasharray') !== '4 6'
+      ))
+    ) {
+      throw new Error('The representative Route must use the shared 1.5px 4 6 plan-colored Lane grammar.');
+    }
+    const invalidRoute = canvasElement.querySelector('[data-route-id="route-short-invalid"]');
+    const staleRoute = canvasElement.querySelector('[data-route-id="route-short-stale"]');
+    if (
+      !invalidRoute?.querySelector('[data-route-path]')?.getAttribute('stroke')?.includes('--viewer-danger')
+      || invalidRoute.querySelector('[data-route-freshness-pulse]')
+      || !staleRoute?.querySelector('[data-route-path]')?.getAttribute('stroke')?.includes('--viewer-warning')
+      || !staleRoute.querySelector('[data-route-freshness-pulse]')
+      || canvasElement.querySelector('[data-route-overlay-state], [data-route-marker-badge]')
+    ) {
+      throw new Error('Route quality must use whole-line invalid/stale treatments without point badges.');
+    }
+    assertPathSystemVisualContract(canvasElement, 'Route detail-only state');
+  },
+};
+
+const SHORT_ROUTE = {
+  id: 'route-short-quality',
+  label: '짧은 Route',
+  status: 'active',
+  segments: [{
+    id: 'segment-short-quality',
+    mapId: 'L1',
+    label: '짧은 계획 구간',
+    points: [{ x: 198, y: 112 }, { x: 262, y: 112 }, { x: 326, y: 112 }],
+    phase: 'current',
+    condition: 'normal',
+  }],
+  progress: { segmentId: 'segment-short-quality', fraction: 0.5 },
+};
+
+function RouteQualityComparison() {
+  return (
+    <section
+      aria-label="Route 데이터 품질 비교"
+      style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))', gap: 'var(--space-4)', minWidth: 0 }}
+    >
+      <PathMap label="오류 Route 지도" eyebrow="ROUTE · INVALID" height={230}>
+        {(viewportScale) => (
+          <RouteOverlay
+            route={{ ...SHORT_ROUTE, id: 'route-short-invalid', label: '오류 Route' }}
+            activeMapId="L1"
+            viewportScale={viewportScale}
             invalid
+          />
+        )}
+      </PathMap>
+      <PathMap appearance="dark" label="오래된 Route 지도" eyebrow="ROUTE · STALE" height={230}>
+        {(viewportScale) => (
+          <RouteOverlay
+            route={{ ...SHORT_ROUTE, id: 'route-short-stale', label: '오래된 Route' }}
+            activeMapId="L1"
+            viewportScale={viewportScale}
             stale
           />
         )}
       </PathMap>
-    </StoryPage>
-  ),
-  play: async ({ canvasElement }) => {
-    // Segment condition lives on the LINE now: tone + a specific NAV_PATH_DASH
-    // pattern, no on-line glyph badge. The exact dash carries the meaning, so
-    // assert the exact pattern rather than merely "some dash".
-    const CONDITION_DASH = { waiting: '10 3 2 3', blocked: '1 5', conflict: '5 3 1 3' };
-    for (const [condition, dash] of Object.entries(CONDITION_DASH)) {
-      const segment = canvasElement.querySelector(`[data-condition="${condition}"]`);
-      const path = segment?.querySelector('[data-route-path]');
-      if (path?.getAttribute('stroke-dasharray') !== dash) {
-        throw new Error(`${condition} segment must encode its state with the ${dash} dash pattern, not a badge.`);
-      }
-      if (segment.querySelector('[data-route-condition-glyph]')) {
-        throw new Error(`${condition} segment must not paint an on-line condition badge.`);
-      }
-    }
-    const trajectory = canvasElement.querySelector('[data-trajectory-status="rerouting"]');
-    if (!trajectory?.querySelector('[data-trajectory-path]')?.getAttribute('stroke-dasharray')) {
-      throw new Error('Rerouting trajectory needs a non-color dash pattern.');
-    }
-    // A route/trajectory carries no lifecycle status badge — the head and dash
-    // already say it. Only the data-quality flags survive as point badges.
-    if (canvasElement.querySelector('[data-route-status-marker], [data-trajectory-status-marker]')) {
-      throw new Error('Lifecycle status must live on the line, not a status badge.');
-    }
-    const compoundRoute = canvasElement.querySelector('[data-route-id="route-invalid-stale"]');
-    if (!compoundRoute?.querySelector('[data-route-overlay-state="invalid"]') || !compoundRoute.querySelector('[data-route-overlay-state="stale"]')) {
-      throw new Error('Route invalid + stale needs independent ! and ~ visual evidence.');
-    }
-    if (compoundRoute.style.opacity !== '0.76') {
-      throw new Error(`Stale Route opacity must match the shared 0.76 contract: ${compoundRoute.style.opacity}.`);
-    }
-    if (!trajectory.querySelector('[data-trajectory-overlay-state="invalid"]') || !trajectory.querySelector('[data-trajectory-overlay-state="stale"]')) {
-      throw new Error('Trajectory invalid + stale needs independent ! and ~ visual evidence.');
-    }
-    assertNavigationStateGlyphGeometry(canvasElement, 'Route/Trajectory states');
-    // The only glyph badges left on lines are the data-quality flags.
-    const renderedKinds = new Set(Array.from(canvasElement.querySelectorAll('[data-navigation-state-glyph]'))
-      .map((glyph) => glyph.getAttribute('data-navigation-state-glyph')));
-    for (const kind of ['invalid', 'stale']) {
-      if (!renderedKinds.has(kind)) throw new Error(`State glyph mapping is missing ${kind}.`);
-    }
-  },
-};
-
-const SHORT_COMPOUND_ROUTE = {
-  id: 'route-short-compound',
-  label: '짧은 복합 상태 경로',
-  status: 'active',
-  segments: [{
-    id: 'segment-short-compound',
-    mapId: 'L1',
-    label: '짧은 충돌 구간',
-    points: [{ x: 260, y: 96 }, { x: 268, y: 96 }, { x: 276, y: 96 }],
-    phase: 'current',
-    condition: 'conflict',
-  }],
-  progress: { segmentId: 'segment-short-compound', fraction: 0.5 },
-};
-
-const SHORT_COMPOUND_TRAJECTORY = {
-  id: 'trajectory-short-compound',
-  label: '짧은 복합 상태 궤적',
-  mapId: 'L1',
-  status: 'active',
-  samples: [
-    { position: { x: 260, y: 190 }, timeMs: 0, headingRad: 0 },
-    { position: { x: 268, y: 190 }, timeMs: 200, headingRad: 0 },
-    { position: { x: 276, y: 190 }, timeMs: 400, headingRad: 0 },
-  ],
-  currentSampleIndex: 1,
-};
-
-const MID_LENGTH_EXACT_COLLISION_ROUTE = {
-  id: 'route-mid-exact-collision',
-  label: '중간 길이 exact-anchor 경로',
-  status: 'active',
-  segments: [{
-    id: 'segment-mid-exact-collision',
-    mapId: 'L1',
-    label: '중간 길이 충돌 구간',
-    points: [{ x: 54, y: 334 }, { x: 270, y: 334 }, { x: 486, y: 334 }],
-    phase: 'current',
-    condition: 'conflict',
-  }],
-  // Progress anchored on the invalid data-quality badge's fraction (0.82) so
-  // the progress marker and the invalid point badge share an EXACT anchor —
-  // the same natural collision the retired condition badge used to provide.
-  progress: { segmentId: 'segment-mid-exact-collision', fraction: 0.82 },
-};
-
-const NORMAL_PROGRESS_ROUTE = {
-  id: 'route-normal-progress-spacing',
-  label: '일반 진행률 경로',
-  status: 'active',
-  segments: [{
-    id: 'segment-normal-progress-spacing',
-    mapId: 'L1',
-    label: '일반 진행 구간',
-    points: [{ x: 54, y: 454 }, { x: 270, y: 454 }, { x: 486, y: 454 }],
-    phase: 'current',
-    condition: 'normal',
-  }],
-  progress: {
-    segmentId: 'segment-normal-progress-spacing',
-    fraction: 0.3,
-    position: { x: 185, y: 454.5 },
-  },
-};
-
-const MISMATCHED_PROGRESS_POSITION_ROUTE = {
-  id: 'route-progress-position-mismatch',
-  label: '진행 좌표 불일치 경로',
-  status: 'active',
-  segments: [{
-    id: 'segment-progress-position-mismatch',
-    mapId: 'L1',
-    label: '좌표 불일치 구간',
-    points: [{ x: 54, y: 70 }, { x: 270, y: 70 }, { x: 486, y: 70 }],
-    phase: 'current',
-    condition: 'normal',
-  }],
-  progress: {
-    segmentId: 'segment-progress-position-mismatch',
-    fraction: 0.25,
-    position: { x: 400, y: 70 },
-  },
-};
-
-const VERTICAL_PROGRESS_ROUTE = {
-  id: 'route-progress-obstacle-vertical',
-  label: '수직 진행 경로',
-  status: 'active',
-  segments: [{
-    id: 'segment-progress-obstacle-vertical',
-    mapId: 'L1',
-    label: '수직 구간',
-    points: [{ x: 120, y: 30 }, { x: 120, y: 110 }],
-    phase: 'current',
-    condition: 'normal',
-  }],
-  progress: { segmentId: 'segment-progress-obstacle-vertical', fraction: 0.5 },
-};
-
-const REVERSE_PROGRESS_ROUTE = {
-  id: 'route-progress-obstacle-reverse',
-  label: '역방향 진행 경로',
-  status: 'active',
-  segments: [{
-    id: 'segment-progress-obstacle-reverse',
-    mapId: 'L1',
-    label: '역방향 구간',
-    points: [{ x: 486, y: 100 }, { x: 306, y: 100 }],
-    phase: 'current',
-    condition: 'normal',
-  }],
-  progress: { segmentId: 'segment-progress-obstacle-reverse', fraction: 0.5 },
-};
-
-function assertProgressTextSpacing(route, label) {
-  const headObstacle = route.querySelector('[data-navigation-progress-head-obstacle] rect');
-  const progressText = route.querySelector('[data-route-progress-label]');
-  const path = route.querySelector('[data-route-path]');
-  if (!headObstacle || !progressText || !path) throw new Error(`${label} progress spacing evidence is incomplete.`);
-  const headRect = headObstacle.getBoundingClientRect();
-  const textRect = progressText.getBoundingClientRect();
-  const pathRect = path.getBoundingClientRect();
-  const rectClearance = (first, second) => {
-    const horizontal = Math.max(first.left - second.right, second.left - first.right, 0);
-    const vertical = Math.max(first.top - second.bottom, second.top - first.bottom, 0);
-    return Math.hypot(horizontal, vertical);
-  };
-  const headGap = rectClearance(textRect, headRect);
-  const pathGap = rectClearance(textRect, pathRect);
-  if (headGap < 3.9 || pathGap < 3.9) {
-    throw new Error(`${label} progress text needs 4 CSS px clearance: head ${headGap}, path ${pathGap}.`);
-  }
+    </section>
+  );
 }
 
 export const ShortPathCompoundMarkers = {
-  name: '변형·상태 · 기준점 충돌 복합 표식',
+  name: '변형·상태 · 짧은 Route와 데이터 품질',
+  tags: ['!dev', 'regression'],
   parameters: storyDescription(
-    '점 뱃지(invalid·stale 데이터 품질)의 자연 anchor가 outline 포함 반지름과 gap보다 가까울 때 compact screen-space row로 분리합니다. 진행 마커와 정확히 같은 anchor를 공유하는 exact-anchor 충돌도 포함합니다.',
+    '짧은 Route의 데이터 품질도 점 뱃지와 연계하지 않습니다. invalid는 정적 negative, stale은 cautionary freshness pulse로 전체 선에 적용합니다.',
   ),
   render: () => (
-    <div data-testid="short-path-stress" style={{ width: 320, maxWidth: '100%', minWidth: 0 }}>
-      <StoryPage
-        title="자연 anchor가 충돌하는 독립 상태 badge와 label은 겹치지 않습니다"
-        description="각 상태의 실제 path anchor 좌표는 보존하고, 충돌한 경우에만 원 지름과 4px gap으로 계산한 중앙 badge row와 별도 상단 label row를 사용합니다."
-      >
-        <PathMap label="anchor 충돌 route와 trajectory 복합 상태 지도" height={510} svgHeight={520}>
-          {(cssViewBoxScale) => (
-            <NavigationAnnotationLayer>
-              <RouteOverlay
-                route={SHORT_COMPOUND_ROUTE}
-                activeMapId="L1"
-                viewportScale={cssViewBoxScale}
-                invalid
-                stale
-              />
-              <TrajectoryOverlay
-                trajectory={SHORT_COMPOUND_TRAJECTORY}
-                viewportScale={cssViewBoxScale}
-                invalid
-                stale
-              />
-              <RouteOverlay
-                route={MID_LENGTH_EXACT_COLLISION_ROUTE}
-                activeMapId="L1"
-                viewportScale={cssViewBoxScale}
-                invalid
-                stale
-              />
-              <RouteOverlay
-                route={NORMAL_PROGRESS_ROUTE}
-                activeMapId="L1"
-                viewportScale={cssViewBoxScale}
-              />
-            </NavigationAnnotationLayer>
-          )}
-        </PathMap>
-        <PathMap
-          label="fraction과 explicit position이 불일치하는 route"
-          height={150}
-          svgHeight={130}
-          eyebrow="MISMATCH · FAIL CLOSED"
-        >
-          {(cssViewBoxScale) => (
-            <RouteOverlay
-              route={MISMATCHED_PROGRESS_POSITION_ROUTE}
-              activeMapId="L1"
-              viewportScale={cssViewBoxScale}
-              showLabel={false}
-            />
-          )}
-        </PathMap>
-        <PathMap
-          label="진행 head와 함께 회전하는 충돌 영역"
-          height={160}
-          svgHeight={140}
-          eyebrow="OBSTACLE · PATH TANGENT"
-        >
-          {(cssViewBoxScale) => (
-            <>
-              <RouteOverlay
-                route={VERTICAL_PROGRESS_ROUTE}
-                activeMapId="L1"
-                viewportScale={cssViewBoxScale}
-                showLabel={false}
-              />
-              <RouteOverlay
-                route={REVERSE_PROGRESS_ROUTE}
-                activeMapId="L1"
-                viewportScale={cssViewBoxScale}
-                showLabel={false}
-              />
-            </>
-          )}
-        </PathMap>
-      </StoryPage>
-    </div>
+    <StoryPage
+      title="Route 데이터 품질은 선 전체에 적용합니다"
+      description="특정 지점의 사건처럼 보이는 점 뱃지는 사용하지 않습니다. 오류는 정적인 negative 선, 오래됨은 기존 LDS freshness pulse로 표현합니다."
+      maxWidth={1120}
+    >
+      <RouteQualityComparison />
+    </StoryPage>
   ),
   play: async ({ canvasElement }) => {
-    const stress = canvasElement.querySelector('[data-testid="short-path-stress"]');
-    await waitFor(() => {
-      const svg = stress?.querySelector('svg[data-css-viewbox-scale]');
-      const cssScale = Number(svg?.getAttribute('data-css-viewbox-scale'));
-      const route = stress?.querySelector('[data-route-id="route-short-compound"]');
-      const trajectory = stress?.querySelector('[data-trajectory-id="trajectory-short-compound"]');
-      const midRoute = stress?.querySelector('[data-route-id="route-mid-exact-collision"]');
-      const normalRoute = stress?.querySelector('[data-route-id="route-normal-progress-spacing"]');
-      const mismatchRoute = stress?.querySelector('[data-route-id="route-progress-position-mismatch"]');
-      const verticalRoute = stress?.querySelector('[data-route-id="route-progress-obstacle-vertical"]');
-      const reverseRoute = stress?.querySelector('[data-route-id="route-progress-obstacle-reverse"]');
-      if (!svg || !Number.isFinite(cssScale) || cssScale >= 0.95) {
-        throw new Error(`Short-path stress did not render at a reduced CSS/viewBox scale: ${cssScale}.`);
-      }
-      if (route?.getAttribute('data-route-marker-layout') !== 'screen-slots'
-        || trajectory?.getAttribute('data-trajectory-marker-layout') !== 'screen-slots'
-        || midRoute?.getAttribute('data-route-marker-layout') !== 'screen-slots') {
-        throw new Error('Every colliding Route and Trajectory fixture must opt into screen-space marker slots.');
-      }
-      const normalProgressHead = normalRoute?.querySelector('[data-navigation-progress-head="route"]');
-      if (
-        !normalProgressHead
-        || normalProgressHead.hasAttribute('data-route-screen-slot')
-        || normalProgressHead.getAttribute('data-route-anchor-x') !== String(NORMAL_PROGRESS_ROUTE.progress.position.x)
-        || normalProgressHead.getAttribute('data-route-anchor-y') !== String(NORMAL_PROGRESS_ROUTE.progress.position.y)
-      ) {
-        throw new Error('The progress head must remain at its exact path anchor while colliding status badges use screen slots.');
-      }
-      if (!normalProgressHead.matches('[data-route-progress-carrier="core"]')) {
-        throw new Error('An explicit Route progress position needs a tangent-aligned carrier at the exact source point.');
-      }
-      const mismatchPast = mismatchRoute?.querySelector('[data-route-progress-past]');
-      if (
-        mismatchRoute?.getAttribute('data-progress-position-mismatch') !== 'true'
-        || mismatchPast?.getAttribute('d') !== 'M 54 70 L 162 70'
-        || mismatchRoute.querySelector('[data-navigation-progress-head], [data-route-progress-carrier], [data-navigation-progress-head-obstacle]')
-        || !mismatchRoute.getAttribute('aria-label')?.includes('25%')
-      ) {
-        throw new Error('A mismatched explicit position must fail closed without detaching the progress head from the fraction boundary.');
-      }
-      for (const [fixture, expectedAngle] of [[verticalRoute, 90], [reverseRoute, 180]]) {
-        const headObstacle = fixture?.querySelector('[data-navigation-progress-head-obstacle]');
-        if (
-          headObstacle?.getAttribute('data-progress-head-angle') !== String(expectedAngle)
-          || !headObstacle.getAttribute('transform')?.includes(`rotate(${expectedAngle})`)
-        ) {
-          throw new Error(`The progress-head obstacle must rotate with its ${expectedAngle}deg path tangent.`);
-        }
-      }
-
-      // Lifecycle status and segment condition no longer paint badges — they
-      // live on the line (tone + NAV_PATH_DASH). The only point badges left are
-      // the two data-quality flags (invalid + stale) per entity.
-      const routeMarkers = Array.from(route.querySelectorAll('[data-route-marker-badge]'));
-      const trajectoryMarkers = Array.from(trajectory.querySelectorAll('[data-trajectory-marker-badge]'));
-      const midRouteMarkers = Array.from(midRoute.querySelectorAll('[data-route-marker-badge]'));
-      if (routeMarkers.length !== 2 || trajectoryMarkers.length !== 2 || midRouteMarkers.length !== 2) {
-        throw new Error('Short-path compound state must render exactly the invalid + stale data-quality badges.');
-      }
-      if (route.querySelector('[data-route-marker-badge="status"], [data-route-marker-badge="condition"]')) {
-        throw new Error('Route must not paint status or condition badges on the line.');
-      }
-      const anchoredMarkerGroups = [
-        ...route.querySelectorAll('[data-route-anchor-x]'),
-        ...trajectory.querySelectorAll('[data-trajectory-anchor-x]'),
-        ...midRoute.querySelectorAll('[data-route-anchor-x]'),
-      ];
-      anchoredMarkerGroups.forEach((marker) => {
-        if (!Number.isFinite(Number(marker.getAttribute(marker.hasAttribute('data-route-anchor-x') ? 'data-route-anchor-x' : 'data-trajectory-anchor-x')))) {
-          throw new Error('A slotted marker lost its actual path anchor coordinates.');
-        }
-      });
-      const routeLabel = route.querySelector('[data-route-segment-label][data-route-screen-row="label"]');
-      const trajectoryLabel = trajectory.querySelector('[data-trajectory-label][data-trajectory-screen-row="label"]');
-      const midRouteLabel = midRoute.querySelector('[data-route-segment-label][data-route-screen-row="label"]');
-      if (!routeLabel || !trajectoryLabel || !midRouteLabel) {
-        throw new Error('A colliding fixture did not move its visual label to the dedicated upper row.');
-      }
-      assertPairwiseNonOverlap([...routeMarkers, routeLabel], 'Route');
-      assertPairwiseNonOverlap([...trajectoryMarkers, trajectoryLabel], 'Trajectory');
-      assertPairwiseNonOverlap([...midRouteMarkers, midRouteLabel], 'Mid-length Route');
-
-      const routeRowWidth = Number(route.getAttribute('data-route-marker-row-width'));
-      const trajectoryRowWidth = Number(trajectory.getAttribute('data-trajectory-marker-row-width'));
-      if (!(routeRowWidth > 0 && routeRowWidth < 100 && trajectoryRowWidth > 0 && trajectoryRowWidth < 100)) {
-        throw new Error(`Collision rows are not compact diameter+gap layouts: ${routeRowWidth}/${trajectoryRowWidth}.`);
-      }
-      const routeStateGlyphs = Array.from(route.querySelectorAll('[data-navigation-state-glyph]'));
-      if (routeStateGlyphs.length < 2 || routeStateGlyphs.some((glyph) => !glyph.style.color)) {
-        throw new Error('Route data-quality badge outlines must retain their hue while internal SVG glyphs use viewer foreground.');
-      }
-      const midPathRect = midRoute.querySelector('[data-route-path]')?.getBoundingClientRect();
-      const midInvalidAnchor = Number(midRoute.querySelector('[data-route-overlay-state="invalid"]')?.getAttribute('data-route-anchor-x'));
-      const midProgressAnchor = Number(midRoute.querySelector('[data-route-progress-marker]')?.getAttribute('data-route-anchor-x'));
-      if (!midPathRect || midPathRect.width < 180 || !Number.isFinite(midInvalidAnchor) || midInvalidAnchor !== midProgressAnchor) {
-        throw new Error('Medium-length route did not preserve the exact natural invalid-badge/progress anchor collision.');
-      }
-      assertProgressTextSpacing(route, 'Short Route');
-      assertProgressTextSpacing(midRoute, 'Mid-length Route');
-      assertProgressTextSpacing(normalRoute, 'Normal Route');
-      for (const [fixtureLabel, fixture] of [
-        ['Short Route', route],
-        ['Short Trajectory', trajectory],
-        ['Mid-length Route', midRoute],
-        ['Normal Route', normalRoute],
-      ]) {
-        assertNavigationStateGlyphGeometry(fixture, fixtureLabel);
-        const role = fixture.hasAttribute('data-lk-trajectory-overlay') ? 'trajectory' : 'route';
-        if (role === 'trajectory') {
-          assertTrajectoryTemporalEncoding(fixture, fixtureLabel);
-        } else {
-          assertNavigationProgressHead(fixture, fixtureLabel, role);
-        }
-      }
-
-      // Cross-entity contract: coordinated labels never overlap each other or
-      // a registered marker footprint, and the coordinator actually engaged
-      // (the short route's progress label collides naturally with the short
-      // trajectory's label row without it).
-      assertNoLabelCollisions(stress, 'Cross-entity');
-      const progressLabelRect = route.querySelector('[data-route-progress-label]')?.getBoundingClientRect();
-      const trajectoryLabelRect = trajectory.querySelector('[data-trajectory-label]')?.getBoundingClientRect();
-      if (!progressLabelRect || !trajectoryLabelRect) {
-        throw new Error('Cross-entity fixture labels must both render.');
-      }
-      const defectPairOverlaps = progressLabelRect.left < trajectoryLabelRect.right - 0.5
-        && progressLabelRect.right > trajectoryLabelRect.left + 0.5
-        && progressLabelRect.top < trajectoryLabelRect.bottom - 0.5
-        && progressLabelRect.bottom > trajectoryLabelRect.top + 0.5;
-      const progressAnnotation = progressLabelRect
-        && route.querySelector('[data-route-progress-label]')?.closest('[data-navigation-annotation]');
-      const trajectoryAnnotation = trajectoryLabelRect
-        && trajectory.querySelector('[data-trajectory-label]')?.closest('[data-navigation-annotation]');
-      const bothVisible = progressAnnotation?.getAttribute('data-annotation-suppressed') !== 'true'
-        && trajectoryAnnotation?.getAttribute('data-annotation-suppressed') !== 'true';
-      if (bothVisible && defectPairOverlaps) {
-        throw new Error('Route progress label and trajectory label still overlap across entities.');
-      }
-      if (!stress.querySelector('[data-annotation-displaced="true"], [data-annotation-suppressed="true"]')) {
-        throw new Error('Cross-entity coordination did not engage on the colliding fixtures.');
-      }
-      const normalProgressAnnotation = normalRoute.querySelector('[data-route-progress-label]')
-        ?.closest('[data-navigation-annotation]');
-      if (
-        normalProgressAnnotation?.getAttribute('data-annotation-suppressed') === 'true'
-        || Math.hypot(
-          Number(normalProgressAnnotation?.getAttribute('data-annotation-nudge-x') || 0),
-          Number(normalProgressAnnotation?.getAttribute('data-annotation-nudge-y') || 0),
-        ) > 0.5
-      ) {
-        throw new Error('A naturally separated progress label must not be displaced or suppressed.');
-      }
-    });
+    const invalidRoute = canvasElement.querySelector('[data-route-id="route-short-invalid"]');
+    const staleRoute = canvasElement.querySelector('[data-route-id="route-short-stale"]');
+    if (
+      !invalidRoute?.querySelector('[data-route-path]')?.getAttribute('stroke')?.includes('--viewer-danger')
+      || invalidRoute.querySelector('[data-route-freshness-pulse]')
+      || !staleRoute?.querySelector('[data-route-path]')?.getAttribute('stroke')?.includes('--viewer-warning')
+      || !staleRoute.querySelector('[data-route-freshness-pulse]')
+      || canvasElement.querySelector('[data-route-overlay-state], [data-route-marker-badge]')
+      || canvasElement.querySelector('[data-route-progress-marker], [data-route-progress-label], [data-route-condition-glyph]')
+    ) {
+      throw new Error('Route quality must use whole-line invalid/stale treatments without point badges.');
+    }
+    assertPathSystemVisualContract(canvasElement, 'Short Route');
   },
 };
 
 function MultiFloorFixture() {
   const [activeMapId, setActiveMapId] = React.useState('L1');
   const trajectory = activeMapId === 'L1' ? ACTIVE_TRAJECTORY : L2_TRAJECTORY;
+  const frame = activeMapId === 'L1' ? PROJECTED_FRAME_L1 : PROJECTED_FRAME_L2;
   return (
     <StoryPage
-      title="층을 바꾸면 해당 층 segment와 trajectory만 남고 가상 연결선은 생기지 않습니다"
-      description="Route는 activeMapId로 segment를 필터합니다. Trajectory는 하나의 map만 소유하므로 renderer가 mapId를 비교해 하나만 마운트합니다. 층 사이 이동은 Lift Facility Transition으로 이어집니다."
+      title="층별 필터링은 Route를 끊어 잇지 않습니다"
+      description="현재 층의 segment만 표시하며 서로 다른 층의 끝점을 가상 선으로 연결하지 않습니다. 층간 이동은 Facility Transition이 소유합니다."
       maxWidth={820}
     >
       <SegmentedControl
@@ -670,87 +321,11 @@ function MultiFloorFixture() {
         aria-label="표시할 층"
         style={{ alignSelf: 'start' }}
       />
-      <PathMap
-        label={`${activeMapId} route와 trajectory 지도`}
-        testId="multi-floor-path-map"
-        annotationDetailMode="standard"
-        eyebrow={`ROUTE · ${activeMapId}`}
-      >
-        {(cssViewBoxScale) => (
-          <NavigationCoordinateBoundary
-            frame={activeMapId === 'L1' ? PROJECTED_FRAME_L1 : PROJECTED_FRAME_L2}
-          >
-            <RouteOverlay route={ACTIVE_ROUTE} activeMapId={activeMapId} viewportScale={cssViewBoxScale} />
-            <RouteOverlay route={ACTIVE_ROUTE} activeMapId="missing-map" viewportScale={cssViewBoxScale} data-empty-route-probe="" />
-            <RouteOverlay
-              route={{
-                id: 'route-insufficient-geometry',
-                label: '불충분 경로 geometry',
-                status: 'planned',
-                segments: [{
-                  id: 'segment-insufficient-geometry',
-                  mapId: activeMapId,
-                  points: [{ x: 20, y: 20 }, { x: Number.NaN, y: 30 }],
-                  phase: 'upcoming',
-                  condition: 'normal',
-                }],
-              }}
-              activeMapId={activeMapId}
-              viewportScale={cssViewBoxScale}
-              onActivate={() => {}}
-              data-insufficient-route-probe=""
-            />
-            <TrajectoryOverlay
-              trajectory={{
-                id: 'trajectory-insufficient-geometry',
-                label: '불충분 궤적 geometry',
-                mapId: activeMapId,
-                status: 'planned',
-                samples: [
-                  { position: { x: 20, y: 40 }, timeMs: 0 },
-                  { position: { x: Number.NaN, y: 50 }, timeMs: 100 },
-                ],
-              }}
-              viewportScale={cssViewBoxScale}
-              onActivate={() => {}}
-              data-insufficient-trajectory-probe=""
-            />
-            <RouteOverlay
-              route={{
-                id: 'route-unprojected',
-                label: '미투영 world route',
-                status: 'planned',
-                segments: [{
-                  id: 'segment-unprojected',
-                  mapId: activeMapId,
-                  source: activeMapId === 'L1' ? PROJECTED_FRAME_L1 : PROJECTED_FRAME_L2,
-                  points: [{ x: 2, y: 2 }, { x: 8, y: 8 }],
-                  phase: 'upcoming',
-                  condition: 'normal',
-                }],
-              }}
-              activeMapId={activeMapId}
-              viewportScale={cssViewBoxScale}
-              data-unprojected-route-probe=""
-            />
-            <TrajectoryOverlay
-              trajectory={{
-                id: 'trajectory-unprojected',
-                label: '미투영 world trajectory',
-                mapId: activeMapId,
-                source: activeMapId === 'L1' ? PROJECTED_FRAME_L1 : PROJECTED_FRAME_L2,
-                status: 'planned',
-                samples: [
-                  { position: { x: 2, y: 2 }, timeMs: 0 },
-                  { position: { x: 8, y: 8 }, timeMs: 100 },
-                ],
-              }}
-              viewportScale={cssViewBoxScale}
-              data-unprojected-trajectory-probe=""
-            />
-            {trajectory.mapId === activeMapId && (
-              <TrajectoryOverlay trajectory={trajectory} viewportScale={cssViewBoxScale} />
-            )}
+      <PathMap label={`${activeMapId} Route와 Trajectory 지도`} testId="multi-floor-path-map" eyebrow={`ROUTE · ${activeMapId}`}>
+        {(viewportScale) => (
+          <NavigationCoordinateBoundary frame={frame}>
+            <RouteOverlay route={ACTIVE_ROUTE} activeMapId={activeMapId} viewportScale={viewportScale} />
+            <TrajectoryOverlay trajectory={trajectory} viewportScale={viewportScale} showLabel={false} />
           </NavigationCoordinateBoundary>
         )}
       </PathMap>
@@ -762,174 +337,62 @@ function MultiFloorFixture() {
 export const MultiFloorFiltering = {
   name: '사용법 · 층별 경로',
   parameters: storyDescription(
-    'L1/L2를 전환해 route segment와 single-map trajectory가 현재 층만 렌더하는지 확인합니다. 필터 후 남은 서로 다른 층의 끝점을 이어 붙이는 path가 없어야 합니다.',
+    'L1/L2를 전환해 Route segment와 single-map Trajectory가 현재 층만 렌더하는지 확인합니다.',
   ),
   render: () => <MultiFloorFixture />,
   play: async ({ canvasElement }) => {
-    const assertMap = (mapId, routeCount, trajectoryId, expectProgress) => {
-      const map = canvasElement.querySelector('[data-testid="multi-floor-path-map"]');
-      const annotationLayer = map?.querySelector('[data-lk-navigation-annotation-layer]');
-      const coordinateBoundary = map?.querySelector('[data-navigation-coordinate-boundary]');
-      if (!annotationLayer || annotationLayer.getAttribute('data-annotation-detail-mode') !== 'standard') {
-        throw new Error(`${mapId} route/trajectory composition must use the standard annotation layer.`);
-      }
-      const segments = Array.from(canvasElement.querySelectorAll('[data-route-segment]'));
-      if (segments.length !== routeCount || segments.some((segment) => segment.getAttribute('data-map-id') !== mapId)) {
-        throw new Error(`${mapId} route filtering failed: ${segments.map((segment) => segment.getAttribute('data-map-id')).join(',')}`);
-      }
-      const route = canvasElement.querySelector('[data-lk-route-overlay]');
-      const progressSegmentId = route?.getAttribute('data-progress-segment-id');
-      const progressFraction = route?.getAttribute('data-progress-fraction');
-      const progressInName = route?.getAttribute('aria-label')?.includes('현재 구간 42%');
-      if (expectProgress && (progressSegmentId !== 'segment-l1-current' || progressFraction !== '0.42' || !progressInName)) {
-        throw new Error(`${mapId} visible progress was not preserved.`);
-      }
-      if (!expectProgress && (progressSegmentId != null || progressFraction != null || progressInName)) {
-        throw new Error(`${mapId} retained progress from a segment hidden by activeMapId.`);
-      }
+    const assertFloor = (mapId, segmentCount, trajectoryId) => {
+      const segments = [...canvasElement.querySelectorAll('[data-route-segment]')];
       const trajectory = canvasElement.querySelector('[data-lk-trajectory-overlay]');
-      if (trajectory?.getAttribute('data-trajectory-id') !== trajectoryId || trajectory.getAttribute('data-map-id') !== mapId) {
-        throw new Error(`${mapId} trajectory renderer filtering failed.`);
-      }
-      const expectedFrameId = mapId === 'L1' ? 'warehouse_L1/map' : 'warehouse_L2/map';
       if (
-        coordinateBoundary?.getAttribute('data-source-map-id') !== mapId
-        || coordinateBoundary?.getAttribute('data-source-frame-id') !== expectedFrameId
-        || coordinateBoundary?.getAttribute('data-require-projected-coordinates') !== 'true'
-        || route?.getAttribute('data-coordinate-space') !== 'svg-map'
-        || trajectory.getAttribute('data-coordinate-space') !== 'svg-map'
-        || trajectory.getAttribute('data-source-frame-id') !== expectedFrameId
-        || segments.some((segment) => segment.closest('[data-lk-route-overlay]')?.getAttribute('data-source-frame-ids') !== expectedFrameId)
+        segments.length !== segmentCount
+        || segments.some((segment) => segment.getAttribute('data-map-id') !== mapId)
+        || trajectory?.getAttribute('data-trajectory-id') !== trajectoryId
       ) {
-        throw new Error(`${mapId} source frame traceability was not preserved.`);
+        throw new Error(`${mapId} Path System filtering failed.`);
       }
-      assertNoLabelCollisions(map, `Multi-floor ${mapId}`);
+      assertPathSystemVisualContract(canvasElement, `${mapId} filtering`);
     };
-    if (canvasElement.querySelector('[data-empty-route-probe]')) {
-      throw new Error('A route with zero visible segments must not leave an empty accessibility object.');
-    }
-    if (canvasElement.querySelector('[data-insufficient-route-probe], [data-insufficient-trajectory-probe]')) {
-      throw new Error('Route/Trajectory with fewer than two finite points must not leave an invisible control.');
-    }
-    if (canvasElement.querySelector('[data-unprojected-route-probe], [data-unprojected-trajectory-probe]')) {
-      throw new Error('Coordinate boundary must suppress line geometry without svg-map projection proof.');
-    }
-    assertMap('L1', 2, 'trajectory-robot-2-l1', true);
-    [...canvasElement.querySelectorAll('button')].find((btn) => btn.textContent.trim() === 'L2')?.click();
+    assertFloor('L1', 2, ACTIVE_TRAJECTORY.id);
+    await userEvent.click([...canvasElement.querySelectorAll('button')].find((button) => button.textContent.trim() === 'L2'));
     await nextRender();
-    assertMap('L2', 1, 'trajectory-robot-2-l2', false);
+    assertFloor('L2', 1, L2_TRAJECTORY.id);
     const l2Path = canvasElement.querySelector('[data-route-path]')?.getAttribute('d') ?? '';
     if (!l2Path.startsWith('M 72 196') || l2Path.includes('190 154')) {
-      throw new Error(`Cross-floor geometry was synthesized or L1 geometry leaked into L2: ${l2Path}`);
+      throw new Error(`L1 geometry leaked into L2: ${l2Path}`);
     }
   },
 };
 
 function PathActivationFixture() {
-  const [selected, setSelected] = React.useState('');
-  const [count, setCount] = React.useState(0);
-  const select = (id) => {
-    setSelected(id);
-    setCount((value) => value + 1);
-  };
+  const [selection, setSelection] = React.useState('none');
   return (
     <StoryPage
-      title="Route segment와 trajectory는 각각의 identity로 선택됩니다"
-      description="segment activation은 routeId와 segmentId를 함께 전달하고 trajectory는 자체 id를 전달합니다. 선택은 상태색 코어와 중립 casing의 굵기 확대로 공유하지만 서로의 phase, progress, sample 상태를 변경하지 않습니다."
+      title="선택은 의미 색이 아니라 casing과 굵기로 표현합니다"
+      description="Route segment와 Trajectory는 서로 다른 identity로 선택됩니다. 선택해도 Route phase·condition·progress의 지도 표현은 생기지 않습니다."
       maxWidth={820}
     >
-      <PathMap label="route와 trajectory 선택 지도" height={460} svgHeight={440}>
-        {(cssViewBoxScale) => (
+      <PathMap label="Route와 Trajectory 선택 지도" eyebrow="PATH SYSTEM · SELECTION" height={300}>
+        {(viewportScale) => (
           <>
             <RouteOverlay
               route={ACTIVE_ROUTE}
               activeMapId="L1"
-              viewportScale={cssViewBoxScale}
-              selectedSegmentId={selected.startsWith('segment:') ? selected.slice(8) : undefined}
-              onActivate={({ segmentId }) => select(`segment:${segmentId}`)}
+              viewportScale={viewportScale}
+              selectedSegmentId={selection.startsWith('route:') ? selection.slice(6) : undefined}
+              onActivate={({ segmentId }) => setSelection(`route:${segmentId}`)}
             />
             <TrajectoryOverlay
               trajectory={ACTIVE_TRAJECTORY}
-              viewportScale={cssViewBoxScale}
-              selected={selected === `trajectory:${ACTIVE_TRAJECTORY.id}`}
-              onActivate={(id) => select(`trajectory:${id}`)}
-            />
-            <RouteOverlay
-              route={{
-                id: 'route-disabled',
-                label: '비활성 경로',
-                status: 'blocked',
-                segments: [{
-                  id: 'segment-disabled',
-                  mapId: 'L1',
-                  points: [{ x: 50, y: 272 }, { x: 480, y: 272 }],
-                  phase: 'current',
-                  condition: 'blocked',
-                }],
-              }}
-              activeMapId="L1"
-              viewportScale={cssViewBoxScale}
-              disabled
-              onActivate={({ segmentId }) => select(`segment:${segmentId}`)}
-            />
-            <TrajectoryOverlay
-              trajectory={{
-                id: 'trajectory-disabled',
-                label: '비활성 궤적',
-                mapId: 'L1',
-                status: 'blocked',
-                samples: [
-                  { position: { x: 50, y: 314 }, timeMs: 0, headingRad: 0 },
-                  { position: { x: 260, y: 308 }, timeMs: 500, headingRad: 0 },
-                  { position: { x: 480, y: 314 }, timeMs: 1000, headingRad: 0 },
-                ],
-                currentSampleIndex: 1,
-              }}
-              viewportScale={cssViewBoxScale}
-              disabled
-              onActivate={(id) => select(`trajectory:${id}`)}
-            />
-            <RouteOverlay
-              route={{
-                id: 'route-passive-disabled',
-                label: '비활성 참조 경로',
-                status: 'blocked',
-                segments: [{
-                  id: 'segment-passive-disabled',
-                  mapId: 'L1',
-                  points: [{ x: 50, y: 366 }, { x: 480, y: 366 }],
-                  phase: 'current',
-                  condition: 'blocked',
-                }],
-              }}
-              activeMapId="L1"
-              viewportScale={cssViewBoxScale}
-              focused
-              disabled
-              data-passive-disabled-route=""
-            />
-            <TrajectoryOverlay
-              trajectory={{
-                id: 'trajectory-passive-disabled',
-                label: '비활성 참조 궤적',
-                mapId: 'L1',
-                status: 'blocked',
-                samples: [
-                  { position: { x: 50, y: 384 }, timeMs: 0, headingRad: 0 },
-                  { position: { x: 260, y: 378 }, timeMs: 500, headingRad: 0 },
-                  { position: { x: 480, y: 384 }, timeMs: 1000, headingRad: 0 },
-                ],
-                currentSampleIndex: 1,
-              }}
-              viewportScale={cssViewBoxScale}
-              focused
-              disabled
-              data-passive-disabled-trajectory=""
+              viewportScale={viewportScale}
+              selected={selection === `trajectory:${ACTIVE_TRAJECTORY.id}`}
+              onActivate={(id) => setSelection(`trajectory:${id}`)}
+              showLabel={false}
             />
           </>
         )}
       </PathMap>
-      <output data-testid="path-activation-output" hidden>{selected || '없음'} · activation {count}회</output>
+      <output data-testid="path-selection-output">{selection}</output>
     </StoryPage>
   );
 }
@@ -937,149 +400,42 @@ function PathActivationFixture() {
 export const PathSelectionAndActivation = {
   name: '상호작용 · 구간과 궤적 선택',
   parameters: storyDescription(
-    'route segment와 trajectory의 accessible name, pointer·Enter/Space activation, Route·Trajectory disabled prevention과 상태색 보존 선택 굵기를 확인합니다.',
+    'Route segment와 Trajectory의 pointer activation과 선택 기하를 비교합니다.',
   ),
   render: () => <PathActivationFixture />,
   play: async ({ canvasElement }) => {
-    const routeSegment = canvasElement.querySelector('[data-segment-id="segment-l1-current"]');
-    const trajectory = canvasElement.querySelector('[data-trajectory-id="trajectory-robot-2-l1"]');
-    const disabledSegment = canvasElement.querySelector('[data-segment-id="segment-disabled"]');
-    const disabledTrajectory = canvasElement.querySelector('[data-trajectory-id="trajectory-disabled"]');
-    const passiveDisabledRoute = canvasElement.querySelector('[data-passive-disabled-route]');
-    const passiveDisabledTrajectory = canvasElement.querySelector('[data-passive-disabled-trajectory]');
-    const output = () => canvasElement.querySelector('[data-testid="path-activation-output"]')?.textContent ?? '';
-    const view = canvasElement.ownerDocument.defaultView;
-    if (!routeSegment?.getAttribute('aria-label')?.includes('현재 구간') || !trajectory?.getAttribute('aria-label')?.includes('sample')) {
-      throw new Error('Route segment and trajectory need meaningful accessible names.');
-    }
-    const routeHitCore = routeSegment.querySelector('[data-route-hit-target-core]');
-    const trajectoryHitCore = trajectory.querySelector('[data-trajectory-hit-target-core]');
-    if (!routeHitCore || Number(routeHitCore.getAttribute('r')) * Math.SQRT2 < 24) {
-      throw new Error('Interactive route segment needs a target core containing 24×24 CSS px.');
-    }
-    if (!trajectoryHitCore || Number(trajectoryHitCore.getAttribute('r')) * Math.SQRT2 < 24) {
-      throw new Error('Interactive trajectory needs a target core containing 24×24 CSS px.');
-    }
-    await userEvent.click(routeSegment);
-    await waitFor(() => {
-      if (!routeSegment.querySelector('[data-route-selection-casing]')) {
-        throw new Error('Selected route segment must widen its neutral casing without an accent halo.');
-      }
-    });
-    const routeFocusVisible = routeSegment.matches(':focus-visible');
-    await waitFor(() => {
-      const hasRouteFocusRing = Boolean(routeSegment.querySelector('[data-route-focus-ring]'));
-      if (hasRouteFocusRing !== routeFocusVisible) {
-        throw new Error('Route focus ring must mirror the native :focus-visible state.');
-      }
-      if (routeFocusVisible && view.getComputedStyle(routeSegment).outlineStyle !== 'none') {
-        throw new Error('Route segment must not duplicate its focus ring with the global rectangular outline.');
-      }
-    });
-    routeSegment.dispatchEvent(new view.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+    const segment = canvasElement.querySelector(
+      '[data-route-segment][data-segment-id="segment-l1-current"]',
+    );
+    const trajectory = canvasElement.querySelector(`[data-trajectory-id="${ACTIVE_TRAJECTORY.id}"]`);
+    await userEvent.click(segment?.querySelector('[data-route-hit-target-core]'));
     await nextRender();
-    if (!routeSegment.querySelector('[data-route-focus-ring]') || view.getComputedStyle(routeSegment).outlineStyle !== 'none') {
-      throw new Error('Route keyboard input must restore only its shape-managed focus ring after pointer modality.');
+    if (!canvasElement.querySelector('[data-route-casing][data-segment-id="segment-l1-current"][data-route-selection-casing]')) {
+      throw new Error('Selected Route segment must widen its casing.');
     }
-    assertSharedFocusIndicator(routeSegment.querySelector('[data-route-focus-ring]'), 'Route');
     await userEvent.click(trajectory);
-    await waitFor(() => {
-      if (!trajectory.querySelector('[data-trajectory-selection-casing]')) {
-        throw new Error('Selected trajectory must widen its neutral casing without an accent halo.');
-      }
-    });
-    const trajectoryFocusVisible = trajectory.matches(':focus-visible');
-    await waitFor(() => {
-      const hasTrajectoryFocusRing = Boolean(trajectory.querySelector('[data-trajectory-focus-indicator]'));
-      if (hasTrajectoryFocusRing !== trajectoryFocusVisible) {
-        throw new Error('Trajectory focus indicator must mirror the native :focus-visible state.');
-      }
-      if (trajectoryFocusVisible && view.getComputedStyle(trajectory).outlineStyle !== 'none') {
-        throw new Error('Trajectory must not duplicate its focus ring with the global rectangular outline.');
-      }
-    });
-    trajectory.dispatchEvent(new view.KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }));
     await nextRender();
-    if (!trajectory.querySelector('[data-trajectory-focus-indicator]') || view.getComputedStyle(trajectory).outlineStyle !== 'none') {
-      throw new Error('Trajectory keyboard input must restore only its shape-managed focus ring after pointer modality.');
+    if (trajectory.getAttribute('data-selected') !== 'true') {
+      throw new Error('Trajectory selection did not update independently.');
     }
-    assertSharedFocusIndicator(trajectory.querySelector('[data-trajectory-focus-indicator]'), 'Trajectory');
-    if (!output().includes('activation 4회') || trajectory.getAttribute('data-selected') !== 'true') {
-      throw new Error(`Path activation or trajectory selection failed: ${output()}`);
-    }
-    routeSegment.dispatchEvent(new view.KeyboardEvent('keydown', {
-      key: 'Enter', repeat: true, bubbles: true, cancelable: true,
-    }));
-    trajectory.dispatchEvent(new view.KeyboardEvent('keydown', {
-      key: ' ', repeat: true, bubbles: true, cancelable: true,
-    }));
-    await nextRender();
-    if (!output().includes('activation 4회')) {
-      throw new Error('Repeated Route/Trajectory keydown invoked onActivate.');
-    }
-    if (disabledSegment.getAttribute('tabindex') !== '-1' || disabledSegment.getAttribute('aria-disabled') !== 'true') {
-      throw new Error('Disabled route segment must expose aria-disabled and leave the Tab order.');
-    }
-    if (disabledSegment.closest('[data-lk-route-overlay]')?.style.opacity !== '0.45') {
-      throw new Error('Disabled Route opacity must match the shared 0.45 contract.');
-    }
-    if (disabledTrajectory?.getAttribute('tabindex') !== '-1' || disabledTrajectory.getAttribute('aria-disabled') !== 'true') {
-      throw new Error('Disabled trajectory must expose aria-disabled and leave the Tab order.');
-    }
-    if (disabledTrajectory.style.opacity !== '0.45') {
-      throw new Error('Disabled Trajectory opacity must match the shared 0.45 contract.');
-    }
-    for (const [name, overlay] of [
-      ['Route', passiveDisabledRoute],
-      ['Trajectory', passiveDisabledTrajectory],
-    ]) {
-      if (overlay?.getAttribute('role') !== 'img'
-        || !overlay.getAttribute('aria-label')?.includes('포커스됨')
-        || !overlay.getAttribute('aria-label')?.includes('선택할 수 없음')
-        || overlay.style.opacity !== '0.45') {
-        throw new Error(`Passive controlled-focused disabled ${name} needs explicit computed states and 0.45 opacity.`);
-      }
-    }
-    disabledSegment.dispatchEvent(new view.MouseEvent('click', { bubbles: true, cancelable: true }));
-    disabledSegment.dispatchEvent(new view.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
-    disabledTrajectory.dispatchEvent(new view.MouseEvent('click', { bubbles: true, cancelable: true }));
-    disabledTrajectory.dispatchEvent(new view.KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }));
-    await nextRender();
-    if (!output().includes('activation 4회')) throw new Error('A disabled Route or Trajectory invoked onActivate.');
+    assertPathSystemVisualContract(canvasElement, 'Path selection');
   },
 };
 
 export const RouteAndTrajectoryNarrow320 = {
   name: '반응형 · 320px 좁은 폭',
+  tags: ['!dev', 'regression'],
   parameters: storyDescription(
-    '320px 폭에서 경로·궤적 뷰포트가 페이지를 밀어내지 않고, 시각 라벨이 잘려도 각 오버레이의 접근성 이름이 같은 정체성과 상태를 그대로 전달하는지 확인합니다.',
+    '320px에서도 Route 계획색 점선, Trajectory sample, RobotPose의 계층과 screen-space hit target을 유지합니다.',
   ),
   render: () => (
     <div data-testid="path-narrow" style={{ width: 320, maxWidth: '100%', minWidth: 0, overflow: 'hidden' }}>
       <StoryPage
-        title="좁은 화면에서도 경로 계층은 겹치지 않고 상세 정보는 접근성 이름으로 이어집니다"
-        description="지도 안에 카드를 겹쳐 넣지 않습니다. 경로와 궤적의 선·글리프를 보존하고, 시각 라벨을 숨겨도 각 오버레이의 접근성 이름이 진행률·표본 같은 상태를 그대로 전달합니다."
+        title="좁은 화면에서도 Path System 문법은 바뀌지 않습니다"
+        description="Route progress와 Trajectory playback cursor를 추가하지 않고 선·sample·RobotPose의 역할을 유지합니다."
       >
-        <PathMap label="320px 경로·궤적 지도" height={230}>
-          {(cssViewBoxScale) => (
-            <>
-              <RouteOverlay
-                route={ACTIVE_ROUTE}
-                activeMapId="L1"
-                showLabel={false}
-                viewportScale={cssViewBoxScale}
-                tabIndex={-1}
-                onActivate={() => {}}
-              />
-              <TrajectoryOverlay
-                trajectory={ACTIVE_TRAJECTORY}
-                showLabel={false}
-                viewportScale={cssViewBoxScale}
-                tabIndex={-1}
-                onActivate={() => {}}
-              />
-            </>
-          )}
+        <PathMap label="320px Path System 지도" eyebrow="PATH SYSTEM · L1" height={230}>
+          {(viewportScale) => <ActivePathLayers viewportScale={viewportScale} />}
         </PathMap>
       </StoryPage>
     </div>
@@ -1087,43 +443,14 @@ export const RouteAndTrajectoryNarrow320 = {
   play: async ({ canvasElement }) => {
     const narrow = canvasElement.querySelector('[data-testid="path-narrow"]');
     if (!narrow || narrow.scrollWidth > narrow.clientWidth) {
-      throw new Error(`Route/trajectory narrow story overflowed: ${narrow?.scrollWidth}/${narrow?.clientWidth}`);
+      throw new Error(`Path System narrow story overflowed: ${narrow?.scrollWidth}/${narrow?.clientWidth}`);
     }
-    const route = narrow.querySelector('[data-lk-route-overlay]');
-    const trajectory = narrow.querySelector('[data-lk-trajectory-overlay]');
-    if (!route?.getAttribute('aria-label')?.includes('현재 구간 42%')) {
-      throw new Error('Hiding visual labels removed explicit route progress from the accessible name.');
-    }
-    if (!trajectory?.getAttribute('aria-label')?.includes('현재 sample 6')) {
-      throw new Error('Hiding visual labels removed current trajectory sample from the accessible name.');
-    }
-    await waitFor(() => {
-      const svg = narrow.querySelector('svg[data-css-viewbox-scale]');
-      const cssScale = Number(svg?.getAttribute('data-css-viewbox-scale'));
-      const routeScale = Number(route?.getAttribute('data-viewport-scale'));
-      if (!svg || !Number.isFinite(cssScale) || cssScale >= 0.95 || Math.abs(cssScale - routeScale) > 0.01) {
-        throw new Error(`Narrow SVG scale was not passed to RouteOverlay: css=${cssScale}, route=${routeScale}.`);
-      }
-
-      const assertCircleContainsTarget = (selector, name) => {
-        const core = narrow.querySelector(selector);
-        const rect = core?.getBoundingClientRect();
-        if (!rect || Math.min(rect.width, rect.height) / Math.SQRT2 < 23.9) {
-          throw new Error(`${name} hit core does not contain a 24×24 CSS px square: ${rect?.width}×${rect?.height}.`);
-        }
-      };
-      assertCircleContainsTarget('[data-route-hit-target-core]', 'Route');
-      assertCircleContainsTarget('[data-trajectory-hit-target-core]', 'Trajectory');
-      assertNavigationStateGlyphGeometry(route, '320px Route');
-      assertNavigationStateGlyphGeometry(trajectory, '320px Trajectory');
-      assertNavigationProgressHead(route, '320px Route', 'route');
-      assertTrajectoryTemporalEncoding(trajectory, '320px Trajectory');
-    });
+    assertPathSystemVisualContract(narrow, '320px Path System');
   },
 };
 
 export const RouteTrajectoryVisualParity = {
   ...RouteAndTrajectoryStates,
-  name: 'Route and trajectory visual parity',
+  name: 'Route visual parity',
   tags: ['!dev', 'visual-parity'],
 };

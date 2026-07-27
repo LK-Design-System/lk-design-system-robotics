@@ -1,6 +1,10 @@
 import React from 'react';
 import { NavigationStateGlyph } from '@lk-robotics/lds-robotics-ui/components/robotics/_NavigationStateGlyph';
-import { NavigationRoleGlyph, ROLE_GLYPH_KINDS } from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationRoleGlyph';
+import { NavigationRoleGlyph, ROLE_GLYPH_KINDS } from '../src/components/robotics/_navigationRoleGlyph.js';
+import {
+  NAV_NODE,
+  NAV_WAYPOINT_AVAILABILITY_FILL,
+} from '../src/components/robotics/_navigationVocabulary.js';
 import { ANNOTATION_CODE, ROLE_CODE } from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationEncoding';
 
 /**
@@ -286,6 +290,35 @@ function StateSwatch({ kind }) {
   );
 }
 
+function WaypointStateSwatch({ kind }) {
+  const fill = NAV_WAYPOINT_AVAILABILITY_FILL[kind]
+    ?? NAV_WAYPOINT_AVAILABILITY_FILL.unknown;
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="-12 -12 24 24"
+      aria-hidden="true"
+      data-waypoint-legend-state={kind}
+      style={{ display: 'block', flexShrink: 0 }}
+    >
+      <rect
+        {...NAV_NODE.rect(NAV_NODE.radius + 0.5, NAV_NODE.cornerRadius + 0.5)}
+        transform="translate(0 1.4)"
+        fill="var(--color-semantic-static-black)"
+        opacity="0.16"
+      />
+      <rect
+        {...NAV_NODE.rect(NAV_NODE.radius, NAV_NODE.cornerRadius)}
+        fill={fill}
+        stroke={STAGE_SURFACE}
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 // Every waypoint role shows its glyph in a code-sized chip so the legend mirrors
 // what the map draws.
 function RoleGlyphSwatch({ role }) {
@@ -365,8 +398,17 @@ function LegendRow({ swatch, code, label }) {
  * @param {string[]} [props.roles]        role keys from NAV_ROLE_LEGEND
  * @param {string[]} [props.annotations]  annotation keys from NAV_ANNOTATION_LEGEND
  * @param {string[]} [props.states]       state keys from NAV_STATE_LEGEND
+ * @param {'glyph'|'waypoint'} [props.statePresentation]
  */
-export function NavigationLegend({ title = '지도 범례', roles, annotations, states, style, ...rest }) {
+export function NavigationLegend({
+  title = '지도 범례',
+  roles,
+  annotations,
+  states,
+  statePresentation = 'glyph',
+  style,
+  ...rest
+}) {
   return (
     <aside
       data-navigation-legend=""
@@ -414,7 +456,10 @@ export function NavigationLegend({ title = '지도 범례', roles, annotations, 
           {states.map((key) => {
             const entry = NAV_STATE_LEGEND[key];
             if (!entry) return null;
-            return <LegendRow key={key} swatch={<StateSwatch kind={key} />} label={entry.label} />;
+            const swatch = statePresentation === 'waypoint'
+              ? <WaypointStateSwatch kind={key} />
+              : <StateSwatch kind={key} />;
+            return <LegendRow key={key} swatch={swatch} label={entry.label} />;
           })}
         </LegendGroup>
       )}

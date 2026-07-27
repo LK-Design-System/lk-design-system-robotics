@@ -8,6 +8,88 @@ import React from 'react';
  */
 export const NavigationAnnotationContext = React.createContext(null);
 export const NavigationAnnotationDetailContext = React.createContext(null);
+export const NavigationLabelPolicyContext = React.createContext(Object.freeze({
+  labelVisibility: 'interaction',
+  detailVisibility: 'selected',
+}));
+
+const LABEL_VISIBILITY_MODES = new Set(['always', 'interaction', 'priority', 'hidden']);
+const DETAIL_VISIBILITY_MODES = new Set(['always', 'selected', 'hidden']);
+
+export function resolveNavigationLabelDisclosure({
+  policy,
+  showLabel,
+  labelVisibility,
+  detailVisibility,
+  hovered = false,
+  focused = false,
+  selected = false,
+  priority = false,
+  hasDetails = false,
+}) {
+  const inheritedLabelVisibility = policy?.labelVisibility ?? 'interaction';
+  const inheritedDetailVisibility = policy?.detailVisibility ?? 'selected';
+  const requestedLabelVisibility = labelVisibility
+    ?? (showLabel === true ? 'always' : showLabel === false ? 'hidden' : inheritedLabelVisibility);
+  const requestedDetailVisibility = detailVisibility
+    ?? (showLabel === true ? 'always' : inheritedDetailVisibility);
+  const resolvedLabelVisibility = LABEL_VISIBILITY_MODES.has(requestedLabelVisibility)
+    ? requestedLabelVisibility
+    : 'interaction';
+  const resolvedDetailVisibility = DETAIL_VISIBILITY_MODES.has(requestedDetailVisibility)
+    ? requestedDetailVisibility
+    : 'selected';
+  const interactionRevealed = hovered || focused || selected;
+  const labelVisible = resolvedLabelVisibility === 'always'
+    || (resolvedLabelVisibility === 'interaction' && interactionRevealed)
+    || (resolvedLabelVisibility === 'priority' && (interactionRevealed || priority));
+  const detailsVisible = labelVisible
+    && hasDetails
+    && resolvedDetailVisibility !== 'hidden'
+    && (
+      resolvedDetailVisibility === 'always'
+      || selected
+      || priority
+    );
+
+  return {
+    labelVisibility: resolvedLabelVisibility,
+    detailVisibility: resolvedDetailVisibility,
+    labelVisible,
+    detailsVisible,
+  };
+}
+
+export function useNavigationLabelPolicy() {
+  return React.useContext(NavigationLabelPolicyContext);
+}
+
+export function useNavigationLabelDisclosure({
+  onPointerEnter,
+  onPointerLeave,
+  ...options
+}) {
+  const policy = useNavigationLabelPolicy();
+  const [hovered, setHovered] = React.useState(false);
+  const disclosure = resolveNavigationLabelDisclosure({
+    ...options,
+    hovered,
+    policy,
+  });
+
+  return {
+    ...disclosure,
+    hovered,
+    onPointerEnter(event) {
+      if (event.pointerType !== 'touch') setHovered(true);
+      onPointerEnter?.(event);
+    },
+    onPointerLeave(event) {
+      setHovered(false);
+      onPointerLeave?.(event);
+    },
+  };
+}
 
 export const useIsomorphicLayoutEffect = typeof window === 'undefined'
   ? React.useEffect
@@ -48,14 +130,12 @@ export const ANNOTATION_IMPORTANCE = Object.freeze({
   'active-trajectory': 600,
   'current-segment': 700,
   'robot-pose': 800,
-  'current-progress': 900,
 });
 
 export const KIND_WEIGHT = {
   'region-label': 0,
   'lane-label': 1,
   'route-segment-label': 2,
-  'route-progress-label': 2,
   'trajectory-label': 3,
   'waypoint-label': 4,
   'facility-label': 5,
@@ -99,17 +179,6 @@ function placementCandidates(label) {
       { name: 'above-trailing', x: alongPath, y: 0 },
       { name: 'below-leading', x: -alongPath, y: height + 16 },
       { name: 'below-trailing', x: alongPath, y: height + 16 },
-    ];
-  }
-  if (kind === 'route-progress-label') {
-    const horizontalSwap = width / 2 + 20;
-    return [
-      { name: 'below', x: 0, y: 0 },
-      { name: 'above', x: 0, y: -(height + 32) },
-      { name: 'below-leading', x: -horizontalSwap, y: 0 },
-      { name: 'below-trailing', x: horizontalSwap, y: 0 },
-      { name: 'above-leading', x: -horizontalSwap, y: -(height + 32) },
-      { name: 'above-trailing', x: horizontalSwap, y: -(height + 32) },
     ];
   }
   if (kind === 'waypoint-label'

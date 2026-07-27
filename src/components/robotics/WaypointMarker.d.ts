@@ -1,5 +1,9 @@
 import * as React from 'react';
 import type { NavigationFrameRef } from './NavigationCoordinateSystem';
+import type {
+  NavigationDetailVisibility,
+  NavigationLabelVisibility,
+} from './NavigationAnnotationLayer';
 
 /** Renderer-neutral 2D point in the owning navigation map's coordinate space. */
 export interface NavigationPoint {
@@ -9,6 +13,12 @@ export interface NavigationPoint {
 
 /** Runtime availability supplied by the navigation source; the marker never infers it. */
 export type NavigationAvailability = 'available' | 'unavailable' | 'unknown';
+
+/** Visible-name disclosure policy for a waypoint marker. */
+export type WaypointLabelVisibility = NavigationLabelVisibility;
+
+/** Secondary annotation disclosure policy for a visible waypoint label. */
+export type WaypointDetailVisibility = NavigationDetailVisibility;
 
 /** Native event delivered by pointer or Enter/Space activation. */
 export type NavigationActivateEvent =
@@ -27,8 +37,15 @@ export interface NavigationSvgFeatureProps extends Omit<
   disabled?: boolean;
   invalid?: boolean;
   stale?: boolean;
-  /** Show the screen-space feature label supplied by the concrete renderer. @default true */
+  /**
+   * Legacy visible-label switch. `true` forces all label detail on and `false`
+   * hides the label unless an explicit visibility policy overrides it.
+   */
   showLabel?: boolean;
+  /** Override the inherited map label disclosure policy. */
+  labelVisibility?: NavigationLabelVisibility;
+  /** Override the inherited map detail disclosure policy. */
+  detailVisibility?: NavigationDetailVisibility;
 }
 
 export type WaypointRole = 'holding' | 'passthrough' | 'parking' | 'charger';
@@ -69,6 +86,20 @@ export interface WaypointData {
 
 export interface WaypointMarkerProps extends NavigationSvgFeatureProps {
   waypoint: WaypointData;
+  /**
+   * Visible-name policy. The default `interaction` mode reveals the label for
+   * hover, keyboard focus, or selection. `priority` is an explicit override.
+   * @default interaction
+   */
+  labelVisibility?: WaypointLabelVisibility;
+  /** Secondary annotation policy. Operational detail defaults to selection only. @default selected */
+  detailVisibility?: WaypointDetailVisibility;
+  /**
+   * Legacy label switch. `true` maps to `labelVisibility="always"` and `false`
+   * maps to `"hidden"` when `labelVisibility` is omitted.
+   * @deprecated Prefer labelVisibility.
+   */
+  showLabel?: boolean;
   /** Select or inspect this waypoint. Disabled markers do not call the callback. */
   onActivate?: (waypointId: string, event: NavigationActivateEvent) => void;
 }

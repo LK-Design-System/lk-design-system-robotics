@@ -4,7 +4,6 @@ import {
   useNavigationCoordinateBoundary,
 } from './NavigationCoordinateBoundary.jsx';
 import { isFocusVisibleTarget } from './_NavigationFocus.js';
-import { NavigationStateGlyph } from './_NavigationStateGlyph.js';
 import {
   trajectoryProgressGeometry,
 } from './_navigationProgressHead.js';
@@ -13,9 +12,10 @@ import {
   NavigationAnnotationBlock,
   annotationPriority,
   useNavigationAnnotationDetailMode,
+  useNavigationLabelDisclosure,
   useNavigationObstacles,
 } from './_navigationAnnotations.js';
-import { navStateOpacity, NAV_DASH, NAV_PATH_DASH, NAV_HIT, NAV_STATE_BADGE, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION, NAV_LINE_ROLE, NAV_TRAJECTORY_SAMPLE } from './_navigationVocabulary.js';
+import { navStateOpacity, NAV_HIT, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION, NAV_LINE_ROLE, NAV_TRAJECTORY_SAMPLE } from './_navigationVocabulary.js';
 
 const STATUS_LABEL = {
   planned: '계획됨',
@@ -26,17 +26,6 @@ const STATUS_LABEL = {
   completed: '완료됨',
 };
 
-const MARKER_GAP_PX = 4;
-const MARKER_ROW_CLEARANCE_PX = 8;
-const LABEL_ROW_GAP_PX = 12;
-// Outline-inclusive footprints for the screen-slot collision layout — derived
-// from the shared badge tokens (painted radius + half the outline stroke) so
-// the layout can never underestimate what the circles actually paint.
-const STATE_BADGE_FOOTPRINT_PX = NAV_STATE_BADGE.radius + NAV_STATE_BADGE.strokeWidth / 2;
-const MARKER_RADIUS_PX = {
-  invalid: STATE_BADGE_FOOTPRINT_PX,
-  stale: STATE_BADGE_FOOTPRINT_PX,
-};
 function finitePoint(point) {
   return point && Number.isFinite(point.x) && Number.isFinite(point.y);
 }
@@ -59,67 +48,8 @@ function visibleSampleIndexes(sampleCount, currentIndex) {
   return [...indexes].sort((first, second) => first - second);
 }
 
-function markerTransform(point, inverseScale, screenSlot) {
-  const anchor = `translate(${point.x} ${point.y}) scale(${inverseScale})`;
-  return screenSlot ? `${anchor} translate(${screenSlot.x} ${screenSlot.y})` : anchor;
-}
-
-function markerCollisionLayout(markers, scale, fixedMarkers = []) {
-  const candidates = [...markers, ...fixedMarkers];
-  if (candidates.length < 2) return undefined;
-  const collisionParticipants = new Set();
-  const collidingMovableIndexes = new Set();
-  for (let first = 0; first < candidates.length; first += 1) {
-    for (let second = first + 1; second < candidates.length; second += 1) {
-      const a = candidates[first];
-      const b = candidates[second];
-      const naturalDistance = Math.hypot(
-        a.point.x - b.point.x,
-        a.point.y - b.point.y,
-      ) * scale;
-      if (naturalDistance < a.radius + b.radius + MARKER_GAP_PX) {
-        collisionParticipants.add(first);
-        collisionParticipants.add(second);
-        if (first < markers.length) collidingMovableIndexes.add(first);
-        if (second < markers.length) collidingMovableIndexes.add(second);
-      }
-    }
-  }
-  if (collidingMovableIndexes.size === 0) return undefined;
-
-  const collisionMarkers = [...collisionParticipants].map((index) => candidates[index]);
-  const reference = collisionMarkers.reduce((point, marker) => ({
-    x: point.x + marker.point.x / collisionMarkers.length,
-    y: point.y + marker.point.y / collisionMarkers.length,
-  }), { x: 0, y: 0 });
-  const maxRadius = Math.max(...markers.map((marker) => marker.radius));
-  const totalWidth = markers.reduce((width, marker) => width + marker.radius * 2, 0)
-    + MARKER_GAP_PX * (markers.length - 1);
-  const rowY = -(maxRadius + MARKER_ROW_CLEARANCE_PX);
-  const slots = {};
-  let cursor = -totalWidth / 2;
-  markers.forEach((marker) => {
-    const centerX = cursor + marker.radius;
-    slots[marker.name] = {
-      x: (reference.x - marker.point.x) * scale + centerX,
-      y: (reference.y - marker.point.y) * scale + rowY,
-    };
-    cursor += marker.radius * 2 + MARKER_GAP_PX;
-  });
-  return {
-    reference,
-    slots,
-    totalWidth,
-    labelY: rowY - maxRadius - LABEL_ROW_GAP_PX,
-  };
-}
-
-function labelScreenSlot(point, layout, scale) {
-  if (!layout) return undefined;
-  return {
-    x: (layout.reference.x - point.x) * scale,
-    y: (layout.reference.y - point.y) * scale + layout.labelY,
-  };
+function markerTransform(point, inverseScale) {
+  return `translate(${point.x} ${point.y}) scale(${inverseScale})`;
 }
 
 function pointAlong(points, ratio) {
@@ -155,32 +85,21 @@ function pointAlong(points, ratio) {
   return { ...points[points.length - 1], angle: 0 };
 }
 
-// Midpoint (+heading) of the longest polyline segment. The direction chevron
-// anchors here instead of at a fixed path fraction: a fraction can land on a
-// bend vertex, where the rotated chevron juts off the corner and reads as
-// detached from its own line.
-// Lifecycle status drives the line + head tone. `invalid` (a data-quality flag)
-// is carried by its own red badge, not by repainting the whole path + progress
-// head red — that stacked two red signals and made an invalid-but-active
-// trajectory read like a blocked one.
-function statusTone(status) {
-  if (status === 'blocked') return 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))';
-  if (status === 'waiting' || status === 'rerouting') return 'var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))';
-  if (status === 'completed') return 'var(--viewer-positive, var(--color-semantic-status-positive-foreground))';
-  if (status === 'active') return 'var(--viewer-accent, var(--color-semantic-primary-normal))';
-  return 'var(--viewer-muted, var(--color-semantic-label-alternative))';
-}
+// Lifecycle status must not change the Trajectory identity stroke. Exact status
+// belongs to labels, accessible names, and detail surfaces. Invalid/stale are
+// whole-dataset quality treatments, never point markers.
+const TRAJECTORY_IDENTITY_TONE = 'var(--viewer-accent, var(--color-semantic-primary-normal))';
 
-function statusDash(status) {
-  if (status === 'planned') return NAV_PATH_DASH.pending;
-  if (status === 'waiting') return NAV_PATH_DASH.waiting;
-  if (status === 'blocked') return NAV_PATH_DASH.blocked;
-  if (status === 'rerouting') return NAV_PATH_DASH.rerouting;
-  if (status === 'completed') return NAV_PATH_DASH.completed;
-  return undefined;
-}
-
-function trajectoryAccessibleName(trajectory, selected, focused, disabled, invalid, stale) {
+function trajectoryAccessibleName(
+  trajectory,
+  selected,
+  focused,
+  disabled,
+  invalid,
+  stale,
+  showTimeCursor,
+  playbackTimeMs,
+) {
   const samples = trajectory?.samples ?? [];
   const currentIndex = Number.isInteger(trajectory?.currentSampleIndex)
     && trajectory.currentSampleIndex >= 0
@@ -190,7 +109,11 @@ function trajectoryAccessibleName(trajectory, selected, focused, disabled, inval
   const timedSamples = samples.filter((sample) => Number.isFinite(sample.timeMs));
   const firstTime = timedSamples[0]?.timeMs;
   const lastTime = timedSamples[timedSamples.length - 1]?.timeMs;
-  const currentTime = currentIndex == null ? undefined : samples[currentIndex]?.timeMs;
+  const currentTime = Number.isFinite(playbackTimeMs)
+    ? playbackTimeMs
+    : currentIndex == null
+      ? undefined
+      : samples[currentIndex]?.timeMs;
   const parts = [
     trajectory.label ?? `궤적 ${trajectory.id}`,
     `지도 ${trajectory.mapId}`,
@@ -198,14 +121,62 @@ function trajectoryAccessibleName(trajectory, selected, focused, disabled, inval
     `sample ${samples.length}개`,
   ];
   if (firstTime != null && lastTime != null) parts.push(`시간 ${firstTime}에서 ${lastTime} 밀리초`);
-  if (currentIndex != null) parts.push(`현재 sample ${currentIndex + 1}`);
-  if (currentTime != null) parts.push(`현재 시간 ${currentTime} 밀리초`);
+  if (showTimeCursor && !Number.isFinite(playbackTimeMs) && currentIndex != null) {
+    parts.push(`재생 sample ${currentIndex + 1}`);
+  }
+  if (showTimeCursor && currentTime != null) parts.push(`재생 시간 ${Math.round(currentTime)} 밀리초`);
   if (selected) parts.push('선택됨');
   if (focused) parts.push('포커스됨');
   if (disabled) parts.push('선택할 수 없음');
   if (invalid) parts.push('데이터 오류');
   if (stale) parts.push('오래된 데이터');
   return parts.join(', ');
+}
+
+function trajectoryTimeProgressGeometry(samples, finiteSamples, playbackTimeMs) {
+  if (!Number.isFinite(playbackTimeMs)) return undefined;
+  const timed = finiteSamples
+    .map(({ sourceIndex, point }, pointIndex) => ({
+      point,
+      pointIndex,
+      timeMs: samples[sourceIndex]?.timeMs,
+    }))
+    .filter(({ timeMs }) => Number.isFinite(timeMs));
+  if (
+    timed.length < 2
+    || timed.some((sample, index) => index > 0 && sample.timeMs < timed[index - 1].timeMs)
+  ) return undefined;
+
+  const first = timed[0];
+  const last = timed[timed.length - 1];
+  const clampedTimeMs = Math.max(first.timeMs, Math.min(last.timeMs, playbackTimeMs));
+  const exact = timed.find((sample) => sample.timeMs === clampedTimeMs);
+  if (exact) {
+    return {
+      ...trajectoryProgressGeometry(finiteSamples.map(({ point }) => point), exact.pointIndex),
+      playbackTimeMs: clampedTimeMs,
+      exactPointIndex: exact.pointIndex,
+    };
+  }
+
+  const upperIndex = timed.findIndex((sample) => sample.timeMs > clampedTimeMs);
+  const lower = timed[Math.max(0, upperIndex - 1)];
+  const upper = timed[upperIndex];
+  if (!lower || !upper || upper.timeMs === lower.timeMs) return undefined;
+
+  const ratio = (clampedTimeMs - lower.timeMs) / (upper.timeMs - lower.timeMs);
+  const point = {
+    x: lower.point.x + (upper.point.x - lower.point.x) * ratio,
+    y: lower.point.y + (upper.point.y - lower.point.y) * ratio,
+  };
+  return {
+    point,
+    angle: Math.atan2(upper.point.y - lower.point.y, upper.point.x - lower.point.x) * 180 / Math.PI,
+    prefixPoints: [...finiteSamples.slice(0, lower.pointIndex + 1).map(({ point: item }) => item), point],
+    usesCarrier: false,
+    playbackTimeMs: clampedTimeMs,
+    exactPointIndex: -1,
+  };
 }
 
 function compactLabel(label, limit = 16) {
@@ -222,11 +193,17 @@ export function TrajectoryOverlay({
   disabled = false,
   invalid = false,
   stale = false,
-  showLabel = true,
+  showLabel,
+  labelVisibility,
+  detailVisibility,
+  showTimeCursor = false,
+  playbackTimeMs,
   onActivate,
   tabIndex,
   onFocus,
   onBlur,
+  onPointerEnter,
+  onPointerLeave,
   onPointerDown,
   onMouseDown,
   'aria-label': ariaLabel,
@@ -251,6 +228,26 @@ export function TrajectoryOverlay({
   })).filter(({ point }) => finitePoint(point));
   const points = finiteSamples.map(({ point }) => point);
   const pathData = pathFromPoints(points);
+  const {
+    hovered,
+    labelVisibility: resolvedLabelVisibility,
+    detailVisibility: resolvedDetailVisibility,
+    labelVisible,
+    onPointerEnter: handleLabelPointerEnter,
+    onPointerLeave: handleLabelPointerLeave,
+  } = useNavigationLabelDisclosure({
+    showLabel,
+    labelVisibility,
+    detailVisibility,
+    selected,
+    focused: focusVisible,
+    priority: invalid
+      || stale
+      || trajectory?.status === 'blocked',
+    hasDetails: false,
+    onPointerEnter,
+    onPointerLeave,
+  });
   if (
     (trajectory?.source && trajectory.source.mapId !== trajectory.mapId)
     || !isNavigationGeometryCompatible(trajectory, coordinateBoundary)
@@ -264,50 +261,29 @@ export function TrajectoryOverlay({
   const currentPointIndex = currentIndex == null
     ? -1
     : finiteSamples.findIndex(({ sourceIndex }) => sourceIndex === currentIndex);
-  const currentProgress = trajectoryProgressGeometry(points, currentPointIndex);
+  const visibleCurrentPointIndex = showTimeCursor ? currentPointIndex : -1;
+  const timeProgress = Number.isFinite(playbackTimeMs)
+    ? trajectoryTimeProgressGeometry(samples, finiteSamples, playbackTimeMs)
+    : undefined;
+  const currentProgress = timeProgress ?? (showTimeCursor
+    ? trajectoryProgressGeometry(points, visibleCurrentPointIndex)
+    : undefined);
+  const cursorPointIndex = timeProgress?.exactPointIndex ?? visibleCurrentPointIndex;
   const markerPoint = currentProgress?.point ?? pointAlong(points, 0.5);
   const currentPrefixPath = currentProgress ? pathFromPoints(currentProgress.prefixPoints) : '';
   const statePoint = pointAlong(points, 0.12);
-  // Heading chevron anchor — longest-segment midpoint, so a trajectory without
-  // a progress head still reads a travel direction, matching the Route/Lane
-  // direction chevron.
-  const sampleIndexes = visibleSampleIndexes(points.length, currentPointIndex);
-  const tone = statusTone(trajectory?.status);
-  const dash = statusDash(trajectory?.status);
+  // Sample visibility is capped so temporal density stays bounded.
+  const sampleIndexes = visibleSampleIndexes(points.length, visibleCurrentPointIndex);
+  const tone = invalid
+    ? 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))'
+    : stale
+      ? 'var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))'
+      : TRAJECTORY_IDENTITY_TONE;
   const foreground = 'var(--viewer-foreground, var(--color-semantic-label-strong))';
   const surface = 'var(--viewer-surface-elevated, var(--color-semantic-background-elevated-normal))';
-  const trajectoryStateMarkers = [
-    invalid ? {
-      state: 'invalid',
-      glyphKind: 'invalid',
-      point: pointAlong(points, 0.8),
-      tone: 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))',
-    } : null,
-    stale ? {
-      state: 'stale',
-      glyphKind: 'stale',
-      point: pointAlong(points, invalid ? 0.9 : 0.8),
-      tone: 'var(--viewer-muted, var(--color-semantic-label-alternative))',
-    } : null,
-  ].filter(Boolean);
-  // Lifecycle status lives on the LINE itself — tone plus the shared
-  // NAV_PATH_DASH patterns (and the progress head for the current position).
-  // Badges are point-vocabulary; the only glyph badges a trajectory keeps are
-  // the data-quality flags (invalid/stale), whose one non-color channel is the
-  // badge because the dash channel is already spent on status.
-  const naturalMarkers = trajectoryStateMarkers.map((item) => ({
-    name: item.state,
-    point: item.point,
-    radius: MARKER_RADIUS_PX[item.state],
-  }));
-  const fixedProgressMarkers = currentProgress ? [{
-    name: 'current',
-    point: currentProgress.point,
-    radius: NAV_TRAJECTORY_SAMPLE.cursorCollisionRadius,
-  }] : [];
-  const markerLayout = markerCollisionLayout(naturalMarkers, scale, fixedProgressMarkers);
-  const trajectoryMarkerSlot = (name) => markerLayout?.slots[name];
-  const trajectoryLabelSlot = labelScreenSlot(markerPoint, markerLayout, scale);
+  // Playback position is opt-in and never claims to be the physical robot
+  // pose. Data quality applies to the complete dataset, so it changes the
+  // complete stroke instead of attaching a point badge.
 
   const activate = (event) => {
     if (disabled || !interactive) return;
@@ -345,22 +321,36 @@ export function TrajectoryOverlay({
       data-coordinate-space={trajectory?.coordinateSpace}
       data-trajectory-status={trajectory?.status}
       data-current-sample-index={currentIndex}
+      data-playback-time-ms={timeProgress?.playbackTimeMs}
+      data-time-cursor-visible={showTimeCursor ? 'true' : 'false'}
       data-viewport-scale={scale}
-      data-trajectory-marker-layout={markerLayout ? 'screen-slots' : 'path-anchored'}
-      data-trajectory-marker-row-width={markerLayout?.totalWidth}
       data-pointer-only={pointerOnly ? 'true' : undefined}
       data-selected={selected ? 'true' : 'false'}
       data-focused={focusVisible ? 'true' : 'false'}
       data-disabled={disabled ? 'true' : 'false'}
       data-invalid={invalid ? 'true' : 'false'}
       data-stale={stale ? 'true' : 'false'}
+      data-trajectory-quality={invalid ? 'invalid' : stale ? 'stale' : 'valid'}
+      data-hovered={hovered ? 'true' : 'false'}
+      data-label-visibility={resolvedLabelVisibility}
+      data-label-visible={labelVisible ? 'true' : 'false'}
+      data-detail-visibility={resolvedDetailVisibility}
       role={hiddenFromAccessibility ? undefined : interactive ? 'button' : 'img'}
       tabIndex={hiddenFromAccessibility ? undefined : interactive ? (disabled ? -1 : tabIndex ?? 0) : tabIndex}
       focusable={hiddenFromAccessibility ? 'false' : interactive ? 'true' : undefined}
       aria-hidden={hiddenFromAccessibility || undefined}
       aria-label={hiddenFromAccessibility
         ? undefined
-        : ariaLabel ?? trajectoryAccessibleName(trajectory, selected, focused, disabled, invalid, stale)}
+        : ariaLabel ?? trajectoryAccessibleName(
+          trajectory,
+          selected,
+          focused,
+          disabled,
+          invalid,
+          stale,
+          showTimeCursor,
+          timeProgress?.playbackTimeMs,
+        )}
       aria-pressed={!hiddenFromAccessibility && interactive ? selected : undefined}
       aria-disabled={!hiddenFromAccessibility && interactive && disabled ? true : undefined}
       aria-invalid={!hiddenFromAccessibility && invalid ? true : undefined}
@@ -376,9 +366,11 @@ export function TrajectoryOverlay({
         setHasDomFocus(false);
         onBlur?.(event);
       } : undefined}
+      onPointerEnter={handleLabelPointerEnter}
+      onPointerLeave={handleLabelPointerLeave}
       style={{
         cursor: disabled ? 'not-allowed' : interactive ? 'pointer' : 'default',
-        opacity: navStateOpacity(disabled, stale),
+        opacity: navStateOpacity(disabled, false),
         outline: 'none',
         ...style,
       }}
@@ -411,6 +403,19 @@ export function TrajectoryOverlay({
           pointerEvents="none"
         />
       )}
+      {pathData && stale && !invalid && (
+        <path
+          data-trajectory-freshness-pulse=""
+          d={pathData}
+          fill="none"
+          stroke={tone}
+          strokeWidth={NAV_LINE_ROLE.trajectory.pulseWidth}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          vectorEffect="non-scaling-stroke"
+          pointerEvents="none"
+        />
+      )}
       {pathData && (
         <path
           data-trajectory-path=""
@@ -420,11 +425,8 @@ export function TrajectoryOverlay({
           stroke={tone}
           strokeWidth={selected
             ? NAV_SELECTION.trajectoryStrokeWidth
-            : trajectory?.status === 'active'
-              ? NAV_LINE_ROLE.trajectory.activeWidth
-              : NAV_LINE_ROLE.trajectory.coreWidth}
+            : NAV_LINE_ROLE.trajectory.activeWidth}
           data-navigation-selection-geometry=""
-          strokeDasharray={dash}
           opacity={currentProgress ? NAV_LINE_ROLE.trajectory.futureOpacity : undefined}
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -459,13 +461,18 @@ export function TrajectoryOverlay({
         </>
       )}
       {pathData && sampleIndexes.map((sampleIndex) => {
-        if (sampleIndex === currentPointIndex) return null;
+        if (sampleIndex === cursorPointIndex) return null;
         const sample = points[sampleIndex];
-        const phase = currentPointIndex < 0
+        const sourceSample = samples[finiteSamples[sampleIndex]?.sourceIndex];
+        const phase = !currentProgress
           ? 'planned'
-          : sampleIndex < currentPointIndex
-            ? 'past'
-            : 'future';
+          : timeProgress && Number.isFinite(sourceSample?.timeMs)
+            ? sourceSample.timeMs < timeProgress.playbackTimeMs
+              ? 'past'
+              : 'future'
+            : sampleIndex < visibleCurrentPointIndex
+              ? 'past'
+              : 'future';
         return (
           <circle
             key={`sample-${sampleIndex}`}
@@ -476,17 +483,17 @@ export function TrajectoryOverlay({
             cy={sample.y}
             r={NAV_TRAJECTORY_SAMPLE.radius * inverseScale}
             fill={tone}
-            stroke={surface}
-            strokeWidth="0.75"
-            opacity={phase === 'past'
-              ? NAV_TRAJECTORY_SAMPLE.pastOpacity
-              : NAV_TRAJECTORY_SAMPLE.futureOpacity}
+            opacity={phase === 'planned'
+              ? 1
+              : phase === 'past'
+                ? NAV_TRAJECTORY_SAMPLE.pastOpacity
+                : NAV_TRAJECTORY_SAMPLE.futureOpacity}
             vectorEffect="non-scaling-stroke"
             pointerEvents="none"
           />
         );
       })}
-      {currentProgress && (
+      {showTimeCursor && currentProgress && (
         <g
           {...obstacle(`trajectory:${trajectory.id}:time-cursor`)}
           data-trajectory-time-cursor=""
@@ -513,7 +520,7 @@ export function TrajectoryOverlay({
           />
         </g>
       )}
-      {pathData && interactive && (
+      {pathData && (
         <>
           <path
             data-trajectory-hit-target=""
@@ -538,38 +545,7 @@ export function TrajectoryOverlay({
           />
         </>
       )}
-      {/* The progress head already points the travel direction — one arrow per
-          line, so the chevron renders only on head-less trajectories. */}
-      {pathData && trajectoryStateMarkers.map((item) => {
-        const point = item.point;
-        const stateSlot = trajectoryMarkerSlot(item.state);
-        return (
-          <g
-            key={item.state}
-            data-trajectory-overlay-state={item.state}
-            data-trajectory-screen-slot={stateSlot ? item.state : undefined}
-            data-trajectory-anchor-x={point.x}
-            data-trajectory-anchor-y={point.y}
-            transform={markerTransform(point, inverseScale, stateSlot)}
-            aria-hidden="true"
-            pointerEvents="none"
-          >
-            <circle
-              {...obstacle(`trajectory:${trajectory.id}:state:${item.state}`)}
-              data-trajectory-marker-badge={item.state}
-              data-navigation-marker-circle=""
-              r={NAV_STATE_BADGE.radius}
-              fill={surface}
-              stroke={item.tone}
-              strokeWidth={NAV_STATE_BADGE.strokeWidth}
-              strokeDasharray={item.state === 'stale' ? NAV_DASH.staleRing : undefined}
-              vectorEffect="non-scaling-stroke"
-            />
-            <NavigationStateGlyph kind={item.glyphKind} size={10} color={foreground} />
-          </g>
-        );
-      })}
-      {showLabel && trajectory?.label && pathData && (
+      {labelVisible && trajectory?.label && pathData && (
         <NavigationAnnotationBlock
           id={`trajectory:${trajectory.id}:label`}
           kind="trajectory-label"
@@ -587,13 +563,12 @@ export function TrajectoryOverlay({
         >
           <text
             data-trajectory-label=""
-            data-trajectory-screen-row={trajectoryLabelSlot ? 'label' : undefined}
             data-trajectory-label-anchor-x={markerPoint.x}
             data-trajectory-label-anchor-y={markerPoint.y}
             x="0"
-            y={trajectoryLabelSlot ? 0 : -13}
+            y="-13"
             textAnchor="middle"
-            transform={markerTransform(markerPoint, inverseScale, trajectoryLabelSlot)}
+            transform={markerTransform(markerPoint, inverseScale)}
             fill={foreground}
             stroke={surface}
             strokeWidth={NAV_LABEL_HALO.primary}

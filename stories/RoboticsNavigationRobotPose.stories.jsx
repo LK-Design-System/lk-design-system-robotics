@@ -92,7 +92,7 @@ const meta = {
       eyebrow: 'Robotics / Navigation / Robot Pose',
       title: '로봇의 위치와 실제 heading은 경로 진행률과 분리해 표현합니다',
       description:
-        'RobotPoseMarker는 모든 상태에 동일한 본체와 heading을 사용합니다. 이동 중은 약한 펄스로, 나머지 상태는 우측 상단의 단일 배지로 표시해 Route·Trajectory 진행 head와 섞지 않습니다.',
+        'RobotPoseMarker는 모든 상태에 동일한 본체와 heading을 사용합니다. 이동 중은 약한 펄스로, 나머지 상태는 우측 상단의 단일 배지로 표시해 Route debug·Trajectory playback cue와 섞지 않습니다.',
     },
     docs: {
       description: {
@@ -190,6 +190,13 @@ export const Overview = {
       }
       if (heading.getAttribute('stroke') !== null) {
         throw new Error('RobotPoseMarker heading must use a solid fill without an outline.');
+      }
+      if (
+        heading.dataset.headingAnchor !== 'center'
+        || heading.getAttribute('d') !== 'M12 0 L-3 -6 L0 0 L-3 6 Z'
+        || heading.getAttribute('transform') !== 'translate(-3 0)'
+      ) {
+        throw new Error('RobotPoseMarker must center the original heading arrowhead on the pose body.');
       }
     });
     const lightMarkers = [...canvasElement.querySelectorAll('[data-viewer-appearance="light"] [data-robot-pose-marker]')];

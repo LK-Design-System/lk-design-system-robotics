@@ -1,11 +1,11 @@
 import React from 'react';
 import { Map2DCanvas } from '@lk-robotics/lds-product';
 import {
-  NAV_PROGRESS_HEAD,
   NAV_TRAJECTORY_SAMPLE,
 } from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationVocabulary';
 import {
   NavigationAnnotationLayer,
+  adaptWorldRobotPoseToPose,
   adaptWorldRouteToRoute,
   adaptWorldTrajectoryToTrajectory,
   createNavigationMapTransform,
@@ -55,7 +55,7 @@ export const ACTIVE_ROUTE = adaptWorldRouteToRoute({
       laneIds: ['lane-corridor-b'],
       exitTransitionId: 'transition-lift-a',
       phase: 'current',
-      condition: 'waiting',
+      condition: 'normal',
     },
     {
       id: 'segment-l2-upcoming',
@@ -82,16 +82,25 @@ export const ACTIVE_TRAJECTORY = adaptWorldTrajectoryToTrajectory({
   mapId: 'L1',
   status: 'active',
   samples: [
-    { position: { x: 14, y: 2.6 }, timeMs: 0, headingRad: 0 },
-    { position: { x: 18.2, y: 2.8 }, timeMs: 250, headingRad: 0.05 },
-    { position: { x: 22.6, y: 3.6 }, timeMs: 500, headingRad: 0.14 },
-    { position: { x: 26.8, y: 5 }, timeMs: 750, headingRad: 0.3 },
-    { position: { x: 31.2, y: 6.6 }, timeMs: 1000, headingRad: 0.36 },
-    { position: { x: 36, y: 7.8 }, timeMs: 1250, headingRad: 0.2 },
-    { position: { x: 41.2, y: 8.4 }, timeMs: 1500, headingRad: 0.08 },
-    { position: { x: 46.8, y: 8.6 }, timeMs: 1750, headingRad: 0 },
+    { position: { x: 20.2, y: 10.1 }, timeMs: 0, headingRad: 0.42 },
+    { position: { x: 23.4, y: 11.6 }, timeMs: 250, headingRad: 0.42 },
+    { position: { x: 26.8, y: 13 }, timeMs: 500, headingRad: 0.3 },
+    { position: { x: 29.4, y: 13.55 }, timeMs: 750, headingRad: 0.1 },
+    { position: { x: 33.4, y: 13.55 }, timeMs: 1000, headingRad: 0 },
+    { position: { x: 37.6, y: 13.52 }, timeMs: 1250, headingRad: 0 },
+    { position: { x: 41.8, y: 13.48 }, timeMs: 1500, headingRad: -0.01 },
+    { position: { x: 45.2, y: 13.5 }, timeMs: 1750, headingRad: 0 },
   ],
-  currentSampleIndex: 5,
+  currentSampleIndex: 1,
+}, { transform: ROUTE_TRANSFORM_L1 });
+
+export const ACTIVE_ROBOT_POSE = adaptWorldRobotPoseToPose({
+  id: 'robot-2-pose',
+  label: 'Robot 2',
+  mapId: 'L1',
+  position: { x: 24.8, y: 12.2 },
+  headingRad: 0.4,
+  state: 'moving',
 }, { transform: ROUTE_TRANSFORM_L1 });
 
 export const L2_TRAJECTORY = adaptWorldTrajectoryToTrajectory({
@@ -190,12 +199,13 @@ export function PathMap({
   );
 }
 
-// Route/Trajectory lifecycle status and segment condition now live on the LINE
-// (tone + NAV_PATH_DASH), not in glyph badges. The only glyph badges left are
-// the data-quality flags, exposed as [data-*-overlay-state] (invalid / stale).
+// Route/Trajectory lifecycle status and segment condition stay in labels,
+// accessible names, and detail surfaces rather than line glyph badges. Data
+// quality applies to the complete stroke; these retired selectors remain only
+// as a regression guard.
 export const NAVIGATION_STATE_BADGE_SELECTOR = [
-  '[data-route-overlay-state]',
-  '[data-trajectory-overlay-state]',
+  '[data-route-marker-badge]',
+  '[data-trajectory-marker-badge]',
 ].join(',');
 
 export function screenPoint(element, x = 0, y = 0) {
@@ -279,8 +289,7 @@ export function assertNavigationStateGlyphGeometry(root, label) {
   groups.forEach((group) => {
     const glyph = group.querySelector(':scope > [data-navigation-state-glyph]');
     const circle = group.querySelector(':scope > [data-navigation-marker-circle]');
-    const stateTexts = Array.from(group.querySelectorAll(':scope > text'))
-      .filter((text) => !text.hasAttribute('data-route-progress-label'));
+    const stateTexts = Array.from(group.querySelectorAll(':scope > text'));
     const expectedKind = expectedNavigationStateKind(group);
     if (!glyph || !circle || stateTexts.length > 0 || glyph.getAttribute('data-navigation-state-glyph') !== expectedKind) {
       throw new Error(`${label} state badge did not preserve its ${expectedKind} SVG glyph mapping.`);
@@ -357,66 +366,11 @@ export function assertNavigationVectorGeometry(root, label) {
   });
 }
 
-export function assertNavigationProgressHead(root, label, role) {
-  const head = root.querySelector(`[data-navigation-progress-head="${role}"]`);
-  const casing = Array.from(root.querySelectorAll(`[data-${role}-progress-casing]`))
-    .find((item) => item.hasAttribute('marker-end'));
-  if (!(head instanceof SVGPathElement) || !(casing instanceof SVGPathElement)) {
-    throw new Error(`${label} needs a path-integrated ${role} progress head with casing.`);
-  }
-  if (head.getAttribute('data-head-rendering') !== 'marker-end'
-    || head.hasAttribute(`data-${role}-screen-slot`)) {
-    throw new Error(`${label} progress head must stay attached to its path through marker-end.`);
-  }
-
-  const markerEnd = head.getAttribute('marker-end') ?? '';
-  const casingMarkerEnd = casing.getAttribute('marker-end') ?? '';
-  const markerId = markerEnd.match(/^url\(#(.+)\)$/)?.[1];
-  const casingMarkerId = casingMarkerEnd.match(/^url\(#(.+)\)$/)?.[1];
-  const svg = head.ownerSVGElement;
-  const marker = Array.from(svg?.querySelectorAll('marker') ?? []).find((item) => item.id === markerId);
-  const casingMarker = Array.from(svg?.querySelectorAll('marker') ?? []).find((item) => item.id === casingMarkerId);
-  const definition = marker?.querySelector('[data-navigation-progress-head-definition="core"]');
-  if (!marker || !casingMarker || definition?.getAttribute('d') !== NAV_PROGRESS_HEAD.path
-    || marker.getAttribute('orient') !== 'auto'
-    || marker.getAttribute('markerUnits') !== 'userSpaceOnUse') {
-    throw new Error(`${label} progress head lost the shared open-V marker geometry.`);
-  }
-
-  const coordinates = (head.getAttribute('d') ?? '')
-    .match(/[-+]?(?:\d*\.?\d+)(?:e[-+]?\d+)?/gi)
-    ?.map(Number) ?? [];
-  const anchorX = Number(head.getAttribute(`data-${role}-anchor-x`));
-  const anchorY = Number(head.getAttribute(`data-${role}-anchor-y`));
-  const endpointX = coordinates[coordinates.length - 2];
-  const endpointY = coordinates[coordinates.length - 1];
-  if (!Number.isFinite(anchorX) || !Number.isFinite(anchorY)
-    || Math.abs(endpointX - anchorX) > 0.001
-    || Math.abs(endpointY - anchorY) > 0.001) {
-    throw new Error(`${label} progress-head tip must equal the source current position.`);
-  }
-
-  const expectedWidth = NAV_PROGRESS_HEAD.width / Number(root.getAttribute('data-viewport-scale') || 1);
-  if (Math.abs(Number(marker.getAttribute('markerWidth')) - expectedWidth) > 0.01
-    || Number(head.getAttribute('stroke-width')) !== NAV_PROGRESS_HEAD[role].coreWidth) {
-    throw new Error(`${label} progress head did not preserve its screen-space size and path weight.`);
-  }
-  const futurePath = role === 'route'
-    ? head.closest('[data-route-segment]')?.querySelector('[data-route-path]')
-    : root.querySelector('[data-trajectory-path]');
-  const futureOpacity = Number(futurePath?.getAttribute('opacity'));
-  if (!(futureOpacity > 0 && futureOpacity < 1)) {
-    throw new Error(`${label} needs a recessed future path behind the strong elapsed path.`);
-  }
-  if (role === 'route' && root.querySelector('[data-route-marker-badge="progress"]')) {
-    throw new Error(`${label} must not restore the old circular Route progress badge.`);
-  }
-  if (role === 'trajectory' && root.querySelector('[data-trajectory-marker-badge="current"]')) {
-    throw new Error(`${label} must not restore the old circular Trajectory current badge.`);
-  }
-}
-
-export function assertTrajectoryTemporalEncoding(root, label) {
+export function assertTrajectoryTemporalEncoding(
+  root,
+  label,
+  { showTimeCursor = false, showPlaybackProgress = false } = {},
+) {
   if (root.getAttribute('data-navigation-line-role') !== 'trajectory'
     || root.getAttribute('data-line-encoding') !== 'temporal-samples') {
     throw new Error(`${label} must expose the trajectory temporal-sample line role.`);
@@ -428,21 +382,101 @@ export function assertTrajectoryTemporalEncoding(root, label) {
   const cursor = root.querySelector('[data-trajectory-time-cursor]');
   const outer = cursor?.querySelector('[data-trajectory-cursor-surface]');
   const core = cursor?.querySelector('[data-trajectory-cursor-core]');
-  if (!cursor || !outer || !core) {
-    throw new Error(`${label} needs a circular current-sample time cursor.`);
-  }
   if (root.querySelector('[data-navigation-progress-head="trajectory"], [data-trajectory-direction]')) {
     throw new Error(`${label} must not reuse Route arrowheads or direction chevrons.`);
   }
+  if (!showTimeCursor) {
+    const progress = root.querySelector('[data-trajectory-progress-past]');
+    const progressCasing = root.querySelector('[data-trajectory-progress-casing]');
+    if (cursor || (!showPlaybackProgress && (progress || progressCasing))) {
+      throw new Error(`${label} must leave playback position cues hidden in an operational map.`);
+    }
+    if (showPlaybackProgress && (!progress || !progressCasing)) {
+      throw new Error(`${label} must render elapsed playback geometry without a map cursor.`);
+    }
+    if (root.getAttribute('data-time-cursor-visible') !== 'false') {
+      throw new Error(`${label} must expose that its playback cursor is disabled.`);
+    }
+    return;
+  }
+  if (!cursor || !outer || !core) {
+    throw new Error(`${label} needs a circular playback cursor when explicitly requested.`);
+  }
   if (Number(outer.getAttribute('r')) !== NAV_TRAJECTORY_SAMPLE.cursorOuterRadius
     || Number(core.getAttribute('r')) !== NAV_TRAJECTORY_SAMPLE.cursorInnerRadius) {
-    throw new Error(`${label} current-sample cursor lost its fixed geometry.`);
+    throw new Error(`${label} playback cursor lost its fixed geometry.`);
   }
   const futurePath = root.querySelector('[data-trajectory-path]');
   const futureOpacity = Number(futurePath?.getAttribute('opacity'));
   if (!(futureOpacity > 0 && futureOpacity < 1)) {
     throw new Error(`${label} needs a recessed future line behind the elapsed samples.`);
   }
+}
+
+export function assertPathSystemVisualContract(root, label, { allowTrajectoryPlayback = false } = {}) {
+  if (root.querySelector('[data-vector-glyph="direction"], [data-lane-direction], [data-trajectory-direction]')) {
+    throw new Error(`${label} must not paint generic direction arrows on Path System lines.`);
+  }
+
+  root.querySelectorAll('[data-lk-lane-overlay]').forEach((lane) => {
+    const path = lane.querySelector('[data-lane-path]');
+    if (path?.getAttribute('stroke-dasharray') !== '4 6') {
+      throw new Error(`${label} Lane must keep the stable 4 6 topology dash.`);
+    }
+  });
+
+  root.querySelectorAll('[data-lk-route-overlay]').forEach((route) => {
+    const paths = [...route.querySelectorAll('[data-route-path]')];
+    const quality = route.getAttribute('data-route-quality');
+    const expectedTone = quality === 'invalid'
+      ? '--viewer-danger'
+      : quality === 'stale'
+        ? '--viewer-warning'
+        : '--viewer-route';
+    const casingLayer = route.querySelector(':scope > [data-route-casing-layer]');
+    const casings = [...(casingLayer?.querySelectorAll('[data-route-casing]') ?? [])];
+    if (
+      paths.length === 0
+      || !casingLayer
+      || route.firstElementChild !== casingLayer
+      || casings.length !== paths.length
+      || casings.some((casing) => casing.getAttribute('stroke-dasharray') !== '4 6')
+      || paths.some((path) => (
+        path.getAttribute('stroke-dasharray') !== '4 6'
+        || path.getAttribute('opacity') !== '1'
+        || !path.getAttribute('stroke')?.includes(expectedTone)
+        || path.getAttribute('stroke-width') !== '1.5'
+      ))
+    ) {
+      throw new Error(`${label} Route must reuse the Lane 4 6 dash and 1.5px width with the correct identity or quality tone.`);
+    }
+    if (route.querySelector('[data-route-progress-marker], [data-route-progress-label], [data-navigation-progress-head="route"], [data-route-progress-past]')) {
+      throw new Error(`${label} Route progress must remain data/detail-only.`);
+    }
+  });
+
+  root.querySelectorAll('[data-lk-trajectory-overlay]').forEach((trajectory) => {
+    const cursor = trajectory.querySelector('[data-trajectory-time-cursor]');
+    const path = trajectory.querySelector('[data-trajectory-path]');
+    const quality = trajectory.getAttribute('data-trajectory-quality');
+    const expectedTone = quality === 'invalid'
+      ? '--viewer-danger'
+      : quality === 'stale'
+        ? '--viewer-warning'
+        : '--viewer-accent';
+    if (!allowTrajectoryPlayback && cursor) {
+      throw new Error(`${label} operational Trajectory must not paint a playback cursor.`);
+    }
+    if (
+      !path
+      || path.hasAttribute('stroke-dasharray')
+      || (!trajectory.matches('[data-selected="true"]') && path.getAttribute('stroke-width') !== '2.25')
+      || !path.getAttribute('stroke')?.includes(expectedTone)
+      || trajectory.querySelectorAll('[data-trajectory-sample]').length < 2
+    ) {
+      throw new Error(`${label} Trajectory must remain one solid 2.25px identity line punctuated by sample dots.`);
+    }
+  });
 }
 
 export function nextRender() {

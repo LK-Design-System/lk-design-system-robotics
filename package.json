@@ -31,9 +31,10 @@
     "check:lds-style": "node scripts/check-lds-style.mjs",
     "check:ownership": "node scripts/check-owner-boundaries.mjs",
     "check:coordinates": "node scripts/check-navigation-coordinates.mjs",
+    "check:navigation-encoding": "node scripts/check-navigation-encoding.mjs",
     "check:types": "tsc --noEmit",
     "check:pack": "npm pack --dry-run --ignore-scripts",
-    "check": "npm run check:lds-style && npm run check:ownership && npm run check:coordinates && npm run build && npm run check:types && npm run check:pack",
+    "check": "npm run check:lds-style && npm run check:ownership && npm run check:coordinates && npm run check:navigation-encoding && npm run build && npm run check:types && npm run check:pack",
     "prepublishOnly": "npm run check"
   },
   "dependencies": {

@@ -150,15 +150,14 @@ export const parameters = {
         'LDS Robotics/Viewer/2D Map': ['Occupancy Layer'],
         'LDS Robotics/Navigation': [
           'Waypoint',
-          'Lane',
-          'Route',
-          'Trajectory',
           'Robot Pose',
           'Regions',
           'Facility Transition',
           'Hazard Marker',
           'Annotation Layer',
+          'Path System',
         ],
+        'LDS Robotics/Navigation/Path System': ['Shared Rules', 'Lane', 'Route', 'Trajectory'],
       };
 
       if (a.title === b.title) {

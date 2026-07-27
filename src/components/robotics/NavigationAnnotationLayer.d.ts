@@ -10,7 +10,6 @@ export type NavigationAnnotationKind =
   | 'region-label'
   | 'lane-label'
   | 'route-segment-label'
-  | 'route-progress-label'
   | 'trajectory-label'
   | 'waypoint-label'
   | 'facility-label'
@@ -18,12 +17,18 @@ export type NavigationAnnotationKind =
   | 'robot-pose-label';
 
 export type NavigationAnnotationDetailMode = 'overview' | 'standard' | 'detail';
+export type NavigationLabelVisibility = 'always' | 'interaction' | 'priority' | 'hidden';
+export type NavigationDetailVisibility = 'always' | 'selected' | 'hidden';
 
 export interface NavigationAnnotationLayerProps
   extends Omit<React.SVGAttributes<SVGGElement>, 'transform'> {
   children?: React.ReactNode;
   /** Explicit label-density tier. State-critical labels remain visible in every tier. */
   detailMode?: NavigationAnnotationDetailMode;
+  /** Shared visible-name disclosure policy for child navigation renderers. @default interaction */
+  labelVisibility?: NavigationLabelVisibility;
+  /** Shared secondary-detail disclosure policy for child navigation renderers. @default selected */
+  detailVisibility?: NavigationDetailVisibility;
   /** Maximum leaderless 2D nudge in CSS px after conventional placements are tried. */
   maxLabelDisplacementPx?: number;
   /** Minimum free CSS px kept on every side of label and obstacle rects. */

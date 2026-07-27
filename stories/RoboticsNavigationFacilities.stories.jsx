@@ -243,7 +243,7 @@ export const AvailabilityAndSourceStates = {
   name: '변형·상태 · 가용성·오프라인·미확인',
   parameters: {
     ...storyDescription(
-      '사용 불가이지만 열린 문, source가 available로 보낸 상태에서 operating mode만 offline인 승강기, 가용성을 알 수 없는 도크를 비교합니다. availability를 내부 축에서 추론하지 않고 slash·점선·question SVG와 텍스트로 함께 전달해야 합니다.',
+      '사용 불가이지만 열린 문, source가 available로 보낸 상태에서 operating mode만 offline인 승강기, 가용성을 알 수 없는 도크를 비교합니다. availability를 내부 축에서 추론하지 않고 slash·점선·question SVG와 접근 가능한 이름으로 함께 전달해야 합니다.',
     ),
     backgrounds: { default: 'Navy' },
   },
@@ -268,8 +268,13 @@ export const AvailabilityAndSourceStates = {
       throw new Error('Offline operating mode must not overwrite source-provided availability.');
     }
     const unknownGlyph = dock.querySelector('[data-transition-unknown-mark] [data-navigation-state-glyph="unknown"]');
-    if (dock.dataset.transitionAvailability !== 'unknown' || !unknownGlyph || dock.querySelector('[data-transition-unknown-mark] text') || !dock.textContent?.includes('가용성 미확인')) {
-      throw new Error('Unknown availability requires the shared question SVG and a text label.');
+    if (
+      dock.dataset.transitionAvailability !== 'unknown'
+      || !unknownGlyph
+      || dock.querySelector('[data-transition-unknown-mark] text')
+      || !dock.getAttribute('aria-label')?.includes('가용성 미확인')
+    ) {
+      throw new Error('Unknown availability requires the shared question SVG and an accessible state name.');
     }
   },
 };

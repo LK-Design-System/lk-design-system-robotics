@@ -6,8 +6,15 @@ import {
   TrajectoryOverlay,
   WaypointMarker,
   LaneOverlay,
+  NavigationAnnotationLayer,
   SpatialRegion,
   FacilityTransition,
+  RobotPoseMarker,
+  adaptWorldLaneToLane,
+  adaptWorldRobotPoseToPose,
+  adaptWorldRouteToRoute,
+  adaptWorldTrajectoryToTrajectory,
+  createNavigationMapTransform,
 } from '../src/index.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { StoryPage } from './RoboticsNavigationRouteTrajectory.shared.jsx';
@@ -51,6 +58,37 @@ function nextRender() {
 // docs/NAVIGATION_EXPRESSION_CONVENTIONS.md.
 const MIRROR_MAP_ID = 'ops-1f';
 
+// Author the composed scene once in map/world metres, then project every path
+// layer through the same ROS-style map transform. This keeps origin,
+// resolution, and the SVG y-axis inversion out of individual fixtures.
+const MIRROR_MAP_TRANSFORM = createNavigationMapTransform({
+  mapId: MIRROR_MAP_ID,
+  frameId: 'ops-1f/map',
+  mapVersion: 'viewer-fixture-v2',
+  stamp: { sec: 1_720_000_000, nanosec: 0 },
+  widthCells: 540,
+  heightCells: 290,
+  resolutionMPerCell: 0.05,
+  origin: { xM: 0, yM: 0, yawRad: 0 },
+}, {
+  svgUnitsPerMeter: 20,
+  svgOrigin: { x: 0, y: 0 },
+});
+
+const projectMirrorPoint = (point) => MIRROR_MAP_TRANSFORM.worldToSvg(point);
+const projectMirrorRadius = (radiusM) => radiusM * MIRROR_MAP_TRANSFORM.svgUnitsPerMeter;
+
+// Named anchors are the only source of corridor geometry. The approach point
+// is a graph waypoint; the door is the physical facility transition.
+const MIRROR_WORLD = {
+  pickup: { x: 4.8, y: 4 },
+  pickupRun: { x: 10, y: 4 },
+  junction: { x: 11.8, y: 4 },
+  bend: { x: 16.5, y: 8.5 },
+  liftApproach: { x: 22.6, y: 9 },
+  liftDoor: { x: 23.8, y: 9.3 },
+};
+
 const MIRROR_KEEPOUT_REGION = {
   id: 'zone-keepout',
   mapId: MIRROR_MAP_ID,
@@ -59,7 +97,12 @@ const MIRROR_KEEPOUT_REGION = {
   rule: { kind: 'keep-out' },
   shape: {
     kind: 'polygon',
-    points: [{ x: 40, y: 26 }, { x: 150, y: 26 }, { x: 150, y: 94 }, { x: 40, y: 94 }],
+    points: [
+      { x: 2, y: 13.2 },
+      { x: 7.5, y: 13.2 },
+      { x: 7.5, y: 9.8 },
+      { x: 2, y: 9.8 },
+    ].map(projectMirrorPoint),
   },
 };
 
@@ -70,22 +113,31 @@ const MIRROR_LOBBY_REGION = {
   category: 'facility',
   kind: 'lift-lobby',
   facilityId: 'lift-a',
-  shape: { kind: 'circle', center: { x: 496, y: 96 }, radius: 40 },
+  shape: {
+    kind: 'circle',
+    center: projectMirrorPoint(MIRROR_WORLD.liftDoor),
+    radius: projectMirrorRadius(1.4),
+  },
 };
 
-const MIRROR_LANE = {
+const MIRROR_LANE = adaptWorldLaneToLane({
   id: 'lane-corridor',
   label: '주 통로 A→B',
   mapId: MIRROR_MAP_ID,
-  points: [{ x: 96, y: 210 }, { x: 236, y: 210 }, { x: 330, y: 120 }, { x: 452, y: 110 }],
+  points: [
+    MIRROR_WORLD.pickup,
+    MIRROR_WORLD.junction,
+    MIRROR_WORLD.bend,
+    MIRROR_WORLD.liftApproach,
+  ],
   entry: { waypointId: 'wp-pick', orientation: 'forward' },
   exit: { waypointId: 'wp-lift', orientation: 'forward', transitionIds: ['facility-lift'] },
   relation: { kind: 'single' },
   speedLimitMps: 0.8,
   mutexGroupId: 'corridor-2',
-};
+}, { transform: MIRROR_MAP_TRANSFORM });
 
-const MIRROR_ROUTE = {
+const MIRROR_ROUTE = adaptWorldRouteToRoute({
   id: 'route-delivery-17',
   label: '배송 경로 17',
   status: 'active',
@@ -94,7 +146,7 @@ const MIRROR_ROUTE = {
       id: 'route-seg-completed',
       mapId: MIRROR_MAP_ID,
       label: '픽업 → 교차로',
-      points: [{ x: 96, y: 210 }, { x: 200, y: 210 }, { x: 236, y: 210 }],
+      points: [MIRROR_WORLD.pickup, MIRROR_WORLD.pickupRun, MIRROR_WORLD.junction],
       laneIds: ['lane-corridor'],
       phase: 'completed',
       condition: 'normal',
@@ -103,45 +155,48 @@ const MIRROR_ROUTE = {
       id: 'route-seg-current',
       mapId: MIRROR_MAP_ID,
       label: '교차로 → 승강기 A',
-      points: [{ x: 236, y: 210 }, { x: 330, y: 120 }, { x: 430, y: 112 }],
+      points: [MIRROR_WORLD.junction, MIRROR_WORLD.bend, MIRROR_WORLD.liftApproach],
       laneIds: ['lane-corridor'],
       exitTransitionId: 'facility-lift',
       phase: 'current',
-      condition: 'waiting',
+      condition: 'normal',
     },
   ],
-  // Keep the explicit progress anchor away from the current segment's midpoint
-  // (the condition badge's natural anchor): at ~equal anchors the renderer's
-  // collision rule correctly lifts both badges into a detached screen-slot
-  // row, which is stress-fixture territory — a representative viewer scene
-  // should read with every badge sitting on its own path anchor.
-  progress: { segmentId: 'route-seg-current', fraction: 0.72 },
-};
+}, { transform: MIRROR_MAP_TRANSFORM });
 
 const MIRROR_ROUTE_CURRENT_SEGMENT_ID = 'route-seg-current';
 const mirrorRouteSegmentKey = (segmentId) => `paths:${MIRROR_ROUTE.id}:${segmentId}`;
 
-const MIRROR_TRAJECTORY = {
+const MIRROR_TRAJECTORY = adaptWorldTrajectoryToTrajectory({
   id: 'trajectory-amr-7',
   label: 'AMR 7 예상 궤적',
   mapId: MIRROR_MAP_ID,
   status: 'active',
   samples: [
-    { position: { x: 100, y: 224 }, timeMs: 0, headingRad: 0 },
-    { position: { x: 178, y: 222 }, timeMs: 300, headingRad: -0.08 },
-    { position: { x: 244, y: 210 }, timeMs: 600, headingRad: -0.4 },
-    { position: { x: 312, y: 156 }, timeMs: 900, headingRad: -0.7 },
-    { position: { x: 388, y: 124 }, timeMs: 1200, headingRad: -0.3 },
-    { position: { x: 448, y: 118 }, timeMs: 1500, headingRad: 0 },
+    { position: { x: 5, y: 3.7 }, timeMs: 0, headingRad: 0 },
+    { position: { x: 9, y: 3.8 }, timeMs: 300, headingRad: 0.04 },
+    { position: { x: 12.2, y: 4.1 }, timeMs: 600, headingRad: 0.42 },
+    { position: { x: 15.7, y: 7 }, timeMs: 900, headingRad: 0.7 },
+    { position: { x: 19.4, y: 8.75 }, timeMs: 1200, headingRad: 0.3 },
+    { position: { x: 22.4, y: 8.75 }, timeMs: 1500, headingRad: 0 },
   ],
   currentSampleIndex: 3,
-};
+}, { transform: MIRROR_MAP_TRANSFORM });
+
+const MIRROR_ROBOT_POSE = adaptWorldRobotPoseToPose({
+  id: 'amr-7',
+  label: 'AMR 7',
+  mapId: MIRROR_MAP_ID,
+  position: { x: 15.7, y: 7 },
+  headingRad: 0.7,
+  state: 'moving',
+}, { transform: MIRROR_MAP_TRANSFORM });
 
 const MIRROR_PICK_WAYPOINT = {
   id: 'wp-pick',
   label: '픽업 지점 P1',
   mapId: MIRROR_MAP_ID,
-  position: { x: 96, y: 210 },
+  position: projectMirrorPoint(MIRROR_WORLD.pickup),
   roles: ['holding'],
   availability: 'available',
 };
@@ -150,8 +205,7 @@ const MIRROR_LIFT_WAYPOINT = {
   id: 'wp-lift',
   label: '승강기 접근 지점',
   mapId: MIRROR_MAP_ID,
-  position: { x: 452, y: 104 },
-  roles: ['passthrough'],
+  position: projectMirrorPoint(MIRROR_WORLD.liftApproach),
   annotations: [{ kind: 'lift-approach', label: '승강기 A 접근' }],
   availability: 'available',
 };
@@ -163,15 +217,15 @@ const MIRROR_FACILITY = {
   facilityId: 'lift-a',
   from: {
     mapId: MIRROR_MAP_ID,
-    position: { x: 496, y: 96 },
-    label: '1층 승강기 접근 지점',
+    position: projectMirrorPoint(MIRROR_WORLD.liftDoor),
+    label: '1층 승강기 문',
     waypointId: 'wp-lift',
     regionId: 'zone-lift-lobby',
     doorId: 'lift-a-door-1f',
   },
   to: {
     mapId: 'ops-2f',
-    position: { x: 496, y: 96 },
+    position: projectMirrorPoint(MIRROR_WORLD.liftDoor),
     label: '2층 승강기 도착 지점',
     doorId: 'lift-a-door-2f',
   },
@@ -199,6 +253,7 @@ const MIRROR_LAYERS = [
   { id: 'regions', label: '영역', description: '동작·시설·지형', tone: 'cautionary' },
   { id: 'lanes', label: '레인', description: '방향 그래프 연결', tone: 'signal' },
   { id: 'paths', label: '경로·궤적', description: '계획 구간과 조밀 궤적', tone: 'positive' },
+  { id: 'robots', label: '로봇 위치', description: '현재 위치와 heading', tone: 'signal' },
   { id: 'waypoints', label: '웨이포인트', description: '그래프 지점', tone: 'neutral' },
   { id: 'facilities', label: '설비 전이', description: '문·승강기·도크', tone: 'signal' },
 ];
@@ -220,7 +275,7 @@ const MIRROR_FEATURES = [
     layerId: 'regions',
     listName: '승강기 로비',
     item: { label: '승강기 로비', kind: '시설 영역', status: '승강기 A', statusTone: 'signal' },
-    sections: [{ title: '영역', fields: [{ label: '분류', value: '시설 · 승강기 로비' }, { label: '설비', value: '화물 승강기 A' }, { label: '형태', value: '원형 r40' }] }],
+    sections: [{ title: '영역', fields: [{ label: '분류', value: '시설 · 승강기 로비' }, { label: '설비', value: '화물 승강기 A' }, { label: '반경', value: 1.4, unit: 'm' }] }],
   },
   {
     key: 'lanes:lane-corridor',
@@ -244,8 +299,8 @@ const MIRROR_FEATURES = [
     routeId: MIRROR_ROUTE.id,
     segmentId: MIRROR_ROUTE_CURRENT_SEGMENT_ID,
     listName: '배송 경로 17 · 교차로 → 승강기 A',
-    item: { label: '배송 경로 17 · 교차로 → 승강기 A', kind: '계획 경로 구간', status: '현재 · 대기', statusTone: 'cautionary' },
-    sections: [{ title: '구간 identity', fields: [{ label: '경로', value: MIRROR_ROUTE.label }, { label: '구간', value: '교차로 → 승강기 A' }, { label: '단계', value: '현재' }, { label: '조건', value: '대기', tone: 'cautionary' }, { label: '진행률', value: '72%' }] }],
+    item: { label: '배송 경로 17 · 교차로 → 승강기 A', kind: '계획 경로 구간', status: '현재 · 정상', statusTone: 'positive' },
+    sections: [{ title: '구간 identity', fields: [{ label: '경로', value: MIRROR_ROUTE.label }, { label: '구간', value: '교차로 → 승강기 A' }, { label: '단계', value: '현재' }, { label: '조건', value: '정상' }] }],
   },
   {
     key: 'paths:trajectory-amr-7',
@@ -255,18 +310,25 @@ const MIRROR_FEATURES = [
     sections: [{ title: '샘플', fields: [{ label: '표본 수', value: 6 }, { label: '현재 표본', value: 3 }, { label: '소속 지도', value: '1층 작업장' }] }],
   },
   {
+    key: 'robots:amr-7',
+    layerId: 'robots',
+    listName: 'AMR 7',
+    item: { label: 'AMR 7', kind: 'Robot Pose', status: '이동 중', statusTone: 'signal' },
+    sections: [{ title: '현재 위치', fields: [{ label: '좌표', value: '15.7, 7.0', unit: 'm' }, { label: 'heading', value: 0.7, unit: 'rad' }, { label: '기준 프레임', value: 'ops-1f/map' }] }],
+  },
+  {
     key: 'waypoints:wp-pick',
     layerId: 'waypoints',
     listName: '픽업 지점 P1',
     item: { label: '픽업 지점 P1', kind: '웨이포인트', status: '사용 가능', statusTone: 'positive' },
-    sections: [{ title: '지점', fields: [{ label: '역할', value: '대기 가능' }, { label: '좌표', value: '96, 210' }] }],
+    sections: [{ title: '지점', fields: [{ label: '역할', value: '대기 가능' }, { label: '좌표', value: '4.8, 4.0', unit: 'm' }] }],
   },
   {
     key: 'waypoints:wp-lift',
     layerId: 'waypoints',
     listName: '승강기 접근 지점',
     item: { label: '승강기 접근 지점', kind: '웨이포인트', status: '사용 가능', statusTone: 'positive' },
-    sections: [{ title: '지점', fields: [{ label: '역할', value: '정차 금지 통과' }, { label: '주석', value: '승강기 A 접근' }] }],
+    sections: [{ title: '지점', fields: [{ label: '역할', value: '승강기 접근 기준점' }, { label: '주석', value: '승강기 A 접근' }] }],
   },
   {
     key: 'facilities:facility-lift',
@@ -279,9 +341,10 @@ const MIRROR_FEATURES = [
 
 const MIRROR_LEGEND_ITEMS = [
   { id: 'regions', label: '영역', color: TONE_COLOR.cautionary, shape: 'square' },
-  { id: 'lanes', label: '레인 (방향선)', color: TONE_COLOR.signal, shape: 'line' },
-  { id: 'route', label: '현재 경로 구간 · 대기 (점선)', color: 'var(--color-semantic-status-cautionary-foreground)', shape: 'line', dashed: true },
+  { id: 'lanes', label: 'Lane · topology (점선)', color: TONE_COLOR.signal, shape: 'line', dashed: true },
+  { id: 'route', label: 'Route · 선택된 Lane (계획색 점선)', color: 'var(--viewer-route, var(--color-semantic-data-viz-series-5))', shape: 'line', dashed: true },
   { id: 'trajectory', label: '현재 궤적 · 이동 중 (실선)', color: TONE_COLOR.signal, shape: 'line' },
+  { id: 'robots', label: 'Robot Pose · 현재 위치', color: TONE_COLOR.signal, shape: 'dot' },
   { id: 'waypoints', label: '웨이포인트', color: TONE_COLOR.neutral, shape: 'dot' },
   { id: 'facilities', label: '설비 전이', color: TONE_COLOR.signal, shape: 'dot' },
 ];
@@ -423,10 +486,12 @@ function SemanticMirrorFixture() {
   const routeForRender = {
     ...MIRROR_ROUTE,
     segments: visibleRouteSegments,
-    progress: visibleRouteSegments.some((segment) => segment.id === MIRROR_ROUTE.progress.segmentId)
-      ? MIRROR_ROUTE.progress
-      : undefined,
   };
+  const visibleRouteLaneIds = new Set(
+    visibleRouteSegments.flatMap((segment) => segment.laneIds ?? []),
+  );
+  const showBaseLane = featureVisible('lanes:lane-corridor')
+    && !visibleRouteLaneIds.has(MIRROR_LANE.id);
 
   let inspectorItem;
   let inspectorSections = [];
@@ -492,12 +557,12 @@ function SemanticMirrorFixture() {
           <section aria-label="내비게이션 지도" style={{ display: 'grid', gap: 'var(--space-3)', alignContent: 'start', minWidth: 0 }}>
             <ViewerMapCanvas>
               {(cssViewBoxScale) => (
-                <>
+                <NavigationAnnotationLayer detailMode="overview">
                   {featureVisible('regions:zone-keepout') && (
                     <SpatialRegion
                       region={MIRROR_KEEPOUT_REGION}
                       viewportScale={cssViewBoxScale}
-                      tabIndex={-1} showLabel={false}
+                      tabIndex={-1}
                       aria-hidden="true"
                       selected={selectedKey === 'regions:zone-keepout'}
                       onActivate={() => selectFromMap('regions:zone-keepout')}
@@ -507,22 +572,19 @@ function SemanticMirrorFixture() {
                     <SpatialRegion
                       region={MIRROR_LOBBY_REGION}
                       viewportScale={cssViewBoxScale}
-                      tabIndex={-1} showLabel={false}
+                      tabIndex={-1}
                       aria-hidden="true"
                       selected={selectedKey === 'regions:zone-lift-lobby'}
                       onActivate={() => selectFromMap('regions:zone-lift-lobby')}
                     />
                   )}
-                  {featureVisible('lanes:lane-corridor') && (
+                  {showBaseLane && (
                     <LaneOverlay
                       lane={MIRROR_LANE}
                       viewportScale={cssViewBoxScale}
                       tabIndex={-1}
                       aria-hidden="true"
                       showEndpoints={false}
-                      // 이 코리도 위를 배송 경로·궤적이 달리며 상위 레이어에서 이미
-                      // 방향을 표시하므로 레인 자체 셰브론은 끕니다(코리도당 화살표 1개).
-                      showDirection={false}
                       selected={selectedKey === 'lanes:lane-corridor'}
                       onActivate={() => selectFromMap('lanes:lane-corridor')}
                     />
@@ -534,7 +596,6 @@ function SemanticMirrorFixture() {
                       viewportScale={cssViewBoxScale}
                       tabIndex={-1}
                       aria-hidden="true"
-                      showLabel={false}
                       selectedSegmentId={selectedRouteSegmentId}
                       onActivate={({ segmentId }) => selectFromMap(mirrorRouteSegmentKey(segmentId))}
                     />
@@ -545,16 +606,25 @@ function SemanticMirrorFixture() {
                       viewportScale={cssViewBoxScale}
                       tabIndex={-1}
                       aria-hidden="true"
-                      showLabel={false}
                       selected={selectedKey === 'paths:trajectory-amr-7'}
                       onActivate={() => selectFromMap('paths:trajectory-amr-7')}
+                    />
+                  )}
+                  {featureVisible('robots:amr-7') && (
+                    <RobotPoseMarker
+                      pose={MIRROR_ROBOT_POSE}
+                      viewportScale={cssViewBoxScale}
+                      tabIndex={-1}
+                      aria-hidden="true"
+                      selected={selectedKey === 'robots:amr-7'}
+                      onActivate={() => selectFromMap('robots:amr-7')}
                     />
                   )}
                   {featureVisible('waypoints:wp-pick') && (
                     <WaypointMarker
                       waypoint={MIRROR_PICK_WAYPOINT}
                       viewportScale={cssViewBoxScale}
-                      tabIndex={-1} showLabel={false}
+                      tabIndex={-1}
                       aria-hidden="true"
                       selected={selectedKey === 'waypoints:wp-pick'}
                       onActivate={() => selectFromMap('waypoints:wp-pick')}
@@ -564,7 +634,7 @@ function SemanticMirrorFixture() {
                     <WaypointMarker
                       waypoint={MIRROR_LIFT_WAYPOINT}
                       viewportScale={cssViewBoxScale}
-                      tabIndex={-1} showLabel={false}
+                      tabIndex={-1}
                       aria-hidden="true"
                       selected={selectedKey === 'waypoints:wp-lift'}
                       onActivate={() => selectFromMap('waypoints:wp-lift')}
@@ -577,12 +647,11 @@ function SemanticMirrorFixture() {
                       viewportScale={cssViewBoxScale}
                       tabIndex={-1}
                       aria-hidden="true"
-                      showLabel={false}
                       selected={selectedKey === 'facilities:facility-lift'}
                       onActivate={() => selectFromMap('facilities:facility-lift')}
                     />
                   )}
-                </>
+                </NavigationAnnotationLayer>
               )}
             </ViewerMapCanvas>
             <div data-testid="mirror-legend">
@@ -641,20 +710,20 @@ export const Overview = {
     const rowFor = (key) => panel.querySelector(`[data-layer-id="${key}"]`);
 
     const legendItems = Array.from(legend.querySelectorAll('li'));
-    const routeLegend = legendItems.find((item) => item.textContent?.includes('현재 경로 구간 · 대기'));
+    const routeLegend = legendItems.find((item) => item.textContent?.includes('Route · 선택된 Lane'));
     const trajectoryLegend = legendItems.find((item) => item.textContent?.includes('현재 궤적 · 이동 중'));
     if (!routeLegend || !trajectoryLegend
       || getComputedStyle(routeLegend.firstElementChild).borderTopStyle !== 'dashed'
       || getComputedStyle(trajectoryLegend.firstElementChild).borderTopStyle !== 'solid') {
-      throw new Error('Legend must mirror the current waiting route dash and active trajectory solid encoding.');
+      throw new Error('Legend must mirror the dashed selected-Lane Route and solid active Trajectory encoding.');
     }
 
     // 1. Selecting a tree row drives the map data-selected and the summary.
     const treeSelections = [
-      ['lanes:lane-corridor', '[data-lane-id="lane-corridor"]', '주 통로'],
       [mirrorRouteSegmentKey('route-seg-completed'), '[data-segment-id="route-seg-completed"]', '배송 경로 17 · 픽업 → 교차로'],
       [mirrorRouteSegmentKey(MIRROR_ROUTE_CURRENT_SEGMENT_ID), `[data-segment-id="${MIRROR_ROUTE_CURRENT_SEGMENT_ID}"]`, '배송 경로 17 · 교차로 → 승강기 A'],
       ['paths:trajectory-amr-7', '[data-trajectory-id="trajectory-amr-7"]', 'AMR 7 예상 궤적'],
+      ['robots:amr-7', '[data-robot-id="amr-7"]', 'AMR 7'],
       ['waypoints:wp-pick', '[data-waypoint-id="wp-pick"]', '픽업 지점 P1'],
       ['facilities:facility-lift', '[data-lds-facility-transition][data-transition-id="facility-lift"]', '화물 승강기 A'],
     ];
@@ -682,6 +751,7 @@ export const Overview = {
       ['[data-segment-id="route-seg-completed"]', mirrorRouteSegmentKey('route-seg-completed'), '배송 경로 17 · 픽업 → 교차로'],
       [`[data-segment-id="${MIRROR_ROUTE_CURRENT_SEGMENT_ID}"]`, mirrorRouteSegmentKey(MIRROR_ROUTE_CURRENT_SEGMENT_ID), '배송 경로 17 · 교차로 → 승강기 A'],
       ['[data-trajectory-id="trajectory-amr-7"]', 'paths:trajectory-amr-7', 'AMR 7 예상 궤적'],
+      ['[data-robot-id="amr-7"]', 'robots:amr-7', 'AMR 7'],
     ];
     for (const [mapSelector, key, name] of mapSelections) {
       const mapFeature = map.querySelector(mapSelector);
@@ -718,19 +788,21 @@ export const Overview = {
       throw new Error('aria-hidden pointer-only Route responded to keyboard activation.');
     }
 
-    // 3. Pointer-selectable map identities are mirrored one-to-one by tree
-    // object rows, and every identity defers screen-reader traversal.
+    // 3. Pointer-selectable map identities are mirrored by tree object rows.
+    // The selected Lane remains in the semantic tree but Route replaces its
+    // duplicate map paint until the Route layer is hidden.
     const mapSvg = map.querySelector('svg[data-css-viewbox-scale]');
     const mapIdentities = [
       ...Array.from(mapSvg?.querySelectorAll('[data-lds-spatial-region]') ?? []),
       mapSvg?.querySelector('[data-lk-lane-overlay]'),
       ...Array.from(mapSvg?.querySelectorAll('[data-route-segment]') ?? []),
       mapSvg?.querySelector('[data-lk-trajectory-overlay]'),
+      mapSvg?.querySelector('[data-robot-pose-marker]'),
       ...Array.from(mapSvg?.querySelectorAll('[data-waypoint-id]') ?? []),
       mapSvg?.querySelector('[data-lds-facility-transition]'),
     ].filter(Boolean);
-    if (mapIdentities.length !== 9) {
-      throw new Error(`Expected 9 pointer-selectable map identities, received ${mapIdentities.length}.`);
+    if (mapIdentities.length !== 9 || mapSvg?.querySelector('[data-lane-id="lane-corridor"]')) {
+      throw new Error(`Expected Route to replace its selected Lane, leaving 9 map identities; received ${mapIdentities.length}.`);
     }
     if (mapSvg?.querySelector('[data-lane-endpoint]')) {
       throw new Error('Waypoint-owned endpoint identities must not duplicate Lane endpoint chrome in the composed map.');
@@ -754,8 +826,8 @@ export const Overview = {
       }
     }
     const objectRows = Array.from(panel.querySelectorAll('[role="treeitem"][data-layer-id*=":"]'));
-    if (objectRows.length !== mapIdentities.length) {
-      throw new Error(`Panel tree must mirror every pointer-selectable map identity: map ${mapIdentities.length}, tree ${objectRows.length}.`);
+    if (objectRows.length !== mapIdentities.length + 1 || !rowFor('lanes:lane-corridor')) {
+      throw new Error(`Panel tree must retain the Route-suppressed Lane identity: map ${mapIdentities.length}, tree ${objectRows.length}.`);
     }
     const allRows = Array.from(panel.querySelectorAll('[role="treeitem"]'));
     if (allRows.filter((row) => row.tabIndex === 0).length !== 1) {
@@ -772,7 +844,7 @@ export const Overview = {
         throw new Error('Hiding the waypoint layer must remove its map fragments.');
       }
     });
-    if (!map.querySelector('[data-lane-id="lane-corridor"]') || !map.querySelector('[data-lds-facility-transition][data-transition-id="facility-lift"]')) {
+    if (!map.querySelector('[data-route-segment]') || !map.querySelector('[data-lds-facility-transition][data-transition-id="facility-lift"]')) {
       throw new Error('Hiding one layer must not remove the others.');
     }
 
@@ -840,6 +912,14 @@ export const Overview = {
     });
     const laneLockToggle = rowFor('lanes:lane-corridor')?.querySelector('[data-layer-action="lock"]');
     if (!laneLockToggle) throw new Error('Lane object lock toggle is missing.');
+    const pathGroupToggle = rowFor('paths')?.querySelector('[data-layer-action="visibility"]');
+    if (!pathGroupToggle) throw new Error('Path layer visibility toggle is missing.');
+    pathGroupToggle.click();
+    await waitFor(() => {
+      if (map.querySelector('[data-route-segment]') || !map.querySelector('[data-lane-id="lane-corridor"]')) {
+        throw new Error('Hiding Route must restore the selected Lane base topology.');
+      }
+    });
     laneLockToggle.click();
     await nextRender();
     await userEvent.click(map.querySelector('[data-lane-id="lane-corridor"]'));
@@ -853,6 +933,12 @@ export const Overview = {
     await waitFor(() => {
       if (!selectionOutput().includes('주 통로')) {
         throw new Error(`Unlocked lane must accept map pointer selection again: ${selectionOutput()}`);
+      }
+    });
+    pathGroupToggle.click();
+    await waitFor(() => {
+      if (!map.querySelector('[data-route-segment]') || map.querySelector('[data-lane-id="lane-corridor"]')) {
+        throw new Error('Restoring Route must replace the duplicate selected Lane paint.');
       }
     });
 
@@ -894,7 +980,6 @@ export const NarrowViewport = {
       }
 
       const circleCoreSelectors = [
-        ['Lane', '[data-lane-actual-hit-core]'],
         ['Route', '[data-route-hit-target-core]'],
         ['Trajectory', '[data-trajectory-actual-hit-core]'],
         ['Waypoint', '[data-waypoint-hit-area]'],
@@ -925,11 +1010,14 @@ export const NarrowViewport = {
       map.querySelector('[data-lk-lane-overlay]'),
       ...map.querySelectorAll('[data-route-segment]'),
       map.querySelector('[data-lk-trajectory-overlay]'),
+      map.querySelector('[data-robot-pose-marker]'),
       ...map.querySelectorAll('[data-waypoint-id]'),
       map.querySelector('[data-lds-facility-transition]'),
     ].filter(Boolean);
-    if (mapIdentities.length !== 9 || mapIdentities.some((identity) => !identity.closest('[aria-hidden="true"]'))) {
-      throw new Error('Narrow map identities must be aria-hidden and mirrored by the panel tree.');
+    if (mapIdentities.length !== 9
+      || map.querySelector('[data-lane-id="lane-corridor"]')
+      || mapIdentities.some((identity) => !identity.closest('[aria-hidden="true"]'))) {
+      throw new Error('Narrow Route must replace its selected Lane and keep every rendered identity aria-hidden.');
     }
     const pointerOnlyPaths = [
       ...map.querySelectorAll('[data-route-segment]'),

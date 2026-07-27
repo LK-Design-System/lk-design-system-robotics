@@ -8,9 +8,9 @@ import { ConnectionBadge } from '@lk-robotics/lds-product/components/robotics/Co
 
 /**
  * LK ROBOTICS — RobotStatusCard
- * Live robot status card — thumbnail (or initials) + name on the left, and a
- * top-right status cluster: the operating-mode chip over a telemetry row
- * (ConnectionBadge signal bars + BatteryGauge). `selected` for the picked robot.
+ * Live robot status card — thumbnail (or initials) + name on the left,
+ * connection and battery telemetry below the name, and the operating-mode chip
+ * on the right. `selected` marks the picked robot.
  *
  * When `onClick` is supplied the whole card becomes a keyboard-operable button
  * (role=button, Tab-reachable, Enter/Space activate) named by the robot's name,
@@ -35,22 +35,19 @@ export function RobotStatusCard({ name, image, status = 'online', battery, mode,
   // A single-select picker state is a toggle-in-a-set → aria-pressed. Radio
   // semantics would need this card to own a radiogroup, but each card is
   // rendered independently by the consumer, which owns any group/list wrapper.
-  const statusCluster = (
+  const telemetry = (
     <div
       id={interactive ? statusId : undefined}
       style={{
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-end',
-        gap: 'var(--space-1-5)',
-        flexShrink: 0,
+        alignItems: 'center',
+        gap: 'var(--space-3)',
+        minWidth: 0,
+        whiteSpace: 'nowrap',
       }}
     >
-      {mode != null && <ContentBadge color="accent" size="xsmall">{mode}</ContentBadge>}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
-        <ConnectionBadge status={status} showLabel={false} size="sm" />
-        {hasBat && <BatteryGauge value={battery} />}
-      </div>
+      <ConnectionBadge status={status} showLabel size="sm" />
+      {hasBat && <BatteryGauge value={battery} />}
     </div>
   );
 
@@ -91,12 +88,15 @@ export function RobotStatusCard({ name, image, status = 'online', battery, mode,
           borderRadius: 'var(--radius-md)',
         }}
         title={<span id={interactive ? nameId : undefined}>{name}</span>}
+        description={telemetry}
+        trailing={mode != null && <ContentBadge color="accent" size="small">{mode}</ContentBadge>}
+        selected={selected}
         titleStyle={{
           color: 'var(--color-semantic-label-strong)',
           fontWeight: 'var(--fw-bold)',
         }}
-        trailing={statusCluster}
-        trailingStyle={{ alignSelf: 'stretch' }}
+        descriptionStyle={{ overflow: 'visible' }}
+        trailingStyle={{ alignSelf: 'flex-start' }}
         verticalPadding="large"
         paddingX={16}
         onClick={interactive ? onClick : undefined}

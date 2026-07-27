@@ -5,14 +5,14 @@ import {
 } from './NavigationCoordinateBoundary.jsx';
 import { isFocusVisibleTarget } from './_NavigationFocus.js';
 import { NavigationStateGlyph } from './_NavigationStateGlyph.js';
-import { NAVIGATION_DIRECTION_PATH, NAVIGATION_ENDPOINT_ORIENTATION_PATH } from './_navigationVectorGlyph.js';
 import {
   ANNOTATION_IMPORTANCE,
   NavigationAnnotationBlock,
   annotationPriority,
+  useNavigationLabelDisclosure,
   useNavigationObstacles,
 } from './_navigationAnnotations.js';
-import { navStateOpacity, NAV_PATH_DASH, NAV_NODE, NAV_HIT, NAV_STATE_BADGE, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION, NAV_LINE_ROLE } from './_navigationVocabulary.js';
+import { navStateOpacity, NAV_NODE, NAV_HIT, NAV_STATE_BADGE, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION, NAV_LINE_ROLE } from './_navigationVocabulary.js';
 
 const VIEWER_FOREGROUND = 'var(--viewer-foreground, var(--color-semantic-label-strong))';
 const VIEWER_MUTED = 'var(--viewer-muted, var(--color-semantic-label-neutral))';
@@ -31,26 +31,6 @@ function finitePoint(point) {
 function pathFromPoints(points) {
   if (points.length < 2) return '';
   return points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`).join(' ');
-}
-
-// Midpoint (+heading) of the longest polyline segment. The direction chevron
-// anchors here instead of at a fixed path fraction: a fraction can land on a
-// bend vertex, where the rotated chevron juts off the corner and reads as
-// detached from its own line.
-function longestSegmentMidpoint(points) {
-  let best;
-  for (let index = 1; index < points.length; index += 1) {
-    const start = points[index - 1];
-    const end = points[index];
-    const length = Math.hypot(end.x - start.x, end.y - start.y);
-    if (!best || length > best.length) best = { start, end, length };
-  }
-  if (!best || best.length === 0) return undefined;
-  return {
-    x: (best.start.x + best.end.x) / 2,
-    y: (best.start.y + best.end.y) / 2,
-    angle: Math.atan2(best.end.y - best.start.y, best.end.x - best.start.x) * 180 / Math.PI,
-  };
 }
 
 function pointAlong(points, ratio) {
@@ -87,12 +67,6 @@ function pointAlong(points, ratio) {
   return { ...points[points.length - 1], angle: 0 };
 }
 
-function orientationAngle(orientation, fallbackAngle) {
-  if (!orientation || orientation === 'unconstrained') return undefined;
-  if (orientation === 'backward') return fallbackAngle + 180;
-  return fallbackAngle;
-}
-
 function upperScreenNormal(angle) {
   const radians = angle * Math.PI / 180;
   let x = Math.sin(radians);
@@ -127,6 +101,12 @@ function laneAccessibleName(lane, availability, conflict, selected, focused, dis
   if (lane.mutexGroupId) parts.push(`상호 배제 그룹 ${lane.mutexGroupId}`);
   if (lane.entry?.transitionIds?.length) parts.push(`진입 전환 ${lane.entry.transitionIds.join(', ')}`);
   if (lane.exit?.transitionIds?.length) parts.push(`이탈 전환 ${lane.exit.transitionIds.join(', ')}`);
+  if (lane.entry?.orientation && lane.entry.orientation !== 'unconstrained') {
+    parts.push(`진입 방위 제약 ${lane.entry.orientation}`);
+  }
+  if (lane.exit?.orientation && lane.exit.orientation !== 'unconstrained') {
+    parts.push(`이탈 방위 제약 ${lane.exit.orientation}`);
+  }
   if (conflict) parts.push('충돌 있음');
   if (selected) parts.push('선택됨');
   if (focused) parts.push('포커스됨');
@@ -136,16 +116,15 @@ function laneAccessibleName(lane, availability, conflict, selected, focused, dis
   return parts.join(', ');
 }
 
-function endpointMarker(point, endpoint, kind, fallbackAngle, inverseScale) {
+function endpointMarker(point, endpoint, kind, inverseScale) {
   if (!point || !endpoint) return null;
-  const orientation = orientationAngle(endpoint.orientation, fallbackAngle);
   const transitionCount = endpoint.transitionIds?.length ?? 0;
-  const markerLabel = kind === 'entry' ? '진입' : '이탈';
 
   return (
     <g
       key={kind}
       data-lane-endpoint={kind}
+      data-lane-endpoint-symbol={kind === 'entry' ? 'circle' : 'square'}
       data-waypoint-id={endpoint.waypointId ?? undefined}
       transform={`translate(${point.x} ${point.y}) scale(${inverseScale})`}
       aria-hidden="true"
@@ -160,22 +139,23 @@ function endpointMarker(point, endpoint, kind, fallbackAngle, inverseScale) {
         strokeLinejoin="round"
         vectorEffect="non-scaling-stroke"
       />
-      <text
-        data-lane-endpoint-label={kind}
-        x="0"
-        y="-8"
-        textAnchor="middle"
-        fill={VIEWER_MUTED}
-        stroke={VIEWER_SURFACE}
-        strokeWidth={NAV_LABEL_HALO.caption}
-        paintOrder="stroke"
-        vectorEffect="non-scaling-stroke"
-        fontFamily="var(--font-sans)"
-        fontSize="var(--caption2-size)"
-        fontWeight="var(--fw-bold)"
-      >
-        {markerLabel}
-      </text>
+      {kind === 'entry' ? (
+        <circle
+          data-lane-endpoint-glyph="entry"
+          r="2.75"
+          fill={VIEWER_MUTED}
+        />
+      ) : (
+        <rect
+          data-lane-endpoint-glyph="exit"
+          x="-2.75"
+          y="-2.75"
+          width="5.5"
+          height="5.5"
+          rx="0.75"
+          fill={VIEWER_MUTED}
+        />
+      )}
       {transitionCount > 0 && (
         <g data-lane-transition-count={transitionCount} transform="translate(0 16)">
           <circle
@@ -205,19 +185,6 @@ function endpointMarker(point, endpoint, kind, fallbackAngle, inverseScale) {
           </text>
         </g>
       )}
-      {orientation != null && (
-        <path
-          data-lane-orientation={endpoint.orientation}
-          d={NAVIGATION_ENDPOINT_ORIENTATION_PATH}
-          transform={`rotate(${orientation}) translate(10 0)`}
-          fill="none"
-          stroke={VIEWER_FOREGROUND}
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          vectorEffect="non-scaling-stroke"
-        />
-      )}
     </g>
   );
 }
@@ -233,9 +200,10 @@ export function LaneOverlay({
   disabled = false,
   invalid = false,
   stale = false,
-  showLabel = true,
-  showEndpoints = true,
-  showDirection = false,
+  showLabel,
+  labelVisibility,
+  detailVisibility,
+  showEndpoints = false,
   onActivate,
   role,
   'aria-label': ariaLabel,
@@ -243,6 +211,8 @@ export function LaneOverlay({
   tabIndex,
   onFocus,
   onBlur,
+  onPointerEnter,
+  onPointerLeave,
   onMouseDown,
   style,
   ...rest
@@ -258,6 +228,33 @@ export function LaneOverlay({
     : 'available';
   const hasConflict = Boolean(conflict);
   const points = (lane?.points ?? []).filter(finitePoint);
+  const interactive = typeof onActivate === 'function';
+  const visibleFocus = !pointerOnly && (focused || hasFocus);
+  const relation = lane?.relation?.kind === 'paired' ? 'paired' : 'single';
+  const hasMetadata = lane?.speedLimitMps != null || Boolean(lane?.mutexGroupId);
+  const {
+    hovered,
+    labelVisibility: resolvedLabelVisibility,
+    detailVisibility: resolvedDetailVisibility,
+    labelVisible,
+    detailsVisible,
+    onPointerEnter: handleLabelPointerEnter,
+    onPointerLeave: handleLabelPointerLeave,
+  } = useNavigationLabelDisclosure({
+    showLabel,
+    labelVisibility,
+    detailVisibility,
+    selected,
+    focused: visibleFocus,
+    priority: invalid
+      || stale
+      || hasConflict
+      || resolvedAvailability === 'closed'
+      || lane?.speedLimitMps != null,
+    hasDetails: hasMetadata,
+    onPointerEnter,
+    onPointerLeave,
+  });
   if (
     (lane?.source && lane.source.mapId !== lane.mapId)
     || !isNavigationGeometryCompatible(lane, coordinateBoundary)
@@ -266,26 +263,16 @@ export function LaneOverlay({
 
   const pathData = pathFromPoints(points);
   const midpoint = pointAlong(points, 0.5);
-  const directionPoint = longestSegmentMidpoint(points) ?? midpoint;
-  const entryDirection = pointAlong(points.slice(0, 2), 0.5).angle;
-  const exitDirection = pointAlong(points.slice(-2), 0.5).angle;
-  const interactive = typeof onActivate === 'function';
-  const visibleFocus = !pointerOnly && (focused || hasFocus);
-  const relation = lane?.relation?.kind === 'paired' ? 'paired' : 'single';
 
-  const availabilityDash = resolvedAvailability === 'closed'
-    ? NAV_PATH_DASH.blocked
-    : resolvedAvailability === 'unknown'
-      ? NAV_PATH_DASH.unknown
-      : undefined;
-  const baseColor = invalid
+  const baseColor = invalid || hasConflict || resolvedAvailability === 'closed'
     ? 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))'
-    : 'var(--viewer-muted, var(--color-semantic-label-alternative))';
-  // Availability and conflict live on the LINE itself — the NAV_PATH_DASH
-  // availability dashes, the muted tone, and the danger conflict pattern.
-  // Badges are point-vocabulary; the only glyph badges a lane keeps are the
-  // data-quality flags (invalid/stale), whose one non-color channel is the
-  // badge because the dash channel is already spent on availability.
+    : resolvedAvailability === 'unknown'
+      ? 'var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))'
+      : 'var(--viewer-muted, var(--color-semantic-label-alternative))';
+  // The dash is a stable LINE ROLE cue: every Lane uses the same quiet topology
+  // texture. Runtime availability/conflict changes tone only; exact state text
+  // remains in the visible label/detail surface and accessible name. The only
+  // glyph badges a lane keeps are data-quality flags (invalid/stale).
   const stateGlyphs = [
     invalid ? { state: 'invalid', tone: 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))' } : null,
     stale ? { state: 'stale', tone: VIEWER_MUTED } : null,
@@ -353,6 +340,7 @@ export function LaneOverlay({
       data-coordinate-space={lane?.coordinateSpace}
       data-availability={resolvedAvailability}
       data-conflict={hasConflict ? 'true' : 'false'}
+      data-lane-flow-encoding="dashed-stroke"
       data-relation={relation}
       data-paired-lane-id={lane?.relation?.kind === 'paired' ? lane.relation.pairedLaneId : undefined}
       data-selected={selected ? 'true' : 'false'}
@@ -360,6 +348,11 @@ export function LaneOverlay({
       data-disabled={disabled ? 'true' : 'false'}
       data-invalid={invalid ? 'true' : 'false'}
       data-stale={stale ? 'true' : 'false'}
+      data-hovered={hovered ? 'true' : 'false'}
+      data-label-visibility={resolvedLabelVisibility}
+      data-label-visible={labelVisible ? 'true' : 'false'}
+      data-detail-visibility={resolvedDetailVisibility}
+      data-detail-visible={detailsVisible ? 'true' : 'false'}
       role={pointerOnly ? undefined : role ?? (interactive ? 'button' : 'img')}
       tabIndex={pointerOnly ? undefined : interactive ? (disabled ? -1 : tabIndex ?? 0) : tabIndex}
       focusable={pointerOnly ? 'false' : interactive && !disabled ? 'true' : undefined}
@@ -391,6 +384,8 @@ export function LaneOverlay({
         setHasFocus(false);
         onBlur?.(event);
       }}
+      onPointerEnter={handleLabelPointerEnter}
+      onPointerLeave={handleLabelPointerLeave}
       style={{
         cursor: disabled ? 'not-allowed' : interactive ? 'pointer' : 'default',
         opacity: navStateOpacity(disabled, stale),
@@ -435,27 +430,14 @@ export function LaneOverlay({
           stroke={baseColor}
           strokeWidth={selected ? NAV_LINE_ROLE.lane.selectedCoreWidth : NAV_LINE_ROLE.lane.coreWidth}
           data-navigation-selection-geometry=""
-          strokeDasharray={availabilityDash}
+          strokeDasharray={NAV_LINE_ROLE.lane.dash}
           strokeLinecap="round"
           strokeLinejoin="round"
           vectorEffect="non-scaling-stroke"
           pointerEvents="none"
         />
       )}
-      {hasConflict && pathData && (
-        <path
-          data-lane-conflict-pattern=""
-          d={pathData}
-          fill="none"
-          stroke="var(--viewer-danger, var(--color-semantic-status-negative-foreground))"
-          strokeWidth="2"
-          strokeDasharray="2 7"
-          strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
-          pointerEvents="none"
-        />
-      )}
-      {pathData && interactive && (
+      {pathData && (
         <>
           <path
             data-lane-hit-target=""
@@ -480,33 +462,14 @@ export function LaneOverlay({
           />
         </>
       )}
-      {/* Direction is opt-in for topology/debug views that hide endpoint
-          identity. Normal maps already expose entry/exit semantics and avoid
-          repeating them with an extra on-line triangle. */}
-      {pathData && showDirection && (
-        <path
-          data-lane-direction="entry-to-exit"
-          data-lane-direction-anchor-x={directionPoint.x}
-          data-lane-direction-anchor-y={directionPoint.y}
-          d={NAVIGATION_DIRECTION_PATH}
-          transform={`translate(${directionPoint.x} ${directionPoint.y}) rotate(${directionPoint.angle}) scale(${inverseScale})`}
-          fill="none"
-          stroke={baseColor}
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          vectorEffect="non-scaling-stroke"
-          pointerEvents="none"
-        />
-      )}
       {showEndpoints && (
         <g {...obstacle(`lane:${lane.id}:endpoint:entry`)}>
-          {endpointMarker(points[0], lane?.entry, 'entry', entryDirection, inverseScale)}
+          {endpointMarker(points[0], lane?.entry, 'entry', inverseScale)}
         </g>
       )}
       {showEndpoints && (
         <g {...obstacle(`lane:${lane.id}:endpoint:exit`)}>
-          {endpointMarker(points[points.length - 1], lane?.exit, 'exit', exitDirection, inverseScale)}
+          {endpointMarker(points[points.length - 1], lane?.exit, 'exit', inverseScale)}
         </g>
       )}
       {positionedStateGlyphs.length > 0 && (
@@ -549,7 +512,7 @@ export function LaneOverlay({
           ))}
         </g>
       )}
-      {showLabel && (lane?.label || metadata) && (
+      {labelVisible && (lane?.label || (detailsVisible && metadata)) && (
         <NavigationAnnotationBlock
           id={`lane:${lane.id}:label`}
           kind="lane-label"
@@ -590,7 +553,7 @@ export function LaneOverlay({
               {lane.label}
             </text>
           )}
-          {metadata && (
+          {detailsVisible && metadata && (
             <text
               data-lane-metadata=""
               data-lane-normal-distance={metadataNormalDistance}

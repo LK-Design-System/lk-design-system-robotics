@@ -19,6 +19,27 @@ const contractRobots = [
   { id: 'r3', name: 'Docking-03', status: 'offline', battery: 12, mode: '충전' },
 ];
 
+function RobotStateOverview() {
+  const [selected, setSelected] = React.useState('r1');
+  return (
+    <main style={{ display: 'grid', gap: 'var(--space-6)', width: '100%', maxWidth: 1024, minWidth: 0 }}>
+      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--space-4)' }}>
+        {contractRobots.map((robot) => (
+          <RobotStatusCard
+            key={robot.id}
+            name={robot.name}
+            status={robot.status}
+            battery={robot.battery}
+            mode={robot.mode}
+            selected={selected === robot.id}
+            onClick={() => setSelected(robot.id)}
+          />
+        ))}
+      </section>
+    </main>
+  );
+}
+
 function RobotCardContractFixture() {
   const [selected, setSelected] = React.useState('r1');
   return (
@@ -68,15 +89,7 @@ export const RobotState = {
       },
     },
   },
-  render: () => (
-    <main style={{ display: 'grid', gap: 'var(--space-6)', width: '100%', maxWidth: 920, minWidth: 0 }}>
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-4)' }}>
-        <RobotStatusCard name="AMR-07" status="online" battery={86} mode="순찰" selected />
-        <RobotStatusCard name="Forklift-B2" status="reconnecting" battery={47} mode="수동" />
-        <RobotStatusCard name="Docking-03" status="offline" battery={12} mode="충전" />
-      </section>
-    </main>
-  ),
+  render: () => <RobotStateOverview />,
 };
 
 export const RobotStatusCardCard = { ...RobotStatusCardCardStory, name: 'RobotStatusCard card parity', tags: ['!dev', 'visual-parity'] };

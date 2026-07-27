@@ -110,7 +110,7 @@ export function DirectionalPad({ onStep, rate = 8, size = 48, disabled = false, 
       touchAction: 'none',
       ...(isActive ? {
         background: 'var(--color-semantic-primary-surface-strong)',
-        borderColor: 'var(--color-semantic-primary-normal)',
+        border: 'var(--border-thin) solid var(--color-semantic-primary-normal)',
         color: 'var(--color-semantic-primary-normal)',
       } : {}),
     };

@@ -2,6 +2,7 @@ import React from 'react';
 import {
   NavigationAnnotationContext,
   NavigationAnnotationDetailContext,
+  NavigationLabelPolicyContext,
   createAnnotationStore,
   useIsomorphicLayoutEffect,
 } from './_navigationAnnotations.js';
@@ -16,12 +17,18 @@ import {
 export function NavigationAnnotationLayer({
   children,
   detailMode = 'standard',
+  labelVisibility = 'interaction',
+  detailVisibility = 'selected',
   maxLabelDisplacementPx = 24,
   labelGapPx = 8,
   ...rest
 }) {
   const [store] = React.useState(createAnnotationStore);
   const hostRef = React.useRef(null);
+  const labelPolicy = React.useMemo(
+    () => ({ labelVisibility, detailVisibility }),
+    [detailVisibility, labelVisibility],
+  );
 
   // Children's layout effects register before this one runs, so the first
   // coordinated layout lands in the same commit, before paint.
@@ -55,12 +62,20 @@ export function NavigationAnnotationLayer({
   }, [store]);
 
   return (
-    <g {...rest} ref={hostRef} data-lk-navigation-annotation-layer="">
-      <NavigationAnnotationDetailContext.Provider value={detailMode}>
-        <NavigationAnnotationContext.Provider value={store}>
-          {children}
-        </NavigationAnnotationContext.Provider>
-      </NavigationAnnotationDetailContext.Provider>
+    <g
+      {...rest}
+      ref={hostRef}
+      data-lk-navigation-annotation-layer=""
+      data-label-visibility={labelVisibility}
+      data-detail-visibility={detailVisibility}
+    >
+      <NavigationLabelPolicyContext.Provider value={labelPolicy}>
+        <NavigationAnnotationDetailContext.Provider value={detailMode}>
+          <NavigationAnnotationContext.Provider value={store}>
+            {children}
+          </NavigationAnnotationContext.Provider>
+        </NavigationAnnotationDetailContext.Provider>
+      </NavigationLabelPolicyContext.Provider>
     </g>
   );
 }

@@ -15,6 +15,7 @@ export {
 export {
   NAVIGATION_GEOMETRY_SPACE,
   adaptWorldLaneToLane,
+  adaptWorldRobotPoseToPose,
   adaptWorldRouteToRoute,
   adaptWorldTrajectoryToTrajectory,
   projectNavigationWorldPoints,

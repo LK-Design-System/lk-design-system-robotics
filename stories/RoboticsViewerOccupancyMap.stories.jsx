@@ -285,7 +285,7 @@ export const RosCoordinateProjection = {
             />
             <TrajectoryOverlay trajectory={ROS_TRAJECTORY} viewportScale={1} />
             <TrajectoryOverlay trajectory={WRONG_VERSION_TRAJECTORY} viewportScale={1} />
-            <RobotPoseMarker pose={ROS_POSE} viewportScale={1} showLabel />
+            <RobotPoseMarker pose={ROS_POSE} viewportScale={1} />
           </NavigationAnnotationLayer>
         </NavigationCoordinateBoundary>
       </svg>

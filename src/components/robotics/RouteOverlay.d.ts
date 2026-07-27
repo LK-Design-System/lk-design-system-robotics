@@ -32,7 +32,7 @@ export interface RouteSegmentData {
 }
 
 export interface RouteProgressData {
-  /** Segment that owns the current line-integrated progress head. */
+  /** Segment that owns executor progress for detail consumers; RouteOverlay does not paint it on the map. */
   readonly segmentId: string;
   /** Explicit progress within that segment only, from 0 to 1. */
   readonly fraction: number;
@@ -60,6 +60,8 @@ export interface RouteOverlayProps extends NavigationSvgFeatureProps {
   activeMapId: string;
   /** Optional segment-level selection when the whole route is not selected. */
   selectedSegmentId?: string;
+  /** Render generic transition-reference probes for topology debugging. Product maps should use FacilityTransition instead. @default false */
+  showTransitions?: boolean;
   onActivate?: (target: RouteSelection, event: NavigationActivateEvent) => void;
 }
 

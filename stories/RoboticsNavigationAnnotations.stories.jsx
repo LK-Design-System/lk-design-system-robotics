@@ -1,5 +1,5 @@
 import React from 'react';
-import { waitFor } from 'storybook/test';
+import { userEvent, waitFor } from 'storybook/test';
 import { Map2DCanvas } from '@lk-robotics/lds-product';
 import {
   FacilityTransition,
@@ -226,6 +226,15 @@ const OVERVIEW_WAYPOINT = {
   availability: 'available',
 };
 
+const OVERVIEW_EXIT_WAYPOINT = {
+  id: 'annotation-wp-lift',
+  label: '승강기 대기 지점',
+  mapId: 'L1',
+  position: { x: 452, y: 110 },
+  roles: ['passthrough'],
+  availability: 'available',
+};
+
 const OVERVIEW_FACILITY = {
   id: 'annotation-facility-lift',
   kind: 'lift',
@@ -258,6 +267,7 @@ export const AnnotationLayerOverview = {
             <RouteOverlay route={OVERVIEW_ROUTE} activeMapId="L1" viewportScale={viewportScale} />
             <TrajectoryOverlay trajectory={OVERVIEW_TRAJECTORY} viewportScale={viewportScale} />
             <WaypointMarker waypoint={OVERVIEW_WAYPOINT} viewportScale={viewportScale} />
+            <WaypointMarker waypoint={OVERVIEW_EXIT_WAYPOINT} viewportScale={viewportScale} />
             <FacilityTransition transition={OVERVIEW_FACILITY} activeMapId="L1" viewportScale={viewportScale} />
           </NavigationAnnotationLayer>
         )}
@@ -265,19 +275,43 @@ export const AnnotationLayerOverview = {
     </main>
   ),
   play: async ({ canvasElement }) => {
+    const map = canvasElement.querySelector('[data-testid="annotation-overview-map"]');
+    const layer = map?.querySelector('[data-lk-navigation-annotation-layer]');
+    if (!layer) throw new Error('Overview must compose the overlays under one annotation layer.');
+    for (const selector of [
+      '[data-lds-spatial-region]',
+      '[data-lk-lane-overlay]',
+      '[data-lk-route-overlay]',
+      '[data-lk-trajectory-overlay]',
+      '[data-waypoint-marker]',
+      '[data-lds-facility-transition]',
+    ]) {
+      if (!map.querySelector(selector)) {
+        throw new Error(`Annotation overview is missing ${selector}.`);
+      }
+    }
+    if (layer.getAttribute('data-label-visibility') !== 'interaction') {
+      throw new Error('Operational overview must inherit the interaction-only label policy.');
+    }
+
+    const waypoint = map.querySelector('[data-waypoint-marker]');
+    await userEvent.hover(waypoint);
     await waitFor(() => {
-      const map = canvasElement.querySelector('[data-testid="annotation-overview-map"]');
-      const layer = map?.querySelector('[data-lk-navigation-annotation-layer]');
-      if (!layer) throw new Error('Overview must compose the overlays under one annotation layer.');
       const labelCount = Number(layer.getAttribute('data-annotation-label-count'));
       const obstacleCount = Number(layer.getAttribute('data-annotation-obstacle-count'));
-      if (!(labelCount >= 6) || !(obstacleCount >= 6)) {
-        throw new Error(`Six overlay kinds must register labels and obstacles: ${labelCount}/${obstacleCount}.`);
+      if (
+        labelCount !== 1
+        || !(obstacleCount >= 3)
+        || !waypoint.querySelector('[data-waypoint-label]')
+      ) {
+        throw new Error(`Hover must reveal only the inspected waypoint label: ${labelCount}/${obstacleCount}.`);
       }
       assertNoLabelCollisions(map, 'Overview');
-      const kinds = new Set(collectAnnotationLabels(map).map((label) => label.getAttribute('data-annotation-kind')));
-      for (const kind of ['region-label', 'lane-label', 'route-segment-label', 'route-progress-label', 'trajectory-label', 'waypoint-label', 'facility-label']) {
-        if (!kinds.has(kind)) throw new Error(`Annotation kind contract is missing ${kind}.`);
+    });
+    await userEvent.unhover(waypoint);
+    await waitFor(() => {
+      if (map.querySelector('[data-navigation-annotation="label"]')) {
+        throw new Error('Transient waypoint label must close after pointer exit.');
       }
     });
   },
@@ -323,6 +357,7 @@ function densityFixtures(viewportScale) {
       <WaypointMarker
         waypoint={{ ...OVERVIEW_WAYPOINT, id: 'annotation-wp-density', label: '북측 피킹 작업 인계 지점 P1' }}
         viewportScale={viewportScale}
+        labelVisibility="always"
       />
       <FacilityTransition
         transition={{ ...OVERVIEW_FACILITY, id: 'annotation-facility-density', label: '북동측 화물 승강기 A' }}
@@ -348,7 +383,7 @@ export const DensityLevels = {
           eyebrow={`DENSITY · ${detailMode.toUpperCase()}`}
         >
           {({ viewportScale }) => (
-            <NavigationAnnotationLayer detailMode={detailMode}>
+            <NavigationAnnotationLayer detailMode={detailMode} labelVisibility="always" detailVisibility="always">
               {densityFixtures(viewportScale)}
             </NavigationAnnotationLayer>
           )}
@@ -389,7 +424,7 @@ export const CrossEntityLabelCollisions = {
     <main style={{ display: 'grid', gap: 'var(--space-4)', width: '100%', maxWidth: 720 }}>
       <AnnotationMap label="교차 개체 라벨 충돌 지도" testId="annotation-collision-map">
         {({ viewportScale }) => (
-          <NavigationAnnotationLayer>
+          <NavigationAnnotationLayer labelVisibility="always" detailVisibility="always">
             {collisionFixtures(viewportScale)}
           </NavigationAnnotationLayer>
         )}
@@ -414,11 +449,10 @@ export const CrossEntityLabelCollisions = {
           throw new Error('Coordinated labels must publish their true anchor coordinates.');
         }
       });
-      const progressLabel = map.querySelector('[data-route-progress-label]')?.getBoundingClientRect();
       const trajectoryLabel = map.querySelector('[data-trajectory-label]')?.getBoundingClientRect();
       const eastLabel = map.querySelector('[data-transition-id="annotation-door-east"] [data-transition-label]')?.getBoundingClientRect();
       const listLabel = map.querySelector('[data-transition-id="annotation-door-list"] [data-transition-label]')?.getBoundingClientRect();
-      for (const [name, a, b] of [['route/trajectory', progressLabel, trajectoryLabel], ['door pair', eastLabel, listLabel]]) {
+      for (const [name, a, b] of [['door pair', eastLabel, listLabel]]) {
         if (!a || !b) throw new Error(`${name} labels must both render.`);
         const overlaps = a.left < b.right - 0.5 && a.right > b.left + 0.5 && a.top < b.bottom - 0.5 && a.bottom > b.top + 0.5;
         if (overlaps) throw new Error(`${name} labels still overlap across entities.`);
@@ -452,7 +486,7 @@ export const LabelSuppressionPriority = {
     <main style={{ display: 'grid', gap: 'var(--space-4)', width: '100%', maxWidth: 720 }}>
       <AnnotationMap label="라벨 숨김 우선순위 지도" testId="annotation-suppression-map">
         {({ viewportScale }) => (
-          <NavigationAnnotationLayer>
+          <NavigationAnnotationLayer labelVisibility="always" detailVisibility="always">
             {CLUSTER_WAYPOINTS.map((waypoint) => (
               <WaypointMarker
                 key={waypoint.id}
@@ -460,6 +494,7 @@ export const LabelSuppressionPriority = {
                 viewportScale={viewportScale}
                 selected={waypoint.id === CLUSTER_SELECTED_ID}
                 focused={waypoint.id === CLUSTER_FOCUSED_ID}
+                labelVisibility="always"
                 onActivate={() => {}}
               />
             ))}
@@ -547,7 +582,7 @@ export const NarrowWidth = {
     <div data-testid="annotation-narrow-shell" style={{ width: 320, maxWidth: '100%', minWidth: 0 }}>
       <AnnotationMap width={320} height={280} label="320px 라벨 조정 지도" testId="annotation-narrow-map">
         {({ viewportScale }) => (
-          <NavigationAnnotationLayer>
+          <NavigationAnnotationLayer labelVisibility="always" detailVisibility="always">
             <FacilityTransition
               transition={{
                 ...EAST_DOOR,

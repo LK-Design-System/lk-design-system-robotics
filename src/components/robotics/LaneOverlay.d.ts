@@ -13,6 +13,7 @@ export type LaneOrientationConstraint = 'unconstrained' | 'forward' | 'backward'
 
 export interface LaneEndpointData {
   readonly waypointId: string;
+  /** Approach constraint retained for planning/detail surfaces; no endpoint arrow is painted on the map. */
   readonly orientation?: LaneOrientationConstraint;
   /** Neutral references to FacilityTransition records; no kind or live state is inferred here. */
   readonly transitionIds?: readonly string[];
@@ -46,10 +47,11 @@ export interface LaneOverlayProps extends NavigationSvgFeatureProps {
   availability?: LaneAvailability;
   /** Runtime schedule/resource conflict, independent from availability. @default false */
   conflict?: boolean;
-  /** Show entry/exit endpoint chrome. Disable when a composed waypoint layer owns the same endpoint identities. @default true */
+  /**
+   * Legacy endpoint fallback for isolated diagnostics. Product maps should
+   * render the referenced identities with WaypointMarker instead. @default false
+   */
   showEndpoints?: boolean;
-  /** Optional on-line direction chevron for topology/debug views with hidden endpoint identity. @default false */
-  showDirection?: boolean;
   onActivate?: (id: string, event: NavigationActivateEvent) => void;
 }
 

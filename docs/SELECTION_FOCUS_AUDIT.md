@@ -13,7 +13,7 @@ not reuse focus chrome as a selected state.
 | `FacilityTransition` | static 1.12× pin-body enlargement; the prioritized solid status badge stays fixed | outer surface + focus silhouette ring | Conforms |
 | `HazardMarker` | static 1.12× pin-body enlargement; severity fill is unchanged | outer surface + focus silhouette ring | Conforms; static severity adds no alarm ring or pulse |
 | `LaneOverlay` | wider semantic-color core + neutral casing | wider solid focus halo | Conforms |
-| `RouteOverlay` | wider semantic-color segment + neutral casing | wider solid segment focus halo | Conforms |
+| `RouteOverlay` | same-width plan-color dash + wider neutral casing | wider solid segment focus halo | Conforms |
 | `TrajectoryOverlay` | wider semantic-color path + neutral casing | wider solid focus halo | Conforms |
 | `SpatialRegion` | wider semantic-color boundary; pattern and tint stay unchanged | wider focus outline | Conforms |
 

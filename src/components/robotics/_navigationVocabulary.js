@@ -15,12 +15,14 @@
 //   - the paired-relation hatch (`2 7`) — LaneOverlay, a relation cue rather
 //     than a state, whose stroke geometry (offset twin line) has no analogue in
 //     the other renderers.
-// Long path-following STATE dashes used to be a per-renderer drift under this
-// rule (`8 5`/`2 5` on lanes, `10 3 2 3`/`7 4`/… on route segments,
-// `3 5`/`9 3 2 3`/`8 4`/… on trajectories); they are now the shared
-// `NAV_PATH_DASH` scale below — that unification is the design decision the
-// previous note deferred. The pin-ring availability dash (`6 3`) stays a
-// small-ring encoding (NAV_DASH scope), not a path dash.
+// Trajectory keeps one solid identity stroke; lifecycle state stays in text and
+// detail surfaces rather than changing line geometry.
+// Lane and Route share one graph-line grammar. Route is the selected subset of
+// Lane, so it keeps the same width and dash cadence and changes only identity
+// tone. Trajectory stays a thin temporal line with samples.
+// while runtime availability/conflict changes tone and is named in label/detail
+// text. Any small-ring availability dash stays component-local rather than
+// becoming a path or area state encoding.
 // See docs/NAVIGATION_ATOMIZATION_PLAN.md.
 
 /**
@@ -71,37 +73,42 @@ export const NAV_SELECTION = {
   pinScale: 1.12,
   regionStrokeWidth: 3.5,
   pathCasingWidth: 7.5,
-  routeCasingWidth: 8.5,
+  routeCasingWidth: 6,
   pathStrokeWidth: 4,
   trajectoryStrokeWidth: 4.5,
-  routeStrokeWidth: 5,
+  routeStrokeWidth: 1.5,
 };
 
 /**
  * Baseline geometry by navigation line ROLE.
  *
- * State dashes may change along any line, so width and repeated geometry carry
- * the identity that must remain legible without a legend:
+ * Width and repeated geometry carry the role identity that must remain legible
+ * without a legend:
  * - lane: quiet topology / connectivity
  * - route: selected graph plan
  * - trajectory: time-ordered samples in free space
  */
 export const NAV_LINE_ROLE = {
   lane: {
+    /** Stable topology texture. Runtime state changes tone, never this dash. */
+    dash: '4 6',
     casingWidth: 4,
     coreWidth: 1.5,
     selectedCasingWidth: 6,
     selectedCoreWidth: 3,
   },
   route: {
-    casingWidth: 7,
-    coreWidth: 3.5,
-    currentWidth: 4.5,
+    /** Selected Lane sequence: same geometry and texture, plan identity tone. */
+    dash: '4 6',
+    casingWidth: 4,
+    coreWidth: 1.5,
+    pulseWidth: 5.5,
   },
   trajectory: {
     casingWidth: 4.5,
     coreWidth: 1.75,
     activeWidth: 2.25,
+    pulseWidth: 6,
     futureOpacity: 0.24,
   },
 };
@@ -112,56 +119,13 @@ export const NAV_LINE_ROLE = {
  * The current sample is a circular time cursor—not a route arrowhead.
  */
 export const NAV_TRAJECTORY_SAMPLE = {
-  radius: 1.75,
+  radius: 1.5,
   maxVisible: 12,
   pastOpacity: 0.78,
   futureOpacity: 0.48,
   cursorOuterRadius: 5,
   cursorInnerRadius: 2.5,
   cursorCollisionRadius: 9,
-};
-
-/**
- * State dashes for small marker rings and region/facility SHAPE outlines. These
- * are shared because the same state means the same dash on comparable geometry.
- * Long path-following encodings are NOT here (see the SCOPE RULE above) — this
- * set is only the small-ring and shape-outline state vocabulary.
- *
- * - `staleRing`  — dashed ring on a small state badge or stale indicator.
- * - `staleShape` — stale dash on a region / facility outline stroke.
- * - `unknown`    — traversability / availability unknown on a shape or ring.
- * - `invalid`    — invalid geometry/data on a shape or ring.
- */
-export const NAV_DASH = {
-  staleRing: '2 2',
-  staleShape: '2 4',
-  unknown: '1 3',
-  invalid: '4 3',
-};
-
-/**
- * Long path-following state dashes shared by RouteOverlay (segment
- * phase/condition), TrajectoryOverlay (status) and LaneOverlay (availability).
- * One scale so the same meaning dashes the same on every path, and states that
- * can co-occur on one map stay distinguishable at the 2.5–4px path strokes:
- *
- * - `pending`   — sparse dots: not yet traversed (route upcoming · trajectory planned).
- * - `completed` — long dash: already traversed.
- * - `waiting`   — long dash + dot: paused, will resume.
- * - `conflict`  — short dash + dot: contested by another entity.
- * - `blocked`   — dense dots: cannot traverse (route/trajectory blocked · lane
- *                 closed — the same pairing that shares the `×` state glyph).
- * - `rerouting` — dense short dash: being recalculated.
- * - `unknown`   — sparse dash: traversability unknown (lane availability).
- */
-export const NAV_PATH_DASH = {
-  pending: '2 6',
-  completed: '7 4',
-  waiting: '10 3 2 3',
-  conflict: '5 3 1 3',
-  blocked: '1 5',
-  rerouting: '3 3',
-  unknown: '4 8',
 };
 
 /**
@@ -203,6 +167,13 @@ export const NAV_NODE = {
   }),
 };
 
+/** Shared availability fills for the Waypoint body and its legend specimen. */
+export const NAV_WAYPOINT_AVAILABILITY_FILL = Object.freeze({
+  available: 'color-mix(in srgb, var(--color-semantic-status-positive-foreground) 72%, var(--viewer-foreground, var(--color-semantic-label-strong)))',
+  unavailable: 'var(--viewer-muted, var(--color-semantic-label-neutral))',
+  unknown: 'color-mix(in srgb, var(--viewer-warning, var(--color-semantic-status-cautionary-foreground)) 70%, var(--viewer-foreground, var(--color-semantic-label-strong)))',
+});
+
 /**
  * Transparent WCAG 2.2 Target Size hit circle. `radius` is in the marker's
  * local units (markers that inverse-scale multiply it by `1/viewportScale`);
@@ -230,24 +201,6 @@ export const NAV_WAYPOINT_STATUS_BADGE = {
   offsetY: -8,
   strokeWidth: 1.5,
   glyphSize: 8.5,
-};
-
-/**
- * Route's line-integrated current-progress head. The elapsed plan is the
- * shaft; this open V is attached with SVG `marker-end` so its tip stays on the
- * source progress position. Trajectory deliberately uses a circular
- * current-sample cursor instead.
- */
-export const NAV_PROGRESS_HEAD = {
-  path: 'M 2 1.5 L 16 8 L 2 14.5',
-  viewBox: '0 0 18 16',
-  refX: 16,
-  refY: 8,
-  width: 18,
-  height: 16,
-  collisionRadius: 20,
-  obstacle: { x: -20, y: -10, width: 24, height: 20 },
-  route: { casingWidth: 7, coreWidth: 4, futureOpacity: 0.34 },
 };
 
 /**

@@ -11,18 +11,19 @@ import { storyDescription } from './StoryGuide.shared.jsx';
 import { NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
 import { assertSharedFocusIndicator, contrastRatio } from './RoboticsNavigationAssert.shared.jsx';
 import {
+  assertPathSystemVisualContract,
   PROJECTED_FRAME_L1,
   ROUTE_TRANSFORM_L1,
 } from './RoboticsNavigationRouteTrajectory.shared.jsx';
 
 const meta = {
-  title: 'LDS Robotics/Navigation/Lane',
+  title: 'LDS Robotics/Navigation/Path System/Lane',
   tags: ['autodocs'],
   component: LaneOverlay,
   parameters: {
     storyGuide: {
-      storyId: 'lds-robotics-navigation-lane--lane-overview',
-      eyebrow: 'Robotics / Navigation / Lane',
+      storyId: 'lds-robotics-navigation-path-system-lane--lane-overview',
+      eyebrow: 'Robotics / Navigation / Path System / Lane',
       title: '레인은 두 지점을 잇는 선이 아니라 방향과 통행 조건을 가진 그래프 연결입니다',
       description:
         '정적 geometry와 방향, 반대 레인 관계, 속도·상호 배제 정보를 먼저 읽고 현재 폐쇄·충돌 상태를 별도로 확인하세요. 실제 주행 궤적이나 문·엘리베이터 상태에는 이 레인이 적합하지 않습니다.',
@@ -136,34 +137,27 @@ function LaneMap({ appearance = 'light', label, children, height = 270, testId, 
 export const LaneOverview = {
   name: '개요',
   parameters: storyDescription(
-    '같은 endpoint·속도·상호 배제 관계를 light와 dark 지도에서 비교합니다. 기본 Lane은 별도 방향 삼각형을 그리지 않고 entry·exit 구조와 endpoint 방위 제약으로 필요한 정보만 전달합니다.',
+    '대표 지도 하나에서 Lane의 geometry·관계·제한을 설명합니다. 테마 반복은 회귀 검증으로 분리하고, 사용자 문서에는 의미가 다른 사례만 남깁니다.',
   ),
   render: () => (
     <StoryPage
       title="레인은 방향, 관계, 제한을 한 번에 읽되 시설 상태와 궤적은 분리합니다"
-      description="Lane의 점 순서와 entry·exit가 graph 방향을 소유합니다. 기본 지도에서는 선 위 방향 삼각형을 반복하지 않으며, paired relation은 반대 방향 Lane이 별도 graph entity로 존재한다는 뜻입니다."
+      description="Lane의 점 순서와 entry·exit가 graph 방향을 소유합니다. 지도 위 화살표는 Waypoint orientation이나 RobotPose heading과 혼동되므로 표시하지 않습니다. paired relation은 반대 방향 Lane이 별도 graph entity로 존재한다는 뜻입니다."
+      maxWidth={720}
     >
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(360px, 100%), 1fr))', gap: 'var(--space-4)', minWidth: 0 }}>
-        <LaneMap label="Light 레인 지도">
-          {(viewportScale) => (
-            <NavigationCoordinateBoundary frame={PROJECTED_FRAME_L1}>
-              <LaneOverlay lane={BASE_LANE} viewportScale={viewportScale} />
-            </NavigationCoordinateBoundary>
-          )}
-        </LaneMap>
-        <LaneMap appearance="dark" label="Dark 레인 지도">
-          {(viewportScale) => (
-            <NavigationCoordinateBoundary frame={PROJECTED_FRAME_L1}>
-              <LaneOverlay lane={BASE_LANE} viewportScale={viewportScale} />
-            </NavigationCoordinateBoundary>
-          )}
-        </LaneMap>
-      </section>
+      <LaneMap label="Lane 대표 지도">
+        {(viewportScale) => (
+          <NavigationCoordinateBoundary frame={PROJECTED_FRAME_L1}>
+            <LaneOverlay lane={BASE_LANE} viewportScale={viewportScale} />
+          </NavigationCoordinateBoundary>
+        )}
+      </LaneMap>
     </StoryPage>
   ),
   play: async ({ canvasElement }) => {
+    assertPathSystemVisualContract(canvasElement, 'Lane overview');
     const lanes = canvasElement.querySelectorAll('[data-lk-lane-overlay]');
-    if (lanes.length !== 2) throw new Error(`Light/dark lane parity expected 2 lanes, found ${lanes.length}.`);
+    if (lanes.length !== 1) throw new Error(`Lane overview expected one representative lane, found ${lanes.length}.`);
     lanes.forEach((lane) => {
       if (lane.getAttribute('data-coordinate-space') !== 'svg-map') {
         throw new Error('Lane overview must be projected from world coordinates into SVG map space.');
@@ -172,7 +166,13 @@ export const LaneOverview = {
       const path = lane.querySelector('[data-lane-path]');
       if (!path?.getAttribute('d')?.startsWith('M 72 178 L')) throw new Error('Lane geometry did not preserve directed points.');
       if (path.getAttribute('vector-effect') !== 'non-scaling-stroke') throw new Error('Lane stroke must remain non-scaling.');
+      if (path.getAttribute('stroke-dasharray') !== '4 6') {
+        throw new Error('Every Lane must use the stable 4 6 topology dash.');
+      }
       assertDirectionOmitted(lane, 'Lane overview');
+      if (lane.querySelector('[data-lane-orientation]')) {
+        throw new Error('Lane endpoint orientation must stay in data/detail instead of painting an endpoint arrow.');
+      }
     });
   },
 };
@@ -216,7 +216,7 @@ const STATE_LANES = [
 export const LaneStatesAndConstraints = {
   name: '변형·상태 · 폐쇄, 충돌, 전환 참조',
   parameters: storyDescription(
-    'available/closed/unknown과 conflict를 독립 조합하고 entry/exit 전환 참조를 중립 T/count로 표시합니다. 색을 가려도 availability는 선의 NAV_PATH_DASH 대시(closed 1 5 · unknown 4 8)로, conflict는 별도 danger 2 7 패턴으로 구분할 수 있어야 합니다.',
+    'available/closed/unknown과 conflict를 독립 조합하고 entry/exit 전환 참조를 중립 T/count로 표시합니다. 모든 Lane은 동일한 4 6 topology 점선을 유지하고, 통행 가능은 중립색, 폐쇄·충돌은 danger, 미확인은 warning tone으로 구분합니다. 정확한 상태명은 라벨·상세·접근성 이름이 보존합니다.',
   ),
   render: () => (
     <StoryPage
@@ -232,16 +232,14 @@ export const LaneStatesAndConstraints = {
     </StoryPage>
   ),
   play: async ({ canvasElement }) => {
+    assertPathSystemVisualContract(canvasElement, 'Lane states and constraints');
     const closed = canvasElement.querySelector('[data-lane-id="lane-closed"]');
     const unknownConflict = canvasElement.querySelector('[data-lane-id="lane-unknown-conflict"]');
-    // Availability lives on the line as a specific NAV_PATH_DASH pattern, not a
-    // point badge. Closed shares the blocked "1 5" dash (same meaning as a
-    // blocked route/trajectory); unknown uses the "4 8" dash.
-    if (closed?.querySelector('[data-lane-path]')?.getAttribute('stroke-dasharray') !== '1 5') {
-      throw new Error('Closed lane must encode availability with the 1 5 dash, not a badge.');
-    }
-    if (unknownConflict?.querySelector('[data-lane-path]')?.getAttribute('stroke-dasharray') !== '4 8') {
-      throw new Error('Unknown lane must encode availability with the 4 8 dash, not a badge.');
+    // Dash identifies the Lane role and never changes with runtime state.
+    for (const lane of [closed, unknownConflict]) {
+      if (lane?.querySelector('[data-lane-path]')?.getAttribute('stroke-dasharray') !== '4 6') {
+        throw new Error('Lane runtime state must preserve the stable 4 6 topology dash.');
+      }
     }
     // Availability/conflict must NOT restore their retired glyph badges.
     if (canvasElement.querySelector('[data-lane-state-glyph="closed"], [data-lane-state-glyph="unknown"], [data-lane-state-glyph="conflict"]')) {
@@ -256,9 +254,14 @@ export const LaneStatesAndConstraints = {
         assertCircularTextGeometry(badge, `Transition count ${index + 1}`);
       });
     });
-    // Conflict stays an independent pattern layered over the availability dash.
-    if (!unknownConflict?.querySelector('[data-lane-conflict-pattern]')) {
-      throw new Error('Conflict must remain an independent pattern over unknown availability.');
+    if (!closed?.querySelector('[data-lane-path]')?.getAttribute('stroke')?.includes('--viewer-danger')) {
+      throw new Error('Closed Lane must use the danger tone without changing its topology dash.');
+    }
+    if (!unknownConflict?.querySelector('[data-lane-path]')?.getAttribute('stroke')?.includes('--viewer-danger')) {
+      throw new Error('Conflict must take danger precedence over unknown without adding another line pattern.');
+    }
+    if (canvasElement.querySelector('[data-lane-conflict-pattern]')) {
+      throw new Error('Conflict must not add a second pattern over the stable Lane dash.');
     }
     assertDirectionOmitted(closed, 'Closed lane');
     assertDirectionOmitted(unknownConflict, 'Unknown/conflict lane');
@@ -444,6 +447,7 @@ function assertLaneFocusStateClearance(lane, context) {
 
 export const LaneDarkCompoundStates = {
   name: '변형·상태 · 다크 복합 상태',
+  tags: ['!dev', 'regression'],
   parameters: storyDescription(
     '어두운 viewer에서 focused·selected·unknown·conflict·invalid가 한 레인에 함께 있을 때 선택 굵기·포커스 링과 상태 glyph가 서로 독립적으로 남고, stale 레인은 별도 freshness 표식과 0.76 opacity를 유지하는지 확인합니다.',
   ),
@@ -484,6 +488,7 @@ export const LaneDarkCompoundStates = {
     </StoryPage>
   ),
   play: async ({ canvasElement }) => {
+    assertPathSystemVisualContract(canvasElement, 'Lane dark compound states');
     const viewer = canvasElement.querySelector('[data-viewer-appearance="dark"]');
     const compound = canvasElement.querySelector('[data-lane-id="lane-dark-compound"]');
     const stale = canvasElement.querySelector('[data-lane-id="lane-dark-stale"]');
@@ -497,13 +502,15 @@ export const LaneDarkCompoundStates = {
     for (const stateName of ['상태 미확인', '충돌 있음', '선택됨', '데이터 오류']) {
       if (!compoundName.includes(stateName)) throw new Error(`Compound lane accessible name lost ${stateName}: ${compoundName}`);
     }
-    // unknown availability and conflict now live on the line (dash + pattern),
-    // not point badges; only the invalid data-quality flag stays a glyph badge.
-    if (compound.querySelector('[data-lane-path]')?.getAttribute('stroke-dasharray') !== '4 8') {
-      throw new Error('Unknown availability must encode as the 4 8 dash on the compound lane.');
+    // Lane role keeps one dash; compound runtime state changes only its tone.
+    if (compound.querySelector('[data-lane-path]')?.getAttribute('stroke-dasharray') !== '4 6') {
+      throw new Error('Compound Lane must preserve the 4 6 topology dash.');
     }
-    if (!compound.querySelector('[data-lane-conflict-pattern]')) {
-      throw new Error('Conflict must remain an independent pattern over the compound lane.');
+    if (!compound.querySelector('[data-lane-path]')?.getAttribute('stroke')?.includes('--viewer-danger')) {
+      throw new Error('Conflict/invalid compound Lane must use the danger tone.');
+    }
+    if (compound.querySelector('[data-lane-conflict-pattern]')) {
+      throw new Error('Compound Lane must not stack a second conflict pattern.');
     }
     if (compound.querySelector('[data-lane-state-glyph="unknown"], [data-lane-state-glyph="conflict"]')) {
       throw new Error('Availability and conflict must not restore their retired point badges.');
@@ -540,8 +547,9 @@ const SHORT_PATH_COMPOUND_LANE = {
 
 export const LaneShortPathCompoundStates = {
   name: '변형·상태 · 짧은 경로 복합 상태 표식',
+  tags: ['!dev', 'regression'],
   parameters: storyDescription(
-    '경로가 상태 marker 행보다 짧고 SVG가 CSS layout에서 축소되어도 invalid·stale 데이터 품질 glyph가 direction·endpoint·label·metadata와 분리된 screen-space hierarchy를 유지하는지 확인합니다. availability(unknown)는 선의 대시로만 표시됩니다.',
+    '경로가 상태 marker 행보다 짧고 SVG가 축소되어도 invalid·stale 데이터 품질 glyph가 endpoint·label·metadata와 분리된 screen-space hierarchy를 유지하는지 확인합니다. availability는 고정 topology 점선 위의 tone과 상세 정보로 전달합니다.',
   ),
   render: () => (
     <StoryPage
@@ -554,6 +562,7 @@ export const LaneShortPathCompoundStates = {
           <LaneOverlay
             lane={SHORT_PATH_COMPOUND_LANE}
             availability="unknown"
+            showEndpoints
             selected
             invalid
             stale
@@ -564,6 +573,7 @@ export const LaneShortPathCompoundStates = {
     </StoryPage>
   ),
   play: async ({ canvasElement }) => {
+    assertPathSystemVisualContract(canvasElement, 'Lane short compound states');
     const lane = canvasElement.querySelector('[data-lane-id="lane-short-compound"]');
     const svg = canvasElement.querySelector('[data-testid="lane-short-compound-frame"] svg');
     // Availability (unknown) is a line dash now; the offset-stacking row is the
@@ -622,13 +632,13 @@ export const LaneShortPathCompoundStates = {
       }
       const stateCircles = states.map((state) => lane.querySelector(`[data-lane-state-circle="${state}"]`));
       const endpointPoints = [...lane.querySelectorAll('[data-lane-endpoint-point]')];
-      const endpointLabels = [...lane.querySelectorAll('[data-lane-endpoint-label]')];
+      const endpointGlyphs = [...lane.querySelectorAll('[data-lane-endpoint-glyph]')];
       const primaryLabel = lane.querySelector('[data-lane-primary-label]');
       const metadata = lane.querySelector('[data-lane-metadata]');
       if (
         stateCircles.some((node) => !node)
         || endpointPoints.length !== 2
-        || endpointLabels.length !== 2
+        || endpointGlyphs.length !== 2
         || !primaryLabel
         || !metadata
       ) {
@@ -636,7 +646,7 @@ export const LaneShortPathCompoundStates = {
       }
       const surroundingAnatomy = [
         ...endpointPoints.map((node, index) => [`endpoint point ${index + 1}`, node]),
-        ...endpointLabels.map((node, index) => [`endpoint label ${index + 1}`, node]),
+        ...endpointGlyphs.map((node, index) => [`endpoint glyph ${index + 1}`, node]),
         ['primary label', primaryLabel],
         ['metadata', metadata],
       ];
@@ -651,10 +661,10 @@ export const LaneShortPathCompoundStates = {
       });
       const primaryLabelBounds = primaryLabel.getBoundingClientRect();
       const metadataBounds = metadata.getBoundingClientRect();
-      [...endpointPoints, ...endpointLabels].forEach((node) => {
+      [...endpointPoints, ...endpointGlyphs].forEach((node) => {
         const bounds = node.getBoundingClientRect();
         if (bboxOverlap(primaryLabelBounds, bounds) || bboxOverlap(metadataBounds, bounds)) {
-          throw new Error('Short-path label or metadata overlaps endpoint/direction chrome.');
+          throw new Error('Short-path label or metadata overlaps endpoint chrome.');
         }
       });
       if (bboxOverlap(primaryLabelBounds, metadataBounds)) {
@@ -708,11 +718,13 @@ function LanePointerOnlyFixture() {
 
 export const LanePointerOnlyAndGeometryGuard = {
   name: '상호작용 · 포인터 전용과 형상 방어',
+  tags: ['!dev', 'regression'],
   parameters: storyDescription(
     'aria-hidden map fragment가 accessibility tree와 Tab 순서에서 빠지면서 pointer click은 유지하는지, passive focused/disabled 이름과 finite point guard가 일관적인지 확인합니다.',
   ),
   render: () => <LanePointerOnlyFixture />,
   play: async ({ canvasElement }) => {
+    assertPathSystemVisualContract(canvasElement, 'Lane pointer-only guard');
     const pointerOnly = canvasElement.querySelector('[data-lane-id="lane-pointer-only"]');
     const passive = canvasElement.querySelector('[data-lane-id="lane-passive-disabled"]');
     const output = () => canvasElement.querySelector('[data-testid="lane-pointer-output"]')?.textContent ?? '';
@@ -803,6 +815,7 @@ export const LaneSelectionAndActivation = {
   ),
   render: () => <LaneActivationFixture />,
   play: async ({ canvasElement }) => {
+    assertPathSystemVisualContract(canvasElement, 'Lane selection');
     const enabled = canvasElement.querySelector('[data-lane-id="lane-selectable"]');
     const disabled = canvasElement.querySelector('[data-lane-id="lane-disabled"]');
     const output = () => canvasElement.querySelector('[data-testid="lane-activation-output"]')?.textContent ?? '';
@@ -878,6 +891,7 @@ export const LaneSelectionAndActivation = {
 
 export const LaneNarrow320 = {
   name: '반응형 · 320px 좁은 폭',
+  tags: ['!dev', 'regression'],
   parameters: storyDescription(
     '320px 폭에서 지도 viewport가 페이지 폭을 밀어내지 않는지, label과 상태 glyph가 clip되더라도 레인의 accessible name과 semantic mirror가 유지되는지 확인합니다.',
   ),
@@ -895,6 +909,7 @@ export const LaneNarrow320 = {
     </div>
   ),
   play: async ({ canvasElement }) => {
+    assertPathSystemVisualContract(canvasElement, 'Lane narrow viewport');
     const narrow = canvasElement.querySelector('[data-testid="lane-narrow"]');
     if (!narrow || narrow.scrollWidth > narrow.clientWidth) {
       throw new Error(`Lane narrow story overflowed: ${narrow?.scrollWidth}/${narrow?.clientWidth}`);
@@ -922,14 +937,15 @@ export const LaneNarrow320 = {
     await waitFor(() => {
       if (!lane.querySelector('[data-lane-focus-ring]')) throw new Error('Narrow lane focus path is missing.');
       assertLaneFocusTextClearance(lane, '320px lane');
-      // closed + conflict are line-encoded now (dash + pattern), so this lane
-      // carries no point state badges — focus clears only the label/metadata
-      // (asserted above), and state lives on the line.
-      if (lane.querySelector('[data-lane-path]')?.getAttribute('stroke-dasharray') !== '1 5') {
-        throw new Error('Narrow closed lane must encode availability with the 1 5 dash.');
+      // Closed + conflict preserve the Lane role dash and use danger tone.
+      if (lane.querySelector('[data-lane-path]')?.getAttribute('stroke-dasharray') !== '4 6') {
+        throw new Error('Narrow closed Lane must preserve the 4 6 topology dash.');
       }
-      if (!lane.querySelector('[data-lane-conflict-pattern]')) {
-        throw new Error('Narrow lane conflict pattern must persist under clipping.');
+      if (!lane.querySelector('[data-lane-path]')?.getAttribute('stroke')?.includes('--viewer-danger')) {
+        throw new Error('Narrow closed/conflict Lane must retain its danger tone.');
+      }
+      if (lane.querySelector('[data-lane-conflict-pattern]')) {
+        throw new Error('Narrow Lane must not stack a second conflict pattern.');
       }
       if (lane.querySelector('[data-lane-state-glyph]')) {
         throw new Error('A closed/conflict lane must not paint point state badges.');

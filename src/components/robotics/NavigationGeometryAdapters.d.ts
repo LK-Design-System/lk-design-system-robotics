@@ -1,5 +1,6 @@
 import type { NavigationMapTransform, NavigationPoint2D } from './NavigationCoordinateSystem';
 import type { LaneData } from './LaneOverlay';
+import type { RobotPoseData } from './RobotPoseMarker';
 import type { RouteData } from './RouteOverlay';
 import type { TrajectoryData } from './TrajectoryOverlay';
 
@@ -26,6 +27,11 @@ export interface WorldLaneData extends Omit<LaneData, 'points' | 'source' | 'coo
   readonly points: readonly NavigationPoint2D[];
 }
 
+export interface WorldRobotPoseData
+  extends Omit<RobotPoseData, 'position' | 'source' | 'coordinateSpace' | 'localization'> {
+  readonly position: NavigationPoint2D;
+}
+
 export interface NavigationSingleMapProjectionOptions {
   readonly transform: NavigationMapTransform;
 }
@@ -50,6 +56,11 @@ export function adaptWorldTrajectoryToTrajectory(
   trajectory: WorldTrajectoryData,
   options: NavigationSingleMapProjectionOptions,
 ): TrajectoryData;
+
+export function adaptWorldRobotPoseToPose(
+  pose: WorldRobotPoseData,
+  options: NavigationSingleMapProjectionOptions,
+): RobotPoseData;
 
 export function adaptWorldLaneToLane(
   lane: WorldLaneData,
