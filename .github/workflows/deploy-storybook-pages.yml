@@ -33,31 +33,37 @@ jobs:
           node-version: 22.17.1
           cache: npm
 
-      # `lds-theme` is consumed only by Storybook and has not been published to
-      # GitHub Packages yet. Build it from the public source at a fixed commit
-      # so this deployment remains reproducible without widening package access.
-      - name: Checkout public LDS theme source
+      # The shared LDS packages are public source but have not been published
+      # to GitHub Packages. Package them from a fixed public commit so this
+      # deployment remains reproducible without widening package access.
+      - name: Checkout public LDS package source
         uses: actions/checkout@v7.0.0
         with:
           repository: LK-Design-System/lk-design-system
           ref: a9ac5fc15bb2be0d6300c7029807ca393f223496
-          path: .lds-theme-source
+          path: .lds-package-source
 
-      - name: Pack public LDS theme
+      - name: Pack public LDS packages
         shell: pwsh
         run: |
-          Push-Location .lds-theme-source/packages/theme
-          npm.cmd pack --pack-destination "$env:GITHUB_WORKSPACE"
-          Pop-Location
+          foreach ($package in 'core', 'product', 'theme') {
+            Push-Location ".lds-package-source/packages/$package"
+            npm.cmd pack --pack-destination "$env:GITHUB_WORKSPACE"
+            Pop-Location
+          }
 
       - name: Install dependencies
         shell: pwsh
         run: |
           $manifest = Get-Content -Raw package.json | ConvertFrom-Json
+          $coreTarball = Get-ChildItem -Filter 'lk-robotics-lds-core-*.tgz' | Select-Object -First 1
+          $productTarball = Get-ChildItem -Filter 'lk-robotics-lds-product-*.tgz' | Select-Object -First 1
           $themeTarball = Get-ChildItem -Filter 'lk-robotics-lds-theme-*.tgz' | Select-Object -First 1
-          if (-not $themeTarball) {
-            throw 'The public LDS theme package could not be packed.'
+          if (-not $coreTarball -or -not $productTarball -or -not $themeTarball) {
+            throw 'The public LDS package set could not be packed.'
           }
+          $manifest.dependencies.'@lk-robotics/lds-core' = "file:./$($coreTarball.Name)"
+          $manifest.dependencies.'@lk-robotics/lds-product' = "file:./$($productTarball.Name)"
           $manifest.devDependencies.'@lk-robotics/lds-theme' = "file:./$($themeTarball.Name)"
           $manifest | ConvertTo-Json -Depth 100 | Set-Content package.json
           npm.cmd install --ignore-scripts --package-lock=false
