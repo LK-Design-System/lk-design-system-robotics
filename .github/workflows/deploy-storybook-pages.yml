@@ -43,6 +43,12 @@ jobs:
           ref: a9ac5fc15bb2be0d6300c7029807ca393f223496
           path: .lds-package-source
 
+      - name: Build public LDS packages
+        working-directory: .lds-package-source
+        run: |
+          npm.cmd ci
+          npm.cmd run build:workspaces
+
       - name: Pack public LDS packages
         shell: pwsh
         run: |
