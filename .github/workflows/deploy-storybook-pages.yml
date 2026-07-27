@@ -68,6 +68,9 @@ jobs:
           $manifest | ConvertTo-Json -Depth 100 | Set-Content package.json
           npm.cmd install --ignore-scripts --package-lock=false
 
+      - name: Prepare LDS Product Storybook compatibility surface
+        run: node scripts/prepare-pages-lds-product-storybook.mjs
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
