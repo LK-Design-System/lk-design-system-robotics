@@ -5,6 +5,7 @@ import {
   FacilityTransition,
   LaneOverlay,
   NavigationAnnotationLayer,
+  assertNavigationMapGraph,
   RouteOverlay,
   SpatialRegion,
   TrajectoryOverlay,
@@ -196,7 +197,8 @@ const OVERVIEW_ROUTE = {
     id: 'annotation-seg-current',
     mapId: 'L1',
     label: '교차로 → 승강기 A',
-    points: [{ x: 236, y: 210 }, { x: 330, y: 120 }, { x: 430, y: 112 }],
+    points: [{ x: 96, y: 210 }, { x: 236, y: 210 }, { x: 330, y: 120 }, { x: 452, y: 110 }],
+    laneIds: ['annotation-lane-corridor'],
     phase: 'current',
     condition: 'waiting',
   }],
@@ -316,6 +318,18 @@ export const AnnotationLayerOverview = {
     });
   },
 };
+
+// Story fixtures use the same graph contract as product map input: Lane and
+// Route boundaries resolve to real WaypointMarker identities, never to a
+// renderer-created entry/exit symbol.
+const OVERVIEW_GRAPH = {
+  waypoints: [OVERVIEW_WAYPOINT, OVERVIEW_EXIT_WAYPOINT],
+  lanes: [OVERVIEW_LANE],
+  routes: [OVERVIEW_ROUTE],
+  facilityTransitions: [OVERVIEW_FACILITY],
+};
+
+assertNavigationMapGraph(OVERVIEW_GRAPH);
 
 const DENSITY_ROUTE = {
   ...OVERVIEW_ROUTE,

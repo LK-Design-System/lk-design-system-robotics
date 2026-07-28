@@ -22,6 +22,10 @@ export interface RouteSegmentData {
   readonly coordinateSpace?: NavigationGeometrySpace;
   /** Static graph lanes represented by this planned segment. */
   readonly laneIds?: readonly string[];
+  /** Required with `exitWaypointId` when the segment does not resolve laneIds. */
+  readonly entryWaypointId?: string;
+  /** Required with `entryWaypointId` when the segment does not resolve laneIds. */
+  readonly exitWaypointId?: string;
   /** Neutral FacilityTransition references at segment boundaries. */
   readonly entryTransitionId?: string;
   readonly exitTransitionId?: string;

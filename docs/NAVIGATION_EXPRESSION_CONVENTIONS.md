@@ -392,6 +392,14 @@ Route, and Trajectory inherit it:
   Product maps compose the referenced waypoint objects at the first/last Lane
   points. `showEndpoints` defaults to `false`; its circle/square fallback is
   retained only for isolated diagnostics and legacy compatibility.
+- Graph input must pass `assertNavigationMapGraph` at the adapter/store boundary.
+  Every `Lane.entry/exit.waypointId` resolves to a Waypoint on the same map at
+  the Lane's first/last coordinate. A Route segment either resolves an ordered
+  `laneIds` chain or supplies both `entryWaypointId` and `exitWaypointId`.
+  Adjacent same-map Route segments share that waypoint; cross-map adjacency
+  shares one `FacilityTransition` whose endpoints resolve the two Waypoints.
+  Invalid references are data errors, never a reason to render a substitute
+  entry/exit glyph. See `NavigationMapGraph` and `check:navigation-graph`.
 - The transient name is still a `NavigationAnnotationBlock`, not a generic
   HTML tooltip, so it obeys the shared collision, safe-inset, and priority
   contract.

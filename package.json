@@ -31,22 +31,23 @@
     "check:lds-style": "node scripts/check-lds-style.mjs",
     "check:ownership": "node scripts/check-owner-boundaries.mjs",
     "check:coordinates": "node scripts/check-navigation-coordinates.mjs",
+    "check:navigation-graph": "node scripts/check-navigation-graph.mjs",
     "check:navigation-encoding": "node scripts/check-navigation-encoding.mjs",
     "check:types": "tsc --noEmit",
     "check:pack": "npm pack --dry-run --ignore-scripts",
-    "check": "npm run check:lds-style && npm run check:ownership && npm run check:coordinates && npm run check:navigation-encoding && npm run build && npm run check:types && npm run check:pack",
+    "check": "npm run check:lds-style && npm run check:ownership && npm run check:coordinates && npm run check:navigation-graph && npm run check:navigation-encoding && npm run build && npm run check:types && npm run check:pack",
     "prepublishOnly": "npm run check"
   },
   "dependencies": {
-    "@lk-robotics/lds-core": "file:vendor/lk-robotics-lds-core-0.1.0-rc.1.tgz",
-    "@lk-robotics/lds-product": "file:vendor/lk-robotics-lds-product-0.1.0-rc.1.tgz"
+"@lk-robotics/lds-core": "0.1.0-rc.1",
+    "@lk-robotics/lds-product": "0.1.0-rc.1"
   },
   "peerDependencies": {
     "react": ">=18 <20",
     "react-dom": ">=18 <20"
   },
   "devDependencies": {
-    "@lk-robotics/lds-theme": "file:vendor/lk-robotics-lds-theme-0.1.0-rc.1.tgz",
+    "@lk-robotics/lds-theme": "0.1.0-rc.1",
     "@storybook/addon-a11y": "10.4.6",
     "@storybook/addon-docs": "10.4.6",
     "@storybook/react-vite": "10.4.6",

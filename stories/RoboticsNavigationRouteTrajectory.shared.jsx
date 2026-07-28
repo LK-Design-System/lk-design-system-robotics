@@ -428,11 +428,11 @@ export function assertPathSystemVisualContract(root, label, { allowTrajectoryPla
   root.querySelectorAll('[data-lk-route-overlay]').forEach((route) => {
     const paths = [...route.querySelectorAll('[data-route-path]')];
     const quality = route.getAttribute('data-route-quality');
-    const expectedTone = quality === 'invalid'
-      ? '--viewer-danger'
+const expectedTone = quality === 'invalid'
+      ? 'status-negative-foreground'
       : quality === 'stale'
-        ? '--viewer-warning'
-        : '--viewer-route';
+        ? 'status-cautionary-foreground'
+        : 'data-viz-series-5';
     const casingLayer = route.querySelector(':scope > [data-route-casing-layer]');
     const casings = [...(casingLayer?.querySelectorAll('[data-route-casing]') ?? [])];
     if (
@@ -459,10 +459,10 @@ export function assertPathSystemVisualContract(root, label, { allowTrajectoryPla
     const cursor = trajectory.querySelector('[data-trajectory-time-cursor]');
     const path = trajectory.querySelector('[data-trajectory-path]');
     const quality = trajectory.getAttribute('data-trajectory-quality');
-    const expectedTone = quality === 'invalid'
-      ? '--viewer-danger'
+const expectedTone = quality === 'invalid'
+      ? 'status-negative-foreground'
       : quality === 'stale'
-        ? '--viewer-warning'
+        ? 'status-cautionary-foreground'
         : '--viewer-accent';
     if (!allowTrajectoryPlayback && cursor) {
       throw new Error(`${label} operational Trajectory must not paint a playback cursor.`);

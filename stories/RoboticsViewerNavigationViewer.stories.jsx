@@ -342,7 +342,7 @@ const MIRROR_FEATURES = [
 const MIRROR_LEGEND_ITEMS = [
   { id: 'regions', label: '영역', color: TONE_COLOR.cautionary, shape: 'square' },
   { id: 'lanes', label: 'Lane · topology (점선)', color: TONE_COLOR.signal, shape: 'line', dashed: true },
-  { id: 'route', label: 'Route · 선택된 Lane (계획색 점선)', color: 'var(--viewer-route, var(--color-semantic-data-viz-series-5))', shape: 'line', dashed: true },
+  { id: 'route', label: 'Route · 선택된 Lane (계획색 점선)', color: 'var(--color-semantic-data-viz-series-5)', shape: 'line', dashed: true },
   { id: 'trajectory', label: '현재 궤적 · 이동 중 (실선)', color: TONE_COLOR.signal, shape: 'line' },
   { id: 'robots', label: 'Robot Pose · 현재 위치', color: TONE_COLOR.signal, shape: 'dot' },
   { id: 'waypoints', label: '웨이포인트', color: TONE_COLOR.neutral, shape: 'dot' },

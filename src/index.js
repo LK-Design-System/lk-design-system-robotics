@@ -8,6 +8,11 @@ export { LaneOverlay } from './components/robotics/LaneOverlay.jsx';
 export { ManualControlSession } from './components/robotics/ManualControlSession.jsx';
 export { NavigationAnnotationLayer } from './components/robotics/NavigationAnnotationLayer.jsx';
 export {
+  NavigationGraphError,
+  assertNavigationMapGraph,
+  validateNavigationMapGraph,
+} from './components/robotics/NavigationMapGraph.js';
+export {
   NavigationCoordinateBoundary,
   isNavigationGeometryCompatible,
   isNavigationSourceCompatible,

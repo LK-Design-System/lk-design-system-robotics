@@ -91,7 +91,7 @@ function pointAlong(points, ratio) {
 }
 
 const ROUTE_IDENTITY_TONE =
-  'var(--viewer-route, var(--color-semantic-data-viz-series-5, var(--color-semantic-accent-foreground-orange)))';
+  'var(--color-semantic-data-viz-series-5, var(--color-semantic-accent-foreground-orange))';
 
 // Route is one selected graph plan. Phase, condition, and executor progress
 // remain data/detail concerns; the operational map always paints one thick,
