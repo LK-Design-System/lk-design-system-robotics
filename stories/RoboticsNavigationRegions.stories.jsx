@@ -3,7 +3,7 @@ import { userEvent } from 'storybook/test';
 import { Map2DCanvas } from '@lk-robotics/lds-product';
 import { SpatialRegion } from '../src/index.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
-import { NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
+import { NavigationLegend, NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
 import { assertSharedFocusIndicator } from './RoboticsNavigationAssert.shared.jsx';
 
 const meta = {
@@ -122,6 +122,9 @@ function OverviewFixture() {
           />
         ))}
       </RegionMap>
+      {/* The three category patterns are the whole point of this story and
+          nothing on the map spells them out, so the key ships with it. */}
+      <NavigationLegend regions={['behavior', 'facility', 'terrain']} />
     </main>
   );
 }
@@ -221,18 +224,18 @@ export const DarkPatternsAndStates = {
 const concaveKeepOutRegion = {
   ...keepOutRegion,
   id: 'concave-keep-out',
-  label: '오목 통행 금지 구역',
+  label: '오목 금지',
   shape: {
     kind: 'polygon',
     points: [
-      { x: 36, y: 34 },
-      { x: 310, y: 34 },
-      { x: 310, y: 78 },
-      { x: 112, y: 78 },
-      { x: 112, y: 206 },
-      { x: 310, y: 206 },
-      { x: 310, y: 250 },
-      { x: 36, y: 250 },
+      { x: 92, y: 62 },
+      { x: 366, y: 62 },
+      { x: 366, y: 78 },
+      { x: 168, y: 78 },
+      { x: 168, y: 206 },
+      { x: 366, y: 206 },
+      { x: 366, y: 250 },
+      { x: 92, y: 250 },
     ],
   },
 };

@@ -32,10 +32,15 @@ const SEVERITY_PRESENTATION = {
   caution: {
     label: '주의',
     fill: 'var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))',
+    ring: 0,
   },
   danger: {
     label: '위험',
     fill: 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))',
+    // 심각도를 채움만으로 나누면 주의와 위험이 색상만 다른 동일 실루엣이 되어,
+    // 지도에서 라벨이 억제되면 색이 유일한 채널로 남는다(WCAG 1.4.1). 위험은
+    // 같은 핀 계열을 유지한 채 표면색 이중선을 둘러 흑백에서도 구분된다.
+    ring: 1.5,
   },
 };
 
@@ -230,8 +235,12 @@ export function HazardMarker({
             {...obstacle(`hazard:${hazard.id}:sign`)}
             d={PIN_PATH}
             fill={severity.fill}
+            stroke={severity.ring ? surface : undefined}
+            strokeWidth={severity.ring || undefined}
+            paintOrder={severity.ring ? 'stroke' : undefined}
             vectorEffect="non-scaling-stroke"
             data-hazard-sign=""
+            data-hazard-ring={severity.ring ? 'true' : 'false'}
           />
           <g fill={surface} pointerEvents="none" transform={GLYPH_FIT} data-hazard-glyph="">
             <path d={glyph} />

@@ -246,18 +246,26 @@ const MIRROR_FACILITY = {
 
 // One tone name per layer keeps the tree rows, the map legend, and the
 // LayerPanel tone vocabulary aligned to the same semantic color tokens.
+// `plan` is the tone RouteOverlay already paints on the map. It lives here so
+// the tree row, the legend swatch, and the rendered route read the same token
+// instead of the group claiming a colour that appears nowhere on the canvas.
 const TONE_COLOR = {
   neutral: 'var(--color-semantic-label-neutral)',
   signal: 'var(--color-semantic-primary-normal)',
   positive: 'var(--color-semantic-status-positive)',
   cautionary: 'var(--color-semantic-status-cautionary)',
+  plan: 'var(--color-semantic-data-viz-series-5)',
 };
 
 // Layer identity shared by the map, the layer/object tree, and the legend.
 const MIRROR_LAYERS = [
   { id: 'regions', label: '영역', description: '동작·시설·지형', tone: 'cautionary' },
   { id: 'lanes', label: '레인', description: '방향 그래프 연결', tone: 'signal' },
-  { id: 'paths', label: '경로·궤적', description: '계획 구간과 조밀 궤적', tone: 'positive' },
+  // `signal`, not the route's plan colour: LayerPanel restricts tone to its
+  // semantic set and rejects arbitrary colours by design, so the row names the
+  // trajectory hue this group actually paints on the map. The plan colour is
+  // carried by the legend, which does take a real token.
+  { id: 'paths', label: '경로·궤적', description: '계획 구간과 조밀 궤적', tone: 'signal' },
   { id: 'robots', label: '로봇 위치', description: '현재 위치와 heading', tone: 'signal' },
   { id: 'waypoints', label: '웨이포인트', description: '그래프 지점', tone: 'neutral' },
   { id: 'facilities', label: '설비 전이', description: '문·승강기·도크', tone: 'signal' },
@@ -347,11 +355,14 @@ const MIRROR_FEATURES = [
 const MIRROR_LEGEND_ITEMS = [
   { id: 'regions', label: '영역', color: TONE_COLOR.cautionary, shape: 'square' },
   { id: 'lanes', label: 'Lane · topology (점선)', color: TONE_COLOR.signal, shape: 'line', dashed: true },
-  { id: 'route', label: 'Route · 선택된 Lane (계획색 점선)', color: 'var(--color-semantic-data-viz-series-5)', shape: 'line', dashed: true },
-  { id: 'trajectory', label: '현재 궤적 · 이동 중 (실선)', color: TONE_COLOR.signal, shape: 'line' },
-  { id: 'robots', label: 'Robot Pose · 현재 위치', color: TONE_COLOR.signal, shape: 'dot' },
-  { id: 'waypoints', label: '웨이포인트', color: TONE_COLOR.neutral, shape: 'dot' },
-  { id: 'facilities', label: '설비 전이', color: TONE_COLOR.signal, shape: 'dot' },
+  { id: 'route', label: 'Route · 선택된 Lane (계획색 점선)', color: TONE_COLOR.plan, shape: 'line', dashed: true },
+  // Lane, trajectory, pose, and facility share the signal hue on purpose: hue
+  // names the navigation-graph family and shape names the entity. The labels
+  // spell the shape out so the shared colour is never read as one identity.
+  { id: 'trajectory', label: '현재 궤적 · 이동 중 (굵은 실선)', color: TONE_COLOR.signal, shape: 'line' },
+  { id: 'robots', label: 'Robot Pose · 현재 위치 (방위 원형)', color: TONE_COLOR.signal, shape: 'dot' },
+  { id: 'waypoints', label: '웨이포인트 · 그래프 지점 (사각)', color: TONE_COLOR.neutral, shape: 'square' },
+  { id: 'facilities', label: '설비 전이 · 문·승강기·도크 (핀)', color: TONE_COLOR.signal, shape: 'dot' },
 ];
 
 function featureByKey(key) {
@@ -594,6 +605,18 @@ function SemanticMirrorFixture() {
                       onActivate={() => selectFromMap('lanes:lane-corridor')}
                     />
                   )}
+                  {/* 궤적이 먼저, 계획선이 그 위에. 반대로 그리면 궤적의 표면색
+                      casing이 겹치는 구간의 route를 지운다. */}
+                  {featureVisible('paths:trajectory-amr-7') && (
+                    <TrajectoryOverlay
+                      trajectory={MIRROR_TRAJECTORY}
+                      viewportScale={cssViewBoxScale}
+                      tabIndex={-1}
+                      aria-hidden="true"
+                      selected={selectedKey === 'paths:trajectory-amr-7'}
+                      onActivate={() => selectFromMap('paths:trajectory-amr-7')}
+                    />
+                  )}
                   {groupVisible('paths') && visibleRouteSegments.length > 0 && (
                     <RouteOverlay
                       route={routeForRender}
@@ -603,16 +626,6 @@ function SemanticMirrorFixture() {
                       aria-hidden="true"
                       selectedSegmentId={selectedRouteSegmentId}
                       onActivate={({ segmentId }) => selectFromMap(mirrorRouteSegmentKey(segmentId))}
-                    />
-                  )}
-                  {featureVisible('paths:trajectory-amr-7') && (
-                    <TrajectoryOverlay
-                      trajectory={MIRROR_TRAJECTORY}
-                      viewportScale={cssViewBoxScale}
-                      tabIndex={-1}
-                      aria-hidden="true"
-                      selected={selectedKey === 'paths:trajectory-amr-7'}
-                      onActivate={() => selectFromMap('paths:trajectory-amr-7')}
                     />
                   )}
                   {featureVisible('robots:amr-7') && (
@@ -662,10 +675,21 @@ function SemanticMirrorFixture() {
             <div data-testid="mirror-legend">
               <Legend items={MIRROR_LEGEND_ITEMS} direction="horizontal" size="sm" aria-label="지도 계층 범례" />
             </div>
+            {/* The inspector describes the object the map has selected, so it
+                sits under the map rather than below a long tree in the other
+                column: shorter eye travel, and the two columns end together. */}
+            <div style={PANEL_CHROME}>
+              <SelectionInspector
+                item={inspectorItem}
+                sections={inspectorSections}
+                emptyLabel="패널이나 지도에서 객체를 선택하세요"
+                onClearSelection={inspectorItem ? () => setSelectedKey('') : undefined}
+              />
+            </div>
           </section>
 
           <aside aria-label="뷰어 패널" style={{ display: 'grid', gap: 'var(--space-4)', alignContent: 'start', minWidth: 0 }}>
-            <div style={PANEL_CHROME}>
+            <div style={{ ...PANEL_CHROME, maxHeight: 'min(620px, 80vh)', overflow: 'auto' }}>
               <LayerPanel
                 title="레이어와 객체"
                 label="내비게이션 레이어와 객체"
@@ -677,14 +701,6 @@ function SemanticMirrorFixture() {
                 lockedLayerIds={lockedIds}
                 onLockedLayerIdsChange={(ids) => setLockedIds(ids)}
                 data-testid="mirror-list"
-              />
-            </div>
-            <div style={PANEL_CHROME}>
-              <SelectionInspector
-                item={inspectorItem}
-                sections={inspectorSections}
-                emptyLabel="패널이나 지도에서 객체를 선택하세요"
-                onClearSelection={inspectorItem ? () => setSelectedKey('') : undefined}
               />
             </div>
           </aside>

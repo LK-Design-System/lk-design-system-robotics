@@ -1,6 +1,7 @@
 import React from 'react';
 import { Map2DCanvas } from '@lk-robotics/lds-product';
-import { RobotPoseMarker } from '../src/index.js';
+import { NavigationAnnotationLayer, RobotPoseMarker } from '../src/index.js';
+import { NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { assertContrastBackedFocus, contrastRatio } from './RoboticsNavigationAssert.shared.jsx';
 
@@ -24,9 +25,21 @@ const ROBOT_VARIANTS = [
       id: 'robot-pose-stopped',
       label: 'AMR 02',
       mapId: 'L1',
-      position: { x: 236, y: 74 },
+      position: { x: 180, y: 74 },
       headingRad: Math.PI / 2,
       state: 'idle',
+    },
+  },
+  {
+    key: 'paused',
+    label: '일시 정지',
+    pose: {
+      id: 'robot-pose-paused',
+      label: 'AMR 03',
+      mapId: 'L1',
+      position: { x: 298, y: 74 },
+      headingRad: Math.PI / 3,
+      state: 'paused',
     },
   },
   {
@@ -34,9 +47,9 @@ const ROBOT_VARIANTS = [
     label: '통신 끊김',
     pose: {
       id: 'robot-pose-offline',
-      label: 'AMR 03',
+      label: 'AMR 04',
       mapId: 'L1',
-      position: { x: 62, y: 158 },
+      position: { x: 180, y: 158 },
       headingRad: -Math.PI / 4,
       state: 'offline',
     },
@@ -46,11 +59,23 @@ const ROBOT_VARIANTS = [
     label: '오류',
     pose: {
       id: 'robot-pose-fault',
-      label: 'AMR 04',
+      label: 'AMR 05',
       mapId: 'L1',
-      position: { x: 236, y: 158 },
+      position: { x: 62, y: 158 },
       headingRad: Math.PI,
       state: 'fault',
+    },
+  },
+  {
+    key: 'unknown',
+    label: '상태 미확인',
+    pose: {
+      id: 'robot-pose-unknown',
+      label: 'AMR 06',
+      mapId: 'L1',
+      position: { x: 298, y: 158 },
+      headingRad: -Math.PI / 2,
+      state: 'unknown',
     },
   },
 ];
@@ -61,6 +86,12 @@ const INTERACTION_VARIANTS = [
     label: '기본',
     description: '상호작용 없음',
     markerProps: {},
+  },
+  {
+    key: 'highlighted',
+    label: 'Hover 강조',
+    description: '포인터·목록 연동 preview',
+    markerProps: { highlighted: true },
   },
   {
     key: 'selected',
@@ -92,12 +123,12 @@ const meta = {
       eyebrow: 'Robotics / Navigation / Robot Pose',
       title: '로봇의 위치와 실제 heading은 경로 진행률과 분리해 표현합니다',
       description:
-        'RobotPoseMarker는 모든 상태에 동일한 본체와 heading을 사용합니다. 이동 중은 약한 펄스로, 나머지 상태는 우측 상단의 단일 배지로 표시해 Route debug·Trajectory playback cue와 섞지 않습니다.',
+        'RobotPoseMarker는 본체 색으로 기본 상태를 표현합니다. 정상 상태에는 보조 뱃지를 붙이지 않고, 오류·오프라인·오래됨·미확인처럼 형태 구분이 필요한 예외에만 단일 glyph를 남깁니다.',
     },
     docs: {
       description: {
         component:
-          '2D 지도 안의 로봇 위치와 heading을 표현하는 renderer-neutral SVG 조각입니다. 본체는 상태에 따라 다시 칠하지 않으며, 이동은 LDS StatusIndicator와 동일한 1.7초 주기의 reduced-motion 대응 펄스, 정지·오프라인·오류는 한 개의 교체 가능한 배지 슬롯이 담당합니다.',
+          '2D 지도 안의 로봇 위치와 heading을 표현하는 renderer-neutral SVG 조각입니다. 이동·정지·일시정지·오류·오프라인 상태는 본체의 의미 색으로 구분하고, 색만으로 놓칠 수 있는 오류·오프라인·오래됨·미확인에는 한 개의 예외 glyph를 함께 사용합니다.',
       },
     },
   },
@@ -110,7 +141,7 @@ function PoseMap({ appearance, label }) {
     <Map2DCanvas
       appearance={appearance}
       label={label}
-      grid
+      grid={false}
       defaultViewport={{ x: 16, y: 20, z: 1 }}
       style={{ height: 260 }}
     >
@@ -123,25 +154,28 @@ function PoseMap({ appearance, label }) {
           aria-label={`${label} 로봇 pose 상태`}
           style={{ display: 'block' }}
         >
-          <rect
-            x="12"
-            y="12"
-            width="336"
-            height="186"
-            rx="8"
-            fill={appearance === 'dark' ? 'var(--viewer-surface-elevated)' : 'var(--viewer-surface)'}
-            stroke="var(--viewer-border)"
-            aria-hidden="true"
-          />
-          {ROBOT_VARIANTS.map(({ key, label: variantLabel, pose, markerProps }) => (
-            <RobotPoseMarker
-              key={key}
-              pose={pose}
-              viewportScale={viewport.z}
-              aria-label={`${pose.label}, ${variantLabel}, 방향 ${Math.round(pose.headingRad * 180 / Math.PI)}도`}
-              {...markerProps}
-            />
-          ))}
+          {/* 다른 Navigation 그룹과 같은 공용 스테이지를 쓴다. 이전에는 여기만
+              맨 rect를 직접 그려서, 격자·map id·나침반·스케일바가 없는 혼자
+              다른 배경이 됐다. 라벨 정책도 레이어가 소유해 6종 상태가 이름을
+              갖는다. */}
+          <NavigationMapStage
+            width={360}
+            height={210}
+            eyebrow={`POSE · ${appearance === 'dark' ? 'DARK' : 'LIGHT'}`}
+            north
+          >
+            <NavigationAnnotationLayer labelVisibility="always" detailVisibility="always">
+              {ROBOT_VARIANTS.map(({ key, label: variantLabel, pose, markerProps }) => (
+                <RobotPoseMarker
+                  key={key}
+                  pose={pose}
+                  viewportScale={viewport.z}
+                  aria-label={`${pose.label}, ${variantLabel}, 방향 ${Math.round(pose.headingRad * 180 / Math.PI)}도`}
+                  {...markerProps}
+                />
+              ))}
+            </NavigationAnnotationLayer>
+          </NavigationMapStage>
         </svg>
       )}
     </Map2DCanvas>
@@ -151,7 +185,7 @@ function PoseMap({ appearance, label }) {
 export const Overview = {
   name: '개요',
   parameters: storyDescription(
-    '이동 펄스·정지·통신 끊김·오류를 Light/Dark 지도에서 비교합니다. 본체와 heading은 완전히 동일하고, 이동은 펄스 하나로, 나머지 상태는 우측 상단 배지 하나로 전달합니다.',
+    '이동·정지·일시정지·통신 끊김·오류·미확인을 Light/Dark 지도에서 비교합니다. 정상 상태는 본체 색과 이동 펄스로, 예외 상태는 의미 색과 단일 glyph로 전달합니다.',
   ),
   render: () => (
     <main
@@ -200,29 +234,48 @@ export const Overview = {
       }
     });
     const lightMarkers = [...canvasElement.querySelectorAll('[data-viewer-appearance="light"] [data-robot-pose-marker]')];
-    const bodyFills = markers
-      .map((marker) => marker.querySelector('[data-robot-pose-body] circle')?.getAttribute('fill'));
-    if (new Set(bodyFills).size !== 1) {
-      throw new Error('Robot state or viewer appearance must not recolor the pose body.');
-    }
+    const expectedTones = {
+      moving: 'moving',
+      idle: 'neutral',
+      paused: 'cautionary',
+      fault: 'negative',
+      offline: 'offline',
+      unknown: 'cautionary',
+    };
+    lightMarkers.forEach((marker) => {
+      if (marker.dataset.robotPoseTone !== expectedTones[marker.dataset.robotState]) {
+        throw new Error(`Robot pose tone does not match ${marker.dataset.robotState}.`);
+      }
+      if (!getComputedStyle(marker.querySelector('[data-robot-pose-body] circle')).fill) {
+        throw new Error('Robot pose body tone must resolve to a visible color.');
+      }
+    });
     const moving = canvasElement.querySelector('[data-robot-id="robot-pose-default"]');
     const stopped = canvasElement.querySelector('[data-robot-id="robot-pose-stopped"]');
+    const paused = canvasElement.querySelector('[data-robot-id="robot-pose-paused"]');
     const offline = canvasElement.querySelector('[data-robot-id="robot-pose-offline"]');
     const fault = canvasElement.querySelector('[data-robot-id="robot-pose-fault"]');
+    const unknown = canvasElement.querySelector('[data-robot-id="robot-pose-unknown"]');
     if (moving?.querySelector('[data-robot-pose-status-badge]')) {
       throw new Error('Moving robot must not render a status badge.');
     }
     if (!moving?.querySelector('[data-robot-pose-motion-indicator]')) {
       throw new Error('Moving robot must render the motion pulse.');
     }
-    if (stopped?.querySelector('[data-robot-pose-status-badge]')?.dataset.statusBadgeKind !== 'idle') {
-      throw new Error('Stopped robot must use the idle badge.');
+    if (stopped?.querySelector('[data-robot-pose-status-badge]')) {
+      throw new Error('Stopped robot must use its neutral body tone without a badge.');
+    }
+    if (paused?.querySelector('[data-robot-pose-status-badge]')) {
+      throw new Error('Paused robot must use its cautionary body tone without a badge.');
     }
     if (offline?.querySelector('[data-robot-pose-status-badge]')?.dataset.statusBadgeKind !== 'offline') {
       throw new Error('Offline robot must use the offline badge.');
     }
     if (fault?.querySelector('[data-robot-pose-status-badge]')?.dataset.statusBadgeKind !== 'fault') {
       throw new Error('Fault robot must use the fault badge.');
+    }
+    if (unknown?.querySelector('[data-robot-pose-status-badge]')?.dataset.statusBadgeKind !== 'unknown') {
+      throw new Error('Unknown robot state must retain the unknown badge.');
     }
     if (lightMarkers.some((marker) => marker.querySelectorAll('[data-robot-pose-status-badge]').length > 1)) {
       throw new Error('RobotPoseMarker must render at most one status badge.');
@@ -232,8 +285,7 @@ export const Overview = {
     }
     const darkNeutralBadges = [
       ...canvasElement.querySelectorAll(
-        '[data-viewer-appearance="dark"] [data-robot-pose-status-badge][data-status-badge-kind="idle"],'
-        + '[data-viewer-appearance="dark"] [data-robot-pose-status-badge][data-status-badge-kind="offline"]',
+        '[data-viewer-appearance="dark"] [data-robot-pose-status-badge][data-status-badge-kind="offline"]',
       ),
     ];
     darkNeutralBadges.forEach((badge) => {
@@ -251,9 +303,9 @@ export const Overview = {
 };
 
 export const InteractionStates = {
-  name: '상호작용 · 선택·포커스',
+  name: '상호작용 · Hover·선택·포커스',
   parameters: storyDescription(
-    '선택은 pose 본체의 1.15배 정적 확대, 키보드 포커스는 바깥의 고대비 이중 링입니다. 기본·선택·포커스·조합 상태를 비교해 두 상호작용 축이 독립적임을 보여줍니다.',
+    'Hover·연결 목록 preview는 1.08배 확대, 선택은 1.15배 확대, 키보드 포커스는 바깥의 고대비 이중 링입니다. 세 상호작용 축은 서로의 상태를 만들지 않습니다.',
   ),
   render: () => (
     <main
@@ -298,14 +350,25 @@ export const InteractionStates = {
   ),
   play: async ({ canvasElement }) => {
     const defaultMarker = canvasElement.querySelector('[data-robot-id="robot-pose-default"]');
+    const highlighted = canvasElement.querySelector('[data-robot-id="robot-pose-highlighted"]');
     const selected = canvasElement.querySelector('[data-robot-id="robot-pose-selected"]');
     const focused = canvasElement.querySelector('[data-robot-id="robot-pose-focused"]');
     const selectedFocused = canvasElement.querySelector('[data-robot-id="robot-pose-selected-focused"]');
     if (
       defaultMarker?.querySelector('[data-robot-pose-selected-scale]')
+      || defaultMarker?.querySelector('[data-robot-pose-highlighted-scale]')
       || defaultMarker?.querySelector('[data-robot-pose-focus-indicator]')
     ) {
       throw new Error('Default interaction example must not render selection or focus.');
+    }
+    if (
+      highlighted?.querySelector('[data-robot-pose-highlighted-scale="1.08"]') == null
+      || highlighted.dataset.highlighted !== 'true'
+      || highlighted.querySelector('[data-robot-pose-selected-scale]')
+      || highlighted.querySelector('[data-robot-pose-focus-indicator]')
+      || highlighted.dataset.focused === 'true'
+    ) {
+      throw new Error('Highlighted preview must use only the 1.08x body enlargement.');
     }
     if (!selected?.querySelector('[data-robot-pose-selected-scale="1.15"]')) {
       throw new Error('Selected interaction example is missing its 1.15x body enlargement.');

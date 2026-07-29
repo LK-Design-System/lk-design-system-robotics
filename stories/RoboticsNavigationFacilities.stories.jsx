@@ -183,7 +183,10 @@ export const FacilityTransitionOverview = {
         <TransitionMap label="2층 승강기 도착 지도" testId="lift-map-to">
           <path d="M54 188H264Q282 188 282 170V132" fill="none" stroke="var(--color-semantic-primary-normal)" strokeWidth="3" strokeDasharray="7 5" vectorEffect="non-scaling-stroke" aria-hidden="true" />
           <SpatialRegion region={secondFloorCabin} />
-          <FacilityTransition transition={arrivalLiftTransition} activeMapId="warehouse-2f" />
+          {/* 양쪽 지도 모두 자기 endpoint를 선택 상태로 둔다. 한쪽만 선택하면
+              라벨이 그쪽에만 떠서, "접근 vs 도착 상태"를 비교하라는 이 스토리의
+              오른쪽 절반에 정작 상태가 없다. */}
+          <FacilityTransition transition={arrivalLiftTransition} activeMapId="warehouse-2f" selected />
         </TransitionMap>
       </section>
     </main>

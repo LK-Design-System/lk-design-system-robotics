@@ -13,6 +13,7 @@ import {
 } from './_navigationAnnotations.js';
 import {
   NAV_FOCUS,
+  NAV_GLYPH_COUNTER_SIZE,
   NAV_HIT,
   NAV_LABEL_HALO,
   NAV_SELECTION,
@@ -30,16 +31,9 @@ const STATE_LABEL = {
 
 const BODY_RADIUS = 10;
 const FOCUS_RADIUS = 17;
+const HIGHLIGHT_SCALE = 1.08;
 
 const BADGE_PRESENTATION = {
-  idle: {
-    tone: 'var(--viewer-muted, var(--color-semantic-label-neutral))',
-    glyph: 'var(--viewer-surface, var(--color-semantic-static-white))',
-  },
-  paused: {
-    tone: 'var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))',
-    glyph: 'var(--color-semantic-static-black)',
-  },
   fault: {
     tone: 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))',
     glyph: 'var(--color-semantic-static-white)',
@@ -62,6 +56,37 @@ const BADGE_PRESENTATION = {
   },
 };
 
+function poseBodyPresentation(state, stale, identityColor) {
+  if (state === 'fault') {
+    return {
+      tone: 'negative',
+      color: 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))',
+    };
+  }
+  if (stale || state === 'offline') {
+    return {
+      tone: stale ? 'stale' : 'offline',
+      color: 'var(--viewer-muted, var(--color-semantic-label-alternative))',
+    };
+  }
+  if (state === 'paused' || state === 'unknown') {
+    return {
+      tone: 'cautionary',
+      color: 'var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))',
+    };
+  }
+  if (state === 'idle') {
+    return {
+      tone: 'neutral',
+      color: 'var(--viewer-muted, var(--color-semantic-label-neutral))',
+    };
+  }
+  return {
+    tone: 'moving',
+    color: identityColor ?? 'var(--viewer-accent, var(--color-semantic-primary-normal))',
+  };
+}
+
 function normalizeViewportScale(value) {
   return Number.isFinite(value) && value > 0 ? value : 1;
 }
@@ -75,8 +100,6 @@ function statusBadgeKind(state, invalid, stale) {
   if (state === 'fault') return 'fault';
   if (state === 'offline') return 'offline';
   if (stale) return 'stale';
-  if (state === 'paused') return 'paused';
-  if (state === 'idle') return 'idle';
   if (state === 'unknown') return 'unknown';
   return undefined;
 }
@@ -113,6 +136,7 @@ export function RobotPoseMarker({
   context = 'live',
   viewportScale = 1,
   selected = false,
+  highlighted = false,
   focused = false,
   disabled = false,
   invalid = false,
@@ -141,6 +165,11 @@ export function RobotPoseMarker({
   const interactive = typeof onActivate === 'function';
   const pointerOnly = ariaHidden === true || ariaHidden === 'true';
   const focusVisible = !pointerOnly && (focused || hasDomFocus);
+  const visualScale = selected
+    ? NAV_SELECTION.robotPoseScale
+    : highlighted
+      ? HIGHLIGHT_SCALE
+      : 1;
   const poseContext = context === 'replay' ? 'replay' : 'live';
   const state = STATE_LABEL[pose.state] ? pose.state : 'unknown';
   const stateLabel = poseContext === 'replay' ? '기록 재생' : STATE_LABEL[state];
@@ -155,7 +184,8 @@ export function RobotPoseMarker({
   const surface = 'var(--viewer-surface, var(--color-semantic-background-normal-normal))';
   const foreground = 'var(--viewer-foreground, var(--color-semantic-label-strong))';
   const muted = 'var(--viewer-muted, var(--color-semantic-label-neutral))';
-  const fleetColor = pose.color ?? 'var(--color-semantic-primary-normal)';
+  const bodyPresentation = poseBodyPresentation(state, stale, pose.color);
+  const bodyColor = bodyPresentation.color;
   const badgeKind = statusBadgeKind(state, invalid, stale);
   const badge = BADGE_PRESENTATION[badgeKind];
   const motionVisible = poseContext !== 'replay' && state === 'moving' && !disabled && !invalid && !stale;
@@ -217,10 +247,12 @@ export function RobotPoseMarker({
       data-robot-state={state}
       data-robot-pose-context={poseContext}
       data-selected={selected ? 'true' : 'false'}
+      data-highlighted={highlighted ? 'true' : 'false'}
       data-focused={focusVisible ? 'true' : 'false'}
       data-disabled={disabled ? 'true' : 'false'}
       data-invalid={invalid ? 'true' : 'false'}
       data-stale={stale ? 'true' : 'false'}
+      data-robot-pose-tone={bodyPresentation.tone}
       data-status-badge-kind={badgeKind}
       data-motion-visible={motionVisible ? 'true' : 'false'}
       data-hovered={hovered ? 'true' : 'false'}
@@ -268,9 +300,9 @@ export function RobotPoseMarker({
           rx={localizationEllipse.majorRadius}
           ry={localizationEllipse.minorRadius}
           transform={`rotate(${ellipseAngle})`}
-          fill={fleetColor}
+          fill={bodyColor}
           fillOpacity="0.08"
-          stroke={fleetColor}
+          stroke={bodyColor}
           strokeOpacity="0.52"
           strokeWidth="1.5"
           strokeDasharray="4 3"
@@ -288,7 +320,7 @@ export function RobotPoseMarker({
             data-robot-pose-motion-indicator=""
             r={BODY_RADIUS + 3}
             fill="none"
-            stroke={fleetColor}
+            stroke={bodyColor}
             strokeWidth="2"
             vectorEffect="non-scaling-stroke"
             pointerEvents="none"
@@ -328,7 +360,10 @@ export function RobotPoseMarker({
           data-navigation-selection-scale=""
           data-robot-pose-selection-visual=""
           data-robot-pose-selected-scale={selected ? NAV_SELECTION.robotPoseScale : undefined}
-          style={{ transform: `scale(${selected ? NAV_SELECTION.robotPoseScale : 1})` }}
+          data-robot-pose-highlighted-scale={
+            highlighted && !selected ? HIGHLIGHT_SCALE : undefined
+          }
+          style={{ transform: `scale(${visualScale})` }}
         >
           <circle
             data-robot-pose-shadow=""
@@ -346,8 +381,8 @@ export function RobotPoseMarker({
           >
             <circle
               r={BODY_RADIUS}
-              fill={fleetColor}
-              stroke={fleetColor}
+              fill={bodyColor}
+              stroke={bodyColor}
               strokeWidth="2"
               vectorEffect="non-scaling-stroke"
             />
@@ -378,12 +413,6 @@ export function RobotPoseMarker({
               strokeWidth="1.5"
               vectorEffect="non-scaling-stroke"
             />
-            {badgeKind === 'idle' && (
-              <rect x="-2.7" y="-2.7" width="5.4" height="5.4" rx="0.7" fill={badge.glyph} />
-            )}
-            {badgeKind === 'paused' && (
-              <path d="M-2.4 -3.2 V3.2 M2.4 -3.2 V3.2" fill="none" stroke={badge.glyph} strokeWidth="2" strokeLinecap="round" />
-            )}
             {(badgeKind === 'fault' || badgeKind === 'invalid') && (
               <path d="M0 -3.5 V1 M0 3.5 V3.7" fill="none" stroke={badge.glyph} strokeWidth="1.8" strokeLinecap="round" />
             )}
@@ -397,7 +426,7 @@ export function RobotPoseMarker({
               </>
             )}
             {badgeKind === 'unknown' && (
-              <text x="0" y="3.1" textAnchor="middle" fill={badge.glyph} fontFamily="var(--font-sans)" fontSize="9" fontWeight="var(--fw-bold)">?</text>
+              <text x="0" y="3.1" textAnchor="middle" fill={badge.glyph} fontFamily="var(--font-sans)" fontSize={NAV_GLYPH_COUNTER_SIZE} fontWeight="var(--fw-bold)">?</text>
             )}
           </g>
         )}

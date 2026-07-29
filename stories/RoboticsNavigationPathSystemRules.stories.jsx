@@ -1,6 +1,7 @@
 import React from 'react';
 // Shared Path System rules; component-specific examples stay in Lane, Route, and Trajectory stories.
 import { storyDescription } from './StoryGuide.shared.jsx';
+import { LineRoleSwatch } from './RoboticsNavigationStage.shared.jsx';
 
 const INK = 'var(--color-semantic-label-strong)';
 const MUTED = 'var(--color-semantic-label-neutral)';
@@ -28,7 +29,10 @@ function Card({ title, hint, children }) {
   );
 }
 
-function DecisionRow({ role, defaultCue, exception }) {
+// 이 표는 "선이 어떻게 보이는가"를 정의하는데, 이전에는 그걸 전부 산문으로만
+// 적었다. 규칙을 정하는 자리에 그 규칙의 실물이 없으면 독자가 글을 그림으로
+// 번역해야 한다. 스와치는 지도가 그리는 것과 같은 dash·굵기·색을 쓴다.
+function DecisionRow({ role, lineRole, defaultCue, exception }) {
   return (
     <div
       data-cue-decision={role.toLowerCase()}
@@ -42,7 +46,10 @@ function DecisionRow({ role, defaultCue, exception }) {
       }}
     >
       <strong style={{ color: INK, fontSize: 'var(--caption1-size)' }}>{role}</strong>
-      <span style={{ color: INK, fontSize: 'var(--caption1-size)' }}>{defaultCue}</span>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: INK, fontSize: 'var(--caption1-size)' }}>
+        {lineRole && <LineRoleSwatch kind={lineRole} />}
+        {defaultCue}
+      </span>
       <span style={{ color: MUTED, fontSize: 'var(--caption1-size)', lineHeight: 1.55 }}>{exception}</span>
     </div>
   );
@@ -56,9 +63,9 @@ function CueCatalog() {
         hint="공통 화살표를 먼저 고르지 않습니다. 사용자가 판단해야 할 정보가 이미 선의 순서·endpoint·sample에 있으면 추가 표식을 그리지 않습니다."
       >
         <div style={{ display: 'grid' }}>
-          <DecisionRow role="Lane" defaultCue="화살표 없음" exception="방향은 entry·exit와 선택 상세에서 확인합니다. 지도 위 방향 표식은 Waypoint·RobotPose와 혼동되므로 사용하지 않습니다." />
-          <DecisionRow role="Route" defaultCue="선택 Lane의 계획색 점선" exception="선택된 Lane 기본선은 숨기고 같은 1.5px·4 6 점선을 계획색으로 대체합니다. phase·condition·진행률은 상세 패널에서 확인합니다." />
-          <DecisionRow role="Trajectory" defaultCue="sample만" exception="시간 cursor는 기록 재생·디버그에서만 사용합니다. 실제 위치는 RobotPose가 소유합니다." />
+          <DecisionRow role="Lane" lineRole="lane" defaultCue="화살표 없음" exception="방향은 entry·exit와 선택 상세에서 확인합니다. 지도 위 방향 표식은 Waypoint·RobotPose와 혼동되므로 사용하지 않습니다." />
+          <DecisionRow role="Route" lineRole="route" defaultCue="선택 Lane의 계획색 점선" exception="선택된 Lane 기본선은 숨기고 같은 1.5px·4 6 점선을 계획색으로 대체합니다. phase·condition·진행률은 상세 패널에서 확인합니다." />
+          <DecisionRow role="Trajectory" lineRole="trajectory" defaultCue="sample만" exception="시간 cursor는 기록 재생·디버그에서만 사용합니다. 실제 위치는 RobotPose가 소유합니다." />
         </div>
       </Card>
     </main>

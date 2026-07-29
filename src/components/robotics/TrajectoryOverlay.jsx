@@ -483,6 +483,8 @@ export function TrajectoryOverlay({
             cy={sample.y}
             r={NAV_TRAJECTORY_SAMPLE.radius * inverseScale}
             fill={tone}
+            stroke={surface}
+            strokeWidth={NAV_TRAJECTORY_SAMPLE.ringWidth * inverseScale}
             opacity={phase === 'planned'
               ? 1
               : phase === 'past'

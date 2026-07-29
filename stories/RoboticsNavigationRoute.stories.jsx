@@ -54,8 +54,12 @@ function ActivePathLayers({ viewportScale }) {
   return (
     <NavigationCoordinateBoundary frame={PROJECTED_FRAME_L1}>
       <NavigationAnnotationLayer detailMode="overview">
-        <RouteOverlay route={ACTIVE_ROUTE} activeMapId="L1" viewportScale={viewportScale} />
+        {/* 궤적을 먼저, 계획선을 그 위에. 반대로 그리면 궤적의 표면색 casing이
+            겹치는 구간의 route를 지워, "Route는 중간에서 끊기지 않는다"는 이
+            스토리의 계약이 화면에서만 깨져 보인다. 점선이 실선 위에 놓이면
+            계획과 실주행이 같은 자리에서도 둘 다 읽힌다. */}
         <TrajectoryOverlay trajectory={ACTIVE_TRAJECTORY} viewportScale={viewportScale} />
+        <RouteOverlay route={ACTIVE_ROUTE} activeMapId="L1" viewportScale={viewportScale} />
         <RobotPoseMarker pose={ACTIVE_ROBOT_POSE} viewportScale={viewportScale} />
       </NavigationAnnotationLayer>
     </NavigationCoordinateBoundary>

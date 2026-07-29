@@ -11,7 +11,7 @@ import {
   TrajectoryOverlay,
   WaypointMarker,
 } from '../src/index.js';
-import { NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
+import { NavigationLegend, NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { assertNoLabelCollisions, collectAnnotationLabels } from './RoboticsNavigationCollision.shared.jsx';
 
@@ -172,8 +172,11 @@ const OVERVIEW_REGION = {
   category: 'behavior',
   rule: { kind: 'keep-out' },
   shape: {
+    // Kept clear of the stage eyebrow at (26, 32): the chrome's halo keeps it
+    // legible over fixture geometry, but a hazard hatch running through the map
+    // id still reads as a mistake rather than as a deliberate overlay.
     kind: 'polygon',
-    points: [{ x: 40, y: 26 }, { x: 150, y: 26 }, { x: 150, y: 94 }, { x: 40, y: 94 }],
+    points: [{ x: 40, y: 52 }, { x: 150, y: 52 }, { x: 150, y: 120 }, { x: 40, y: 120 }],
   },
 };
 
@@ -274,6 +277,9 @@ export const AnnotationLayerOverview = {
           </NavigationAnnotationLayer>
         )}
       </AnnotationMap>
+      {/* Six overlay kinds share one canvas here, and labels only appear on
+          hover — so the static read depends entirely on pattern and stroke. */}
+      <NavigationLegend regions={['behavior']} lines={['lane', 'route', 'trajectory']} />
     </main>
   ),
   play: async ({ canvasElement }) => {

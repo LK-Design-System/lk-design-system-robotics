@@ -72,6 +72,9 @@ export const NAV_SELECTION = {
   robotPoseScale: 1.15,
   pinScale: 1.12,
   regionStrokeWidth: 3.5,
+  /** Region outline below selection: hover lifts the edge, rest sits quiet. */
+  regionHoverStrokeWidth: 2,
+  regionRestStrokeWidth: 1.5,
   pathCasingWidth: 7.5,
   routeCasingWidth: 6,
   pathStrokeWidth: 4,
@@ -119,7 +122,13 @@ export const NAV_LINE_ROLE = {
  * The current sample is a circular time cursor—not a route arrowhead.
  */
 export const NAV_TRAJECTORY_SAMPLE = {
-  radius: 1.5,
+  // 이 반경은 궤적 core(2.25px)보다 커야 한다. 이전 1.5는 지름 3px이라 같은 색
+  // 선 위에서 양쪽으로 0.375px만 삐져나왔고, 결과적으로 이 컴포넌트를 Lane·Route와
+  // 구분 짓는 유일한 표현인 시간 순 sample이 보이지 않았다. 표면색 링과 함께
+  // 써야 선 위의 점으로 읽힌다.
+  radius: 2.4,
+  /** 점을 선에서 떼어내는 표면색 knockout 두께. */
+  ringWidth: 1,
   maxVisible: 12,
   pastOpacity: 0.78,
   futureOpacity: 0.48,
@@ -212,3 +221,33 @@ export const NAV_WAYPOINT_STATUS_BADGE = {
  * name / detail / caption text tiers.
  */
 export const NAV_LABEL_HALO = { primary: 4, secondary: 3, caption: 3 };
+
+/**
+ * Text-label size ramp, tiered to match NAV_LABEL_HALO.
+ *
+ * Stroke width, radius, opacity, dash, and halo were centralised here from the
+ * start; type was the one visual property left to each call site. That is why
+ * every overlay independently landed on the same three tokens while fixtures
+ * drifted to raw 8–11px — the convention existed but had nowhere to live. Read
+ * this alongside NAV_LABEL_HALO: a tier's size and its knockout are chosen
+ * together, so changing one here without the other breaks the legibility
+ * contract on busy map content.
+ */
+export const NAV_LABEL_TYPE = {
+  /** Entity identity — waypoint name, robot name. */
+  primary: 'var(--label2-size)',
+  /** Entity detail line — region label, lane label, facility label. */
+  secondary: 'var(--caption1-size)',
+  /** Sub-detail and ambient map chrome — the floor of the ramp. */
+  caption: 'var(--caption2-size)',
+};
+
+/**
+ * Deliberately NOT on the ramp above: marks painted inside a glyph, such as the
+ * `?` in an unknown-state badge or a transition counter. Those are sized to the
+ * shape that contains them (NAV_STATE_BADGE is radius 7, so its counter cannot
+ * exceed ~9 user units) and live in SVG user space rather than CSS text space.
+ * Pulling them onto the readable-text ramp would overflow the glyph. This
+ * mirrors the same carve-out NAV_LABEL_HALO already documents.
+ */
+export const NAV_GLYPH_COUNTER_SIZE = 9;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { userEvent, waitFor } from 'storybook/test';
 import { Map2DCanvas } from '@lk-robotics/lds-product';
-import { WaypointMarker } from '../src/index.js';
+import { NavigationAnnotationLayer, WaypointMarker } from '../src/index.js';
 import { NAV_SELECTION } from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationVocabulary';
 import { NAV_WAYPOINT_STATUS_BADGE } from '../src/components/robotics/_navigationVocabulary.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
@@ -336,8 +336,13 @@ function WaypointGraphic({
       style={{ display: 'block', overflow: 'visible' }}
     >
       <NavigationMapStage width={width} height={height} eyebrow={mapId} north>
-        {waypoints.map((waypoint) => (
-          <WaypointMarker
+        {/* 레이어가 없으면 라벨이 협상을 거치지 않고 natural 위치에 그대로 앉는다.
+            그러면 스테이지 패널 경계도 적용되지 않아, 오른쪽 끝 마커의 라벨이
+            그려진 지도 밖으로 삐져나간다. 가시성 정책은 마커 prop이 그대로
+            소유하도록 always로 열어둔다. */}
+        <NavigationAnnotationLayer labelVisibility="always" detailVisibility="always">
+          {waypoints.map((waypoint) => (
+            <WaypointMarker
             key={waypoint.id}
             waypoint={waypoint}
             viewportScale={viewportScale}
@@ -346,11 +351,12 @@ function WaypointGraphic({
             disabled={markerStates[waypoint.id]?.disabled}
             invalid={markerStates[waypoint.id]?.invalid}
             stale={markerStates[waypoint.id]?.stale}
-            labelVisibility={labelVisibility}
-            detailVisibility={detailVisibility}
-            onActivate={onActivate}
-          />
-        ))}
+              labelVisibility={labelVisibility}
+              detailVisibility={detailVisibility}
+              onActivate={onActivate}
+            />
+          ))}
+        </NavigationAnnotationLayer>
       </NavigationMapStage>
     </svg>
   );
@@ -374,7 +380,10 @@ function MapSurface({
       appearance={appearance}
       controls={false}
       grid={false}
-      style={{ width: '100%', height }}
+      // The canvas frames the stage, so it must not outrun it: without the cap
+      // the card stretches to the page column while the fixed-width stage stays
+      // left-aligned inside it, leaving a lopsided band down the right edge.
+      style={{ width: '100%', maxWidth: width, height }}
     >
       {({ viewport }) => (
         <WaypointGraphic

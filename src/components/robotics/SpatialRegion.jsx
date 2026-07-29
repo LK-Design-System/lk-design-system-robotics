@@ -10,7 +10,13 @@ import {
   annotationPriority,
   useNavigationLabelDisclosure,
 } from './_navigationAnnotations.js';
-import { navStateOpacity, NAV_LABEL_HALO, NAV_FOCUS, NAV_SELECTION } from './_navigationVocabulary.js';
+import {
+  navStateOpacity,
+  NAV_LABEL_HALO,
+  NAV_LABEL_TYPE,
+  NAV_FOCUS,
+  NAV_SELECTION,
+} from './_navigationVocabulary.js';
 
 // facility uses a DOT field rather than a grid: the map canvas already draws a
 // square grid, so a region grid pattern reads as "empty map", not "facility
@@ -242,6 +248,15 @@ function strokeForRegion(region, { disabled, invalid, stale }) {
     if (region.traversability === 'blocked') return 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))';
     if (region.traversability === 'restricted') return 'var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))';
     if (region.traversability === 'unknown') return 'var(--viewer-muted, var(--color-semantic-label-alternative))';
+  }
+
+  // Facility footprints belong to the same family FacilityTransition paints in
+  // accent, so they take the accent edge rather than falling through to the
+  // foreground ink. Category is already carried by the fill pattern; letting
+  // colour fall back to near-black made the least severe region on the map the
+  // heaviest mark on it.
+  if (region.category === 'facility') {
+    return 'var(--viewer-accent, var(--color-semantic-primary-normal))';
   }
 
   return 'var(--viewer-foreground, var(--color-semantic-label-neutral))';
@@ -504,7 +519,11 @@ export function SpatialRegion({
         shape={region.shape}
         fill={`url(#${patternId})`}
         stroke={stroke}
-        strokeWidth={selected ? NAV_SELECTION.regionStrokeWidth : hovered ? 2 : 1.5}
+        strokeWidth={selected
+          ? NAV_SELECTION.regionStrokeWidth
+          : hovered
+            ? NAV_SELECTION.regionHoverStrokeWidth
+            : NAV_SELECTION.regionRestStrokeWidth}
         vectorEffect="non-scaling-stroke"
         data-region-geometry={region.shape.kind}
         data-region-selection-geometry={selected ? '' : undefined}
@@ -541,7 +560,7 @@ export function SpatialRegion({
               strokeWidth={NAV_LABEL_HALO.primary}
               paintOrder="stroke"
               vectorEffect="non-scaling-stroke"
-              style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--caption1-size)', fontWeight: 'var(--fw-bold)' }}
+              style={{ fontFamily: 'var(--font-sans)', fontSize: NAV_LABEL_TYPE.secondary, fontWeight: 'var(--fw-bold)' }}
             >
               {region.label?.trim() || semanticLabel(region)}
             </text>
@@ -557,7 +576,7 @@ export function SpatialRegion({
                 paintOrder="stroke"
                 vectorEffect="non-scaling-stroke"
                 data-region-details=""
-                style={{ fontFamily: 'var(--font-sans)', fontSize: 'var(--caption2-size)', fontWeight: 'var(--fw-semibold)' }}
+                style={{ fontFamily: 'var(--font-sans)', fontSize: NAV_LABEL_TYPE.caption, fontWeight: 'var(--fw-semibold)' }}
               >
                 {visualDetails}
               </text>

@@ -30,6 +30,16 @@ const STAGE_MUTED = 'var(--viewer-muted, var(--color-semantic-label-neutral))';
 
 const MONO_FONT = 'var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)';
 
+/**
+ * One size for every ambient mark on the stage — map id, compass, scale bar,
+ * legend group headings, legend codes. These were previously hand-set to 8, 9,
+ * 10, and 11 raw px, which put four unrelated sizes on a single map and pushed
+ * the compass below any legible floor. The overlays themselves already ride a
+ * three-step token ramp (label2 · caption1 · caption2); chrome now sits on its
+ * bottom step instead of inventing a scale beneath it.
+ */
+const STAGE_CHROME_SIZE = 'var(--caption2-size)';
+
 // ---------------------------------------------------------------------------
 // Shared semantic encoding — a single source the map badges and the Legend
 // both read from, so what the operator sees on the floor plan matches the key.
@@ -53,6 +63,50 @@ export const NAV_ANNOTATION_LEGEND = {
   'door-approach': { code: ANNOTATION_CODE['door-approach'], label: '문 접근' },
   mutex: { code: ANNOTATION_CODE.mutex, label: '상호 배제' },
   custom: { code: ANNOTATION_CODE.custom, label: '사용자 정의' },
+};
+
+/**
+ * Region fill patterns and path stroke roles are the two encodings on these
+ * maps that a reader cannot infer from the shape alone — a hatch is not
+ * self-evidently "behaviour rule", and a dashed line is not self-evidently
+ * "topology". Both were previously undecodable because the groups that use
+ * them shipped without a key.
+ *
+ * The geometry below mirrors what SpatialRegion and the path overlays actually
+ * paint (tile sizes, dash arrays, and core widths were read off the rendered
+ * output), so the swatch is the same mark as the map rather than an
+ * approximation of it.
+ */
+export const NAV_REGION_LEGEND = {
+  behavior: {
+    pattern: 'diagonal',
+    tile: 9,
+    color: 'var(--viewer-danger, var(--color-semantic-status-negative-foreground))',
+    label: '동작 규칙',
+  },
+  facility: {
+    pattern: 'dot',
+    tile: 8,
+    color: 'var(--viewer-accent, var(--color-semantic-primary-normal))',
+    label: '설비 범위',
+  },
+  terrain: {
+    pattern: 'contour',
+    tile: 12,
+    color: 'var(--viewer-warning, var(--color-semantic-status-cautionary-foreground))',
+    label: '지형 통행성',
+  },
+};
+
+export const NAV_LINE_LEGEND = {
+  lane: { color: STAGE_MUTED, width: 1.5, dash: '4 6', label: '레인 · 정적 토폴로지' },
+  route: { color: 'var(--color-semantic-data-viz-series-5)', width: 1.5, dash: '4 6', label: 'Route · 선택된 계획' },
+  trajectory: {
+    color: 'var(--viewer-accent, var(--color-semantic-primary-normal))',
+    width: 2.25,
+    dash: null,
+    label: '궤적 · 실제 주행',
+  },
 };
 
 // state key -> { label, glyph kind for NavigationStateGlyph | null, tone token }
@@ -151,6 +205,10 @@ export function NavigationMapStage({
         {/* Panel surface. */}
         <rect
           data-navigation-stage-surface=""
+          // 라벨 협상의 경계를 SVG 박스가 아니라 이 패널로 잡는다. 패널은 SVG
+          // 안쪽으로 margin만큼 들어와 있어서, 경계가 SVG면 라벨이 "안에 있다"고
+          // 판정되면서도 화면에서는 그려진 지도 밖 여백에 앉는다.
+          data-navigation-label-boundary=""
           x={fx}
           y={fy}
           width={fw}
@@ -204,7 +262,7 @@ export function NavigationMapStage({
             strokeWidth="3"
             strokeLinejoin="round"
             paintOrder="stroke"
-            style={{ fontFamily: MONO_FONT, fontSize: '10px', fontWeight: 'var(--fw-bold)', letterSpacing: '1.4px' }}
+            style={{ fontFamily: MONO_FONT, fontSize: STAGE_CHROME_SIZE, fontWeight: 'var(--fw-bold)', letterSpacing: '1.4px' }}
           >
             {eyebrow}
           </text>
@@ -217,7 +275,7 @@ export function NavigationMapStage({
             transform={`translate(${fx + fw - 20} ${fy + 22})`}
           >
             <path d="M0 -9 L4 6 L0 2 L-4 6 Z" fill={STAGE_MUTED} stroke={STAGE_SURFACE} strokeWidth="2.5" strokeLinejoin="round" paintOrder="stroke" />
-            <text x="0" y="17" textAnchor="middle" fill={STAGE_MUTED} stroke={STAGE_SURFACE} strokeWidth="2.5" strokeLinejoin="round" paintOrder="stroke" style={{ fontFamily: MONO_FONT, fontSize: '8px', fontWeight: 'var(--fw-bold)', letterSpacing: '0.5px' }}>N</text>
+            <text x="0" y="17" textAnchor="middle" fill={STAGE_MUTED} stroke={STAGE_SURFACE} strokeWidth="2.5" strokeLinejoin="round" paintOrder="stroke" style={{ fontFamily: MONO_FONT, fontSize: STAGE_CHROME_SIZE, fontWeight: 'var(--fw-bold)', letterSpacing: '0.5px' }}>N</text>
           </g>
         )}
 
@@ -252,7 +310,7 @@ export function NavigationMapStage({
               strokeWidth="3"
               strokeLinejoin="round"
               paintOrder="stroke"
-              style={{ fontFamily: MONO_FONT, fontSize: '9px', fontWeight: 'var(--fw-semibold)', letterSpacing: '0.4px' }}
+              style={{ fontFamily: MONO_FONT, fontSize: STAGE_CHROME_SIZE, fontWeight: 'var(--fw-semibold)', letterSpacing: '0.4px' }}
             >
               {scaleBar.label}
             </text>
@@ -342,13 +400,71 @@ function RoleGlyphSwatch({ role }) {
   );
 }
 
+function RegionPatternSwatch({ kind }) {
+  const entry = NAV_REGION_LEGEND[kind];
+  const reactId = React.useId().replace(/[^a-zA-Z0-9_-]/g, '');
+  const patternId = `nav-legend-region-${kind}-${reactId}`;
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" style={{ display: 'block', flexShrink: 0 }}>
+      <defs>
+        <pattern id={patternId} width={entry.tile} height={entry.tile} patternUnits="userSpaceOnUse">
+          {entry.pattern === 'dot' && (
+            <circle cx="4" cy="4" r="1.35" fill={entry.color} fillOpacity="0.5" />
+          )}
+          {entry.pattern === 'contour' && (
+            <path
+              d="M-2 3C1 1 4 1 7 3S13 5 16 3M-2 9C1 7 4 7 7 9S13 11 16 9"
+              fill="none"
+              stroke={entry.color}
+              strokeOpacity="0.48"
+              strokeWidth="1"
+            />
+          )}
+          {entry.pattern === 'diagonal' && (
+            <path d="M-3 12L12-3M3 15L15 3" fill="none" stroke={entry.color} strokeOpacity="0.5" strokeWidth="1" />
+          )}
+        </pattern>
+      </defs>
+      <rect
+        x="0.75"
+        y="0.75"
+        width="18.5"
+        height="18.5"
+        rx="3"
+        fill={`url(#${patternId})`}
+        stroke={entry.color}
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
+}
+
+export function LineRoleSwatch({ kind }) {
+  const entry = NAV_LINE_LEGEND[kind];
+  return (
+    <svg width="28" height="20" viewBox="0 0 28 20" aria-hidden="true" style={{ display: 'block', flexShrink: 0 }}>
+      {/* Same casing-then-core order the overlays use, so the swatch keeps its
+          contrast on the legend surface exactly as it does on the map. */}
+      <path d="M2 10H26" fill="none" stroke={STAGE_SURFACE} strokeWidth={entry.width + 2.5} strokeLinecap="round" />
+      <path
+        d="M2 10H26"
+        fill="none"
+        stroke={entry.color}
+        strokeWidth={entry.width}
+        strokeDasharray={entry.dash ?? undefined}
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 function LegendGroup({ title, children }) {
   return (
     <div style={{ display: 'grid', gap: 'var(--space-2)', minWidth: 0 }}>
       <div
         style={{
           fontFamily: MONO_FONT,
-          fontSize: 10,
+          fontSize: STAGE_CHROME_SIZE,
           fontWeight: 'var(--fw-extra)',
           letterSpacing: '1.4px',
           textTransform: 'uppercase',
@@ -379,7 +495,7 @@ function LegendRow({ swatch, code, label }) {
             background: 'var(--color-semantic-fill-normal)',
             color: 'var(--color-semantic-label-strong)',
             fontFamily: MONO_FONT,
-            fontSize: 11,
+            fontSize: STAGE_CHROME_SIZE,
             fontWeight: 'var(--fw-bold)',
             lineHeight: 1,
           }}
@@ -398,6 +514,8 @@ function LegendRow({ swatch, code, label }) {
  * @param {string[]} [props.roles]        role keys from NAV_ROLE_LEGEND
  * @param {string[]} [props.annotations]  annotation keys from NAV_ANNOTATION_LEGEND
  * @param {string[]} [props.states]       state keys from NAV_STATE_LEGEND
+ * @param {string[]} [props.regions]      category keys from NAV_REGION_LEGEND
+ * @param {string[]} [props.lines]        role keys from NAV_LINE_LEGEND
  * @param {'glyph'|'waypoint'} [props.statePresentation]
  */
 export function NavigationLegend({
@@ -405,6 +523,8 @@ export function NavigationLegend({
   roles,
   annotations,
   states,
+  regions,
+  lines,
   statePresentation = 'glyph',
   style,
   ...rest
@@ -439,6 +559,24 @@ export function NavigationLegend({
               return <LegendRow key={key} swatch={<RoleGlyphSwatch role={key} />} label={entry.label} />;
             }
             return <LegendRow key={key} code={entry.code} label={entry.label} />;
+          })}
+        </LegendGroup>
+      )}
+      {regions?.length > 0 && (
+        <LegendGroup title="영역 분류">
+          {regions.map((key) => {
+            const entry = NAV_REGION_LEGEND[key];
+            if (!entry) return null;
+            return <LegendRow key={key} swatch={<RegionPatternSwatch kind={key} />} label={entry.label} />;
+          })}
+        </LegendGroup>
+      )}
+      {lines?.length > 0 && (
+        <LegendGroup title="경로 표현">
+          {lines.map((key) => {
+            const entry = NAV_LINE_LEGEND[key];
+            if (!entry) return null;
+            return <LegendRow key={key} swatch={<LineRoleSwatch kind={key} />} label={entry.label} />;
           })}
         </LegendGroup>
       )}

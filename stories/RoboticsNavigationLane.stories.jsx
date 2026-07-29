@@ -8,7 +8,7 @@ import {
   adaptWorldLaneToLane,
 } from '../src/index.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
-import { NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
+import { NavigationLegend, NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
 import { assertSharedFocusIndicator, contrastRatio } from './RoboticsNavigationAssert.shared.jsx';
 import {
   assertPathSystemVisualContract,
@@ -53,7 +53,7 @@ const BASE_LANE = adaptWorldLaneToLane({
   exit: { waypointId: 'B', orientation: 'forward' },
   relation: { kind: 'paired', pairedLaneId: 'lane-b-a' },
   speedLimitMps: 0.8,
-  mutexGroupId: 'corridor-2',
+  mutexGroupId: 'C2',
 }, { transform: ROUTE_TRANSFORM_L1 });
 
 function StoryPage({ title, description, children, maxWidth = 1040 }) {
@@ -141,8 +141,8 @@ export const LaneOverview = {
   ),
   render: () => (
     <StoryPage
-      title="레인은 방향, 관계, 제한을 한 번에 읽되 시설 상태와 궤적은 분리합니다"
-      description="Lane의 점 순서와 entry·exit가 graph 방향을 소유합니다. 지도 위 화살표는 Waypoint orientation이나 RobotPose heading과 혼동되므로 표시하지 않습니다. paired relation은 반대 방향 Lane이 별도 graph entity로 존재한다는 뜻입니다."
+      title="방향·관계·제한은 함께, 시설 상태와 궤적은 따로"
+      description="점 순서와 entry·exit가 graph 방향을 소유합니다. 화살표는 Waypoint orientation·RobotPose heading과 혼동되므로 그리지 않고, paired relation은 반대 방향 Lane이 별도 entity라는 뜻입니다."
       maxWidth={720}
     >
       <LaneMap label="Lane 대표 지도">
@@ -152,6 +152,9 @@ export const LaneOverview = {
           </NavigationCoordinateBoundary>
         )}
       </LaneMap>
+      {/* A bare dashed line cannot say "topology, not trajectory" on its own —
+          the contrast with route and trajectory is what carries the meaning. */}
+      <NavigationLegend lines={['lane', 'route', 'trajectory']} />
     </StoryPage>
   ),
   play: async ({ canvasElement }) => {
@@ -462,8 +465,8 @@ export const LaneDarkCompoundStates = {
           lane={{
             ...BASE_LANE,
             id: 'lane-dark-compound',
-            label: '검증 대기 레인',
-            points: [{ x: 60, y: 72 }, { x: 460, y: 72 }],
+            label: '검증 대기',
+            points: [{ x: 60, y: 104 }, { x: 460, y: 104 }],
             relation: { kind: 'single' },
           }}
           availability="unknown"
@@ -680,8 +683,8 @@ function LanePointerOnlyFixture() {
   const pointerLane = {
     ...BASE_LANE,
     id: 'lane-pointer-only',
-    label: '포인터 전용 지도 레인',
-    points: [{ x: 72, y: 72 }, { x: 440, y: 72 }],
+    label: '포인터 전용',
+    points: [{ x: 72, y: 104 }, { x: 440, y: 104 }],
   };
   const passiveLane = {
     ...BASE_LANE,
@@ -781,7 +784,7 @@ function LaneActivationFixture() {
     >
       <LaneMap label="레인 선택 지도">
         <LaneOverlay
-          lane={{ ...BASE_LANE, id: 'lane-selectable', label: '검사할 레인' }}
+          lane={{ ...BASE_LANE, id: 'lane-selectable', label: '검사할 레인', points: [{ x: 132, y: 120 }, { x: 460, y: 120 }] }}
           selected={selectedId === 'lane-selectable'}
           onActivate={activate}
         />
@@ -790,7 +793,7 @@ function LaneActivationFixture() {
             ...BASE_LANE,
             id: 'lane-disabled',
             label: '잠긴 레인',
-            points: [{ x: 72, y: 220 }, { x: 440, y: 220 }],
+            points: [{ x: 72, y: 188 }, { x: 440, y: 188 }],
           }}
           availability="closed"
           disabled

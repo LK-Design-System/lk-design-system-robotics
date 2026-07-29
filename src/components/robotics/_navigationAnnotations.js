@@ -241,6 +241,22 @@ function rectsConflict(a, b, gap) {
     && a.bottom > b.top - gap + EPSILON;
 }
 
+/**
+ * The rectangle labels must stay inside.
+ *
+ * Defaults to the owning `<svg>`, but a host that draws its own framed map
+ * panel inside that SVG can mark the panel with `data-navigation-label-boundary`
+ * and get labels negotiated against the panel instead. Without it a label is
+ * "inside the SVG" while visually sitting in the margin outside the drawn map —
+ * the panel edge is what a reader perceives as the map's edge, not the SVG box.
+ */
+function labelBoundaryRect(host) {
+  const svg = host?.ownerSVGElement;
+  if (!svg) return undefined;
+  const panel = svg.querySelector?.('[data-navigation-label-boundary]');
+  return (panel ?? svg).getBoundingClientRect?.();
+}
+
 function rectInsideBoundary(rect, boundary, gap) {
   if (!boundary) return true;
   const inset = gap + 8;
@@ -315,6 +331,45 @@ export function solveAnnotationLayout(labels, obstacleRects, options = {}) {
         }
       }
       if (chosen) break;
+    }
+
+    if (!chosen && options.boundaryRect) {
+      // 후보가 전부 실패하는 흔한 이유는 다른 라벨과의 충돌이 아니라 "경계 밖"이다.
+      // 지도 가장자리 마커는 좌우 어느 쪽으로도 라벨이 온전히 들어갈 자리가 없을
+      // 뿐인데, 그때 숨기면 읽을 수 있었을 이름이 사라지고 그냥 두면 그려진 지도
+      // 밖으로 나간다. 최소 이동으로 경계 안에 밀어넣고, 그렇게 옮긴 자리가 다른
+      // 라벨과 부딪힐 때만 비로소 숨긴다 — 억제는 충돌에만 쓴다.
+      const inset = gap + 8;
+      const natural = shiftedRect(label.rect, 0, 0);
+      const dxPx = Math.min(0, options.boundaryRect.right - inset - natural.right)
+        + Math.max(0, options.boundaryRect.left + inset - natural.left);
+      const dyPx = Math.min(0, options.boundaryRect.bottom - inset - natural.bottom)
+        + Math.max(0, options.boundaryRect.top + inset - natural.top);
+      // 경계 안으로 민 자리가 곧바로 비어 있으리란 보장은 없다. `placed`는 이미
+      // 배치된 라벨뿐 아니라 스케일바·맵 헤더 같은 obstacle로 시작하므로, 최소
+      // 이동만 하면 그 위에 앉기 쉽다. 그래서 클램프 지점을 기준으로 기존 nudge
+      // 격자를 한 번 더 돌려 경계 안에서 빈자리를 찾는다. 그래도 없으면 그때는
+      // 진짜 자리가 없는 것이라 억제한다.
+      for (const nudge of nudges) {
+        const nx = dxPx + nudge.x;
+        const ny = dyPx + nudge.y;
+        const candidateRect = shiftedRect(label.rect, nx, ny);
+        if (
+          rectInsideBoundary(candidateRect, options.boundaryRect, gap)
+          && placed.every((blocker) => !rectsConflict(candidateRect, blocker, gap))
+        ) {
+          chosen = {
+            dxPx: nx,
+            dyPx: ny,
+            nudgeDxPx: nudge.x,
+            nudgeDyPx: nudge.y,
+            placement: 'clamped',
+            hidden: false,
+          };
+          placed.push(candidateRect);
+          break;
+        }
+      }
     }
 
     if (!chosen) {
@@ -464,7 +519,7 @@ export function createAnnotationStore() {
 
     const solved = solveAnnotationLayout(measured, obstacleRects, {
       ...options,
-      boundaryRect: options.host?.ownerSVGElement?.getBoundingClientRect?.(),
+      boundaryRect: labelBoundaryRect(options.host),
     });
     const next = new Map();
     let changed = published.size !== measured.length;
