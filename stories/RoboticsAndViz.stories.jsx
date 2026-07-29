@@ -57,6 +57,70 @@ function RobotCardContractFixture() {
   );
 }
 
+function RobotDensityVariants() {
+  const renderStatePair = (density) => (
+    <div style={{ display: 'grid', gap: 'var(--space-3)' }}>
+      {[
+        { label: '선택 안 됨', selected: false },
+        { label: '선택됨', selected: true },
+      ].map((state) => (
+        <div
+          key={state.label}
+          data-density-state={state.selected ? 'selected' : 'unselected'}
+          style={{ display: 'grid', gap: 'var(--space-1)' }}
+        >
+          <span
+            style={{
+              color: 'var(--color-semantic-label-alternative)',
+              fontSize: 'var(--label2-size)',
+              lineHeight: 'var(--label2-line)',
+            }}
+          >
+            {state.label}
+          </span>
+          <RobotStatusCard
+            name="AMR-07"
+            status="online"
+            battery={86}
+            mode="순찰"
+            density={density}
+            selected={state.selected}
+          />
+        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <main
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+        alignItems: 'start',
+        gap: 'var(--space-6)',
+        width: '100%',
+        maxWidth: 760,
+      }}
+    >
+      <section aria-label="편안한 밀도" style={{ display: 'grid', gap: 'var(--space-2)' }}>
+        <strong>Comfortable</strong>
+        {renderStatePair('comfortable')}
+      </section>
+      <section aria-label="Fleet용 조밀한 밀도" style={{ display: 'grid', gap: 'var(--space-2)' }}>
+        <strong>Compact</strong>
+        {renderStatePair('compact')}
+      </section>
+      <section
+        aria-label="한 줄 밀도"
+        style={{ display: 'grid', gap: 'var(--space-2)', gridColumn: '1 / -1' }}
+      >
+        <strong>Single-line</strong>
+        {renderStatePair('single-line')}
+      </section>
+    </main>
+  );
+}
+
 const meta = {
   title: 'LDS Robotics/Status/Robot State',
   tags: ['autodocs'],
@@ -92,6 +156,45 @@ export const RobotState = {
   render: () => <RobotStateOverview />,
 };
 
+export const DensityVariants = {
+  name: '밀도 · Comfortable / Compact / Single-line',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '동일한 RobotStatusCard를 단일 로봇 선택 카드, Fleet 목록 행, 고밀도 한 줄 행에 맞는 세 밀도로 비교합니다. Single-line은 로봇명·연결·배터리·모드를 한 행에 유지하고 공간이 부족하면 로봇명을 먼저 말줄임합니다.',
+      },
+    },
+  },
+  render: () => <RobotDensityVariants />,
+  play: async ({ canvasElement }) => {
+    ['comfortable', 'compact', 'single-line'].forEach((density) => {
+      const cards = [...canvasElement.querySelectorAll(`[data-density="${density}"]`)];
+      if (
+        cards.length !== 2
+        || cards.map((card) => card.getAttribute('data-selected')).join(',') !== 'false,true'
+      ) {
+        throw new Error(`${density} must show unselected and selected RobotStatusCard states.`);
+      }
+    });
+    const singleLine = canvasElement.querySelector(
+      '[data-density-state="unselected"] [data-density="single-line"]',
+    );
+    if (!singleLine) throw new Error('Unselected single-line RobotStatusCard did not render.');
+    const content = singleLine.children[1];
+    const description = content?.children[1];
+    const contentStyle = content && getComputedStyle(content);
+    const descriptionStyle = description && getComputedStyle(description);
+    if (
+      contentStyle?.display !== 'flex'
+      || contentStyle?.alignItems !== 'center'
+      || descriptionStyle?.marginTop !== '0px'
+    ) {
+      throw new Error('Single-line density must keep identity and telemetry on one row.');
+    }
+  },
+};
+
 export const RobotStatusCardCard = { ...RobotStatusCardCardStory, name: 'RobotStatusCard card parity', tags: ['!dev', 'visual-parity'] };
 
 export const KeyboardAndSelectionContract = {
@@ -112,6 +215,12 @@ export const KeyboardAndSelectionContract = {
     const doc = root.ownerDocument;
     const cards = [...root.querySelectorAll('[data-interactive] [data-robot-status-card]')];
     if (cards.length !== 3) throw new Error('Expected three interactive cards.');
+    if (cards.some((card) => !card.hasAttribute('data-robot-status-cell'))) {
+      throw new Error('RobotStatusCard must use the shared robot status cell.');
+    }
+    if (cards.some((card) => !card.querySelector('.lk-status-badge'))) {
+      throw new Error('RobotStatusCard mode must use the LDS Core StatusBadge.');
+    }
 
     cards.forEach((card) => {
       if (card.getAttribute('role') !== 'button') throw new Error('An onClick card must expose role="button".');

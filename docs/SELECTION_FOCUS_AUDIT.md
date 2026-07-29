@@ -9,7 +9,7 @@ not reuse focus chrome as a selected state.
 | Component | Selection | Focus | Result |
 | --- | --- | --- | --- |
 | `WaypointMarker` | static 1.25× enlargement from 20px to 25px; availability fill is unchanged and the exception badge stays fixed | contrast-backed rounded-square shell | Conforms; primary role is an internal vector icon and compound data quality uses one prioritized top-right 12px solid badge |
-| `RobotPoseMarker` | static 1.15× body enlargement; status badge stays fixed | outer surface + focus double ring | Conforms |
+| `RobotPoseMarker` | static 1.15× body enlargement; prioritized exception glyph stays fixed | outer surface + focus double ring | Conforms; routine state uses body tone and only fault/offline/stale/unknown/invalid retain a glyph |
 | `FacilityTransition` | static 1.12× pin-body enlargement; the prioritized solid status badge stays fixed | outer surface + focus silhouette ring | Conforms |
 | `HazardMarker` | static 1.12× pin-body enlargement; severity fill is unchanged | outer surface + focus silhouette ring | Conforms; static severity adds no alarm ring or pulse |
 | `LaneOverlay` | wider semantic-color core + neutral casing | wider solid focus halo | Conforms |
@@ -20,6 +20,8 @@ not reuse focus chrome as a selected state.
 All interactive SVG fragments mirror native `:focus-visible`, suppress the
 duplicate rectangular browser outline, keep `aria-pressed` for selection, and
 preserve controlled `selected` / `focused` props for passive renderers.
+`RobotPoseMarker highlighted` is a separate 1.08× linked-preview cue and never
+sets `data-focused` or paints the keyboard focus ring.
 
 ## Robotics DOM surfaces
 

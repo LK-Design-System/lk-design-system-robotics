@@ -36,7 +36,7 @@ The single most load-bearing split.
 | **Lane line** | Lane | stable `4 6`, 1.5px graph dash **+ state tone + explicit state text** |
 | **Plan line** | Route | the same `4 6`, 1.5px selected-Lane dash **+ route identity tone + explicit layer/detail text** |
 | **Execution line** | Trajectory | stable 2.25px primary/accent solid stroke **+ capped sample dots + explicit status text** |
-| **Marker** | Waypoint, Facility pin, Robot pose | availability/identity on the body **+ at most one prioritized solid badge** |
+| **Marker** | Waypoint, Facility pin, Robot pose | availability/identity/operation tone on the body **+ at most one prioritized solid badge** |
 | **Area** | Region | category pattern **+ state tone on fill and outline**; no floating badge |
 
 Lines do **not** wear lifecycle/condition/availability badges. Trajectory keeps
@@ -51,6 +51,13 @@ non-color exception channel. They never grow a badge stack: each renderer
 resolves its own priority into one visual slot while the accessible name
 preserves every raw state. Waypoint uses `invalid > stale`; FacilityTransition
 uses `invalid > stale > unknown`.
+
+RobotPose keeps routine fleet density low: `moving` uses accent plus its motion
+ring, `idle` uses neutral, and `paused` uses cautionary without a badge.
+`fault`, `offline`, `stale`, `unknown`, and `invalid` retain one prioritized
+exception glyph so the exact exceptional state is not communicated by color
+alone. A custom robot identity color applies only to the normal moving state;
+operational warning, error, and offline tones take precedence.
 
 Route and Trajectory do not attach point badges for **data quality**, because
 `invalid` and `stale` describe the complete plan/sample set rather than one
@@ -169,7 +176,7 @@ Each renderer chooses the smallest cue its geometry can carry:
 | Geometry | Selection | Keyboard focus |
 | --- | --- | --- |
 | Waypoint rounded square | static 1.25× enlargement from 20px to 25px; availability fill is unchanged and the solid badge stays fixed | one silhouette shell made from a surface contrast underlay + `--color-semantic-focus-indicator` |
-| Robot pose | static 1.15× body enlargement; status badge stays fixed | one outer high-contrast double ring |
+| Robot pose | static 1.15× body enlargement; exception glyph stays fixed | one outer high-contrast double ring |
 | Facility / hazard pin | static 1.12× body enlargement; facility/severity fill and the status badge stay unchanged | outer contrast-backed silhouette ring |
 | Region | wider semantic-color boundary; pattern and category tint remain unchanged | wider focus outline |
 | Lane / route / trajectory | wider semantic-color core plus neutral casing | wider solid focus halo under the status path |
@@ -195,22 +202,26 @@ immediate under `prefers-reduced-motion` and never repeat. A pulse is not a
 selection, focus, or static severity cue; reserve repeating motion for an
 explicitly modeled live alarm or activity state.
 
-### 4.1 Three independent state axes
+### 4.1 Four independent state axes
 
 Every interactive map renderer keeps the following axes separate in DOM hooks,
 accessible naming, and paint:
 
-1. **Selection** — persistent product choice, exposed through `data-selected`
+1. **Highlight preview** — transient pointer or linked-list preview, exposed
+   through `data-highlighted`. RobotPose uses a small 1.08× body enlargement
+   without creating keyboard focus or selection.
+2. **Selection** — persistent product choice, exposed through `data-selected`
    and `aria-pressed` when the fragment is interactive.
-2. **Keyboard focus** — transient input location, mirrored from
+3. **Keyboard focus** — transient input location, mirrored from
    `:focus-visible` or the controlled `focused` prop and painted with the focus
    token. Point/pin geometry adds a wider surface contrast underlay.
-3. **Data/operation state** — availability, validation, freshness, lifecycle,
+4. **Data/operation state** — availability, validation, freshness, lifecycle,
    or severity. It remains on the base stroke/fill, dash, slash, or state badge
    and never substitutes for selection or focus.
 
-Co-occurrence is expected: selecting an object must not erase its focus or data
-state, and focusing it must not manufacture selection. Storybook interaction
+Co-occurrence is expected: highlighting an object must not manufacture keyboard
+focus, selecting it must not erase its focus or data state, and focusing it must
+not manufacture selection. Storybook interaction
 tests assert the axes independently for waypoint, robot pose, facility, hazard,
 lane, route, trajectory, and region renderers.
 

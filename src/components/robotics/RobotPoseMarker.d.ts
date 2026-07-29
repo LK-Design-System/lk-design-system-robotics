@@ -27,9 +27,9 @@ export interface RobotPoseData {
   readonly position: NavigationPoint;
   /** Heading in radians, where 0 points along the positive x-axis. @default 0 */
   readonly headingRad?: number;
-  /** Explicit operational state. `moving` has no badge; other states use one replaceable badge slot. */
+  /** Explicit operational state. The pose body uses the state tone; only exceptional states retain a glyph badge. */
   readonly state: RobotPoseState;
-  /** Optional fleet/robot identity color. Omission uses the appearance-stable primary color; operational state never recolors the pose body. */
+  /** Optional fleet/robot identity color used for the normal moving state. Operational warning/error/offline tones take precedence. */
   readonly color?: string;
   /** Optional projected 2D localization uncertainty. */
   readonly localization?: {
@@ -49,6 +49,8 @@ export interface RobotPoseMarkerProps extends NavigationSvgFeatureProps {
   pose: RobotPoseData;
   /** Rendering context. Replay keeps the pose anatomy and heading but replaces live motion treatment with an explicit recording-replay label. @default 'live' */
   context?: 'live' | 'replay';
+  /** Pointer 또는 연결된 목록 행의 일시적 preview 강조. 키보드 focus ring과 독립적으로 본체만 작게 확대한다. @default false */
+  highlighted?: boolean;
   /** Legacy visible-label switch. Omission inherits the shared map disclosure policy. */
   showLabel?: boolean;
   /** Select or inspect this robot. Disabled markers do not call the callback. */
