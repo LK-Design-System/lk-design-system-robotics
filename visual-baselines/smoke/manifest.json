@@ -22,8 +22,8 @@
         "width": 1180,
         "height": 820
       },
-      "bytes": 189492,
-      "sha256": "bfc5ca7b4f08a4348387a83059f6c16cd039cba497f8cdee6bc81842cc99059d"
+      "bytes": 193139,
+      "sha256": "4d9d5674dcc45b0d38d30131a0eeb55ef2a702ef1cf8e461c62e3322a6e594d5"
     },
     {
       "name": "robotics-navigation-viewer-narrow",
@@ -33,8 +33,8 @@
         "width": 320,
         "height": 720
       },
-      "bytes": 112509,
-      "sha256": "5a48d25c57b37f1401179aa273f285c82e1cbdf6650cab8e35f3e289d92a1d77"
+      "bytes": 118603,
+      "sha256": "8ccc95dc0f61af55bade2bea34dd3e85a91af7f59723599847e6a85aed50aba5"
     },
     {
       "name": "robotics-occupancy-map",
@@ -99,8 +99,8 @@
         "width": 980,
         "height": 760
       },
-      "bytes": 2082,
-      "sha256": "91fa65220eeb311759702de66f050a4e7fc2ef128f5ae93323f350f2758eef5b"
+      "bytes": 1785,
+      "sha256": "4ae44a626e08d650a8f671f3ff9fc4baeb6e5c5074cedeb00b6c2e5e67ed6827"
     },
     {
       "name": "atom-facility-door-marker@8x",
@@ -110,8 +110,8 @@
         "width": 980,
         "height": 760
       },
-      "bytes": 4855,
-      "sha256": "eadf1679c2d0603056732a56de57b5d487b78ab71f458ddec71e83b21b8f2405"
+      "bytes": 4559,
+      "sha256": "3e79cbc3ae990dfc9bfc9bdc426230dbaedf2edf07deac41ce6efd393a1feb75"
     },
     {
       "name": "atom-facility-dock-marker",
@@ -121,8 +121,8 @@
         "width": 980,
         "height": 760
       },
-      "bytes": 2127,
-      "sha256": "506d4a23a6b0fbf3e996eed54a08169f68d8dc077c6183667bf9fbd3b9001051"
+      "bytes": 1943,
+      "sha256": "21a460028abbfe10e8047ffbc732b8fcc9d0cf50240a8b96f6d68b26d2aaafe1"
     },
     {
       "name": "atom-facility-dock-marker@8x",
@@ -132,8 +132,8 @@
         "width": 980,
         "height": 760
       },
-      "bytes": 5143,
-      "sha256": "79045235bc7d8f2cb6b18781d4e6fccbf219fd1d271e361d6dbf0affca8f7904"
+      "bytes": 5004,
+      "sha256": "1dbe6eb4f175e6310ad9db502ac154702f9270cf3a62a0d149361feb78dbe7f1"
     },
     {
       "name": "atom-waypoint-point",
@@ -143,8 +143,8 @@
         "width": 900,
         "height": 720
       },
-      "bytes": 591,
-      "sha256": "65743b84fc9aceeb3f8d8ce9e4af39a182d4488303bbf2b7671ab8efd3426bca"
+      "bytes": 797,
+      "sha256": "e912870d7d3d4b1418c43dade59f58e1937dc9a2fd2c7e04f449f3a9dc9a0052"
     },
     {
       "name": "atom-waypoint-point@8x",
@@ -154,8 +154,8 @@
         "width": 900,
         "height": 720
       },
-      "bytes": 1448,
-      "sha256": "b0bdbee4d63fca9d95bb1031c3a8470b4729a92f3376bd49f24255a10b67980e"
+      "bytes": 1772,
+      "sha256": "fab5012aa5d4fbe7bf9357be5087836fa96685fa8da8caeb4a5d8a4e20a0cbd2"
     },
     {
       "name": "atom-glyph-unknown",

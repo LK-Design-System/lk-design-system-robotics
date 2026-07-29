@@ -427,6 +427,11 @@ function OverviewMapFixture() {
         waypoints={overviewWaypoints}
         selectedId={selectedId}
         onActivate={setSelectedId}
+        // The story promises that error/stale/unavailable waypoints keep a
+        // standing label while ordinary ones stay quiet until interaction.
+        // That is the 'priority' mode; the inherited default is 'interaction',
+        // which would silently drop the standing half of that contract.
+        labelVisibility="priority"
         height={300}
         label="1층 웨이포인트 역할 지도"
       />

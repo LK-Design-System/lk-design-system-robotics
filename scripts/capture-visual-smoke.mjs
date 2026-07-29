@@ -65,7 +65,12 @@ const atomTargets = [
   { name: 'atom-facility-lift-marker-dark', match: { importPath: './stories/RoboticsNavigationFacilities.stories.jsx', exportName: 'AvailabilityAndSourceStates' }, selector: '[data-transition-kind="lift"] [data-transition-marker]', clip: 46, viewport: { width: 980, height: 760 } },
   { name: 'atom-facility-door-marker', match: { importPath: './stories/RoboticsNavigationFacilities.stories.jsx', exportName: 'AvailabilityAndSourceStates' }, selector: '[data-transition-kind="door"] [data-transition-marker]', clip: 46, viewport: { width: 980, height: 760 } },
   { name: 'atom-facility-dock-marker', match: { importPath: './stories/RoboticsNavigationFacilities.stories.jsx', exportName: 'AvailabilityAndSourceStates' }, selector: '[data-transition-kind="dock"] [data-transition-marker]', clip: 46, viewport: { width: 980, height: 760 } },
-  { name: 'atom-waypoint-point', match: { importPath: './stories/RoboticsNavigationWaypoint.stories.jsx', exportName: 'Overview' }, selector: '[data-waypoint-id="wp-holding"][data-selected="false"] [data-waypoint-point]', clip: 28, viewport: { width: 900, height: 720 } },
+  // Captures a waypoint point in its resting, unselected form. The target must
+  // be a waypoint the Overview play leaves untouched — it ends by selecting
+  // wp-holding, so that marker is no longer available in a resting state. The
+  // passthrough chevrons are the thinnest strokes in the role set, which makes
+  // them the strictest true-size legibility check.
+  { name: 'atom-waypoint-point', match: { importPath: './stories/RoboticsNavigationWaypoint.stories.jsx', exportName: 'Overview' }, selector: '[data-waypoint-id="wp-passthrough"][data-selected="false"] [data-waypoint-point]', clip: 28, viewport: { width: 900, height: 720 } },
   // State-glyph shapes are captured from the State Badge catalog — the single
   // canonical source that renders all 11 shapes. (Lifecycle/availability/
   // condition states no longer render as badges on route/lane/trajectory; the

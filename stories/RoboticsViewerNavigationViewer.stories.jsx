@@ -166,6 +166,11 @@ const MIRROR_ROUTE = adaptWorldRouteToRoute({
 
 const MIRROR_ROUTE_CURRENT_SEGMENT_ID = 'route-seg-current';
 const mirrorRouteSegmentKey = (segmentId) => `paths:${MIRROR_ROUTE.id}:${segmentId}`;
+// RouteOverlay paints a casing path per segment ahead of the segment identity
+// group, and both carry data-segment-id. Selection, phase, and condition state
+// live on the identity group only, so always qualify with [data-route-segment]
+// — a bare attribute selector resolves to the leading casing paint instead.
+const mirrorRouteSegmentSelector = (segmentId) => `[data-route-segment][data-segment-id="${segmentId}"]`;
 
 const MIRROR_TRAJECTORY = adaptWorldTrajectoryToTrajectory({
   id: 'trajectory-amr-7',
@@ -720,8 +725,8 @@ export const Overview = {
 
     // 1. Selecting a tree row drives the map data-selected and the summary.
     const treeSelections = [
-      [mirrorRouteSegmentKey('route-seg-completed'), '[data-segment-id="route-seg-completed"]', '배송 경로 17 · 픽업 → 교차로'],
-      [mirrorRouteSegmentKey(MIRROR_ROUTE_CURRENT_SEGMENT_ID), `[data-segment-id="${MIRROR_ROUTE_CURRENT_SEGMENT_ID}"]`, '배송 경로 17 · 교차로 → 승강기 A'],
+      [mirrorRouteSegmentKey('route-seg-completed'), mirrorRouteSegmentSelector('route-seg-completed'), '배송 경로 17 · 픽업 → 교차로'],
+      [mirrorRouteSegmentKey(MIRROR_ROUTE_CURRENT_SEGMENT_ID), mirrorRouteSegmentSelector(MIRROR_ROUTE_CURRENT_SEGMENT_ID), '배송 경로 17 · 교차로 → 승강기 A'],
       ['paths:trajectory-amr-7', '[data-trajectory-id="trajectory-amr-7"]', 'AMR 7 예상 궤적'],
       ['robots:amr-7', '[data-robot-id="amr-7"]', 'AMR 7'],
       ['waypoints:wp-pick', '[data-waypoint-id="wp-pick"]', '픽업 지점 P1'],
@@ -748,8 +753,8 @@ export const Overview = {
     // 2. Pointer selection preserves route segment identity, and the reverse
     // map -> tree direction stays in sync without stealing focus.
     const mapSelections = [
-      ['[data-segment-id="route-seg-completed"]', mirrorRouteSegmentKey('route-seg-completed'), '배송 경로 17 · 픽업 → 교차로'],
-      [`[data-segment-id="${MIRROR_ROUTE_CURRENT_SEGMENT_ID}"]`, mirrorRouteSegmentKey(MIRROR_ROUTE_CURRENT_SEGMENT_ID), '배송 경로 17 · 교차로 → 승강기 A'],
+      [mirrorRouteSegmentSelector('route-seg-completed'), mirrorRouteSegmentKey('route-seg-completed'), '배송 경로 17 · 픽업 → 교차로'],
+      [mirrorRouteSegmentSelector(MIRROR_ROUTE_CURRENT_SEGMENT_ID), mirrorRouteSegmentKey(MIRROR_ROUTE_CURRENT_SEGMENT_ID), '배송 경로 17 · 교차로 → 승강기 A'],
       ['[data-trajectory-id="trajectory-amr-7"]', 'paths:trajectory-amr-7', 'AMR 7 예상 궤적'],
       ['[data-robot-id="amr-7"]', 'robots:amr-7', 'AMR 7'],
     ];
@@ -770,15 +775,15 @@ export const Overview = {
         }
       });
       if (key === mirrorRouteSegmentKey('route-seg-completed')
-        && map.querySelector(`[data-segment-id="${MIRROR_ROUTE_CURRENT_SEGMENT_ID}"]`)?.getAttribute('data-selected') !== 'false') {
+        && map.querySelector(mirrorRouteSegmentSelector(MIRROR_ROUTE_CURRENT_SEGMENT_ID))?.getAttribute('data-selected') !== 'false') {
         throw new Error('Selecting the completed route segment also selected the current segment.');
       }
       if (key === mirrorRouteSegmentKey(MIRROR_ROUTE_CURRENT_SEGMENT_ID)
-        && map.querySelector('[data-segment-id="route-seg-completed"]')?.getAttribute('data-selected') !== 'false') {
+        && map.querySelector(mirrorRouteSegmentSelector('route-seg-completed'))?.getAttribute('data-selected') !== 'false') {
         throw new Error('Selecting the current route segment also selected the completed segment.');
       }
     }
-    const pointerOnlyRoute = map.querySelector('[data-segment-id="route-seg-current"]');
+    const pointerOnlyRoute = map.querySelector(mirrorRouteSegmentSelector(MIRROR_ROUTE_CURRENT_SEGMENT_ID));
     const selectionBeforeKey = selectionOutput();
     pointerOnlyRoute?.dispatchEvent(new canvasElement.ownerDocument.defaultView.KeyboardEvent('keydown', {
       key: 'Enter', bubbles: true, cancelable: true,
@@ -887,6 +892,9 @@ export const Overview = {
     });
     const completedSegmentKey = mirrorRouteSegmentKey('route-seg-completed');
     rowFor(completedSegmentKey)?.querySelector('[data-layer-action="visibility"]')?.click();
+    // Presence here is deliberately unqualified: a hidden segment must leave no
+    // trace at all, casing paint included, so this asserts more than the
+    // identity group alone. State reads still need mirrorRouteSegmentSelector.
     await waitFor(() => {
       if (map.querySelector('[data-segment-id="route-seg-completed"]')) {
         throw new Error('Hiding a route segment object must remove that segment from the rendered route.');
