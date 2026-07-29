@@ -2,6 +2,41 @@
 
 export { DirectionalPad } from './components/robotics/DirectionalPad.jsx';
 export { FacilityTransition } from './components/robotics/FacilityTransition.jsx';
+export {
+  FLEET_ATTENTION_LEVELS,
+  FLEET_AUTHORITY_STATES,
+  FLEET_CAPABILITY_STATES,
+  FLEET_CONTROL_STATES,
+  FLEET_FRESHNESS_STATES,
+  FLEET_MISSION_STATES,
+  FLEET_OPERABILITY_STATES,
+  FLEET_SAFETY_STATES,
+  type FleetAttentionLevel,
+  type FleetAuthorityState,
+  type FleetCapabilityState,
+  type FleetCommandResult,
+  type FleetConnectionState,
+  type FleetControlState,
+  type FleetFreshnessState,
+  type FleetIncidentData,
+  type FleetMissionData,
+  type FleetMissionState,
+  type FleetOperabilityState,
+  type FleetRobotData,
+  type FleetRobotState,
+  type FleetSafetyState,
+} from './components/robotics/FleetState.js';
+export {
+  FleetHealthSummary,
+  type FleetHealthCounts,
+  type FleetHealthFilter,
+  type FleetHealthStatusFilter,
+  type FleetHealthSummaryProps,
+} from './components/robotics/FleetHealthSummary.jsx';
+export {
+  FleetRobotRow,
+  type FleetRobotRowProps,
+} from './components/robotics/FleetRobotRow.jsx';
 export { HazardMarker } from './components/robotics/HazardMarker.jsx';
 export { Joystick } from './components/robotics/Joystick.jsx';
 export { LaneOverlay } from './components/robotics/LaneOverlay.jsx';

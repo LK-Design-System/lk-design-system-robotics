@@ -1,16 +1,25 @@
 import React from 'react';
 import { Card } from '@lk-robotics/lds-core/components/cards/Card';
-import { ContentBadge } from '@lk-robotics/lds-core/components/content/ContentBadge';
-import { ListCell } from '@lk-robotics/lds-core/components/content/ListCell';
-import { Avatar } from '@lk-robotics/lds-core/components/feedback/Avatar';
+import { StatusBadge } from '@lk-robotics/lds-core/components/content/StatusBadge';
+import { VisuallyHidden } from '@lk-robotics/lds-core/components/layout/VisuallyHidden';
 import { BatteryGauge } from '@lk-robotics/lds-product/components/robotics/BatteryGauge';
 import { ConnectionBadge } from '@lk-robotics/lds-product/components/robotics/ConnectionBadge';
+import { RobotStatusCell } from './_RobotStatusCell.jsx';
+
+function statusTone(tone) {
+  if (tone === 'accent' || tone === 'navy') return 'signal';
+  return tone;
+}
 
 /**
  * LK ROBOTICS — RobotStatusCard
  * Live robot status card — thumbnail (or initials) + name on the left,
  * connection and battery telemetry below the name, and the operating-mode chip
  * on the right. `selected` marks the picked robot.
+ *
+ * `badges` replaces the single `mode` chip when a row must show more than one
+ * independent state — a safety stop stays visible next to an attention state
+ * instead of being ranked away. Composers own the ordering and the cap.
  *
  * When `onClick` is supplied the whole card becomes a keyboard-operable button
  * (role=button, Tab-reachable, Enter/Space activate) named by the robot's name,
@@ -19,35 +28,53 @@ import { ConnectionBadge } from '@lk-robotics/lds-product/components/robotics/Co
  * The nested ConnectionBadge / BatteryGauge are non-focusable visual readouts;
  * their labels reach the button through `aria-describedby`.
  */
-export function RobotStatusCard({ name, image, status = 'online', battery, mode, selected = false, onClick, style, ...rest }) {
+export function RobotStatusCard({
+  name,
+  image,
+  status = 'online',
+  connectionState,
+  battery,
+  mode,
+  modeTone = 'accent',
+  badges,
+  meta,
+  showAvatar = true,
+  density = 'comfortable',
+  accessibleDescription,
+  selected = false,
+  disabled = false,
+  interaction,
+  onClick,
+  style,
+  ...rest
+}) {
   const hasBat = typeof battery === 'number';
-  const interactive = typeof onClick === 'function';
-  // Stable ids so an interactive card is *named* by the robot name and
-  // *described* by its status cluster. Naming a button from its own content
-  // would fold the mode chip + signal + battery into one noisy name; making it
-  // a button without a description would instead hide that telemetry (a button
-  // is a leaf for AT). labelledby + describedby keeps the name clean and the
-  // status readable — and carries mode/connection/battery on a channel that is
-  // not colour alone (1.4.1).
-  const reactId = React.useId();
-  const nameId = `${reactId}-name`;
-  const statusId = `${reactId}-status`;
-  // A single-select picker state is a toggle-in-a-set → aria-pressed. Radio
-  // semantics would need this card to own a radiogroup, but each card is
-  // rendered independently by the consumer, which owns any group/list wrapper.
+  const singleLine = density === 'single-line';
+  const compact = density === 'compact';
+  const badgeList = Array.isArray(badges) && badges.length > 0
+    ? badges
+    : (mode != null ? [{ key: 'mode', label: mode, tone: modeTone }] : []);
   const telemetry = (
     <div
-      id={interactive ? statusId : undefined}
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 'var(--space-3)',
+        gap: singleLine ? 'var(--space-2)' : 'var(--space-3)',
         minWidth: 0,
+        flexShrink: 0,
         whiteSpace: 'nowrap',
       }}
     >
-      <ConnectionBadge status={status} showLabel size="sm" />
-      {hasBat && <BatteryGauge value={battery} />}
+      <ConnectionBadge
+        {...(connectionState == null ? { status } : { connectionState })}
+        showLabel
+        size="sm"
+      />
+      {hasBat && <BatteryGauge value={battery} size={singleLine ? 'sm' : 'md'} />}
+      {meta}
+      {accessibleDescription != null && (
+        <VisuallyHidden>{accessibleDescription}</VisuallyHidden>
+      )}
     </div>
   );
 
@@ -68,47 +95,69 @@ export function RobotStatusCard({ name, image, status = 'online', battery, mode,
         ...style,
       }}
     >
-      <ListCell
+      <RobotStatusCell
+        {...rest}
         data-robot-status-card=""
+        data-density={density}
         data-selected={selected ? 'true' : 'false'}
-        leading={(
-          <Avatar
-            aria-hidden="true"
-            src={image}
-            name={name}
-            variant="company"
-            size="large"
-          />
-        )}
+        name={name}
+        image={image}
+        showAvatar={showAvatar}
+        density={density}
         leadingStyle={{
-          width: 48,
-          height: 48,
-          padding: 0,
-          background: 'transparent',
           borderRadius: 'var(--radius-md)',
         }}
-        title={<span id={interactive ? nameId : undefined}>{name}</span>}
         description={telemetry}
-        trailing={mode != null && <ContentBadge color="accent" size="small">{mode}</ContentBadge>}
+        trailing={badgeList.length === 0 ? undefined : badgeList.length === 1 ? (
+          <StatusBadge tone={statusTone(badgeList[0].tone ?? 'accent')}>
+            {badgeList[0].label}
+          </StatusBadge>
+        ) : (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              gap: 'var(--space-1)',
+              minWidth: 0,
+            }}
+          >
+            {badgeList.map((badge, index) => (
+              <StatusBadge key={badge.key ?? index} tone={statusTone(badge.tone ?? 'accent')}>
+                {badge.label}
+              </StatusBadge>
+            ))}
+          </div>
+        )}
         selected={selected}
+        disabled={disabled}
+        interaction={interaction}
+        contentStyle={singleLine ? {
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--space-2)',
+        } : undefined}
         titleStyle={{
           color: 'var(--color-semantic-label-strong)',
           fontWeight: 'var(--fw-bold)',
+          ...(singleLine ? {
+            flex: '1 1 auto',
+            minWidth: 0,
+          } : {}),
         }}
-        descriptionStyle={{ overflow: 'visible' }}
-        trailingStyle={{ alignSelf: 'flex-start' }}
-        verticalPadding="large"
-        paddingX={16}
-        onClick={interactive ? onClick : undefined}
-        aria-pressed={interactive ? selected : undefined}
-        aria-labelledby={interactive ? nameId : undefined}
-        aria-describedby={interactive ? statusId : undefined}
+        descriptionStyle={{
+          overflow: 'visible',
+          ...(singleLine ? {
+            marginTop: 0,
+            flexShrink: 0,
+          } : {}),
+        }}
+        trailingStyle={{ alignSelf: singleLine || compact ? 'center' : 'flex-start' }}
+        onClick={onClick}
         style={{
-          gap: 'var(--space-4)',
           borderRadius: 'var(--component-card-radius)',
           background: 'transparent',
         }}
-        {...rest}
       />
     </Card>
   );
