@@ -1,6 +1,7 @@
 import React from 'react';
 import { Icon } from '@lk-robotics/lds-core/components/icon/Icon';
 import { IconButton } from '@lk-robotics/lds-core/components/buttons/IconButton';
+import { VIEWER_OVERLAY } from './_viewerOverlay.js';
 
 /**
  * LK ROBOTICS — DirectionalPad
@@ -35,7 +36,20 @@ const normalizeNumber = (value, fallback) => {
   return Number.isFinite(next) ? next : fallback;
 };
 
-export function DirectionalPad({ onStep, rate = 8, size = 48, disabled = false, center, onCenter, label = '방향 패드', directionLabels, centerLabel = '가운데', style, ...rest }) {
+// Overlay treatment for a pad floating on a viewer surface (video, dark map).
+// The ghost buttons are page-ink on transparent, which disappears over footage -
+// and PTZ/gimbal, this pad's own headline use case, IS an over-video control.
+// Per-button scrims rather than one shared plate so the cluster occludes as
+// little of the frame as possible; see _viewerOverlay for the recipe rationale.
+const ON_DARK_BUTTON = {
+  background: VIEWER_OVERLAY.surface,
+  border: VIEWER_OVERLAY.border,
+  boxShadow: VIEWER_OVERLAY.shadow,
+  backdropFilter: VIEWER_OVERLAY.blur,
+  color: VIEWER_OVERLAY.ink,
+};
+
+export function DirectionalPad({ onStep, rate = 8, size = 48, disabled = false, center, onCenter, label = '방향 패드', directionLabels, centerLabel = '가운데', appearance = 'light', style, ...rest }) {
   const timer = React.useRef(null);
   const activeRef = React.useRef(null);
   // The repeat interval is a long-lived closure; capture onStep by ref so a
@@ -108,6 +122,9 @@ export function DirectionalPad({ onStep, rate = 8, size = 48, disabled = false, 
       boxSizing: 'border-box',
       gridArea: DIRS[key]?.gridArea || '2 / 2',
       touchAction: 'none',
+      ...(appearance === 'on-dark' ? ON_DARK_BUTTON : {}),
+      // The active highlight is an opaque tinted surface, so it carries its own
+      // contrast on either appearance and stays the same in both.
       ...(isActive ? {
         background: 'var(--color-semantic-primary-surface-strong)',
         border: 'var(--border-thin) solid var(--color-semantic-primary-normal)',
@@ -138,6 +155,7 @@ export function DirectionalPad({ onStep, rate = 8, size = 48, disabled = false, 
   return (
     <div role="group" aria-label={label}
       aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight"
+      data-appearance={appearance}
       data-active-direction={activeDirection || undefined}
       onKeyDown={handleDirectionalKeyDown}
       onKeyUp={handleDirectionalKeyUp}

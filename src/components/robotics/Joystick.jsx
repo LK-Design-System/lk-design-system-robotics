@@ -1,4 +1,5 @@
 import React from 'react';
+import { VIEWER_OVERLAY } from './_viewerOverlay.js';
 
 const ZERO_VECTOR = { x: 0, y: 0 };
 const ARROW_KEYS = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);
@@ -27,6 +28,7 @@ export function Joystick({
   label = '조이스틱',
   instructions = '누르고 있는 동안 이동 · 화살표 키를 놓으면 정지',
   showValue = true,
+  appearance = 'light',
   style,
   ...rest
 }) {
@@ -241,6 +243,7 @@ export function Joystick({
         aria-disabled={disabled || undefined}
         aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Space Escape"
         tabIndex={disabled ? -1 : 0}
+        data-appearance={appearance}
         data-active={active ? 'true' : 'false'}
         data-command-x={command.x}
         data-command-y={command.y}
@@ -265,16 +268,22 @@ export function Joystick({
           height: size,
           borderRadius: '50%',
           outline: 'none',
-          background: 'var(--color-semantic-fill-normal)',
-          border: '1px solid var(--color-semantic-line-normal-normal)',
-          boxShadow: focus ? '0 0 0 4px var(--color-semantic-focus-ring)' : 'inset var(--shadow-sm)',
+          // On-dark: the base disc becomes a translucent scrim (see
+          // _viewerOverlay) — the page-theme fill disappears or glares over
+          // footage, which is where an analog drive control actually lives.
+          background: appearance === 'on-dark' ? VIEWER_OVERLAY.surface : 'var(--color-semantic-fill-normal)',
+          border: appearance === 'on-dark' ? VIEWER_OVERLAY.border : '1px solid var(--color-semantic-line-normal-normal)',
+          backdropFilter: appearance === 'on-dark' ? VIEWER_OVERLAY.blur : undefined,
+          boxShadow: focus
+            ? '0 0 0 4px var(--color-semantic-focus-ring)'
+            : appearance === 'on-dark' ? VIEWER_OVERLAY.shadow : 'inset var(--shadow-sm)',
           touchAction: 'none',
           cursor: disabled ? 'not-allowed' : (active ? 'grabbing' : 'grab'),
           opacity: disabled ? 0.45 : 1,
         }}
       >
-        <span aria-hidden="true" style={{ position: 'absolute', left: '50%', top: 10, bottom: 10, width: 1, background: 'var(--color-semantic-line-normal-neutral)', transform: 'translateX(-0.5px)' }} />
-        <span aria-hidden="true" style={{ position: 'absolute', top: '50%', left: 10, right: 10, height: 1, background: 'var(--color-semantic-line-normal-neutral)', transform: 'translateY(-0.5px)' }} />
+        <span aria-hidden="true" style={{ position: 'absolute', left: '50%', top: 10, bottom: 10, width: 1, background: appearance === 'on-dark' ? VIEWER_OVERLAY.hairline : 'var(--color-semantic-line-normal-neutral)', transform: 'translateX(-0.5px)' }} />
+        <span aria-hidden="true" style={{ position: 'absolute', top: '50%', left: 10, right: 10, height: 1, background: appearance === 'on-dark' ? VIEWER_OVERLAY.hairline : 'var(--color-semantic-line-normal-neutral)', transform: 'translateY(-0.5px)' }} />
         <span
           aria-hidden="true"
           style={{
@@ -300,7 +309,10 @@ export function Joystick({
           fontSize: 'var(--label2-size)',
           lineHeight: 'var(--label2-line)',
           fontWeight: 'var(--fw-semibold)',
-          color: 'var(--color-semantic-label-strong)',
+          // Text below the disc sits on raw footage on-dark, so it takes the
+          // overlay ink plus a shadow floor instead of page-theme labels.
+          color: appearance === 'on-dark' ? VIEWER_OVERLAY.ink : 'var(--color-semantic-label-strong)',
+          textShadow: appearance === 'on-dark' ? VIEWER_OVERLAY.textShadow : undefined,
           textAlign: 'center',
         }}
       >
@@ -315,7 +327,8 @@ export function Joystick({
             fontSize: 'var(--caption1-size)',
             lineHeight: 'var(--caption1-line)',
             fontWeight: 'var(--fw-semibold)',
-            color: 'var(--color-semantic-label-neutral)',
+            color: appearance === 'on-dark' ? VIEWER_OVERLAY.inkMuted : 'var(--color-semantic-label-neutral)',
+            textShadow: appearance === 'on-dark' ? VIEWER_OVERLAY.textShadow : undefined,
             textAlign: 'center',
           }}
         >
@@ -329,7 +342,8 @@ export function Joystick({
             fontFamily: 'var(--font-sans)',
             fontSize: 'var(--caption1-size)',
             lineHeight: 'var(--caption1-line)',
-            color: 'var(--color-semantic-label-alternative)',
+            color: appearance === 'on-dark' ? VIEWER_OVERLAY.inkMuted : 'var(--color-semantic-label-alternative)',
+            textShadow: appearance === 'on-dark' ? VIEWER_OVERLAY.textShadow : undefined,
             textAlign: 'center',
           }}
         >

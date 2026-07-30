@@ -28,6 +28,30 @@ export function contrastRatio(foreground, background) {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
+/**
+ * For viewer-overlay scrims (DirectionalPad / Joystick on-dark): returns the
+ * computed colour with its alpha forced to 1 so contrast is judged against the
+ * scrim's own tone — a translucent overlay never sits on the page background
+ * that contrastRatio's default compositing assumes. Throws when the colour is
+ * fully transparent, because alpha-stripping rgba(0,0,0,0) would masquerade as
+ * solid black and hide the "ink floating raw over footage" regression.
+ */
+export function assertOverlayOpaque(color) {
+  if (!color) throw new Error('Overlay surface has no computed colour.');
+  if (color.includes('/')) {
+    const alpha = Number.parseFloat(color.split('/')[1]);
+    if (alpha === 0) throw new Error(`Overlay surface is fully transparent: ${color}`);
+    return color.replace(/\/\s*[\d.%]+\s*\)/, '/ 1)');
+  }
+  const parts = color.split(',');
+  if (parts.length === 4) {
+    if (Number.parseFloat(parts[3]) === 0) throw new Error(`Overlay surface is fully transparent: ${color}`);
+    parts[3] = ' 1)';
+    return parts.join(',');
+  }
+  return color;
+}
+
 // Every navigation renderer must draw its focus indicator with the shared
 // focus token and a zoom-stable stroke. Each page asserts its own ring against
 // this one contract, which keeps the rings consistent across renderers without

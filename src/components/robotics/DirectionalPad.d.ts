@@ -19,6 +19,12 @@ export interface DirectionalPadProps extends React.HTMLAttributes<HTMLDivElement
   directionLabels?: Partial<Record<PadDirection, string>>;
   /** Center button accessible name. @default "가운데" */
   centerLabel?: string;
+  /**
+   * 뷰어 표면(영상·다크 지도) 위에 얹을 때 `on-dark`: 버튼마다 스크림 표면과
+   * 밝은 전경을 입혀 어두운 프레임 위에서도 대비를 유지합니다(ViewerToolbar의
+   * on-dark와 같은 계열). @default "light"
+   */
+  appearance?: 'light' | 'on-dark';
 }
 
 /** PTZ·짐벌·조그용 D-pad. 누르고 있으면 반복 스텝, 탭은 1회. 아날로그는 Joystick. */

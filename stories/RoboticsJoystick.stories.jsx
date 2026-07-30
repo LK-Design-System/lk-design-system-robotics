@@ -1,6 +1,8 @@
 import React from 'react';
+import { Map2DCanvas } from '@lk-robotics/lds-product';
 import { Joystick } from '../src/index.js';
 import { JoystickCard as JoystickCardStory } from './RoboticsAndViz.shared.jsx';
+import { assertOverlayOpaque, contrastRatio } from './RoboticsNavigationAssert.shared.jsx';
 
 const waitFor = async (predicate, message) => {
   for (let attempt = 0; attempt < 40; attempt += 1) {
@@ -96,6 +98,57 @@ export const JoystickControl = {
       </section>
     </main>
   ),
+};
+
+export const OnViewerSurface = {
+  name: '뷰어 표면 위',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '아날로그 주행 조작은 카메라·지도 프레임을 보면서 이뤄지므로 조이스틱도 그 프레임 위에 얹힙니다. on-dark는 원판을 반투명 스크림(+blur)으로 바꾸고 라벨·안내 텍스트에 밝은 잉크와 그림자 바닥을 줍니다 — DirectionalPad·ViewerToolbar와 같은 오버레이 계열입니다. 스크림이 반투명이라 조작 중에도 발밑 영상이 계속 읽혀야 합니다.',
+      },
+    },
+  },
+  render: () => (
+    <main style={{ maxWidth: 640 }}>
+      <div style={{ position: 'relative', width: '100%' }}>
+        <Map2DCanvas
+          appearance="dark"
+          label="주행 카메라 프레임"
+          controls={false}
+          panEnabled={false}
+          wheelZoom={false}
+          keyboard={false}
+          defaultViewport={{ x: 0, y: 0, z: 1 }}
+          style={{ width: '100%', aspectRatio: '16 / 10' }}
+        />
+        <div style={{ position: 'absolute', right: 'var(--space-4)', bottom: 'var(--space-4)' }}>
+          <Joystick appearance="on-dark" size={132} label="수동 주행" showValue={false} instructions={null} />
+        </div>
+      </div>
+    </main>
+  ),
+  play: async ({ canvasElement }) => {
+    const disc = canvasElement.querySelector('[role="application"][data-appearance="on-dark"]');
+    if (!disc) throw new Error('The overlay joystick must declare data-appearance="on-dark".');
+    const view = canvasElement.ownerDocument.defaultView;
+    const styles = view.getComputedStyle(disc);
+    // Crosshair hairlines are the only ink drawn ON the disc; they must clear
+    // the scrim's own tone. assertOverlayOpaque throws if the disc lost its
+    // scrim entirely (the page-theme fill regression this story blocks).
+    const scrim = assertOverlayOpaque(styles.backgroundColor);
+    const hairline = disc.querySelector('span[aria-hidden="true"]');
+    const hairlineTone = assertOverlayOpaque(view.getComputedStyle(hairline).backgroundColor);
+    if (contrastRatio(hairlineTone, scrim) < 1.2) {
+      throw new Error('Crosshair hairlines must remain distinguishable on the scrim.');
+    }
+    const label = canvasElement.ownerDocument.getElementById(disc.getAttribute('aria-labelledby'));
+    const labelStyles = view.getComputedStyle(label);
+    if (labelStyles.textShadow === 'none') {
+      throw new Error('Overlay label text sits on raw footage and must keep its shadow floor.');
+    }
+  },
 };
 
 export const KeyboardHoldAndRelease = {

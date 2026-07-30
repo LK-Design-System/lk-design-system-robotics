@@ -1,6 +1,8 @@
 import React from 'react';
 import { userEvent, waitFor } from 'storybook/test';
+import { Map2DCanvas } from '@lk-robotics/lds-product';
 import { DirectionalPad } from '../src/index.js';
+import { assertOverlayOpaque, contrastRatio } from './RoboticsNavigationAssert.shared.jsx';
 
 const meta = {
   title: 'LDS Robotics/Control/Directional Pad',
@@ -127,6 +129,57 @@ export const Sizes = {
       </PadSample>
     </main>
   ),
+};
+
+export const OnViewerSurface = {
+  name: '뷰어 표면 위',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'PTZ·짐벌은 이 패드의 대표 용도이고, 그 자리는 어두운 영상·지도 프레임 위입니다. 기본 ghost 버튼은 페이지 잉크라 어두운 프레임에서 소실되므로 on-dark는 버튼마다 스크림 표면과 밝은 전경을 입힙니다 — ViewerToolbar의 on-dark와 같은 계열이라 한 프레임 위에서 툴바와 패드가 한 가족으로 읽힙니다. 프레임 점유를 줄이기 위해 공유 판 대신 버튼별 스크림을 씁니다.',
+      },
+    },
+  },
+  render: () => (
+    <main style={{ maxWidth: 640 }}>
+      <div style={{ position: 'relative', width: '100%' }}>
+        <Map2DCanvas
+          appearance="dark"
+          label="PTZ 카메라 프레임"
+          controls={false}
+          panEnabled={false}
+          wheelZoom={false}
+          keyboard={false}
+          defaultViewport={{ x: 0, y: 0, z: 1 }}
+          style={{ width: '100%', aspectRatio: '16 / 10' }}
+        />
+        <div style={{ position: 'absolute', right: 'var(--space-4)', bottom: 'var(--space-4)' }}>
+          <DirectionalPad appearance="on-dark" size={40} onStep={() => {}} onCenter={() => {}} label="PTZ 방향 패드" />
+        </div>
+      </div>
+    </main>
+  ),
+  play: async ({ canvasElement }) => {
+    const pad = canvasElement.querySelector('[role="group"][data-appearance="on-dark"]');
+    if (!pad) throw new Error('The overlay pad must declare data-appearance="on-dark".');
+    const view = canvasElement.ownerDocument.defaultView;
+    const buttons = [...pad.querySelectorAll('button')];
+    if (buttons.length === 0) throw new Error('Overlay pad buttons are missing.');
+    for (const button of buttons) {
+      const styles = view.getComputedStyle(button);
+      // The scrim is deliberately translucent (the blur carries legibility over
+      // footage), so measure ink against the scrim's own tone at full opacity —
+      // compositing a 72% scrim over the helper's white default would judge the
+      // overlay against a page background it never sits on. The helper throws on
+      // a fully transparent background, which is the "ghost button floating raw
+      // over footage" regression this story exists to block.
+      const ratio = contrastRatio(styles.color, assertOverlayOpaque(styles.backgroundColor));
+      if (ratio < 3) {
+        throw new Error(`${button.getAttribute('aria-label')} ink is ${ratio.toFixed(2)}:1 against its scrim; expected ≥ 3:1.`);
+      }
+    }
+  },
 };
 
 /* 홀드 중 부모 리렌더로 onStep 핸들러가 바뀌어도, 실행 중인 반복은 최신

@@ -34,6 +34,12 @@ export interface JoystickProps extends Omit<React.HTMLAttributes<HTMLDivElement>
   instructions?: React.ReactNode;
   /** 현재 명령의 텍스트 피드백을 표시합니다. 라이브 영역으로 자동 공지하지 않습니다. @default true */
   showValue?: boolean;
+  /**
+   * 뷰어 표면(영상·다크 지도) 위에 얹을 때 `on-dark`: 원판이 반투명 스크림이
+   * 되고 텍스트가 밝은 잉크+그림자 바닥을 얻습니다(DirectionalPad와 같은 계열).
+   * @default "light"
+   */
+  appearance?: 'light' | 'on-dark';
 }
 
 /** 홀드-투-런 텔레옵 조이스틱 — 누르는 동안 벡터를 내보내고 모든 종료 경로에서 0으로 정지. */
