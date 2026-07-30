@@ -6,6 +6,7 @@ import { EmptyState } from '@lk-robotics/lds-core/components/status/EmptyState';
 import { Spinner } from '@lk-robotics/lds-core/components/status/Spinner';
 import { Icon } from '@lk-robotics/lds-core/components/icon/Icon';
 import { ConnectionBadge } from '@lk-robotics/lds-product/components/robotics/ConnectionBadge';
+import { OverlayStatusChip } from './_OverlayStatusChip.jsx';
 
 const LINK_LABELS = {
   ready: '연결 준비됨',
@@ -113,21 +114,15 @@ const STOP_REQUEST_STATUS = {
 /* The guard surface previously rendered every state — calm lock and failed
    stop alike — in the same quiet typography; tone existed only as an ARIA
    role. The preflight body now composes the core EmptyState, whose tone tile
-   owns the family severity language (surface / foreground / glyph). This map
-   mirrors the core STATUS_TONE_STYLE glyphs and exists only for the compact
-   notice bar and per-guard overrides, so Robotics never invents a second
-   tone-to-glyph mapping. */
+   owns the family severity language (surface / foreground / glyph). The tile
+   glyph still has to be named, and this map mirrors the core
+   STATUS_TONE_STYLE glyphs so Robotics never invents a second tone-to-glyph
+   mapping. */
 const GUARD_TONE_ICONS = {
   negative: 'circle-close-fill',
   cautionary: 'triangle-exclamation-fill',
   positive: 'circle-check-fill',
   signal: 'circle-info-fill',
-};
-
-const GUARD_TONE_ICON_COLORS = {
-  negative: 'var(--color-semantic-status-negative)',
-  cautionary: 'var(--color-semantic-status-cautionary)',
-  positive: 'var(--color-semantic-status-positive)',
 };
 
 /* Preflight checklist rows. "정상은 무채색": a met step earns a quiet grey
@@ -311,7 +306,13 @@ export function ManualControlSession({
 
   const canRequestArm = linkReady && authorityGranted && !stopBlockActive;
   const showControlSurface = armed && linkReady && authorityGranted && !stopBlockActive;
-  const showControlNotice = showControlSurface && reason != null && reason !== 'deadman-released';
+  /* Every "the control is up but inert" reason now speaks through one chip over
+     the control area. It used to be split: focus-loss got an inserted notice bar
+     (which pushed the control down every time focus moved) while a released
+     enabling device was left to whatever the product happened to put in the
+     footer — an ocean away from the dimmed control it explained. One anchor,
+     one grammar, zero layout shift. */
+  const showControlChip = showControlSurface && reason != null;
   /* Split "no handler wired" from "request already in flight". The former is a hard
      unavailable control (native `disabled`); the latter is a temporal block that must
      keep the button focusable so a keyboard operator who just pressed the stop does
@@ -328,12 +329,12 @@ export function ManualControlSession({
      keep saying "정지 요청 중" in words for as long as the request is open. */
   const stopBusy = displayStopState === 'requesting' || displayStopState === 'acknowledged';
   const guardIcon = guard.icon ?? GUARD_TONE_ICONS[guard.tone] ?? 'circle-info-fill';
-  /* Colour applies to the compact notice glyph only; the preflight body gets
-     its severity colours from the EmptyState tone tile. Per-guard icon
-     overrides (lock, hourglass) stay neutral in the notice. */
-  const noticeIconColor = guard.icon != null
-    ? 'var(--color-semantic-label-neutral)'
-    : GUARD_TONE_ICON_COLORS[guard.tone];
+  /* A released enabling device is the resting state of a hold-to-run control,
+     so it stays achromatic; anything else that blocks an armed session (focus
+     loss) escalates to its guard tone. */
+  const chipTone = reason === 'deadman-released'
+    ? 'neutral'
+    : (guard.tone === 'negative' || guard.tone === 'cautionary' ? guard.tone : 'neutral');
   /* The two server-owned preconditions, as checklist rows under the preflight
      headline. The stop lifecycle replaces the checklist: those states have one
      subject (the stop request) and the rows would only dilute it. */
@@ -510,33 +511,6 @@ export function ManualControlSession({
 
       {showControlSurface && (
         <>
-          {showControlNotice && (
-            <div
-              id={statusId}
-              data-manual-control-state="notice"
-              data-guard-tone={guard.tone}
-              role="status"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--space-2)',
-                padding: 'var(--space-3) var(--space-5)',
-                color: 'var(--color-semantic-label-neutral)',
-                background: 'var(--color-semantic-fill-normal)',
-                borderBottom: '1px solid var(--color-semantic-line-normal-alternative)',
-                fontSize: 'var(--label1-size)',
-                lineHeight: 'var(--label1-line)',
-              }}
-            >
-              <Icon
-                name={guardIcon}
-                size={16}
-                aria-hidden="true"
-                style={noticeIconColor ? { color: noticeIconColor, flex: 'none' } : { flex: 'none' }}
-              />
-              <span><strong style={{ color: 'var(--color-semantic-label-strong)' }}>{guard.title}</strong>{guard.message ? ` · ${guard.message}` : ''}</span>
-            </div>
-          )}
           {controlToolbar != null && (
             <div
               data-manual-control-toolbar=""
@@ -551,45 +525,21 @@ export function ManualControlSession({
           )}
           {renderedControls != null && (
             <div style={{ position: 'relative', minWidth: 0 }}>
-              {/* The deadman-released reason used to live only in whatever the
-                  product put in the footer, an ocean away from the dimmed
-                  control it explains. It sits over the control area instead —
-                  absolutely positioned and outside the inert subtree, so the
-                  high-frequency press/release cycle never shifts layout and
-                  the hint stays readable by assistive tech. Quiet on purpose:
-                  a released enabling device is the resting state, not a fault. */}
-              {reason === 'deadman-released' && (
-                <span
-                  data-manual-control-deadman-hint=""
-                  role="status"
-                  style={{
-                    position: 'absolute',
-                    top: 'var(--space-4)',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    zIndex: 1,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 'var(--space-2)',
-                    maxWidth: 'calc(100% - var(--space-6))',
-                    padding: 'var(--space-1) var(--space-3)',
-                    borderRadius: 999,
-                    background: 'var(--color-semantic-background-elevated-normal)',
-                    border: '1px solid var(--color-semantic-line-normal-alternative)',
-                    boxShadow: 'var(--shadow-sm)',
-                    color: 'var(--color-semantic-label-neutral)',
-                    fontSize: 'var(--label1-size)',
-                    lineHeight: 'var(--label1-line)',
-                    pointerEvents: 'none',
-                  }}
+              {/* Sits outside the inert subtree below so assistive tech keeps
+                  reading it while the controls are switched off. */}
+              {showControlChip && (
+                <OverlayStatusChip
+                  id={statusId}
+                  data-manual-control-state="chip"
+                  data-guard-tone={guard.tone}
+                  tone={chipTone}
                 >
-                  <Icon name="circle-info" size={14} aria-hidden="true" style={{ flex: 'none' }} />
-                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{GUARD_STATUS['deadman-released'].title}</span>
-                </span>
+                  {guard.title}
+                </OverlayStatusChip>
               )}
               <div
               ref={controlsRef}
-              id={!showControlNotice ? statusId : undefined}
+              id={!showControlChip ? statusId : undefined}
               aria-label="제어 입력"
               aria-disabled={!interactionEnabled}
               inert={!interactionEnabled ? true : undefined}

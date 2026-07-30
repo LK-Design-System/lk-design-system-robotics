@@ -246,8 +246,19 @@ export const AuthorizedSession = {
       if (!armedButton || armedButton.textContent?.trim() !== '수동 제어 해제' || !deadmanButton || deadmanButton.disabled || deadmanButton.getAttribute('aria-pressed') !== 'false') {
         throw new Error('Arming must expose the required continuous enabling control.');
       }
-      if (!blockedControls?.hasAttribute('inert') || !modeToolbar || modeToolbar.closest('[inert]') || session.querySelector('[data-manual-control-state]')) {
-        throw new Error('An armed session must remain blocked by the continuous enabling control without duplicating gate messaging.');
+      if (!blockedControls?.hasAttribute('inert') || !modeToolbar || modeToolbar.closest('[inert]') || session.querySelector('[data-manual-control-state="preflight"]')) {
+        throw new Error('An armed session must remain blocked by the continuous enabling control without replacing the control surface.');
+      }
+      /* The reason must be anchored over the control it explains, as a chip
+         that takes no layout: a released enabling device toggles many times a
+         second, so an inserted notice would make the control jump each press.
+         The chip also sits outside the inert subtree so it stays readable. */
+      const chip = session.querySelector('[data-manual-control-state="chip"]');
+      if (!chip || chip.closest('[inert]') || chip.getAttribute('role') !== 'status') {
+        throw new Error('A blocked armed session must explain itself with a status chip outside the inert control subtree.');
+      }
+      if (getComputedStyle(chip).position !== 'absolute' || getComputedStyle(chip).pointerEvents !== 'none') {
+        throw new Error('The overlay status chip must not participate in layout or absorb pointer input.');
       }
     });
 

@@ -18,6 +18,7 @@
 | [`NAVIGATION_EXPRESSION_CONVENTIONS.md`](NAVIGATION_EXPRESSION_CONVENTIONS.md) | Navigation 오버레이가 지도 위에서 의미를 그리는 규약 — 업스트림 동명 문서가 공유 정책의 authoritative이고, 이 문서는 consumer 특화. 값의 단일 소스는 `_navigationVocabulary` |
 | [`NAVIGATION_COORDINATE_CONTRACT.md`](NAVIGATION_COORDINATE_CONTRACT.md) | frame·timestamp·projection 증명 계약 — ROS 지도/경로/포즈 통합 전 필독. `check:coordinates`가 검증 |
 | [`OCCUPANCY_MAP_CONVENTIONS.md`](OCCUPANCY_MAP_CONVENTIONS.md) | 구조 베이스맵의 free/occupied/unknown 시각 규약 — 지도는 무채색, accent는 내비게이션 콘텐츠 전용 |
+| [`OVERLAY_STATUS_CHIP.md`](OVERLAY_STATUS_CHIP.md) | 표면 위 비차단 상태 칩 — 레이아웃·포인터 불참, inert 밖, 하우스 톤 글리프 미러링. 코어 편입 제안 진행 중 |
 
 ## 감사와 평가 (Audit)
 
