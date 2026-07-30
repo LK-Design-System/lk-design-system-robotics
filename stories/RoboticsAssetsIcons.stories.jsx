@@ -2,6 +2,12 @@ import React from 'react';
 import { ICON_NAMES, Icon } from '@lk-robotics/lds-core';
 import { storyDescription } from './StoryGuide.shared.jsx';
 
+/* Curated by hand — deliberately NOT the registry's extension tail. The
+   upstream ICON_NAMES appends every late addition to one block, including
+   `apple` (an iOS platform glyph for brand badges), and mirroring that tail
+   verbatim put a fruit logo on the robotics-concept page. Only names that
+   answer to this page's own definition — equipment, space, and viewer-control
+   concepts — belong here. */
 const LDS_EXTENSION_NAMES = [
   'robot',
   'joystick',
@@ -20,7 +26,6 @@ const LDS_EXTENSION_NAMES = [
   'volume-x',
   'maximize',
   'volume-2',
-  'apple',
 ];
 
 const roboticsExtensionIconNames = LDS_EXTENSION_NAMES.filter((name) => ICON_NAMES.includes(name));

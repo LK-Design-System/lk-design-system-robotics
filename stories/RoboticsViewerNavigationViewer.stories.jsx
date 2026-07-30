@@ -266,7 +266,7 @@ const MIRROR_LAYERS = [
   // trajectory hue this group actually paints on the map. The plan colour is
   // carried by the legend, which does take a real token.
   { id: 'paths', label: '경로·궤적', description: '계획 구간과 조밀 궤적', tone: 'signal' },
-  { id: 'robots', label: '로봇 위치', description: '현재 위치와 heading', tone: 'signal' },
+  { id: 'robots', label: '로봇 위치', description: '현재 위치와 방위', tone: 'signal' },
   { id: 'waypoints', label: '웨이포인트', description: '그래프 지점', tone: 'neutral' },
   { id: 'facilities', label: '설비 전이', description: '문·승강기·도크', tone: 'signal' },
 ];
@@ -327,7 +327,7 @@ const MIRROR_FEATURES = [
     layerId: 'robots',
     listName: 'AMR 7',
     item: { label: 'AMR 7', kind: 'Robot Pose', status: '이동 중', statusTone: 'signal' },
-    sections: [{ title: '현재 위치', fields: [{ label: '좌표', value: '15.7, 7.0', unit: 'm' }, { label: 'heading', value: 0.7, unit: 'rad' }, { label: '기준 프레임', value: 'ops-1f/map' }] }],
+    sections: [{ title: '현재 위치', fields: [{ label: '좌표', value: '15.7, 7.0', unit: 'm' }, { label: '방위', value: 0.7, unit: 'rad' }, { label: '기준 프레임', value: 'ops-1f/map' }] }],
   },
   {
     key: 'waypoints:wp-pick',
@@ -353,9 +353,17 @@ const MIRROR_FEATURES = [
 ];
 
 const MIRROR_LEGEND_ITEMS = [
-  { id: 'regions', label: '영역', color: TONE_COLOR.cautionary, shape: 'square' },
+  // Two region keys, not one: behavior rules hatch in cautionary while
+  // facility footprints (the dashed lift-lobby circle) draw the accent edge —
+  // a single amber swatch made the blue facility ring read as an unlegended
+  // mark.
+  { id: 'regions-rule', label: '영역 · 규제 (빗금)', color: TONE_COLOR.cautionary, shape: 'square' },
+  { id: 'regions-facility', label: '영역 · 시설 (점 채움)', color: TONE_COLOR.signal, shape: 'square' },
   { id: 'lanes', label: 'Lane · topology (점선)', color: TONE_COLOR.signal, shape: 'line', dashed: true },
-  { id: 'route', label: 'Route · 선택된 Lane (계획색 점선)', color: TONE_COLOR.plan, shape: 'line', dashed: true },
+  // "계획 경로", not the conventions' internal "selected-Lane dash" nickname:
+  // that vocabulary names a dash geometry, and echoing it here made the key
+  // read as "selecting a lane recolors it".
+  { id: 'route', label: 'Route · 계획 경로 (계획색 점선)', color: TONE_COLOR.plan, shape: 'line', dashed: true },
   // Lane, trajectory, pose, and facility share the signal hue on purpose: hue
   // names the navigation-graph family and shape names the entity. The labels
   // spell the shape out so the shared colour is never read as one identity.
@@ -731,7 +739,7 @@ export const Overview = {
     const rowFor = (key) => panel.querySelector(`[data-layer-id="${key}"]`);
 
     const legendItems = Array.from(legend.querySelectorAll('li'));
-    const routeLegend = legendItems.find((item) => item.textContent?.includes('Route · 선택된 Lane'));
+    const routeLegend = legendItems.find((item) => item.textContent?.includes('Route · 계획 경로'));
     const trajectoryLegend = legendItems.find((item) => item.textContent?.includes('현재 궤적 · 이동 중'));
     if (!routeLegend || !trajectoryLegend
       || getComputedStyle(routeLegend.firstElementChild).borderTopStyle !== 'dashed'

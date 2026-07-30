@@ -458,13 +458,25 @@ export function ManualControlSession({
               the description node. Padding is collapsed because the reserved
               300px guard area already centres and spaces the block — the
               default 48px would make the locked card taller than the armed
-              one and shift the stop button on every transition. */}
-          <EmptyState
+              one and shift the stop button on every transition.
+
+              `requesting` deliberately gets a BARE spinner instead of the tone
+              tile: the EmptyState guide reserves the tile for classified
+              states and sends in-flight work to the loading pattern, and a
+              spinner inside a status tile mixes those two vocabularies. The
+              split is "still moving = bare Spinner, classified = tone tile" —
+              `acknowledged` keeps its cautionary tile because "sent but not
+              confirmed stopped" is a safety classification, not progress. */}
+          <div style={{ display: 'grid', justifyItems: 'center', gap: 'var(--space-4)' }}>
+            {displayStopState === 'requesting' && (
+              <Spinner size={28} aria-hidden="true" data-manual-control-busy="" />
+            )}
+            <EmptyState
             data-manual-control-preflight=""
             tone={guard.tone}
             headingLevel={Math.min(6, normalizedHeadingLevel + 1)}
             icon={displayStopState === 'requesting'
-              ? <Spinner size={26} thickness={3} color="currentColor" aria-hidden="true" />
+              ? undefined
               : <Icon name={guardIcon} size={26} aria-hidden="true" data-guard-glyph="" />}
             title={guard.title}
             description={(guard.message == null && preflightChecklist == null) ? undefined : (
@@ -505,7 +517,8 @@ export function ManualControlSession({
             )}
             action={!stopBlockActive ? armControl : undefined}
             style={{ padding: 0, maxWidth: 'min(100%, 380px)' }}
-          />
+            />
+          </div>
         </div>
       )}
 

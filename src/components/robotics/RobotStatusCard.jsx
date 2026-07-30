@@ -61,7 +61,14 @@ export function RobotStatusCard({
         alignItems: 'center',
         gap: singleLine ? 'var(--space-2)' : 'var(--space-3)',
         minWidth: 0,
-        flexShrink: 0,
+        /* Stacked densities let the telemetry row wrap instead of refusing to
+           shrink: in a ~200px column the old nowrap/no-shrink row starved the
+           robot name down to one glyph and then pushed the battery readout
+           through the card border. Identity survives first; telemetry drops
+           to its own line. Single-line keeps one row — that density's context
+           is a wide list row, and wrapping would break its contract. */
+        flexShrink: singleLine ? 0 : undefined,
+        flexWrap: singleLine ? undefined : 'wrap',
         whiteSpace: 'nowrap',
       }}
     >
