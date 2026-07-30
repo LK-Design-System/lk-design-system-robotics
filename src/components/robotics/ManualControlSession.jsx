@@ -2,6 +2,8 @@ import React from 'react';
 import { Button } from '@lk-robotics/lds-core/components/buttons/Button';
 import { Card } from '@lk-robotics/lds-core/components/cards/Card';
 import { StatusBadge } from '@lk-robotics/lds-core/components/content/StatusBadge';
+import { EmptyState } from '@lk-robotics/lds-core/components/status/EmptyState';
+import { Spinner } from '@lk-robotics/lds-core/components/status/Spinner';
 import { Icon } from '@lk-robotics/lds-core/components/icon/Icon';
 import { ConnectionBadge } from '@lk-robotics/lds-product/components/robotics/ConnectionBadge';
 
@@ -43,6 +45,7 @@ const GUARD_STATUS = {
   },
   disarmed: {
     tone: 'signal',
+    icon: 'lock',
     title: '수동 제어 잠김',
     message: '수동 제어를 준비한 뒤 활성화 장치를 누르고 있는 동안만 이동할 수 있습니다.',
   },
@@ -85,18 +88,20 @@ const REARM_STATUS = {
 const STOP_REQUEST_STATUS = {
   requesting: {
     tone: 'signal',
+    icon: 'hourglass',
     title: '정지 요청 중',
     message: '로봇이 요청을 수신했는지 확인하고 있습니다.',
   },
   acknowledged: {
     tone: 'cautionary',
+    icon: 'hourglass',
     title: '정지 확인 중',
     message: '요청은 수신됐지만 실제 정지는 아직 확인되지 않았습니다.',
   },
   stopped: {
     tone: 'positive',
     title: '정지됨',
-    message: null,
+    message: '로봇 정지가 확인되었습니다. 필요할 때 수동 제어를 다시 준비하세요.',
   },
   failed: {
     tone: 'negative',
@@ -104,6 +109,38 @@ const STOP_REQUEST_STATUS = {
     message: '로봇의 실제 상태를 확인한 뒤 다시 요청하세요.',
   },
 };
+
+/* The guard surface previously rendered every state — calm lock and failed
+   stop alike — in the same quiet typography; tone existed only as an ARIA
+   role. The preflight body now composes the core EmptyState, whose tone tile
+   owns the family severity language (surface / foreground / glyph). This map
+   mirrors the core STATUS_TONE_STYLE glyphs and exists only for the compact
+   notice bar and per-guard overrides, so Robotics never invents a second
+   tone-to-glyph mapping. */
+const GUARD_TONE_ICONS = {
+  negative: 'circle-close-fill',
+  cautionary: 'triangle-exclamation-fill',
+  positive: 'circle-check-fill',
+  signal: 'circle-info-fill',
+};
+
+const GUARD_TONE_ICON_COLORS = {
+  negative: 'var(--color-semantic-status-negative)',
+  cautionary: 'var(--color-semantic-status-cautionary)',
+  positive: 'var(--color-semantic-status-positive)',
+};
+
+/* Preflight checklist rows. "정상은 무채색": a met step earns a quiet grey
+   check; colour is reserved for the step that blocks arming. */
+const CHECKLIST_GLYPHS = {
+  met: { icon: 'check-thick', color: 'var(--color-semantic-label-alternative)' },
+  pending: { icon: 'hourglass', color: 'var(--color-semantic-status-cautionary)' },
+  failed: { icon: 'close-thick', color: 'var(--color-semantic-status-negative)' },
+};
+
+function checklistStepState(met, pending) {
+  return met ? 'met' : pending ? 'pending' : 'failed';
+}
 
 const STOP_BUTTON_LABELS = {
   requesting: '정지 요청 중',
@@ -285,6 +322,37 @@ export function ManualControlSession({
     || displayStopState === 'acknowledged'
     || displayStopState === 'stopped';
   const stopRequestDisabled = !stopHasCallback || stopLifecycleBlocked;
+  /* In-flight states swap the block glyph for an hourglass and expose
+     aria-busy while staying focusable. Button's `loading` treatment is not
+     used here: it hides the label behind a spinner, and a stop control must
+     keep saying "정지 요청 중" in words for as long as the request is open. */
+  const stopBusy = displayStopState === 'requesting' || displayStopState === 'acknowledged';
+  const guardIcon = guard.icon ?? GUARD_TONE_ICONS[guard.tone] ?? 'circle-info-fill';
+  /* Colour applies to the compact notice glyph only; the preflight body gets
+     its severity colours from the EmptyState tone tile. Per-guard icon
+     overrides (lock, hourglass) stay neutral in the notice. */
+  const noticeIconColor = guard.icon != null
+    ? 'var(--color-semantic-label-neutral)'
+    : GUARD_TONE_ICON_COLORS[guard.tone];
+  /* The two server-owned preconditions, as checklist rows under the preflight
+     headline. The stop lifecycle replaces the checklist: those states have one
+     subject (the stop request) and the rows would only dilute it. */
+  const preflightChecklist = !stopGuard && !stopRearmRequired
+    ? [
+      {
+        step: 'link',
+        label: '로봇 연결',
+        state: checklistStepState(linkReady, linkState === 'stale'),
+        detail: LINK_LABELS[linkState] ?? LINK_LABELS.lost,
+      },
+      {
+        step: 'authority',
+        label: '제어 권한',
+        state: checklistStepState(authorityGranted, authority === 'checking'),
+        detail: AUTHORITY_LABELS[authority] ?? AUTHORITY_LABELS.revoked,
+      },
+    ]
+    : null;
   const armControl = (
     <Button
       data-manual-control-arm=""
@@ -356,11 +424,11 @@ export function ManualControlSession({
               disabled={!stopHasCallback}
               aria-disabled={stopLifecycleBlocked || undefined}
               aria-label={STOP_BUTTON_LABELS[displayStopState] || stopRequestLabel}
-              aria-busy={displayStopState === 'requesting' || undefined}
+              aria-busy={stopBusy || undefined}
               aria-controls={statusId}
               onClick={requestStop}
             >
-              <Icon name="circle-block" size={18} aria-hidden="true" />
+              <Icon name={stopBusy ? 'hourglass' : 'circle-block'} size={18} aria-hidden="true" />
               {STOP_BUTTON_LABELS[displayStopState] || stopRequestLabel}
             </Button>
           </div>
@@ -371,6 +439,7 @@ export function ManualControlSession({
         <div
           id={statusId}
           data-manual-control-state="preflight"
+          data-guard-tone={guard.tone}
           role={guard.tone === 'negative' ? 'alert' : 'status'}
           style={{
             minHeight: 300,
@@ -380,31 +449,62 @@ export function ManualControlSession({
             boxSizing: 'border-box',
           }}
         >
-          <div
+          {/* The preflight body is the core EmptyState — the family pattern for
+              "no content, here is why and what to do next". Its tone tile owns
+              the severity colours, its title is a real heading one level below
+              the card title, and the arm control rides its action slot. Only
+              the precondition checklist is Robotics-specific, carried inside
+              the description node. Padding is collapsed because the reserved
+              300px guard area already centres and spaces the block — the
+              default 48px would make the locked card taller than the armed
+              one and shift the stop button on every transition. */}
+          <EmptyState
             data-manual-control-preflight=""
-            style={{
-              width: 'min(100%, 380px)',
-              display: 'grid',
-              justifyItems: 'center',
-              gap: 'var(--space-3)',
-              minWidth: 0,
-              textAlign: 'center',
-            }}
-          >
-            <div style={{ display: 'grid', gap: 'var(--space-1)', minWidth: 0 }}>
-              <strong style={{ color: 'var(--color-semantic-label-strong)', fontSize: 'var(--body1-size)', lineHeight: 'var(--body1-line)', fontWeight: 'var(--fw-bold)', overflowWrap: 'anywhere' }}>
-                {guard.title}
-              </strong>
-              {guard.message != null && (
-                <span style={{ color: 'var(--color-semantic-label-neutral)', fontSize: 'var(--label1-size)', lineHeight: 'var(--label1-line)', overflowWrap: 'anywhere' }}>
-                  {guard.message}
-                </span>
-              )}
-            </div>
-            {!stopBlockActive && (
-              <div style={{ marginTop: 'var(--space-2)' }}>{armControl}</div>
+            tone={guard.tone}
+            headingLevel={Math.min(6, normalizedHeadingLevel + 1)}
+            icon={displayStopState === 'requesting'
+              ? <Spinner size={26} thickness={3} color="currentColor" aria-hidden="true" />
+              : <Icon name={guardIcon} size={26} aria-hidden="true" data-guard-glyph="" />}
+            title={guard.title}
+            description={(guard.message == null && preflightChecklist == null) ? undefined : (
+              <>
+                {guard.message}
+                {preflightChecklist != null && (
+                  <span
+                    data-manual-control-checklist=""
+                    style={{
+                      display: 'grid',
+                      justifyItems: 'start',
+                      gap: 'var(--space-2)',
+                      textAlign: 'left',
+                      minWidth: 0,
+                      width: 'fit-content',
+                      margin: guard.message != null ? 'var(--space-3) auto 0' : '0 auto',
+                    }}
+                  >
+                    {preflightChecklist.map(({ step, label, state, detail }) => {
+                      const glyph = CHECKLIST_GLYPHS[state];
+                      return (
+                        <span
+                          key={step}
+                          data-checklist-step={step}
+                          data-checklist-state={state}
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minWidth: 0, fontSize: 'var(--label1-size)', lineHeight: 'var(--label1-line)', color: 'var(--color-semantic-label-neutral)' }}
+                        >
+                          <Icon name={glyph.icon} size={14} aria-hidden="true" style={{ color: glyph.color, flex: 'none' }} />
+                          <span style={{ fontWeight: 'var(--fw-semibold)', color: 'var(--color-semantic-label-normal)' }}>{label}</span>
+                          <span aria-hidden="true">·</span>
+                          <span style={{ overflowWrap: 'anywhere' }}>{detail}</span>
+                        </span>
+                      );
+                    })}
+                  </span>
+                )}
+              </>
             )}
-          </div>
+            action={!stopBlockActive ? armControl : undefined}
+            style={{ padding: 0, maxWidth: 'min(100%, 380px)' }}
+          />
         </div>
       )}
 
@@ -414,6 +514,7 @@ export function ManualControlSession({
             <div
               id={statusId}
               data-manual-control-state="notice"
+              data-guard-tone={guard.tone}
               role="status"
               style={{
                 display: 'flex',
@@ -427,7 +528,12 @@ export function ManualControlSession({
                 lineHeight: 'var(--label1-line)',
               }}
             >
-              <Icon name="info" size={16} aria-hidden="true" />
+              <Icon
+                name={guardIcon}
+                size={16}
+                aria-hidden="true"
+                style={noticeIconColor ? { color: noticeIconColor, flex: 'none' } : { flex: 'none' }}
+              />
               <span><strong style={{ color: 'var(--color-semantic-label-strong)' }}>{guard.title}</strong>{guard.message ? ` · ${guard.message}` : ''}</span>
             </div>
           )}
@@ -444,7 +550,44 @@ export function ManualControlSession({
             </div>
           )}
           {renderedControls != null && (
-            <div
+            <div style={{ position: 'relative', minWidth: 0 }}>
+              {/* The deadman-released reason used to live only in whatever the
+                  product put in the footer, an ocean away from the dimmed
+                  control it explains. It sits over the control area instead —
+                  absolutely positioned and outside the inert subtree, so the
+                  high-frequency press/release cycle never shifts layout and
+                  the hint stays readable by assistive tech. Quiet on purpose:
+                  a released enabling device is the resting state, not a fault. */}
+              {reason === 'deadman-released' && (
+                <span
+                  data-manual-control-deadman-hint=""
+                  role="status"
+                  style={{
+                    position: 'absolute',
+                    top: 'var(--space-4)',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    zIndex: 1,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-2)',
+                    maxWidth: 'calc(100% - var(--space-6))',
+                    padding: 'var(--space-1) var(--space-3)',
+                    borderRadius: 999,
+                    background: 'var(--color-semantic-background-elevated-normal)',
+                    border: '1px solid var(--color-semantic-line-normal-alternative)',
+                    boxShadow: 'var(--shadow-sm)',
+                    color: 'var(--color-semantic-label-neutral)',
+                    fontSize: 'var(--label1-size)',
+                    lineHeight: 'var(--label1-line)',
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <Icon name="circle-info" size={14} aria-hidden="true" style={{ flex: 'none' }} />
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{GUARD_STATUS['deadman-released'].title}</span>
+                </span>
+              )}
+              <div
               ref={controlsRef}
               id={!showControlNotice ? statusId : undefined}
               aria-label="제어 입력"
@@ -466,6 +609,7 @@ export function ManualControlSession({
               style={{ display: 'flex', minHeight: controlToolbar != null ? 250 : 300, alignItems: 'center', justifyContent: 'center', padding: 'var(--space-4) var(--space-5) var(--space-5)', pointerEvents: interactionEnabled ? 'auto' : 'none' }}
             >
               {renderedControls}
+              </div>
             </div>
           )}
         </>
