@@ -11,8 +11,8 @@
         "width": 1180,
         "height": 820
       },
-      "bytes": 37780,
-      "sha256": "907fb839586d4ab9993185e4426f832cc73f6620aad708ce0a86f98c2771e9fa"
+      "bytes": 40618,
+      "sha256": "19e0954c220bfb0330e3bcf88da2e6187239fc69f50f752080f5ac6621afcba0"
     },
     {
       "name": "robotics-navigation-viewer",
@@ -22,8 +22,8 @@
         "width": 1180,
         "height": 820
       },
-      "bytes": 193139,
-      "sha256": "4d9d5674dcc45b0d38d30131a0eeb55ef2a702ef1cf8e461c62e3322a6e594d5"
+      "bytes": 180778,
+      "sha256": "662414640ab741298802661868d6dbbaf7b60d047c65e2f272e7e9b864411c63"
     },
     {
       "name": "robotics-navigation-viewer-narrow",
@@ -33,8 +33,8 @@
         "width": 320,
         "height": 720
       },
-      "bytes": 118603,
-      "sha256": "8ccc95dc0f61af55bade2bea34dd3e85a91af7f59723599847e6a85aed50aba5"
+      "bytes": 105346,
+      "sha256": "5b4b1dda5db60f1d62da0faa4ee83eba934175f945395b608df72e37d4bfedbb"
     },
     {
       "name": "robotics-occupancy-map",
@@ -55,8 +55,8 @@
         "width": 900,
         "height": 720
       },
-      "bytes": 1871,
-      "sha256": "e5ed5e564ec18275075f17c91e0b77de379468764ca6389bd8c73500332f6d75"
+      "bytes": 1932,
+      "sha256": "ef26b5901f4bec6c38b64eaf40e9a6f2584cfb40253770db42306aeb7f2b9aab"
     },
     {
       "name": "atom-facility-lift-marker@8x",
@@ -66,8 +66,8 @@
         "width": 900,
         "height": 720
       },
-      "bytes": 4767,
-      "sha256": "ef2bbfb6c84f647ffbaad895d61d26fb51510f4a6e4d0f8a8b93a8de7b300caa"
+      "bytes": 4783,
+      "sha256": "cffa799eec3dc97582c2dd65d9cd0877bb33172cee0cfc509d04581682166a61"
     },
     {
       "name": "atom-facility-lift-marker-dark",
@@ -77,8 +77,8 @@
         "width": 980,
         "height": 760
       },
-      "bytes": 1595,
-      "sha256": "9947ce00796e2ebefdfe053cb33aeebe6dfa11c16f096f10e8aa38b3b23b69de"
+      "bytes": 1630,
+      "sha256": "8beac712ea32753f0f50c4f395c1594506fdf95739ca6388e9ea8d01068bdabb"
     },
     {
       "name": "atom-facility-lift-marker-dark@8x",
@@ -88,8 +88,8 @@
         "width": 980,
         "height": 760
       },
-      "bytes": 3605,
-      "sha256": "bc372f6b24d7ad2c07f7374063149dfd8455a8a8545e77a876a2d8c69a701303"
+      "bytes": 3654,
+      "sha256": "c48348048594fa56c00032040280365dea0c954e3b32a07ed6248da046ac414c"
     },
     {
       "name": "atom-facility-door-marker",
@@ -99,8 +99,8 @@
         "width": 980,
         "height": 760
       },
-      "bytes": 1785,
-      "sha256": "4ae44a626e08d650a8f671f3ff9fc4baeb6e5c5074cedeb00b6c2e5e67ed6827"
+      "bytes": 1776,
+      "sha256": "1fb5f26b5ac81a06f354903f4a2c39b03e0721711b65a3d2db60504faaed2116"
     },
     {
       "name": "atom-facility-door-marker@8x",
@@ -110,8 +110,8 @@
         "width": 980,
         "height": 760
       },
-      "bytes": 4559,
-      "sha256": "3e79cbc3ae990dfc9bfc9bdc426230dbaedf2edf07deac41ce6efd393a1feb75"
+      "bytes": 4551,
+      "sha256": "671009b0532d4abc76d63ed3f3a1c738f36d6b9c79b86e88729825207ffecae3"
     },
     {
       "name": "atom-facility-dock-marker",
