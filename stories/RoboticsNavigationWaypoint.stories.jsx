@@ -2,7 +2,7 @@ import React from 'react';
 import { userEvent, waitFor } from 'storybook/test';
 import { Map2DCanvas } from '@lk-robotics/lds-product';
 import { NavigationAnnotationLayer, WaypointMarker } from '../src/index.js';
-import { NAV_SELECTION } from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationVocabulary';
+import { NAV_SELECTION } from '../src/components/robotics/_navigationVocabulary.js';
 import { NAV_WAYPOINT_STATUS_BADGE } from '../src/components/robotics/_navigationVocabulary.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { NavigationLegend, NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';

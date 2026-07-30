@@ -1,6 +1,6 @@
 import React from 'react';
-import { HAZARD_GLYPH_PATHS, HAZARD_GLYPH_FIT } from '@lk-robotics/lds-robotics-ui/components/robotics/_HazardGlyph';
-import { FACILITY_GLYPH_PATHS } from '@lk-robotics/lds-robotics-ui/components/robotics/_FacilityGlyph';
+import { HAZARD_GLYPH_PATHS, HAZARD_GLYPH_FIT } from '../src/components/robotics/_HazardGlyph.js';
+import { FACILITY_GLYPH_PATHS } from '../src/components/robotics/_FacilityGlyph.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
 
 // Renders the hazard knockout glyphs straight from the _HazardGlyph atom (path +

@@ -10,7 +10,7 @@ import {
   RobotPoseMarker,
   SpatialRegion,
 } from '../src/index.js';
-import { NAV_SELECTION } from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationVocabulary';
+import { NAV_SELECTION } from '../src/components/robotics/_navigationVocabulary.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import {
   DENSE_FLEET_ROBOTS,

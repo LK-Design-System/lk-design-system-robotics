@@ -49,17 +49,18 @@ reviewed) + source-of-truth 우선순위 + 날짜별 immutable handoff까지 갖
 
 ## 갚아야 할 빚
 
-### 1. dist/src 이중 모듈 그래프 — 최우선
+### 1. ~~dist/src 이중 모듈 그래프~~ — 2026-07-30 청산
 
-스토리가 패키지 서브패스(`@lk-robotics/lds-robotics-ui/components/robotics/*`)로
-import하면 dist를, 컴포넌트가 상대경로로 import하면 src를 읽어 같은 모듈이 두
-번 존재한다. React 컨텍스트가 복제되면 Provider가 **조용히** 무력화된다 —
-`NavigationLabelPolicyProvider`에서 실제 발생했고 play는 못 잡았으며
-스크린샷으로만 발견했다. 현재 방어는 "스토리에서 Provider는
-`../src/...`에서 import" 관례+주석뿐이다. 관례는 언젠가 뚫린다.
+스토리가 패키지 서브패스로 import하면 dist를, 컴포넌트가 상대경로로 import하면
+src를 읽어 같은 모듈이 두 번 존재했고, React 컨텍스트 복제로 Provider가
+조용히 무력화되는 사고가 실제 있었다(`NavigationLabelPolicyProvider`).
 
-**맞는 수리**: 스토리 전체를 한쪽 그래프로 통일(전부 src 상대경로, 또는 전부
-패키지 경로 + 컨텍스트 모듈의 단일화). lint 룰로 강제할 수 있으면 더 좋다.
+**수리 완료**: 스토리의 자기 패키지 import 12건을 전부 상대 src 경로로
+통일했고, `check:module-graph`(`scripts/check-story-module-graph.mjs`)가
+`stories/`·`src/` 전체에서 자기참조를 차단한다 — 관례가 아니라 게이트다.
+부수 효과로 "어휘 상수 변경 후 rebuild해야 스토리에 반영되는" 함정도 함께
+사라졌다(스토리는 이제 항상 src를 직접 읽는다). dist는 `check:pack`과 실제
+소비자가 검증하는 산출물로 남는다.
 
 ### 2. 고정 업스트림과의 조율 부채
 

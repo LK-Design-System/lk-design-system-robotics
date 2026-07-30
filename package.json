@@ -36,8 +36,9 @@
     "check:navigation-encoding": "node scripts/check-navigation-encoding.mjs",
     "check:types": "tsc --noEmit",
     "check:pack": "npm pack --dry-run --ignore-scripts",
-    "check": "npm run check:lds-style && npm run check:ownership && npm run check:coordinates && npm run check:navigation-graph && npm run check:navigation-encoding && npm run build && npm run check:types && npm run check:pack",
-    "prepublishOnly": "npm run check"
+    "check": "npm run check:lds-style && npm run check:module-graph && npm run check:ownership && npm run check:coordinates && npm run check:navigation-graph && npm run check:navigation-encoding && npm run build && npm run check:types && npm run check:pack",
+    "prepublishOnly": "npm run check",
+    "check:module-graph": "node scripts/check-story-module-graph.mjs"
   },
   "dependencies": {
     "@lk-robotics/lds-core": "0.1.0-rc.3",

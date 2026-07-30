@@ -1,11 +1,11 @@
 import React from 'react';
-import { NavigationStateGlyph } from '@lk-robotics/lds-robotics-ui/components/robotics/_NavigationStateGlyph';
+import { NavigationStateGlyph } from '../src/components/robotics/_NavigationStateGlyph.js';
 import { NavigationRoleGlyph, ROLE_GLYPH_KINDS } from '../src/components/robotics/_navigationRoleGlyph.js';
 import {
   NAV_NODE,
   NAV_WAYPOINT_AVAILABILITY_FILL,
 } from '../src/components/robotics/_navigationVocabulary.js';
-import { ANNOTATION_CODE, ROLE_CODE } from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationEncoding';
+import { ANNOTATION_CODE, ROLE_CODE } from '../src/components/robotics/_navigationEncoding.js';
 
 /**
  * Shared visual foundation for the LDS Robotics / Navigation story groups

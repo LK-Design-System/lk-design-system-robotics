@@ -2,7 +2,7 @@ import React from 'react';
 import { Map2DCanvas } from '@lk-robotics/lds-product';
 import {
   NAV_TRAJECTORY_SAMPLE,
-} from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationVocabulary';
+} from '../src/components/robotics/_navigationVocabulary.js';
 import {
   NavigationAnnotationLayer,
   adaptWorldRobotPoseToPose,

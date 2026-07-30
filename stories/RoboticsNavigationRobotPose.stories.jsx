@@ -1,7 +1,7 @@
 import React from 'react';
 import { Map2DCanvas } from '@lk-robotics/lds-product';
 import { NavigationAnnotationLayer, RobotPoseMarker } from '../src/index.js';
-import { NAV_SELECTION } from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationVocabulary';
+import { NAV_SELECTION } from '../src/components/robotics/_navigationVocabulary.js';
 import { NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { assertContrastBackedFocus, contrastRatio } from './RoboticsNavigationAssert.shared.jsx';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavigationStateGlyph } from '@lk-robotics/lds-robotics-ui/components/robotics/_NavigationStateGlyph';
+import { NavigationStateGlyph } from '../src/components/robotics/_NavigationStateGlyph.js';
 import { FacilityTransition, WaypointMarker } from '../src/index.js';
 import { NAV_WAYPOINT_STATUS_BADGE } from '../src/components/robotics/_navigationVocabulary.js';
 import { storyDescription } from './StoryGuide.shared.jsx';

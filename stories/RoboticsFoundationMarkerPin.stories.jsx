@@ -1,6 +1,6 @@
 import React from 'react';
 import { FacilityTransition, HazardMarker, WaypointMarker } from '../src/index.js';
-import { NAV_PIN } from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationVocabulary';
+import { NAV_PIN } from '../src/components/robotics/_navigationVocabulary.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
 
 // The shared map-pin BODY, shown where it actually appears: the real

@@ -8,8 +8,8 @@ import {
   NavigationCoordinateBoundary,
   adaptWorldLaneToLane,
 } from '../src/index.js';
-// 반드시 컴포넌트와 같은 모듈 인스턴스(../src)에서 가져와야 한다. dist 경로로
-// 가져오면 React 컨텍스트가 두 개가 되어 프로바이더가 조용히 무력화된다.
+// 스토리는 전부 상대 src 경로만 쓴다(패키지 자기참조는 dist 제2 그래프를 만들어
+// 컨텍스트를 복제한다) — check:module-graph가 레포 전체에서 이를 강제한다.
 import { NavigationLabelPolicyProvider } from '../src/components/robotics/_navigationAnnotations.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { NavigationLegend, NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';

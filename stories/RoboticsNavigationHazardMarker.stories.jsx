@@ -1,6 +1,6 @@
 import React from 'react';
 import { HazardMarker } from '../src/index.js';
-import { NAV_SELECTION } from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationVocabulary';
+import { NAV_SELECTION } from '../src/components/robotics/_navigationVocabulary.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { assertContrastBackedFocus } from './RoboticsNavigationAssert.shared.jsx';
 
