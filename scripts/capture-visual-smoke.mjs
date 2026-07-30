@@ -1,11 +1,11 @@
 import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
 import { copyFile, mkdir, readFile, stat, writeFile } from 'node:fs/promises';
-import { createServer } from 'node:http';
 import path from 'node:path';
 import { chromium } from '@playwright/test';
 import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
+import { closeServer, startStaticServer } from './_storybook-static.mjs';
 
 const root = process.cwd();
 const staticDir = path.join(root, 'storybook-static');
@@ -114,52 +114,6 @@ function shouldCapture(name) {
 
 function shouldCaptureAtom(name) {
   return shouldCapture(name) || shouldCapture(`${name}@${ATOM_ZOOM}x`);
-}
-
-function contentType(filePath) {
-  if (filePath.endsWith('.html')) return 'text/html; charset=utf-8';
-  if (filePath.endsWith('.js')) return 'text/javascript; charset=utf-8';
-  if (filePath.endsWith('.css')) return 'text/css; charset=utf-8';
-  if (filePath.endsWith('.json')) return 'application/json; charset=utf-8';
-  if (filePath.endsWith('.svg')) return 'image/svg+xml';
-  if (filePath.endsWith('.png')) return 'image/png';
-  if (filePath.endsWith('.webp')) return 'image/webp';
-  if (filePath.endsWith('.woff2')) return 'font/woff2';
-  return 'application/octet-stream';
-}
-
-function startStaticServer() {
-  const server = createServer(async (req, res) => {
-    try {
-      const requestUrl = new URL(req.url || '/', 'http://127.0.0.1');
-      const safePath = decodeURIComponent(requestUrl.pathname).replace(/^\/+/, '') || 'index.html';
-      const filePath = path.resolve(staticDir, safePath);
-      if (!filePath.startsWith(staticDir)) {
-        res.writeHead(403);
-        res.end('Forbidden');
-        return;
-      }
-      const fileStat = await stat(filePath);
-      if (!fileStat.isFile()) {
-        res.writeHead(404);
-        res.end('Not found');
-        return;
-      }
-      res.writeHead(200, { 'content-type': contentType(filePath) });
-      createReadStream(filePath).pipe(res);
-    } catch {
-      res.writeHead(404);
-      res.end('Not found');
-    }
-  });
-
-  return new Promise((resolve, reject) => {
-    server.on('error', reject);
-    server.listen(0, '127.0.0.1', () => {
-      const address = server.address();
-      resolve({ server, origin: `http://127.0.0.1:${address.port}` });
-    });
-  });
 }
 
 function findStoryId(entries, target) {
@@ -313,11 +267,6 @@ async function captureAtom(page, atom, outputDirectory) {
   return [atom.name, zoomName];
 }
 
-async function closeServer(server) {
-  if (!server) return;
-  await new Promise((resolve) => server.close(resolve));
-}
-
 async function main() {
   const indexPath = path.join(staticDir, 'index.json');
   const index = JSON.parse(await readFile(indexPath, 'utf8'));
@@ -348,7 +297,7 @@ async function main() {
   const regressions = [];
 
   try {
-    const staticServer = await startStaticServer();
+    const staticServer = await startStaticServer(staticDir);
     server = staticServer.server;
     browser = await chromium.launch();
     page = await browser.newPage({ viewport: targets[0].viewport, deviceScaleFactor: 1 });

@@ -224,12 +224,28 @@ export const LaneStatesAndConstraints = {
   render: () => (
     <StoryPage
       title="폐쇄와 충돌은 같은 상태가 아니며 시설 전환은 중립 참조로만 남깁니다"
-      description="availability는 선의 톤과 대시가 전달하고 conflict는 그 위에 겹치는 별도 패턴입니다(점 뱃지가 아니라). 문이나 엘리베이터의 실시간 상태는 Facility Transition이 소유하며, 레인은 해당 경계에 전환이 있다는 사실과 개수만 표시하고 종류를 ID에서 추론하지 않습니다."
+      description="availability와 conflict는 4 6 topology 대시를 그대로 둔 채 톤만 바꿉니다. 폐쇄와 충돌은 같은 danger 톤을 공유하므로 둘을 가르는 것은 라벨·상세·접근성 이름이고, 그래서 이 명세 스토리는 라벨을 항상 노출합니다. 문이나 엘리베이터의 실시간 상태는 Facility Transition이 소유하며, 레인은 해당 경계에 전환이 있다는 사실과 개수만 표시하고 종류를 ID에서 추론하지 않습니다."
       maxWidth={780}
     >
       <LaneMap label="레인 복합 상태 지도" height={360} svgHeight={340}>
+        {/* 지도 기본값은 `interaction`이라 hover 전에는 라벨이 없다. 여기서는 세 상태를
+            나란히 비교하는 것이 본론이고, 규약상 폐쇄와 충돌은 톤이 같아 라벨이 유일한
+            판별 채널이므로 명세 스토리에 한해 항상 노출한다. `selected`로 드러내면
+            casing 4→6·core 1.5→3으로 굵어져 기본 선 두께를 못 보여준다.
+            상세는 끈다 — 세 레인이 BASE_LANE의 같은 속도·mutex를 물려받아 동일한 문자열이
+            세 번 반복될 뿐, 상태 비교에 아무것도 보태지 않는다.
+            `showEndpoints`는 전환 참조(T/count)의 전제다. 이게 빠져 있어 스토리 설명이
+            약속한 T 뱃지가 렌더되지 않았고 play의 전환 개수 단언이 계속 실패하고 있었다. */}
         {STATE_LANES.map(({ lane, availability, conflict }) => (
-          <LaneOverlay key={lane.id} lane={lane} availability={availability} conflict={conflict} />
+          <LaneOverlay
+            key={lane.id}
+            lane={lane}
+            availability={availability}
+            conflict={conflict}
+            labelVisibility="always"
+            detailVisibility="hidden"
+            showEndpoints
+          />
         ))}
       </LaneMap>
     </StoryPage>

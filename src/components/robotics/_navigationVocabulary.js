@@ -124,11 +124,13 @@ export const NAV_LINE_ROLE = {
 export const NAV_TRAJECTORY_SAMPLE = {
   // 이 반경은 궤적 core(2.25px)보다 커야 한다. 이전 1.5는 지름 3px이라 같은 색
   // 선 위에서 양쪽으로 0.375px만 삐져나왔고, 결과적으로 이 컴포넌트를 Lane·Route와
-  // 구분 짓는 유일한 표현인 시간 순 sample이 보이지 않았다. 표면색 링과 함께
-  // 써야 선 위의 점으로 읽힌다.
+  // 구분 짓는 유일한 표현인 시간 순 sample이 보이지 않았다. 2.4는 지름 4.8px이라
+  // 선 밖으로 1.275px씩 나와 염주처럼 읽힌다.
+  //
+  // 표면색 링은 쓰지 않는다. 링을 두르면 sample마다 선이 끊겨, 유효한 궤적은 하나의
+  // 끊김 없는 선이어야 한다는 규약을 깬다(`data-trajectory-sample`에 stroke가 없어야
+  // 한다고 play가 단언한다). 굵기만으로 구분하고 선은 잇는다.
   radius: 2.4,
-  /** 점을 선에서 떼어내는 표면색 knockout 두께. */
-  ringWidth: 1,
   maxVisible: 12,
   pastOpacity: 0.78,
   futureOpacity: 0.48,

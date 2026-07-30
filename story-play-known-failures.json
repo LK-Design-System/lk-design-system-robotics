@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "note": "Stories whose play function is known to fail. A ratchet: check:story-play fails on any unlisted failure, and also when a listed story starts passing. Only ever remove entries.",
+  "count": 7,
+  "failures": [
+    {
+      "id": "lds-robotics-foundation-viewer-tokens--narrow-viewport",
+      "error": "The state-tone board must remain fully visible without vertical clipping at 320px (content 638/664px, bottom 2176.8125; board bottom 2202.8125)."
+    },
+    {
+      "id": "lds-robotics-navigation-annotation-layer--no-provider-baseline",
+      "error": "Baseline door labels must render."
+    },
+    {
+      "id": "lds-robotics-navigation-hazard-marker--narrow-viewport",
+      "error": "The long hazard label must stay attached to the marker."
+    },
+    {
+      "id": "lds-robotics-navigation-path-system--overview",
+      "error": "Route must remain the same 1.5px 4 6 graph line as Lane, changing only to the plan identity tone."
+    },
+    {
+      "id": "lds-robotics-navigation-path-system-lane--lane-short-path-compound-states",
+      "error": "Short-path fixture no longer stresses a path shorter than the state glyph row."
+    },
+    {
+      "id": "lds-robotics-navigation-path-system-shared-rules--narrow-viewport",
+      "error": "The directional-cue catalog must not overflow at 320px."
+    },
+    {
+      "id": "lds-robotics-navigation-waypoint--light-and-dark",
+      "error": "light focused waypoint focus rectangle is only -73.91px from its label; expected at least 3px."
+    }
+  ]
+}
