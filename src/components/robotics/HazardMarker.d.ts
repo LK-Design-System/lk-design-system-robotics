@@ -14,7 +14,12 @@ import type { NavigationFrameRef } from './NavigationCoordinateSystem';
  * protruding equipment, low clearance, standing storage). Dynamic obstacles the
  * robot senses at runtime (people, forklifts, dropped boxes) are the product's
  * live perception layers, never this static annotation. */
-export type HazardKind = 'stairs' | 'ramp' | 'dropoff' | 'obstacle';
+/**
+ * `obstacle`은 길을 막은 물체, `conflict`는 두 이동체가 같은 좌표를 두고
+ * 경합하는 상태입니다 — 원인도 해소 방법도 다르므로(치우기 vs 통행 순서 조정)
+ * 실루엣을 공유하지 않습니다.
+ */
+export type HazardKind = 'stairs' | 'ramp' | 'dropoff' | 'obstacle' | 'conflict';
 
 /** Product-owned avoidance weight; the marker never infers it from kind or position. */
 export type HazardSeverity = 'caution' | 'danger';

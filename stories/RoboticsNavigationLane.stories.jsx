@@ -261,12 +261,12 @@ export const LaneStatesAndConstraints = {
         {/* 쉼 상태에서 폐쇄와 충돌을 가르는 것은 레인 페인트가 아니라 이 지점
             마커다. 규약이 "충돌은 hazards·alerts·상세가 표면화한다"고 정해 두고
             그 마커를 아무도 그리지 않아 두 상태가 픽셀 동일했다. 충돌은 좌표가
-            있는 사건이므로 기존 hazard 어휘(kind `obstacle` = 충돌)를 그 좌표에
+            있는 사건이므로 전용 hazard kind `conflict`(마주보는 화살표)를 그 좌표에
             그대로 쓴다 — 레인의 4 6 대시와 톤 규약은 건드리지 않는다. */}
         <HazardMarker
           hazard={{
             id: 'lane-conflict-point',
-            kind: 'obstacle',
+            kind: 'conflict',
             label: '경로 충돌',
             mapId: 'L1',
             position: { x: 390, y: 262 },
@@ -274,12 +274,12 @@ export const LaneStatesAndConstraints = {
           }}
         />
       </LaneMap>
-      {/* 두 표기가 이 지도에서만 나오고 스스로를 설명하지 못한다: endpoint 사각형은
-          웨이포인트처럼 생겼지만 참조 토큰이고, T2는 순번처럼 읽히지만 개수다. */}
+      {/* endpoint 사각형은 웨이포인트처럼 생겼지만 참조 토큰이라 여전히 설명이
+          필요하다. 전환 개수 배지는 T2에서 ×2로 바꿔 스스로를 설명하게 됐으므로
+          범례 항목에서 뺀다 — 표기가 자립하면 주석은 사라지는 게 맞다. */}
       <NavigationLegend
         notes={[
           { code: '◻', label: '웨이포인트 참조 — 역할·상태·선택은 Waypoint 레이어의 실체가 소유' },
-          { code: 'T2', label: '경계의 시설 전환 개수 (T2 = 전환 2개) — 순번이 아니라 개수' },
         ]}
       />
     </StoryPage>
@@ -319,7 +319,7 @@ export const LaneStatesAndConstraints = {
     // At rest, closed and conflict share the danger tone by convention, so the
     // thing that separates them is the conflict-point marker — the lane paint
     // stays untouched, the event owns a coordinate.
-    const conflictPoint = canvasElement.querySelector('[data-lds-hazard-marker][data-hazard-kind="obstacle"]');
+    const conflictPoint = canvasElement.querySelector('[data-lds-hazard-marker][data-hazard-kind="conflict"]');
     if (!conflictPoint) {
       throw new Error('The conflict lane must carry a conflict-point marker so closed and conflict differ at rest.');
     }

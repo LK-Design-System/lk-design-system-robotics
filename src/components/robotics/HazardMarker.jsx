@@ -22,8 +22,13 @@ const KIND_LABELS = {
   stairs: '계단',
   ramp: '경사로',
   dropoff: '단차·낙하',
-  // Reads as "충돌 위험" in the `${kind} 위험` accessible-name slot.
-  obstacle: '충돌',
+  // A physical object in the way. It used to also carry path contention, which
+  // made one silhouette answer two different operational questions; contention
+  // is now its own `conflict` kind.
+  obstacle: '장애물',
+  // Two movers contending for one coordinate. Reads as "경로 충돌 위험" in the
+  // `${kind} 위험` accessible-name slot.
+  conflict: '경로 충돌',
 };
 
 // Hazard severity is the visual axis (not availability): products classify the

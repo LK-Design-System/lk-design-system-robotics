@@ -126,9 +126,11 @@ exact identity without color. Trajectory remains geometrically distinct:
    for selected, zoomed, or editing contexts rather than a repeated dash shape.
    Because closed and conflict share the danger tone, **the at-rest distinction
    between them is owned by a conflict-point marker**, not by the lane paint: a
-   conflict is an event with a coordinate, so the hazard vocabulary's collision
-   pin (kind `obstacle`, severity by classification) is placed at the contention
-   point. This is the concrete form of "surfaced by hazards, alerts, and the
+   conflict is an event with a coordinate, so the hazard vocabulary's dedicated
+   `conflict` pin (opposing arrows across a contested gap, severity by
+   classification) is placed at the contention point. Deliberately not the
+   `obstacle` cone: an obstacle is cleared or routed around while a conflict is
+   sequenced, so the two never share a silhouette. This is the concrete form of "surfaced by hazards, alerts, and the
    detail panel" below — the lane keeps one dash and one tone.
 2. **Route** is the selected graph plan: the referenced Lane geometry is
    removed from base topology paint and replaced by one 1.5px, `4 6` line in the

@@ -160,7 +160,7 @@ function endpointMarker(point, endpoint, kind, inverseScale) {
         <g data-lane-transition-count={transitionCount} transform="translate(0 16)">
           <circle
             data-lane-transition-count-circle=""
-            r="9"
+            r="10"
             fill={VIEWER_SURFACE}
             stroke={VIEWER_MUTED}
             strokeWidth="1.5"
@@ -181,7 +181,12 @@ function endpointMarker(point, endpoint, kind, inverseScale) {
             fontSize="var(--caption2-size)"
             fontWeight="var(--fw-bold)"
           >
-            T{transitionCount}
+            {/* "×2", not "T2": the T read as an identifier or a sequence
+                number ("transition #2") when it always meant a count, and a
+                legend note had to exist to say so. The multiplication sign is
+                the language-neutral count marker, so the badge explains
+                itself and the note can retire. */}
+            ×{transitionCount}
           </text>
         </g>
       )}

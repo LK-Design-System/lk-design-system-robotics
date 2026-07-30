@@ -14,7 +14,8 @@ const SURFACE = 'var(--color-semantic-background-elevated-normal)';
 const KIND_LABELS = {
   stairs: '계단',
   dropoff: '단차·낙하',
-  obstacle: '충돌 위험물',
+  obstacle: '장애물 (길을 막은 물체)',
+  conflict: '경로 충돌 (같은 좌표 경합)',
 };
 
 function Card({ title, hint, children }) {
