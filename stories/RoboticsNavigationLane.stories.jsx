@@ -274,6 +274,14 @@ export const LaneStatesAndConstraints = {
           }}
         />
       </LaneMap>
+      {/* 두 표기가 이 지도에서만 나오고 스스로를 설명하지 못한다: endpoint 사각형은
+          웨이포인트처럼 생겼지만 참조 토큰이고, T2는 순번처럼 읽히지만 개수다. */}
+      <NavigationLegend
+        notes={[
+          { code: '◻', label: '웨이포인트 참조 — 역할·상태·선택은 Waypoint 레이어의 실체가 소유' },
+          { code: 'T2', label: '경계의 시설 전환 개수 (T2 = 전환 2개) — 순번이 아니라 개수' },
+        ]}
+      />
     </StoryPage>
   ),
   play: async ({ canvasElement }) => {

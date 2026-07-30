@@ -525,6 +525,10 @@ export function NavigationLegend({
   states,
   regions,
   lines,
+  // Free-form notation rows ({ code | swatch, label }) for marks that are not in
+  // the fixed vocabulary groups — e.g. the lane endpoint reference token, or the
+  // T-count badge whose "T2" otherwise reads as an ordinal instead of a count.
+  notes,
   statePresentation = 'glyph',
   style,
   ...rest
@@ -587,6 +591,13 @@ export function NavigationLegend({
             if (!entry) return null;
             return <LegendRow key={key} code={entry.code} label={entry.label} />;
           })}
+        </LegendGroup>
+      )}
+      {notes?.length > 0 && (
+        <LegendGroup title="표기">
+          {notes.map((note) => (
+            <LegendRow key={note.label} code={note.code} swatch={note.swatch} label={note.label} />
+          ))}
         </LegendGroup>
       )}
       {states?.length > 0 && (
