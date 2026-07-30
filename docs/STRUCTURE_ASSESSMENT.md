@@ -84,16 +84,15 @@ import하면 dist를, 컴포넌트가 상대경로로 import하면 src를 읽어
 모르는 사람이 와도 안 헤매는 상태여야 한다. 어느 쪽이 진본인지 결정하고
 나머지를 정리(또는 README로 명시)할 것.
 
-## 문서 체계 점검에서 나온 결함 (미수정, 기록만)
+## 문서 체계 점검에서 나온 결함 (2026-07-30 해소)
 
-1. **`SELECTION_FOCUS_AUDIT.md` 낡음** — RobotPose 1.15×, Facility/Hazard
-   1.12×로 기록돼 있으나 현재 코드는 점 마커 전부 1.25× + selection seat다
-   (`NAV_SELECTION` 참조). 감사 스냅숏이 코드와 모순되는 상태.
-2. **로보틱스 `docs/`에 색인·메타데이터 규약 부재** — 업스트림과 달리 README
-   색인이 없고 각 문서에 Type/Status/Last reviewed 헤더가 없어, 어느 문서가
-   현재 유효한 규약이고 어느 것이 완료된 계획인지 파일명으로 추측해야 한다.
-3. (참고) 같은 파일명 `NAVIGATION_EXPRESSION_CONVENTIONS.md`의 양 레포 병존은
-   분업이 명시돼 있어 결함은 아니나, 링크·검색 시 혼동 여지는 있다.
+1. ~~**`SELECTION_FOCUS_AUDIT.md` 낡음**~~ — 점 마커 전부 1.25× + selection
+   seat, highlight 1.12×(`NAV_SELECTION`)로 갱신함.
+2. ~~**로보틱스 `docs/`에 색인·메타데이터 규약 부재**~~ — [`README.md`](README.md)
+   색인을 만들고 전 문서에 업스트림 메타데이터 헤더(Type/Status/Owner/Last
+   reviewed)를 부착함. 규약 자체는 업스트림 문서 체계를 따른다고 명시.
+3. (참고, 유지) 같은 파일명 `NAVIGATION_EXPRESSION_CONVENTIONS.md`의 양 레포
+   병존은 분업이 명시돼 있어 결함은 아니나, 링크·검색 시 혼동 여지는 있다.
 
 ## 이 문서의 갱신 규칙
 

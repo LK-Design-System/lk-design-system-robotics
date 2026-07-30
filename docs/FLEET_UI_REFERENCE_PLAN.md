@@ -1,7 +1,13 @@
 # Fleet UI reference and implementation plan
 
-Status: Phase 0–2 first increment implemented  
-Research date: 2026-07-28  
+| Field | Value |
+| --- | --- |
+| Type | Plan |
+| Status | Phase 0–2 first increment implemented; later phases open |
+| Owner | Robotics domain engineering |
+| Last reviewed | 2026-07-30 |
+| Research date | 2026-07-28 |
+
 Target package: `@lk-robotics/lds-robotics-ui`
 
 Implemented in this increment:

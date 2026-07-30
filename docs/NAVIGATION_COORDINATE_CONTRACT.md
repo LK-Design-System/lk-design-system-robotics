@@ -1,5 +1,13 @@
 # Navigation Coordinate Contract
 
+| Field | Value |
+| --- | --- |
+| Type | Contract |
+| Status | Current |
+| Owner | Robotics domain engineering |
+| Last reviewed | 2026-07-30 |
+| Source | `check:coordinates` (`scripts/check-navigation-coordinates.mjs`) |
+
 Navigation graphics are only trustworthy when map, route, trajectory, pose,
 waypoint, region, and facility data share one explicit frame and timestamp
 contract. A coincident pair of `x`/`y` numbers is not evidence that two records

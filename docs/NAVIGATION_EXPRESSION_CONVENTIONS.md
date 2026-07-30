@@ -1,5 +1,13 @@
 # Navigation Expression Conventions
 
+| Field | Value |
+| --- | --- |
+| Type | Convention |
+| Status | Current |
+| Owner | Robotics domain engineering (shared policy: Design system owner) |
+| Last reviewed | 2026-07-30 |
+| Source | Upstream `NAVIGATION_EXPRESSION_CONVENTIONS.md` (authoritative) · `src/components/robotics/_navigationVocabulary.js` |
+
 How the Robotics **Navigation** overlays encode meaning on a map. These are the
 rules the renderers (`LaneOverlay`, `RouteOverlay`, `TrajectoryOverlay`,
 `WaypointMarker`, `FacilityTransition`, `HazardMarker`, `SpatialRegion`) and the

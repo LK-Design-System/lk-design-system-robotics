@@ -1,5 +1,12 @@
 # Occupancy Map Conventions
 
+| Field | Value |
+| --- | --- |
+| Type | Convention |
+| Status | Current |
+| Owner | Robotics domain engineering |
+| Last reviewed | 2026-07-30 |
+
 `OccupancyMapLayer` draws the structural base map below navigation overlays.
 It does not infer rooms or traversable interiors from closed lines.
 

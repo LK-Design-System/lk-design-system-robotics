@@ -1,5 +1,13 @@
 # LDS Robotics selection / focus audit
 
+| Field | Value |
+| --- | --- |
+| Type | Audit |
+| Status | Current |
+| Owner | Robotics domain engineering |
+| Last reviewed | 2026-07-30 |
+| Source | `NAV_SELECTION` / `NAV_FOCUS` in `src/components/robotics/_navigationVocabulary.js` |
+
 This audit separates persistent selection from transient keyboard focus across
 the package. It records the current ownership boundary so future components do
 not reuse focus chrome as a selected state.
@@ -8,20 +16,28 @@ not reuse focus chrome as a selected state.
 
 | Component | Selection | Focus | Result |
 | --- | --- | --- | --- |
-| `WaypointMarker` | static 1.25× enlargement from 20px to 25px; availability fill is unchanged and the exception badge stays fixed | contrast-backed rounded-square shell | Conforms; primary role is an internal vector icon and compound data quality uses one prioritized top-right 12px solid badge |
-| `RobotPoseMarker` | static 1.15× body enlargement; prioritized exception glyph stays fixed | outer surface + focus double ring | Conforms; routine state uses body tone and only fault/offline/stale/unknown/invalid retain a glyph |
-| `FacilityTransition` | static 1.12× pin-body enlargement; the prioritized solid status badge stays fixed | outer surface + focus silhouette ring | Conforms |
-| `HazardMarker` | static 1.12× pin-body enlargement; severity fill is unchanged | outer surface + focus silhouette ring | Conforms; static severity adds no alarm ring or pulse |
+| `WaypointMarker` | static 1.25× enlargement + selection seat; availability fill is unchanged and the exception badge stays fixed | contrast-backed rounded-square shell | Conforms; primary role is an internal vector icon and compound data quality uses one prioritized top-right 12px solid badge |
+| `RobotPoseMarker` | static 1.25× body enlargement + selection seat; prioritized exception glyph stays fixed | outer surface + focus double ring | Conforms; routine state uses body tone and only fault/offline/stale/unknown/invalid retain a glyph |
+| `FacilityTransition` | static 1.25× pin-body enlargement + selection seat; the prioritized solid status badge stays fixed | outer surface + focus silhouette ring | Conforms |
+| `HazardMarker` | static 1.25× pin-body enlargement + selection seat; severity fill is unchanged | outer surface + focus silhouette ring | Conforms; static severity adds no alarm ring or pulse — the seat sits behind the silhouette, so `danger + selected` never becomes a triple coloured edge |
 | `LaneOverlay` | wider semantic-color core + neutral casing | wider solid focus halo | Conforms |
 | `RouteOverlay` | same-width plan-color dash + wider neutral casing | wider solid segment focus halo | Conforms |
 | `TrajectoryOverlay` | wider semantic-color path + neutral casing | wider solid focus halo | Conforms |
 | `SpatialRegion` | wider semantic-color boundary; pattern and tint stay unchanged | wider focus outline | Conforms |
 
+Point-marker selection is one shared recipe owned by `NAV_SELECTION`: a 1.25×
+enlargement (relative cue — visible next to unselected siblings) plus a
+"selection seat", the marker silhouette re-drawn behind the body in
+`--viewer-surface-elevated` with a hairline `--viewer-border` rim (absolute cue
+— visible on a marker alone on a map). The seat lives behind the silhouette so
+it stacks under semantic paint and stays clear of the blue focus ring.
+
 All interactive SVG fragments mirror native `:focus-visible`, suppress the
 duplicate rectangular browser outline, keep `aria-pressed` for selection, and
 preserve controlled `selected` / `focused` props for passive renderers.
-`RobotPoseMarker highlighted` is a separate 1.08× linked-preview cue and never
-sets `data-focused` or paints the keyboard focus ring.
+`RobotPoseMarker highlighted` is a separate 1.12× linked-preview cue
+(`NAV_SELECTION.robotPoseHighlightScale`) and never sets `data-focused` or
+paints the keyboard focus ring.
 
 ## Robotics DOM surfaces
 
