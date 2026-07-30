@@ -1,6 +1,7 @@
 import React from 'react';
 import { Map2DCanvas } from '@lk-robotics/lds-product';
 import { NavigationAnnotationLayer, RobotPoseMarker } from '../src/index.js';
+import { NAV_SELECTION } from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationVocabulary';
 import { NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { assertContrastBackedFocus, contrastRatio } from './RoboticsNavigationAssert.shared.jsx';
@@ -305,7 +306,7 @@ export const Overview = {
 export const InteractionStates = {
   name: '상호작용 · Hover·선택·포커스',
   parameters: storyDescription(
-    'Hover·연결 목록 preview는 1.08배 확대, 선택은 1.15배 확대, 키보드 포커스는 바깥의 고대비 이중 링입니다. 세 상호작용 축은 서로의 상태를 만들지 않습니다.',
+    'Hover·연결 목록 preview는 1.12배 확대, 선택은 1.25배 확대, 키보드 포커스는 바깥의 고대비 이중 링입니다. 세 상호작용 축은 서로의 상태를 만들지 않습니다.',
   ),
   render: () => (
     <main
@@ -362,16 +363,18 @@ export const InteractionStates = {
       throw new Error('Default interaction example must not render selection or focus.');
     }
     if (
-      highlighted?.querySelector('[data-robot-pose-highlighted-scale="1.08"]') == null
+      highlighted?.querySelector(`[data-robot-pose-highlighted-scale="${NAV_SELECTION.robotPoseHighlightScale}"]`) == null
       || highlighted.dataset.highlighted !== 'true'
       || highlighted.querySelector('[data-robot-pose-selected-scale]')
       || highlighted.querySelector('[data-robot-pose-focus-indicator]')
       || highlighted.dataset.focused === 'true'
     ) {
-      throw new Error('Highlighted preview must use only the 1.08x body enlargement.');
+      throw new Error('Highlighted preview must use only its body enlargement.');
     }
-    if (!selected?.querySelector('[data-robot-pose-selected-scale="1.15"]')) {
-      throw new Error('Selected interaction example is missing its 1.15x body enlargement.');
+    // Read the scale off the vocabulary rather than hardcoding it — the pinned
+    // "1.15" literal was exactly what made pinScale untunable before.
+    if (!selected?.querySelector(`[data-robot-pose-selected-scale="${NAV_SELECTION.robotPoseScale}"]`)) {
+      throw new Error(`Selected interaction example is missing its ${NAV_SELECTION.robotPoseScale}x body enlargement.`);
     }
     if (selected?.querySelector('[data-robot-pose-focus-indicator]')) {
       throw new Error('Selected-only example must not render keyboard focus.');
@@ -395,7 +398,7 @@ export const InteractionStates = {
       throw new Error('Focused-only example must not render selection.');
     }
     if (
-      !selectedFocused?.querySelector('[data-robot-pose-selected-scale="1.15"]')
+      !selectedFocused?.querySelector(`[data-robot-pose-selected-scale="${NAV_SELECTION.robotPoseScale}"]`)
       || !selectedFocused?.querySelector('[data-robot-pose-focus-indicator]')
     ) {
       throw new Error('Combined interaction example must render selection and focus together.');

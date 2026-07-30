@@ -237,15 +237,19 @@ const concaveKeepOutRegion = {
   id: 'concave-keep-out',
   label: '오목 금지',
   shape: {
+    // The C's right arms used to end at x 366 inside a 360-unit stage, so the
+    // opening of the very shape this story exists to show was clipped off the
+    // panel edge. 330 keeps the notch (and the naive vertex average the play
+    // asserts stays outside the surface) fully on stage.
     kind: 'polygon',
     points: [
       { x: 92, y: 62 },
-      { x: 366, y: 62 },
-      { x: 366, y: 78 },
+      { x: 330, y: 62 },
+      { x: 330, y: 78 },
       { x: 168, y: 78 },
       { x: 168, y: 206 },
-      { x: 366, y: 206 },
-      { x: 366, y: 250 },
+      { x: 330, y: 206 },
+      { x: 330, y: 250 },
       { x: 92, y: 250 },
     ],
   },
@@ -502,9 +506,11 @@ export const NarrowWidth = {
   ),
   render: () => (
     <div data-testid="narrow-region-shell" style={{ width: 320, maxWidth: '100%', minWidth: 0 }}>
+      {/* 이 스토리의 본문이 "라벨을 함께 읽는 상황"인데 disclosure 기본값이
+          `interaction`이라 라벨이 아예 없었다 — 다크 비교 스토리(§4.1)와 같은 뿌리. */}
       <RegionMap width={320} height={280} label="320px 공간 영역 지도" testId="narrow-region-map">
-        <SpatialRegion region={narrowSpeedRegion} />
-        <SpatialRegion region={narrowSlopeRegion} />
+        <SpatialRegion region={narrowSpeedRegion} labelVisibility="always" />
+        <SpatialRegion region={narrowSlopeRegion} labelVisibility="always" />
       </RegionMap>
     </div>
   ),

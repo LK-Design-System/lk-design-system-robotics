@@ -143,6 +143,9 @@ export function PathMap({
   // up either padded with dead space or overflowed. Pass `aspectRatio` (e.g.
   // '540 / 250') to let the card track the map instead. ViewerFrame still floors
   // the card at 200px, which the pinned lds-product build owns.
+  //
+  // The card also caps at the SVG footprint (540 + canvas padding): the SVG never
+  // grows past 540px, so a wider card is just empty surface to the right of it.
   aspectRatio,
 }) {
   const svgRef = React.useRef(null);
@@ -186,8 +189,8 @@ export function PathMap({
       defaultViewport={{ x: 0, y: 0, z: 1 }}
       data-testid={testId}
       style={aspectRatio
-        ? { width: '100%', minWidth: 0, height: 'auto', aspectRatio }
-        : { width: '100%', minWidth: 0, height }}
+        ? { width: '100%', maxWidth: 572, minWidth: 0, height: 'auto', aspectRatio }
+        : { width: '100%', maxWidth: 572, minWidth: 0, height }}
     >
       <svg
         ref={svgRef}

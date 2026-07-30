@@ -10,6 +10,7 @@ import {
   RobotPoseMarker,
   SpatialRegion,
 } from '../src/index.js';
+import { NAV_SELECTION } from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationVocabulary';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import {
   DENSE_FLEET_ROBOTS,
@@ -568,7 +569,7 @@ export const Overview = {
       const marker = root.querySelector(`[data-robot-pose-marker][data-robot-id="${criticalRows[0].dataset.robotId}"]`);
       if (
         marker?.dataset.highlighted !== 'true'
-        || !marker.querySelector('[data-robot-pose-highlighted-scale="1.08"]')
+        || !marker.querySelector(`[data-robot-pose-highlighted-scale="${NAV_SELECTION.robotPoseHighlightScale}"]`)
         || marker.dataset.focused === 'true'
         || marker.querySelector('[data-robot-pose-focus-indicator]')
       ) {

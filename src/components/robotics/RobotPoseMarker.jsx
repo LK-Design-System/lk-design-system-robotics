@@ -31,7 +31,7 @@ const STATE_LABEL = {
 
 const BODY_RADIUS = 10;
 const FOCUS_RADIUS = 17;
-const HIGHLIGHT_SCALE = 1.08;
+const HIGHLIGHT_SCALE = NAV_SELECTION.robotPoseHighlightScale;
 
 const BADGE_PRESENTATION = {
   fault: {

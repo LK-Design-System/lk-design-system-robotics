@@ -438,7 +438,7 @@ export const RouteAndTrajectoryNarrow320 = {
         title="좁은 화면에서도 Path System 문법은 바뀌지 않습니다"
         description="Route progress와 Trajectory playback cursor를 추가하지 않고 선·sample·RobotPose의 역할을 유지합니다."
       >
-        <PathMap label="320px Path System 지도" eyebrow="PATH SYSTEM · L1" height={230}>
+        <PathMap label="320px Path System 지도" eyebrow="PATH SYSTEM · L1" aspectRatio="572 / 282">
           {(viewportScale) => <ActivePathLayers viewportScale={viewportScale} />}
         </PathMap>
       </StoryPage>

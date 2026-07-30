@@ -68,7 +68,13 @@ function StoryPage({ title, description, children, maxWidth = 1040 }) {
   );
 }
 
-function LaneMap({ appearance = 'light', label, children, height = 270, testId, eyebrow = 'LANE · L1', svgHeight = 250 }) {
+// The card caps at the SVG's own footprint (520 map units + canvas padding).
+// Without the cap the Map2DCanvas stretched to the story column while the SVG
+// stayed at 520px, leaving a third of every wide card - dark cards especially -
+// as empty surface to the right of the map. `aspectRatio` is the vertical
+// counterpart (same rationale as PathMap): a fixed `height` only fits one column
+// width, so narrow fixtures ended up with an empty band under the scaled map.
+function LaneMap({ appearance = 'light', label, children, height = 270, testId, eyebrow = 'LANE · L1', svgHeight = 250, aspectRatio }) {
   const svgRef = React.useRef(null);
   const [viewportScale, setViewportScale] = React.useState(1);
 
@@ -114,7 +120,9 @@ function LaneMap({ appearance = 'light', label, children, height = 270, testId, 
       grid={false}
       defaultViewport={{ x: 0, y: 0, z: 1 }}
       data-testid={testId}
-      style={{ width: '100%', minWidth: 0, height }}
+      style={aspectRatio
+        ? { width: '100%', maxWidth: 552, minWidth: 0, height: 'auto', aspectRatio }
+        : { width: '100%', maxWidth: 552, minWidth: 0, height }}
     >
       <svg
         ref={svgRef}
@@ -476,7 +484,7 @@ export const LaneDarkCompoundStates = {
       description="상태 색은 path와 glyph 외곽선에 남기고, glyph 전경은 viewer surface와 3:1 이상 대비되는 공통 foreground를 사용합니다. label 충돌과 우선순위는 owning renderer가 결정합니다."
       maxWidth={780}
     >
-      <LaneMap appearance="dark" label="Dark 레인 복합 상태 지도" height={280}>
+      <LaneMap appearance="dark" label="Dark 레인 복합 상태 지도" aspectRatio="552 / 282">
         <LaneOverlay
           lane={{
             ...BASE_LANE,
@@ -582,7 +590,7 @@ export const LaneShortPathCompoundStates = {
       maxWidth={520}
     >
       <div data-testid="lane-short-compound-frame" style={{ width: 360, maxWidth: '100%', minWidth: 0 }}>
-        <LaneMap label="짧은 복합 상태 레인 지도" height={240}>
+        <LaneMap label="짧은 복합 상태 레인 지도" aspectRatio="552 / 282">
           <LaneOverlay
             lane={SHORT_PATH_COMPOUND_LANE}
             availability="unknown"
@@ -711,7 +719,10 @@ function LanePointerOnlyFixture() {
     ...BASE_LANE,
     id: 'lane-passive-disabled',
     label: '수동 포커스 비활성 레인',
-    points: [{ x: 72, y: 178 }, { x: 440, y: 178 }],
+    // y 200, not 178: the pointer lane's metadata (below its path) and this
+    // lane's label (above this path) shared the 74px gap and visually grouped
+    // into one ambiguous text block between the two lines.
+    points: [{ x: 72, y: 200 }, { x: 440, y: 200 }],
   };
 
   return (
@@ -803,9 +814,14 @@ function LaneActivationFixture() {
       description="선택은 상태색을 유지한 path 코어와 중립 casing의 굵기 확대로 남습니다. disabled 레인은 맥락을 보존하지만 Tab 순서와 activation에서 빠지며, 전체 그래프 탐색은 이름 있는 목록을 함께 제공해야 합니다."
       maxWidth={780}
     >
+      {/* The selectable lane sits at y 100, not 120: its metadata renders below
+          its path and the locked lane's label renders above its own, so at
+          120/188 the two text lines sat 25px apart in the gap between the lanes
+          and read as one block — you could not tell which line belonged to
+          which lane. */}
       <LaneMap label="레인 선택 지도">
         <LaneOverlay
-          lane={{ ...BASE_LANE, id: 'lane-selectable', label: '검사할 레인', points: [{ x: 132, y: 120 }, { x: 460, y: 120 }] }}
+          lane={{ ...BASE_LANE, id: 'lane-selectable', label: '검사할 레인', points: [{ x: 132, y: 100 }, { x: 460, y: 100 }] }}
           selected={selectedId === 'lane-selectable'}
           onActivate={activate}
         />
@@ -925,7 +941,7 @@ export const LaneNarrow320 = {
         title="좁은 화면에서는 viewport를 보존하고 상세 탐색은 목록으로 이어집니다"
         description="지도 안 label을 억지로 여러 줄 card로 만들지 않습니다. 보이는 선과 glyph는 유지하고 동일 레인 identity를 아래 목록에서 다시 선택할 수 있게 구성합니다."
       >
-        <LaneMap label="320px 레인 지도" height={230}>
+        <LaneMap label="320px 레인 지도" aspectRatio="552 / 282">
           <LaneOverlay lane={BASE_LANE} availability="closed" conflict onActivate={() => {}} />
         </LaneMap>
         <Button type="button" variant="secondary" full>A → B 레인 상세 열기 · 폐쇄 · 충돌</Button>

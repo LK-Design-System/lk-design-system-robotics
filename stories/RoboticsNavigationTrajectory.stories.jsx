@@ -400,7 +400,7 @@ export const NarrowViewport = {
         title="좁은 화면에서도 궤적 계층은 겹치지 않고 상세 정보는 이름으로 이어집니다"
         description="지도 안에 card를 겹쳐 넣지 않습니다. trajectory의 선·sample을 보존하고 접근성 이름은 수명주기 상태만 전달합니다."
       >
-        <PathMap label="320px trajectory 지도" height={230} eyebrow="TRAJECTORY · L1">
+        <PathMap label="320px trajectory 지도" aspectRatio="572 / 282" eyebrow="TRAJECTORY · L1">
           {(cssViewBoxScale) => (
             <TrajectoryOverlay
               trajectory={ACTIVE_TRAJECTORY}

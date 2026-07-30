@@ -532,11 +532,14 @@ export const InteractionAndMapFiltering = {
   },
 };
 
+// Both pins sat at x 16–24, which put the 35px-wide pin bodies 5.5px past the
+// stage's left boundary — measured, not eyeballed. The pin is anchored at its
+// tip, so x has to clear half a pin plus the panel inset.
 const narrowLift = {
   ...liftTransition,
   id: 'narrow-lift',
   label: '승강기 A',
-  from: { ...liftTransition.from, position: { x: 24, y: 62 } },
+  from: { ...liftTransition.from, position: { x: 44, y: 62 } },
   phase: 'moving',
   motionState: 'up',
   sessionState: 'owned',
@@ -546,8 +549,8 @@ const narrowDoor = {
   ...activeDoor,
   id: 'narrow-door',
   label: '자동문 B',
-  from: { mapId: 'warehouse-1f', position: { x: 16, y: 192 } },
-  to: { mapId: 'warehouse-1f', position: { x: 32, y: 192 } },
+  from: { mapId: 'warehouse-1f', position: { x: 40, y: 192 } },
+  to: { mapId: 'warehouse-1f', position: { x: 56, y: 192 } },
 };
 
 export const NarrowWidth = {

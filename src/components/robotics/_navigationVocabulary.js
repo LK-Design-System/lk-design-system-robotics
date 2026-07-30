@@ -69,13 +69,25 @@ export const NAV_FOCUS = {
  */
 export const NAV_SELECTION = {
   waypointScale: 1.25,
-  robotPoseScale: 1.15,
+  // 1.15였다. 34px 원에서 5px 차이는 비교 대상이 옆에 없으면 보이지 않아, 상호작용
+  // 상태 스토리에서 기본과 선택이 육안 동일했다 — pinScale을 1.12에서 올린 것과 같은
+  // 이유로 waypointScale에 맞춘다. 셋이 같은 값이면 "선택 = 1.25배"라는 규칙 하나만
+  // 기억하면 된다.
+  robotPoseScale: 1.25,
   // Pins were the weakest selection cue in the set at 1.12: on a 35x42 pin that
   // is a 4x5px delta, and a marker alone on a map has nothing to compare against.
   // Scale is the only channel available here - Hazard already spends its outline
   // on severity, so a selection border would make `danger + selected` a triple
   // edge. Matched to waypointScale instead of inventing a fourth number.
   pinScale: 1.25,
+  /**
+   * Hover/list-preview enlargement for the pose body. 1.08 was under 3px on a
+   * ~34px circle and read as "no change"; 1.12 is perceptible while staying
+   * clearly below the 1.25 selection scale — hover is transient and has the
+   * cursor for context, so it may be subtler than selection. Lives here (like
+   * regionHoverStrokeWidth) so stories assert the constant, not a literal.
+   */
+  robotPoseHighlightScale: 1.12,
   regionStrokeWidth: 3.5,
   /** Region outline below selection: hover lifts the edge, rest sits quiet. */
   regionHoverStrokeWidth: 2,
