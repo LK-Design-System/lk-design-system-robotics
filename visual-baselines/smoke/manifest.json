@@ -11,8 +11,8 @@
         "width": 1180,
         "height": 820
       },
-      "bytes": 40618,
-      "sha256": "19e0954c220bfb0330e3bcf88da2e6187239fc69f50f752080f5ac6621afcba0"
+      "bytes": 40788,
+      "sha256": "b672926393f676fdbff20a0b8907c27c789564c0293905c990a2b8c08526b809"
     },
     {
       "name": "robotics-navigation-viewer",
@@ -22,8 +22,8 @@
         "width": 1180,
         "height": 820
       },
-      "bytes": 182558,
-      "sha256": "766b8d57fe68cccf2aee96538e8983ed215e67716a2b1c54dfd6aa90034b6383"
+      "bytes": 187137,
+      "sha256": "8c7e653dbb6874a979b6e5b3a1a5f57283dc4c24e968f7f64f5dbf69a33503d8"
     },
     {
       "name": "robotics-navigation-viewer-narrow",
@@ -33,8 +33,8 @@
         "width": 320,
         "height": 720
       },
-      "bytes": 107376,
-      "sha256": "3c7abfb53cd5fa91c359ee3012a89f5a6e208004a84d264f9765055d3f2756eb"
+      "bytes": 110275,
+      "sha256": "272f88eec63bbf73881479c6eedc4beadb5618d044d9daa9014a2cbdcb5dec51"
     },
     {
       "name": "robotics-occupancy-map",

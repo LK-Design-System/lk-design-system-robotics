@@ -3,10 +3,10 @@
 | Field | Value |
 | --- | --- |
 | Type | Convention |
-| Status | Current |
-| Owner | Robotics domain engineering |
+| Status | Adopted upstream — 코어 `OverlayStatusChip`(lds-core 0.1.0-rc.2) 소비 중 |
+| Owner | Robotics domain engineering (구현 소유: LDS Core Status) |
 | Last reviewed | 2026-07-30 |
-| Source | `src/components/robotics/_OverlayStatusChip.jsx` (internal) · 업스트림 제안: `lk-design-system/docs/OVERLAY_STATUS_CHIP_PROPOSAL.md` |
+| Source | `@lk-robotics/lds-core/components/status/OverlayStatusChip` · 코어 가이드: `lk-design-system/docs/components/guides/core-components-status-overlay-status-chip.md` |
 
 상호작용 표면(제어 영역, 뷰어 프레임)이 **떠 있는 채로 비활성**일 때, 그 이유를
 표면 위에 얹어 말하는 알약형 상태 표시다. 업스트림 표현 규약의 "새 표현은
@@ -48,9 +48,10 @@
 - `ManualControlSession` — deadman 대기(`neutral`), 포커스 상실(`cautionary`).
   play 단언이 계약 1·2·3을 고정한다(`RoboticsManualControlSession.stories.jsx`).
 
-## 승격 경로
+## 승격 경로 (완료)
 
-내부 모듈(`_OverlayStatusChip.jsx`, 공개 export 아님) → 제품 근거 축적 →
-업스트림 제안 문서 심사 → 코어 `Status` 가족 편입 시 이 파일 삭제 후 코어
-import로 교체. 어두운 영상 위 변형(`VIEWER_OVERLAY` 스크림)은 소비처가 생기기
-전까지 만들지 않는다 — 확장 지점으로만 제안 문서에 기록한다.
+내부 모듈로 시작(2026-07-30) → 같은 날 업스트림 제안 심사·구현 → **lds-core
+0.1.0-rc.2로 편입 완료**. 내부 모듈은 삭제했고 소비처는 코어 import로
+교체됐다. 이 문서는 로보틱스 쪽 사용 규약(inert 밖 배치, 휴지=neutral)의
+기록으로 유지한다. 어두운 영상 위 변형(`VIEWER_OVERLAY` 스크림)은 여전히
+소비처가 생기기 전까지 만들지 않는다 — 코어 프롬프트의 의도적 제외 항목.

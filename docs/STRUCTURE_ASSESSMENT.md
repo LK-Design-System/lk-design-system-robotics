@@ -68,8 +68,13 @@ import하면 dist를, 컴포넌트가 상대경로로 import하면 src를 읽어
 
 | 항목 | 현재 상태 |
 | --- | --- |
-| `ViewerFrame` 200px min-height 미오버라이드 | 로보틱스에서 우회 불가, 좁은 합성에서 제약 |
-| 뷰어 위 표면 불투명도 이원화 | `ViewerToolbar` 94% vs 로보틱스 오버레이 킷(`_viewerOverlay`) 72%+blur — 한 프레임에서 어색하면 업스트림에서 통일 |
+| ~~`ViewerFrame` 200px min-height 미오버라이드~~ | 2026-07-30 재조사: 오기록. `Map2DCanvas`의 `minHeight: 200`은 소비자 `style` 스프레드보다 앞이라 `style={{minHeight}}`로 오버라이드 가능(고정 dist 동일). 부채 아님 |
+| ~~뷰어 위 표면 불투명도 이원화~~ | 2026-07-30 청산: 업스트림 `_viewerOverlaySurface.js`가 strong(94)/soft(72) 두 레벨을 한 소스로 정의, ViewerToolbar와 로보틱스 킷이 각자 레벨을 소비(lds-product 0.1.0-rc.2) |
+
+2026-07-30 릴리즈 사이클(코어·프로덕트 0.1.0-rc.2)로 업스트림 조율 부채가
+일괄 청산됐다: OverlayStatusChip 코어 편입(내부 모듈 삭제), Button
+`loading="inline"`(정지 버튼 채택), ConnectionBadge 절단 슬래시,
+StatusIndicator 채택(체크리스트 수제 행 대체), 오버레이 표면 단일 소스.
 
 ### 3. 산문과 계약의 이중 진실
 

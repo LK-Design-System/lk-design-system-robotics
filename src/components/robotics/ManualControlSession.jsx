@@ -6,7 +6,8 @@ import { EmptyState } from '@lk-robotics/lds-core/components/status/EmptyState';
 import { Spinner } from '@lk-robotics/lds-core/components/status/Spinner';
 import { Icon } from '@lk-robotics/lds-core/components/icon/Icon';
 import { ConnectionBadge } from '@lk-robotics/lds-product/components/robotics/ConnectionBadge';
-import { OverlayStatusChip } from './_OverlayStatusChip.jsx';
+import { OverlayStatusChip } from '@lk-robotics/lds-core/components/status/OverlayStatusChip';
+import { StatusIndicator } from '@lk-robotics/lds-core/components/content/StatusIndicator';
 
 const LINK_LABELS = {
   ready: '연결 준비됨',
@@ -125,12 +126,16 @@ const GUARD_TONE_ICONS = {
   signal: 'circle-info-fill',
 };
 
-/* Preflight checklist rows. "정상은 무채색": a met step earns a quiet grey
-   check; colour is reserved for the step that blocks arming. */
-const CHECKLIST_GLYPHS = {
-  met: { icon: 'check-thick', color: 'var(--color-semantic-label-alternative)' },
-  pending: { icon: 'hourglass', color: 'var(--color-semantic-status-cautionary)' },
-  failed: { icon: 'close-thick', color: 'var(--color-semantic-status-negative)' },
+/* Preflight checklist rows compose the core StatusIndicator — its guide owns
+   exactly this job ("live availability, connection, freshness signals": a
+   coloured dot plus a mandatory visible label). The hand-rolled check/hourglass
+   glyph rows predate the indicator shipping in a release Robotics could pin.
+   No pulse: `stale` is delayed data, not an actively-changing link, and the
+   guide reserves pulse for genuine in-flight transitions. */
+const CHECKLIST_TONES = {
+  met: 'positive',
+  pending: 'cautionary',
+  failed: 'negative',
 };
 
 function checklistStepState(met, pending) {
@@ -323,10 +328,11 @@ export function ManualControlSession({
     || displayStopState === 'acknowledged'
     || displayStopState === 'stopped';
   const stopRequestDisabled = !stopHasCallback || stopLifecycleBlocked;
-  /* In-flight states swap the block glyph for an hourglass and expose
-     aria-busy while staying focusable. Button's `loading` treatment is not
-     used here: it hides the label behind a spinner, and a stop control must
-     keep saying "정지 요청 중" in words for as long as the request is open. */
+  /* In-flight states use Button's label-preserving `loading="inline"` (added
+     upstream for exactly this control): spinner beside the words, danger
+     palette retained, aria-busy/aria-disabled + focus retention handled by
+     the Button contract. `stopped` stays a plain aria-disabled block — it is
+     terminal, not in flight. */
   const stopBusy = displayStopState === 'requesting' || displayStopState === 'acknowledged';
   const guardIcon = guard.icon ?? GUARD_TONE_ICONS[guard.tone] ?? 'circle-info-fill';
   /* A released enabling device is the resting state of a hold-to-run control,
@@ -423,13 +429,13 @@ export function ManualControlSession({
               variant="danger"
               size="md"
               disabled={!stopHasCallback}
-              aria-disabled={stopLifecycleBlocked || undefined}
+              loading={stopBusy ? 'inline' : false}
+              aria-disabled={(!stopBusy && stopLifecycleBlocked) || undefined}
               aria-label={STOP_BUTTON_LABELS[displayStopState] || stopRequestLabel}
-              aria-busy={stopBusy || undefined}
               aria-controls={statusId}
               onClick={requestStop}
             >
-              <Icon name={stopBusy ? 'hourglass' : 'circle-block'} size={18} aria-hidden="true" />
+              {!stopBusy && <Icon name="circle-block" size={18} aria-hidden="true" />}
               {STOP_BUTTON_LABELS[displayStopState] || stopRequestLabel}
             </Button>
           </div>
@@ -495,22 +501,18 @@ export function ManualControlSession({
                       margin: guard.message != null ? 'var(--space-3) auto 0' : '0 auto',
                     }}
                   >
-                    {preflightChecklist.map(({ step, label, state, detail }) => {
-                      const glyph = CHECKLIST_GLYPHS[state];
-                      return (
-                        <span
-                          key={step}
-                          data-checklist-step={step}
-                          data-checklist-state={state}
-                          style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)', minWidth: 0, fontSize: 'var(--label1-size)', lineHeight: 'var(--label1-line)', color: 'var(--color-semantic-label-neutral)' }}
-                        >
-                          <Icon name={glyph.icon} size={14} aria-hidden="true" style={{ color: glyph.color, flex: 'none' }} />
-                          <span style={{ fontWeight: 'var(--fw-semibold)', color: 'var(--color-semantic-label-normal)' }}>{label}</span>
-                          <span aria-hidden="true">·</span>
-                          <span style={{ overflowWrap: 'anywhere' }}>{detail}</span>
-                        </span>
-                      );
-                    })}
+                    {preflightChecklist.map(({ step, label, state, detail }) => (
+                      <StatusIndicator
+                        key={step}
+                        tone={CHECKLIST_TONES[state]}
+                        data-checklist-step={step}
+                        data-checklist-state={state}
+                      >
+                        <span style={{ fontWeight: 'var(--fw-semibold)', color: 'var(--color-semantic-label-normal)' }}>{label}</span>
+                        <span aria-hidden="true"> · </span>
+                        <span style={{ overflowWrap: 'anywhere' }}>{detail}</span>
+                      </StatusIndicator>
+                    ))}
                   </span>
                 )}
               </>
