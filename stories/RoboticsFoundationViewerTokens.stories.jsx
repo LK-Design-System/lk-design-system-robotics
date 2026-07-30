@@ -350,7 +350,12 @@ export const NarrowViewport = {
   ),
   render: () => (
     <div data-viewer-token-narrow style={{ width: 320, maxWidth: '100%' }}>
-      <ViewerTokenCatalog frameHeight={520} toneFrameHeight={640} />
+      {/* At 320px the tone swatches wrap into more rows than at documentation
+          width, so the frame has to be taller here than the 420 default. 640 left
+          the board 26px past the content box and clipped the last row. The extra
+          headroom past the measured 664 is deliberate: CI renders on Linux, where
+          different Korean font metrics can change the wrap count again. */}
+      <ViewerTokenCatalog frameHeight={520} toneFrameHeight={720} />
     </div>
   ),
   play: async ({ canvasElement }) => {

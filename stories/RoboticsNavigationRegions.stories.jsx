@@ -181,19 +181,30 @@ export const DarkPatternsAndStates = {
   },
   render: () => (
     <main style={{ width: 'min(100%, 720px)' }}>
+      {/* Four categories/states are the whole comparison, so the labels have to be
+          asked for - the disclosure default is `interaction` and only the selected
+          region named itself at rest. */}
       <RegionMap appearance="dark" label="다크 공간 영역 지도">
-        <SpatialRegion region={speedRegion} />
-        <SpatialRegion region={unknownTerrain} />
-        <SpatialRegion region={liftCabinRegion} selected stale />
+        <SpatialRegion region={speedRegion} labelVisibility="always" />
+        <SpatialRegion region={unknownTerrain} labelVisibility="always" />
+        <SpatialRegion region={liftCabinRegion} selected stale labelVisibility="always" />
         <SpatialRegion
           region={{
             ...liftCabinRegion,
             id: 'invalid-door-area',
             label: '출입문 A',
             kind: 'door-area',
-            shape: { kind: 'circle', center: { x: 420, y: 214 }, radius: 30 },
+            // Was centred at (420, 214), which put this circle inside the terrain
+            // band (x 88-412, y 178-254) and mashed the dot pattern into the
+            // contour pattern. It now sits right of the lift cabin (ends x 366) and
+            // above the slope (starts y 178). x is 411 rather than 424 because this
+            // story has no annotation layer to negotiate labels: at 424 the detail
+            // line ended 0.2px inside the panel edge, which Linux font metrics would
+            // turn into an overflow. y is 134 so its label band clears the lift's.
+            shape: { kind: 'circle', center: { x: 411, y: 134 }, radius: 30 },
           }}
           invalid
+          labelVisibility="always"
         />
       </RegionMap>
     </main>

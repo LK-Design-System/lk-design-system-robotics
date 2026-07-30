@@ -298,8 +298,15 @@ export const Overview = {
     const routePaths = [...map.querySelectorAll('[data-route-path]')];
     const routeStrokes = new Set(routePaths.map((path) => getComputedStyle(path).stroke));
     const routeWidths = new Set(routePaths.map((path) => path.getAttribute('stroke-width')));
+    // The plan identity tone is RouteOverlay's ROUTE_IDENTITY_TONE, built on
+    // --color-semantic-data-viz-series-5. This used to look for --viewer-route,
+    // which is not a token: it appears only in prose and in this assertion, is
+    // absent from the manifest's inheritedRuntimeCustomProperties, and is defined
+    // nowhere - so `var(--viewer-route, …)` would always fall back and the check
+    // could never pass. The intent (one identity tone, never a lifecycle tone,
+    // Lane's width and dash) is unchanged.
     if (
-      routePaths.some((path) => !path.getAttribute('stroke')?.includes('--viewer-route'))
+      routePaths.some((path) => !path.getAttribute('stroke')?.includes('--color-semantic-data-viz-series-5'))
       || routePaths.some((path) => /positive|warning|cautionary/.test(path.getAttribute('stroke') ?? ''))
       || routePaths.some((path) => path.getAttribute('stroke-dasharray') !== '4 6' || path.getAttribute('opacity') !== '1')
       || routeStrokes.size !== 1

@@ -117,9 +117,11 @@ exact identity without color. Trajectory remains geometrically distinct:
    state name stays in label/detail text. Direction is a sparse, separate cue
    for selected, zoomed, or editing contexts rather than a repeated dash shape.
 2. **Route** is the selected graph plan: the referenced Lane geometry is
-   removed from base topology paint and replaced by one 1.5px, `4 6` line in
-   `--viewer-route`. Segment phase, condition, and executor progress remain in
-   data and the detail panel; they do not alter the operational map stroke.
+   removed from base topology paint and replaced by one 1.5px, `4 6` line in the
+   plan identity tone (`RouteOverlay`'s `ROUTE_IDENTITY_TONE`, on
+   `--color-semantic-data-viz-series-5`). Segment phase, condition, and executor
+   progress remain in data and the detail panel; they do not alter the
+   operational map stroke.
 3. **Trajectory** is temporal telemetry: a stable 2.25px solid line punctuated
    by capped sample dots. Lifecycle state never changes its tone, dash, or
    width. A circular temporal cursor is opt-in for sample inspection, not for
@@ -132,8 +134,11 @@ Trajectory may deviate within a configured cross-track tolerance; RobotPose
 comes from localization and sits near the executable Trajectory. A large
 deviation is an explicit off-route exception, never a normal composition example.
 
-Route keeps one identity tone (`--viewer-route`), the Lane width/dash, and
-opacity across segment phases and conditions. Safety-critical blockage or
+Route keeps one identity tone (`ROUTE_IDENTITY_TONE`), the Lane width/dash, and
+opacity across segment phases and conditions. There is no `--viewer-route`
+viewer role: the identity tone is an upstream semantic token, not a runtime
+custom property the host overrides, so it is not in the manifest's
+`inheritedRuntimeCustomProperties`. Safety-critical blockage or
 conflict is surfaced by Lane availability, hazards, alerts, and the detail
 panel instead of fragmenting the selected plan line.
 

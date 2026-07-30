@@ -16,8 +16,12 @@
 | `lk-design-system` | `main` | `162bc0f2` | O |
 
 **CI는 지금 빨간불이다.** `check:storybook`이 `check:visual-regression`에서 죽는다.
-원인이 둘이고 §5에 적었다. 이번 커밋으로 고쳐지지 않는다 — 베이스라인 재생성은
-"지금 렌더가 정답"이라는 승인이라 사람이 판단할 일이다.
+원인이 셋이고 §5에 적었다 — 두 개는 베이스라인이 낡은 것이고 하나는 이번 작업의 의도된
+시각 변경이다. **베이스라인 재생성은 "지금 렌더가 정답"이라는 승인이라 사람이 판단할 일이다.**
+
+그 외 검사는 전부 통과한다: `types` · `lds-style` · `ownership` · `coordinates` ·
+`navigation-graph` · `navigation-encoding` · `representative-stories` · `story-play`(109/109) ·
+`build` · `pack`.
 
 ---
 
@@ -46,7 +50,8 @@
 `storybook-static`의 모든 story 엔트리(109개, `!test` 태그 0개)를 실제로 렌더하고 play를
 돌린다. 4-way 병렬로 26초.
 
-7건이 실패하고 `story-play-known-failures.json`에 고정돼 있다. §4.1이 그 목록이다.
+**현재 109/109 통과. `story-play-known-failures.json`은 비어 있다(count 0).**
+처음 돌렸을 때 7건이 실패했고 전부 수정했다 — 경위는 §4.
 
 ---
 
@@ -76,62 +81,63 @@ npm run check:story-play -- --update-known-failures      # 목록 재생성(리�
 
 ---
 
-## 4. 미해결 결함
+## 4. 결함 — 전부 수정됨
 
-### 4.1 play 실패 7건 (고정됨)
+기록해둔 11건을 모두 닫았다. **남은 미해결 결함은 없다.** 아래는 무엇이 원인이었는지의
+기록이고, 대부분이 세 가지 뿌리로 모인다.
 
-전부 `story-play-known-failures.json`에 있다. **1건은 Navigation 밖이다** — Navigation만
-훑던 스윕으로는 나오지 않았고, 전수로 돌려서 나왔다.
+### 4.1 뿌리 1 — 라벨 기본값이 `interaction`이다 (5건)
 
-| 스토리 | 단언 |
-| --- | --- |
-| `foundation-viewer-tokens--narrow-viewport` | 320px에서 상태 톤 보드가 26px 세로로 잘림 |
-| `navigation-annotation-layer--no-provider-baseline` | 기준 door 라벨 미렌더 |
-| `navigation-hazard-marker--narrow-viewport` | 긴 라벨이 마커에서 떨어짐 |
-| `navigation-path-system--overview` | Route가 Lane과 같은 1.5px `4 6` 선이 아님 |
-| `navigation-path-system-lane--lane-short-path-compound-states` | 짧은 경로 픽스처가 더는 압박을 안 줌 |
-| `navigation-path-system-shared-rules--narrow-viewport` | 320px에서 방향 큐 카탈로그 넘침 |
-| `navigation-waypoint--light-and-dark` | 포커스 사각형이 라벨과 -73.91px(겹침) |
+`labelVisibility` 기본값이 `interaction`이라 hover/focus/selected 없이는 라벨이 아예 안
+뜬다([`_navigationAnnotations.js:30,44`](../src/components/robotics/_navigationAnnotations.js)).
+"N가지를 비교하라"가 본론인 명세 스토리들이 정작 무엇이 무엇인지 못 보여주고 있었고,
+라벨 존재를 단언하는 play는 그대로 실패했다.
 
-마지막 항목 주의: 이 스토리는 `8800180` 기준선에서도 실패했지만 **메시지가 달랐다**
-("compact text anatomy is incomplete"). `ecd9a00`의 `NAV_LABEL_TYPE` 변경이 앞 단언을
-통과시키고 뒤 단언을 노출시킨 것인지, 새로 만든 것인지 **아직 안 갈랐다.**
-이 한 건은 귀속 미확정이다.
-
-### 4.2 라벨이 하나만 뜸 — 2개 스토리 남음
-
-| 스토리 | 개체 | 라벨 |
+| 스토리 | 증상 | 처방 |
 | --- | --- | --- |
-| `regions--dark-patterns-and-states` | 4 | 1 |
-| `path-system-trajectory--statuses` | 3 | 0 |
+| `path-system-lane--lane-states-and-constraints` | 폐쇄/충돌이 라벨 없이 동일 픽셀 | `labelVisibility="always"` |
+| `regions--dark-patterns-and-states` | 4개 중 1개만 이름 | 같음 |
+| `path-system-trajectory--statuses` | 3개 다 이름 없음(eyebrow는 셋 다 TRAJECTORY) | 같음 |
+| `hazard-marker--narrow-viewport` | 긴 라벨이 주제인데 라벨이 없음 | 같음 |
+| `annotation-layer--no-provider-baseline` | layer를 빼니 라벨 요청도 같이 빠짐 | 픽스처에 disclosure 인자 추가 |
 
-전부 "N가지를 비교하라"가 본론인데 무엇이 무엇인지 알 수 없다. 라벨 정책 기본값이
-`interaction`이라 hover/focus/selected 없이는 뜨지 않는다
-([`_navigationAnnotations.js:30,44`](../src/components/robotics/_navigationAnnotations.js)).
+**`selected`로 드러내지 말 것.** 선택은 굵기를 바꾼다(Lane casing 4→6·core 1.5→3) —
+정작 보여줘야 할 기본 두께가 사라진다. `facility-transition--facility-transition-overview`
+한 곳만 `selected`를 쓰는데(`ecd9a00`) 거기는 선택 자체가 주제라 괜찮다.
 
-**처방 두 가지가 다 검증됐다.** `facility-transition--facility-transition-overview`는
-각 개체에 `selected`를 줘서 해결했고(`ecd9a00`), Lane 상태 스토리는
-`labelVisibility="always"`로 해결했다(7-30). **Lane 계열에는 후자가 맞다** — `selected`는
-casing 4→6·core 1.5→3으로 굵어져서 정작 보여줘야 할 기본 선 두께가 사라진다.
+### 4.2 뿌리 2 — 단언이 실물과 어긋나 있었다 (3건)
 
-### 4.3 Trajectory 다크 카드 하단 절반이 빔
+- **`path-system--overview`**: `--viewer-route`를 찾는데 그 토큰은 존재하지 않는다(산문 2곳
+  + 이 단언에만 있고 정의가 없다). 실제 톤은 `RouteOverlay`의 `ROUTE_IDENTITY_TONE`
+  (`--color-semantic-data-viz-series-5`)이고 매니페스트에도 그것만 있다. 단언과 규약 문서를
+  실물에 맞췄다.
+- **`waypoint--light-and-dark`**: `label.left - focus.right`로 재서, 라벨이 반대쪽으로
+  뒤집히면 -73.91px 같은 값이 나왔다. 실제 여유는 2.61px(3px 미달)이었다. 양쪽·양축을 보는
+  side-agnostic 측정으로 바꾸고, 픽스처를 패널 안쪽으로 옮겨 뒤집힘 자체를 없앴다.
+- **`lane-short-path-compound-states`**: "경로가 glyph 행보다 짧아야 한다"는 노후화 감지
+  단언이 제대로 작동한 것. availability/conflict가 점 뱃지를 잃어 행이 2개(32px)로 줄면서
+  56단위 경로(35.2px)가 더 넓어졌다. 경로를 42단위로 줄였다.
 
-`path-system-trajectory--statuses` — 카드 ~420px에 지도 ~220px. 어두운 배경이라 빈 공간이
-특히 두드러진다.
+### 4.3 뿌리 3 — 고정 크기가 폭에 따라 안 맞는다 (3건)
 
-### 4.4 Regions — 오류 영역이 경사면 영역과 겹침
+- **`shared-rules--narrow-viewport`**: `minmax(72px…) minmax(110px…) minmax(160px…)` + gap
+  = 366px 하한이 320px를 63px 넘겼다. 레포 관용구인
+  `repeat(auto-fit, minmax(min(200px, 100%), 1fr))`로 교체.
+- **`foundation-viewer-tokens--narrow-viewport`**: 320px에서 스와치가 더 감겨 보드가
+  26px 잘렸다. `toneFrameHeight` 640 → 720(Linux 폰트 메트릭 여유 포함).
+- **`path-system-trajectory--statuses`**: 3열에서 540폭 지도가 ~152px로 축소되는데 카드는
+  270px 고정이라 아래 절반이 비었다. `PathMap`에 옵트인 `aspectRatio`를 추가하고 2열로
+  바꿨다. **`height: 'auto'`만 주면 안 된다** — ViewerFrame의 200px 하한이 카드 높이가 되고
+  240px 지도가 넘쳐 스케일바가 잘린다.
 
-`regions--dark-patterns-and-states`의 `invalid-door-area`(center 420,214 r30)가
-`slopeRegion`(x 88–412, y 178–254)과 겹쳐 두 패턴이 뭉갠다. 픽스처 좌표 문제.
+### 4.4 그 외 2건
 
-### 4.5 Hazard — 선택 표시가 4px 차이뿐
-
-`기본` 35×42 → `선택됨` 39×47 (`NAV_SELECTION.pinScale` 1.12). 지도 위에 흩어져 있으면
-비교 대상이 없어 구분 불가.
-
-`SpatialRegion`은 선택 시 외곽선 1.5→3.5, `LaneOverlay`는 casing 확대인데 Hazard만 배율이다.
-**다만 severity 이중 윤곽과 충돌한다** — 선택에도 테두리를 쓰면 `위험 + 선택됨`이 삼중
-윤곽이 된다. 배율을 키우는 쪽(1.12 → 1.25)이 덜 충돌한다.
+- **Regions 패턴 뭉갬**: `invalid-door-area`가 지형 밴드(x 88–412, y 178–254) 안에 있었다.
+  (411, 134)로 옮겼다 — x가 424가 아닌 이유는 이 스토리에 annotation layer가 없어서
+  424에서는 상세 줄이 패널 경계 안쪽 0.2px에 걸렸기 때문이다.
+- **Hazard 선택 4px**: `NAV_SELECTION.pinScale` 1.12 → 1.25(`waypointScale`과 동일).
+  Hazard는 외곽선을 severity에 이미 쓰므로 선택에 테두리를 더하면 삼중 윤곽이 된다.
+  하드코딩돼 있던 `"1.12"` 단언 4곳도 상수 참조로 바꿨다.
 
 ---
 
@@ -143,6 +149,7 @@ casing 4→6·core 1.5→3으로 굵어져서 정작 보여줘야 할 기본 선
 | --- | --- |
 | `smoke-linux`(**CI가 실제로 쓰는 세트**)에 현재 타깃 4개 중 3개가 없다. 37개가 옛 이름(`robotics-viewer-map` 등)으로 남아 있고 `robotics-navigation-viewer`, `-narrow`, `robotics-occupancy-map`이 전부 부재 → Linux에서 `Missing visual baseline`으로 죽는다 | `8800180` 이후 **이전부터** |
 | `smoke`(Windows) `robotics-navigation-viewer` 치수 불일치 1180×1501 → 1133 | **`ecd9a00`** — 그 스토리를 66줄, `Stage.shared`를 148줄 고치고 베이스라인을 안 돌렸다 |
+| `atom-facility-lift-marker` 7.37% / `@8x` 18.10% 차이 | **§4.4의 `pinScale` 1.12 → 1.25** — 의도된 변경이다. 이 atom은 lift 전이가 **선택된** 스토리에서 잘라내므로 핀이 커진 만큼 달라진다. 같은 스토리의 `atom-facility-door-marker`와 `atom-waypoint-point`는 0.000%로 무변화 |
 
 `capture-visual-smoke.mjs`는 `platform === 'linux' ? 'smoke-linux' : 'smoke'`로 세트를
 고른다. 그래서 Windows에서 로컬로 고쳐도 CI는 안 고쳐진다. `smoke-linux`는
@@ -208,6 +215,22 @@ import해서 전부 404가 났다. 되는 방법은 **본 레포에서 `git stas
 (텍스트 위치가 두 번 연속 같아질 때까지), dev 서버 재컴파일은 별개다. 결과가 이상하면 한 번
 더 돌려라.
 
+**어휘 상수를 고치면 스토리와 컴포넌트가 서로 다른 값을 본다.** 컴포넌트는
+`../src/index.js`(상대 경로)로 들어오지만 스토리가 쓰는
+`@lk-robotics/lds-robotics-ui/components/robotics/_navigationVocabulary`는 `exports` 맵을 타고
+**`dist/`로 간다.** `pinScale`을 src에서 1.25로 바꿨더니 컴포넌트는 1.25를 렌더하고 단언은
+1.12를 기대해서 실패했다. `npm run build`로도 부족하다 — dev 서버가 그 패키지를 사전 번들해
+캐시하므로 **`build:storybook` 후 `storybook-static`에 대고 검증**해야 한다. CI는
+`npm run check`(build 포함)를 `check:storybook`보다 먼저 돌려서 자연히 일관된다.
+
+**하드코딩된 상수 리터럴을 단언에 쓰지 마라.** `"1.12"`가 단언 4곳과 산문 3곳에 박혀 있어
+값을 못 건드리는 상태였다. `RoboticsNavigationWaypoint.stories.jsx`가 하던 대로
+`NAV_SELECTION`을 import해 템플릿으로 쓰면 드리프트가 안 생긴다.
+
+**`annotation-layer--overview`의 hover 단언은 flaky하다.** 3회 중 1회
+"Hover must reveal only the inspected waypoint label: 0/3"으로 떨어진다. 내 변경과 무관하며
+(hover 시뮬레이션 경합) 아직 안 고쳤다. `check:story-play`가 CI에서 간헐 실패하면 여기다.
+
 ---
 
 ## 7. 도구
@@ -253,13 +276,11 @@ npm run check:storybook    # + representative-stories, story-play, visual-regres
 
 ## 9. 다음 순서 제안
 
-1. **§5 베이스라인** — CI가 빨간불인 채로는 다른 어떤 검사도 신호를 못 준다.
-   `smoke-linux`는 `workflow_dispatch`로만 만들어진다는 점에 주의.
-2. **§4.1 play 실패 7건** — 이제 래칫이 지키고 있으니 하나 고칠 때마다
-   `story-play-known-failures.json`에서 그 줄을 지워야 통과한다.
-   `waypoint--light-and-dark`는 귀속부터 가릴 것.
-3. **§4.2 라벨 부재 2건** — 처방이 검증돼 있어 빠르다. Lane 계열은 `labelVisibility`,
-   그 외는 `selected`.
-4. **§4.3~4.5** — 픽스처·배율 조정.
-5. **나머지 33개 시각 검토** — `상호작용` 계열과 `320px` 계열이 남았다. play가 잡는 것은
-   단언이 걸린 것뿐이고, 색 위계·문구·빈 공간은 여전히 사람이 봐야 나온다.
+1. **§5 베이스라인** — 이제 유일한 빨간불이고, 이게 빨간 동안은 다른 시각 회귀를 못 잡는다.
+   `smoke-linux`는 `workflow_dispatch`(`update_visual_baseline: true`)로만 만들어진다.
+   `atom-facility-lift-marker` 하나는 이번 작업의 의도된 변경이라 승인 대상이다.
+2. **`annotation-layer--overview` hover flake** — §6 마지막 항목. CI 간헐 실패의 원인이 된다.
+3. **나머지 33개 시각 검토** — `상호작용` 계열과 `320px` 계열이 남았다. 결함 목록이 비었으니
+   다음 신호는 여기서 나온다. play가 잡는 것은 단언이 걸린 것뿐이고, 색 위계·문구·빈 공간은
+   여전히 사람이 봐야 나온다. 이번에 고친 11건 중 **자동 검증이 스스로 찾아낸 것은 7건**이고
+   나머지 4건은 사람이 봐서 나왔다 — 그 비율이 33개에도 그대로 적용될 것이다.

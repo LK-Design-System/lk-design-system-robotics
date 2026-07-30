@@ -138,6 +138,12 @@ export function PathMap({
   testId,
   eyebrow = 'ROUTE · L1',
   annotationDetailMode,
+  // Opt-in ratio sizing. The default fixed `height` is only correct at one column
+  // width: the SVG scales with the column, so a card in a multi-column grid ends
+  // up either padded with dead space or overflowed. Pass `aspectRatio` (e.g.
+  // '540 / 250') to let the card track the map instead. ViewerFrame still floors
+  // the card at 200px, which the pinned lds-product build owns.
+  aspectRatio,
 }) {
   const svgRef = React.useRef(null);
   const [cssViewBoxScale, setCssViewBoxScale] = React.useState(1);
@@ -179,7 +185,9 @@ export function PathMap({
       grid={false}
       defaultViewport={{ x: 0, y: 0, z: 1 }}
       data-testid={testId}
-      style={{ width: '100%', minWidth: 0, height }}
+      style={aspectRatio
+        ? { width: '100%', minWidth: 0, height: 'auto', aspectRatio }
+        : { width: '100%', minWidth: 0, height }}
     >
       <svg
         ref={svgRef}

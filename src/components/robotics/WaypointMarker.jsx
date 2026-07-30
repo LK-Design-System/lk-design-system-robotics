@@ -292,6 +292,15 @@ export function WaypointMarker({
           browser's rectangular outline. A surface-colored contrast underlay
           makes the focus indicator survive both light/dark maps and separates
           it from selection without introducing a dashed interaction state.
+
+          The shell is deliberately NOT an annotation obstacle even though it
+          scales the point's silhouette out past the registered 20px point.
+          Registering it does buy a focused marker's own label more room, but the
+          obstacle list is global and unscoped, so it also pushes other entities'
+          labels - it displaced the danger label in label-suppression-priority,
+          where the contract is that the highest-priority label keeps its natural
+          position. Fixture placement is the cheaper lever: a label only crowds
+          this shell once the solver has flipped it to escape the panel edge.
         */}
         {focusVisible && (
           <>

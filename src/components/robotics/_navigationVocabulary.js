@@ -70,7 +70,12 @@ export const NAV_FOCUS = {
 export const NAV_SELECTION = {
   waypointScale: 1.25,
   robotPoseScale: 1.15,
-  pinScale: 1.12,
+  // Pins were the weakest selection cue in the set at 1.12: on a 35x42 pin that
+  // is a 4x5px delta, and a marker alone on a map has nothing to compare against.
+  // Scale is the only channel available here - Hazard already spends its outline
+  // on severity, so a selection border would make `danger + selected` a triple
+  // edge. Matched to waypointScale instead of inventing a fourth number.
+  pinScale: 1.25,
   regionStrokeWidth: 3.5,
   /** Region outline below selection: hover lifts the edge, rest sits quiet. */
   regionHoverStrokeWidth: 2,

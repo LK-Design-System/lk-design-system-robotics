@@ -38,7 +38,13 @@ function DecisionRow({ role, lineRole, defaultCue, exception }) {
       data-cue-decision={role.toLowerCase()}
       style={{
         display: 'grid',
-        gridTemplateColumns: 'minmax(72px, 0.7fr) minmax(110px, 1fr) minmax(160px, 1.8fr)',
+        // The fixed minima used to be 72+110+160 plus two 12px gaps - a hard 366px
+        // floor that overran the 320px fixture by 63px. `min(…, 100%)` lets the
+        // track shrink below its own minimum once the container is narrower, so
+        // auto-fit drops to the single column this story says it wants, and still
+        // lays out three tracks at documentation width. Same idiom as
+        // RoboticsFleetOverview.
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))',
         gap: 12,
         alignItems: 'start',
         padding: '10px 0',

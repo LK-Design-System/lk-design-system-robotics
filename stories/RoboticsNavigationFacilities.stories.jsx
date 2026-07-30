@@ -2,6 +2,7 @@ import React from 'react';
 import { userEvent, waitFor } from 'storybook/test';
 import { Map2DCanvas } from '@lk-robotics/lds-product';
 import { FacilityTransition, NavigationAnnotationLayer, SpatialRegion } from '../src/index.js';
+import { NAV_SELECTION } from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationVocabulary';
 import { NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { assertNoLabelCollisions } from './RoboticsNavigationCollision.shared.jsx';
@@ -203,7 +204,9 @@ export const FacilityTransitionOverview = {
     if (!name.includes('접근')) {
       throw new Error(`Lift overview endpoint must keep its accessible identity: ${name}`);
     }
-    if (!from.querySelector('[data-transition-selected-scale="1.12"]')) throw new Error('Selected lift transition requires a 1.12x pin-body enlargement.');
+    if (!from.querySelector(`[data-transition-selected-scale="${NAV_SELECTION.pinScale}"]`)) {
+      throw new Error(`Selected lift transition requires a ${NAV_SELECTION.pinScale}x pin-body enlargement.`);
+    }
   },
 };
 
@@ -293,7 +296,7 @@ const compoundStateDock = {
 export const ValidationAndFocusStates = {
   name: '변형·상태 · 선택·포커스·오류·지연',
   parameters: storyDescription(
-    '수동 설비 전이에 선택·포커스·오류·지연이 동시에 적용된 상황입니다. 선택은 핀 본체의 1.12배 정적 확대, 포커스는 surface 대비층을 둔 바깥 outline이며, 데이터 상태 glyph와 접근 가능한 이름·aria-invalid가 같은 정보를 제공해야 합니다.',
+    '수동 설비 전이에 선택·포커스·오류·지연이 동시에 적용된 상황입니다. 선택은 핀 본체의 1.25배 정적 확대, 포커스는 surface 대비층을 둔 바깥 outline이며, 데이터 상태 glyph와 접근 가능한 이름·aria-invalid가 같은 정보를 제공해야 합니다.',
   ),
   render: () => (
     <main style={{ width: 'min(100%, 520px)' }}>
@@ -324,7 +327,7 @@ export const ValidationAndFocusStates = {
       if (!name.includes(state)) throw new Error(`Accessible name is missing the visible state: ${state}.`);
     }
     for (const selector of [
-      '[data-transition-selected-scale="1.12"]',
+      `[data-transition-selected-scale="${NAV_SELECTION.pinScale}"]`,
       '[data-transition-focus-contrast]',
       '[data-transition-focus-ring]',
       '[data-transition-invalid-mark]',

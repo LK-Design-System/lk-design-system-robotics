@@ -319,15 +319,29 @@ export const Statuses = {
       description="계획됨·대기·차단·재계산·완료는 같은 실선을 사용하므로 라벨·상세 정보에서만 구분합니다. 지도에서는 실제로 모양이 다른 정상, 오류, 오래됨 세 가지만 비교하며 invalid와 stale이 겹치면 오류가 우선합니다."
       maxWidth={1120}
     >
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', gap: 'var(--space-4)', minWidth: 0 }}>
+      {/* Two-up, not three. ViewerFrame carries a 200px min-height from the pinned
+          lds-product build, so a column narrow enough for three cards scaled the
+          540-wide map down to ~152px and left a quarter of every dark card empty
+          under it. At two columns the map renders ~241px and fills the frame. */}
+      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(480px, 100%), 1fr))', gap: 'var(--space-4)', minWidth: 0 }}>
         {TRAJECTORY_QUALITY_ROWS.map(({ quality, label, trajectory, invalid, stale }) => (
-          <PathMap key={quality} appearance="dark" label={`${label} trajectory 지도`} eyebrow="TRAJECTORY">
+          // Ratio-sized rather than PathMap's fixed 270px: the SVG scales with the
+          // column, so a fixed height left a dark empty half under every map here.
+          // Bare `height: auto` is not the fix - ViewerFrame's 200px floor then
+          // becomes the card height and the 240px map overflows it, clipping the
+          // scale bar. Matching the map's own 540/250 makes the card track it.
+          <PathMap key={quality} appearance="dark" label={`${label} trajectory 지도`} eyebrow="TRAJECTORY" aspectRatio="540 / 250">
             {(cssViewBoxScale) => (
               <TrajectoryOverlay
                 trajectory={trajectory}
                 viewportScale={cssViewBoxScale}
                 invalid={invalid}
                 stale={stale}
+                // Three cards that all say TRAJECTORY in the eyebrow and carry no
+                // other visible discriminator: the trajectory labels (정상/오류/
+                // 오래된 궤적) are the only thing that names which is which, and
+                // the disclosure default kept all three hidden.
+                labelVisibility="always"
               />
             )}
           </PathMap>

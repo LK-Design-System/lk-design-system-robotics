@@ -152,13 +152,19 @@ const LIST_DOOR = {
   to: { mapId: 'L1', position: { x: 216, y: 70 }, label: '목록 소유 출구', doorId: 'door-list' },
 };
 
-function collisionFixtures(viewportScale) {
+// `disclosure` exists for the no-provider baseline. The coordinated story gets
+// labelVisibility from its NavigationAnnotationLayer, so removing the layer also
+// removed the label request and the baseline rendered no labels at all - it could
+// not show the natural collision it exists to show. The baseline now asks for the
+// same labels directly, so the only difference between the two stories is
+// coordination.
+function collisionFixtures(viewportScale, disclosure = {}) {
   return (
     <>
-      <FacilityTransition transition={EAST_DOOR} activeMapId="L1" viewportScale={viewportScale} onActivate={() => {}} />
-      <FacilityTransition transition={LIST_DOOR} activeMapId="L1" viewportScale={viewportScale} onActivate={() => {}} />
-      <RouteOverlay route={SHORT_ROUTE} activeMapId="L1" viewportScale={viewportScale} invalid stale />
-      <TrajectoryOverlay trajectory={SHORT_TRAJECTORY} viewportScale={viewportScale} invalid stale />
+      <FacilityTransition transition={EAST_DOOR} activeMapId="L1" viewportScale={viewportScale} onActivate={() => {}} {...disclosure} />
+      <FacilityTransition transition={LIST_DOOR} activeMapId="L1" viewportScale={viewportScale} onActivate={() => {}} {...disclosure} />
+      <RouteOverlay route={SHORT_ROUTE} activeMapId="L1" viewportScale={viewportScale} invalid stale {...disclosure} />
+      <TrajectoryOverlay trajectory={SHORT_TRAJECTORY} viewportScale={viewportScale} invalid stale {...disclosure} />
     </>
   );
 }
@@ -569,7 +575,10 @@ export const NoProviderBaseline = {
   render: () => (
     <main style={{ display: 'grid', gap: 'var(--space-4)', width: '100%', maxWidth: 720 }}>
       <AnnotationMap label="provider 없는 기준선 지도" testId="annotation-baseline-map">
-        {({ viewportScale }) => collisionFixtures(viewportScale)}
+        {({ viewportScale }) => collisionFixtures(viewportScale, {
+          labelVisibility: 'always',
+          detailVisibility: 'always',
+        })}
       </AnnotationMap>
     </main>
   ),

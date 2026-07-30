@@ -10,7 +10,7 @@ import { storyDescription } from './StoryGuide.shared.jsx';
 // what is deliberately NOT a pin. Rendered from production components — the
 // catalog IS the atom in context — and the play asserts the hazard marker
 // consumes NAV_PIN.path. Focus traces the silhouette at scale 1.34; selection
-// enlarges the complete pin body to 1.12 without recoloring it.
+// enlarges the complete pin body to NAV_SELECTION.pinScale without recoloring it.
 const STAGE = 'stage';
 
 const INK = 'var(--color-semantic-label-strong)';

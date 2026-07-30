@@ -558,7 +558,12 @@ const SHORT_PATH_COMPOUND_LANE = {
   ...BASE_LANE,
   id: 'lane-short-compound',
   label: '짧은 복합 상태 레인',
-  points: [{ x: 232, y: 126 }, { x: 288, y: 126 }],
+  // The path must render NARROWER than the state glyph row, or this fixture stops
+  // stressing anything and its play function says so. The row shrank when
+  // availability/conflict lost their point badges: it is now just invalid+stale,
+  // two 14px glyphs at ±9, so 32px screen. At 56 units the path measured 35.2px
+  // and had quietly become the wider of the two. 42 units lands near 26px.
+  points: [{ x: 232, y: 126 }, { x: 274, y: 126 }],
   entry: { waypointId: 'S' },
   exit: { waypointId: 'E' },
   relation: { kind: 'single' },

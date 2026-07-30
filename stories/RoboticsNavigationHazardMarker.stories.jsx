@@ -1,5 +1,6 @@
 import React from 'react';
 import { HazardMarker } from '../src/index.js';
+import { NAV_SELECTION } from '@lk-robotics/lds-robotics-ui/components/robotics/_navigationVocabulary';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { assertContrastBackedFocus } from './RoboticsNavigationAssert.shared.jsx';
 
@@ -198,7 +199,7 @@ export const Overview = {
 export const States = {
   name: '변형·상태 · 선택·포커스·비활성',
   parameters: storyDescription(
-    '같은 계단 위험물이 선택·포커스·비활성 상태로 바뀔 때의 표기입니다. 선택은 severity 색을 유지한 핀 본체의 1.12배 정적 확대, 키보드 포커스는 surface 대비층을 둔 바깥 outline으로 분리합니다.',
+    '같은 계단 위험물이 선택·포커스·비활성 상태로 바뀔 때의 표기입니다. 선택은 severity 색을 유지한 핀 본체의 1.25배 정적 확대, 키보드 포커스는 surface 대비층을 둔 바깥 outline으로 분리합니다.',
   ),
   render: () => {
     const states = [
@@ -230,7 +231,10 @@ export const States = {
     if (base.querySelector('[data-hazard-selected-scale], [data-hazard-focus-ring], [data-hazard-focus-contrast]')) {
       throw new Error('The base hazard must not render selection enlargement or focus outline.');
     }
-    if (!selected.querySelector('[data-hazard-selected-scale="1.12"]') || selected.querySelector('[data-hazard-focus-ring]')) {
+    // Read the scale off the vocabulary rather than hardcoding it: the literal
+    // 1.12 was pinned in four assertions and three prose lines, so the value could
+    // not be tuned without hunting them all down.
+    if (!selected.querySelector(`[data-hazard-selected-scale="${NAV_SELECTION.pinScale}"]`) || selected.querySelector('[data-hazard-focus-ring]')) {
       throw new Error('A selected hazard must enlarge only its severity-preserving pin body.');
     }
     if (
@@ -276,7 +280,10 @@ export const NarrowViewport = {
         aria-label="320px 좁은 지도 안의 계단 위험물"
         role="img"
       >
-        <HazardMarker hazard={{ ...NARROW_HAZARD, position: at(36, 44) }} />
+        {/* The long label is the subject here, so it has to be asked for: the
+            disclosure default is `interaction`, which meant nothing rendered at
+            rest and the overflow check had no label to measure. */}
+        <HazardMarker hazard={{ ...NARROW_HAZARD, position: at(36, 44) }} labelVisibility="always" />
       </svg>
     </main>
   ),
