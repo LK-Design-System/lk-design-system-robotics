@@ -365,6 +365,23 @@ export function RobotPoseMarker({
           }
           style={{ transform: `scale(${visualScale})` }}
         >
+          {/* Absolute selection cue behind the body — see NAV_SELECTION.seat. */}
+          {selected && (
+            <>
+              <circle
+                data-robot-pose-selection-seat-rim=""
+                r={BODY_RADIUS + NAV_SELECTION.seat.margin + NAV_SELECTION.seat.borderWidth}
+                fill={NAV_SELECTION.seat.rim}
+                pointerEvents="none"
+              />
+              <circle
+                data-robot-pose-selection-seat=""
+                r={BODY_RADIUS + NAV_SELECTION.seat.margin}
+                fill={NAV_SELECTION.seat.fill}
+                pointerEvents="none"
+              />
+            </>
+          )}
           <circle
             data-robot-pose-shadow=""
             cx="0"

@@ -228,14 +228,19 @@ export const States = {
     if (!base || !selected || !focused || !disabled) {
       throw new Error('The hazard state matrix must render base, selected, focused, and disabled fixtures.');
     }
-    if (base.querySelector('[data-hazard-selected-scale], [data-hazard-focus-ring], [data-hazard-focus-contrast]')) {
-      throw new Error('The base hazard must not render selection enlargement or focus outline.');
+    if (base.querySelector('[data-hazard-selected-scale], [data-hazard-selection-seat], [data-hazard-focus-ring], [data-hazard-focus-contrast]')) {
+      throw new Error('The base hazard must not render selection enlargement, a seat, or focus outline.');
     }
     // Read the scale off the vocabulary rather than hardcoding it: the literal
     // 1.12 was pinned in four assertions and three prose lines, so the value could
     // not be tuned without hunting them all down.
     if (!selected.querySelector(`[data-hazard-selected-scale="${NAV_SELECTION.pinScale}"]`) || selected.querySelector('[data-hazard-focus-ring]')) {
       throw new Error('A selected hazard must enlarge only its severity-preserving pin body.');
+    }
+    // Scale is relative; the seat is the absolute cue a lone selected marker
+    // depends on. Both layers, behind the pin, never touching its edges.
+    if (!selected.querySelector('[data-hazard-selection-seat]') || !selected.querySelector('[data-hazard-selection-seat-rim]')) {
+      throw new Error('A selected hazard must render its selection seat behind the pin.');
     }
     if (
       focused.getAttribute('data-focused') !== 'true'

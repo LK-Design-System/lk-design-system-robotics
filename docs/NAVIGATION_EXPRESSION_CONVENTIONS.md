@@ -116,6 +116,12 @@ exact identity without color. Trajectory remains geometrically distinct:
    is neutral, closed/conflict is danger, and unknown is warning. The exact
    state name stays in label/detail text. Direction is a sparse, separate cue
    for selected, zoomed, or editing contexts rather than a repeated dash shape.
+   Because closed and conflict share the danger tone, **the at-rest distinction
+   between them is owned by a conflict-point marker**, not by the lane paint: a
+   conflict is an event with a coordinate, so the hazard vocabulary's collision
+   pin (kind `obstacle`, severity by classification) is placed at the contention
+   point. This is the concrete form of "surfaced by hazards, alerts, and the
+   detail panel" below — the lane keeps one dash and one tone.
 2. **Route** is the selected graph plan: the referenced Lane geometry is
    removed from base topology paint and replaced by one 1.5px, `4 6` line in the
    plan identity tone (`RouteOverlay`'s `ROUTE_IDENTITY_TONE`, on
@@ -180,11 +186,20 @@ Each renderer chooses the smallest cue its geometry can carry:
 
 | Geometry | Selection | Keyboard focus |
 | --- | --- | --- |
-| Waypoint rounded square | static 1.25× enlargement from 20px to 25px; availability fill is unchanged and the solid badge stays fixed | one silhouette shell made from a surface contrast underlay + `--color-semantic-focus-indicator` |
-| Robot pose | static 1.15× body enlargement; exception glyph stays fixed | one outer high-contrast double ring |
-| Facility / hazard pin | static 1.12× body enlargement; facility/severity fill and the status badge stay unchanged | outer contrast-backed silhouette ring |
+| Waypoint rounded square | static 1.25× enlargement + selection seat; availability fill is unchanged and the solid badge stays fixed | one silhouette shell made from a surface contrast underlay + `--color-semantic-focus-indicator` |
+| Robot pose | static 1.25× body enlargement + selection seat; exception glyph stays fixed | one outer high-contrast double ring |
+| Facility / hazard pin | static 1.25× body enlargement + selection seat; facility/severity fill and the status badge stay unchanged | outer contrast-backed silhouette ring |
 | Region | wider semantic-color boundary; pattern and category tint remain unchanged | wider focus outline |
 | Lane / route / trajectory | wider semantic-color core plus neutral casing | wider solid focus halo under the status path |
+
+Every point marker uses **one selection scale (1.25×)** and one **selection
+seat**: the marker's own silhouette re-drawn behind it as a
+`--viewer-surface-elevated` die-cut matte with a hairline `--viewer-border` rim
+(`NAV_SELECTION.seat`). Scale is a relative cue — obvious beside an unselected
+sibling, invisible on a marker alone on a map — so the seat carries the absolute
+"this one is selected" reading. It sits behind the silhouette, which is why it
+can coexist with the hazard severity double edge (no third coloured outline) and
+with the blue focus shell (different colour, different layer).
 
 Compact markers never stack status badges. The waypoint is the strictest case:
 

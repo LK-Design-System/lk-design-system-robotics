@@ -424,6 +424,29 @@ export function FacilityTransition({
           data-transition-selected-scale={selected ? NAV_SELECTION.pinScale : undefined}
           style={{ transform: `scale(${selected ? NAV_SELECTION.pinScale : 1})` }}
         >
+          {/* Absolute selection cue behind the pin — see NAV_SELECTION.seat. */}
+          {selected && (
+            <>
+              <path
+                data-transition-selection-seat-rim=""
+                d={PIN_PATH}
+                fill={NAV_SELECTION.seat.rim}
+                stroke={NAV_SELECTION.seat.rim}
+                strokeWidth={(NAV_SELECTION.seat.margin + NAV_SELECTION.seat.borderWidth) * 2}
+                strokeLinejoin="round"
+                pointerEvents="none"
+              />
+              <path
+                data-transition-selection-seat=""
+                d={PIN_PATH}
+                fill={NAV_SELECTION.seat.fill}
+                stroke={NAV_SELECTION.seat.fill}
+                strokeWidth={NAV_SELECTION.seat.margin * 2}
+                strokeLinejoin="round"
+                pointerEvents="none"
+              />
+            </>
+          )}
           <path d={PIN_PATH} transform={NAV_PIN.shadow.transform} fill={NAV_PIN.shadow.fill} opacity={NAV_PIN.shadow.opacity} pointerEvents="none" data-transition-shadow="" />
           <path
             {...obstacle(`facility:${transition.id}:pin`)}

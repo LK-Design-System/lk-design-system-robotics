@@ -88,6 +88,21 @@ export const NAV_SELECTION = {
    * regionHoverStrokeWidth) so stories assert the constant, not a literal.
    */
   robotPoseHighlightScale: 1.12,
+  /**
+   * Selection seat: a die-cut matte behind the selected point marker — the
+   * silhouette re-drawn in `--viewer-surface-elevated` with a hairline
+   * `--viewer-border` rim. Scale alone is a RELATIVE cue: 1.25x is obvious next
+   * to an unselected sibling and invisible on a marker alone on a map. The seat
+   * is the absolute cue, and it lives BEHIND the silhouette, so it stacks with
+   * Hazard's severity double edge (no third coloured outline) and stays clear
+   * of the blue focus ring (different colour, different layer).
+   */
+  seat: {
+    margin: 6,
+    borderWidth: 1.5,
+    fill: 'var(--viewer-surface-elevated, var(--color-semantic-background-elevated-normal))',
+    rim: 'var(--viewer-border, var(--color-semantic-line-normal-normal))',
+  },
   regionStrokeWidth: 3.5,
   /** Region outline below selection: hover lifts the edge, rest sits quiet. */
   regionHoverStrokeWidth: 2,

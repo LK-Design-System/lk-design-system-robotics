@@ -3,10 +3,14 @@ import { userEvent, waitFor } from 'storybook/test';
 import { Button } from '@lk-robotics/lds-core';
 import { Map2DCanvas } from '@lk-robotics/lds-product';
 import {
+  HazardMarker,
   LaneOverlay,
   NavigationCoordinateBoundary,
   adaptWorldLaneToLane,
 } from '../src/index.js';
+// 반드시 컴포넌트와 같은 모듈 인스턴스(../src)에서 가져와야 한다. dist 경로로
+// 가져오면 React 컨텍스트가 두 개가 되어 프로바이더가 조용히 무력화된다.
+import { NavigationLabelPolicyProvider } from '../src/components/robotics/_navigationAnnotations.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { NavigationLegend, NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
 import { assertSharedFocusIndicator, contrastRatio } from './RoboticsNavigationAssert.shared.jsx';
@@ -74,7 +78,7 @@ function StoryPage({ title, description, children, maxWidth = 1040 }) {
 // as empty surface to the right of the map. `aspectRatio` is the vertical
 // counterpart (same rationale as PathMap): a fixed `height` only fits one column
 // width, so narrow fixtures ended up with an empty band under the scaled map.
-function LaneMap({ appearance = 'light', label, children, height = 270, testId, eyebrow = 'LANE · L1', svgHeight = 250, aspectRatio }) {
+function LaneMap({ appearance = 'light', label, children, height = 270, testId, eyebrow = 'LANE · L1', svgHeight = 250, aspectRatio, labelPolicy, detailPolicy }) {
   const svgRef = React.useRef(null);
   const [viewportScale, setViewportScale] = React.useState(1);
 
@@ -135,7 +139,11 @@ function LaneMap({ appearance = 'light', label, children, height = 270, testId, 
         style={{ display: 'block', width: 'min(520px, calc(100cqw - 32px))', height: 'auto' }}
       >
         <NavigationMapStage width={520} height={svgHeight} eyebrow={eyebrow} scaleBar={{ px: 96, label: '4 m' }}>
-          {scaledChildren}
+          {/* 명세 픽스처는 라벨 정책을 지도 한 곳에서 선언한다. 오버레이마다
+              labelVisibility를 반복하다 하나를 빠뜨리는 것이 반복 결함이었다. */}
+          <NavigationLabelPolicyProvider labelVisibility={labelPolicy} detailVisibility={detailPolicy}>
+            {scaledChildren}
+          </NavigationLabelPolicyProvider>
         </NavigationMapStage>
       </svg>
     </Map2DCanvas>
@@ -232,29 +240,39 @@ export const LaneStatesAndConstraints = {
   render: () => (
     <StoryPage
       title="폐쇄와 충돌은 같은 상태가 아니며 시설 전환은 중립 참조로만 남깁니다"
-      description="availability와 conflict는 4 6 topology 대시를 그대로 둔 채 톤만 바꿉니다. 폐쇄와 충돌은 같은 danger 톤을 공유하므로 둘을 가르는 것은 라벨·상세·접근성 이름이고, 그래서 이 명세 스토리는 라벨을 항상 노출합니다. 문이나 엘리베이터의 실시간 상태는 Facility Transition이 소유하며, 레인은 해당 경계에 전환이 있다는 사실과 개수만 표시하고 종류를 ID에서 추론하지 않습니다."
+      description="availability와 conflict는 4 6 topology 대시를 그대로 둔 채 톤만 바꿉니다. 폐쇄와 충돌은 같은 danger 톤을 공유하므로, 쉼 상태의 판별은 충돌 좌표에 놓인 지점 마커(hazard 어휘의 충돌)가 소유하고 정확한 상태명은 라벨·상세·접근성 이름이 보존합니다. 문이나 엘리베이터의 실시간 상태는 Facility Transition이 소유하며, 레인은 해당 경계에 전환이 있다는 사실과 개수만 표시하고 종류를 ID에서 추론하지 않습니다."
       maxWidth={780}
     >
-      <LaneMap label="레인 복합 상태 지도" height={360} svgHeight={340}>
-        {/* 지도 기본값은 `interaction`이라 hover 전에는 라벨이 없다. 여기서는 세 상태를
-            나란히 비교하는 것이 본론이고, 규약상 폐쇄와 충돌은 톤이 같아 라벨이 유일한
-            판별 채널이므로 명세 스토리에 한해 항상 노출한다. `selected`로 드러내면
-            casing 4→6·core 1.5→3으로 굵어져 기본 선 두께를 못 보여준다.
-            상세는 끈다 — 세 레인이 BASE_LANE의 같은 속도·mutex를 물려받아 동일한 문자열이
-            세 번 반복될 뿐, 상태 비교에 아무것도 보태지 않는다.
-            `showEndpoints`는 전환 참조(T/count)의 전제다. 이게 빠져 있어 스토리 설명이
-            약속한 T 뱃지가 렌더되지 않았고 play의 전환 개수 단언이 계속 실패하고 있었다. */}
+      {/* 라벨 정책은 지도에서 한 번 선언한다. 규약상 폐쇄와 충돌은 톤이 같아 라벨이
+          판별 채널이므로 명세 스토리는 항상 노출하되(`selected`는 casing을 굵혀 기본
+          두께를 가리므로 쓰지 않는다), 상세는 끈다 — 세 레인이 같은 속도·mutex를
+          물려받아 동일 문자열이 세 번 반복될 뿐이다. `showEndpoints`는 전환 참조
+          (T/count)의 전제로, 빠지면 play의 전환 개수 단언이 실패한다. */}
+      <LaneMap label="레인 복합 상태 지도" height={360} svgHeight={340} labelPolicy="always" detailPolicy="hidden">
         {STATE_LANES.map(({ lane, availability, conflict }) => (
           <LaneOverlay
             key={lane.id}
             lane={lane}
             availability={availability}
             conflict={conflict}
-            labelVisibility="always"
-            detailVisibility="hidden"
             showEndpoints
           />
         ))}
+        {/* 쉼 상태에서 폐쇄와 충돌을 가르는 것은 레인 페인트가 아니라 이 지점
+            마커다. 규약이 "충돌은 hazards·alerts·상세가 표면화한다"고 정해 두고
+            그 마커를 아무도 그리지 않아 두 상태가 픽셀 동일했다. 충돌은 좌표가
+            있는 사건이므로 기존 hazard 어휘(kind `obstacle` = 충돌)를 그 좌표에
+            그대로 쓴다 — 레인의 4 6 대시와 톤 규약은 건드리지 않는다. */}
+        <HazardMarker
+          hazard={{
+            id: 'lane-conflict-point',
+            kind: 'obstacle',
+            label: '경로 충돌',
+            mapId: 'L1',
+            position: { x: 390, y: 262 },
+            severity: 'danger',
+          }}
+        />
       </LaneMap>
     </StoryPage>
   ),
@@ -289,6 +307,13 @@ export const LaneStatesAndConstraints = {
     }
     if (canvasElement.querySelector('[data-lane-conflict-pattern]')) {
       throw new Error('Conflict must not add a second pattern over the stable Lane dash.');
+    }
+    // At rest, closed and conflict share the danger tone by convention, so the
+    // thing that separates them is the conflict-point marker — the lane paint
+    // stays untouched, the event owns a coordinate.
+    const conflictPoint = canvasElement.querySelector('[data-lds-hazard-marker][data-hazard-kind="obstacle"]');
+    if (!conflictPoint) {
+      throw new Error('The conflict lane must carry a conflict-point marker so closed and conflict differ at rest.');
     }
     assertDirectionOmitted(closed, 'Closed lane');
     assertDirectionOmitted(unknownConflict, 'Unknown/conflict lane');

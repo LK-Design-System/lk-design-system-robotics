@@ -357,6 +357,7 @@ export const InteractionStates = {
     const selectedFocused = canvasElement.querySelector('[data-robot-id="robot-pose-selected-focused"]');
     if (
       defaultMarker?.querySelector('[data-robot-pose-selected-scale]')
+      || defaultMarker?.querySelector('[data-robot-pose-selection-seat]')
       || defaultMarker?.querySelector('[data-robot-pose-highlighted-scale]')
       || defaultMarker?.querySelector('[data-robot-pose-focus-indicator]')
     ) {
@@ -375,6 +376,9 @@ export const InteractionStates = {
     // "1.15" literal was exactly what made pinScale untunable before.
     if (!selected?.querySelector(`[data-robot-pose-selected-scale="${NAV_SELECTION.robotPoseScale}"]`)) {
       throw new Error(`Selected interaction example is missing its ${NAV_SELECTION.robotPoseScale}x body enlargement.`);
+    }
+    if (!selected?.querySelector('[data-robot-pose-selection-seat]')) {
+      throw new Error('Selected pose must render its selection seat — the absolute cue scale cannot provide alone.');
     }
     if (selected?.querySelector('[data-robot-pose-focus-indicator]')) {
       throw new Error('Selected-only example must not render keyboard focus.');

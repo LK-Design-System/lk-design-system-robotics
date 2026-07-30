@@ -235,6 +235,31 @@ export function HazardMarker({
           data-hazard-selected-scale={selected ? NAV_SELECTION.pinScale : undefined}
           style={{ transform: `scale(${selected ? NAV_SELECTION.pinScale : 1})` }}
         >
+          {/* Absolute selection cue (scale is only relative): a die-cut matte
+              BEHIND the pin, so it stacks under the severity double edge
+              instead of adding a third coloured outline. */}
+          {selected && (
+            <>
+              <path
+                data-hazard-selection-seat-rim=""
+                d={PIN_PATH}
+                fill={NAV_SELECTION.seat.rim}
+                stroke={NAV_SELECTION.seat.rim}
+                strokeWidth={(NAV_SELECTION.seat.margin + NAV_SELECTION.seat.borderWidth) * 2}
+                strokeLinejoin="round"
+                pointerEvents="none"
+              />
+              <path
+                data-hazard-selection-seat=""
+                d={PIN_PATH}
+                fill={NAV_SELECTION.seat.fill}
+                stroke={NAV_SELECTION.seat.fill}
+                strokeWidth={NAV_SELECTION.seat.margin * 2}
+                strokeLinejoin="round"
+                pointerEvents="none"
+              />
+            </>
+          )}
           <path d={PIN_PATH} transform={NAV_PIN.shadow.transform} fill={NAV_PIN.shadow.fill} opacity={NAV_PIN.shadow.opacity} pointerEvents="none" data-hazard-shadow="" />
           {severity.ring ? (
             <path

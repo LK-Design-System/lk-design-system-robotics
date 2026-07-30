@@ -330,18 +330,16 @@ export const Statuses = {
           // Bare `height: auto` is not the fix - ViewerFrame's 200px floor then
           // becomes the card height and the 240px map overflows it, clipping the
           // scale bar. Matching the map's own 540/250 makes the card track it.
-          <PathMap key={quality} appearance="dark" label={`${label} trajectory 지도`} eyebrow="TRAJECTORY" aspectRatio="540 / 250">
+          <PathMap key={quality} appearance="dark" label={`${label} trajectory 지도`} eyebrow="TRAJECTORY" aspectRatio="540 / 250" labelPolicy="always">
+            {/* labelPolicy="always" on the map: three cards that all say TRAJECTORY
+                in the eyebrow have no other visible discriminator, so the
+                trajectory labels are the only thing naming which is which. */}
             {(cssViewBoxScale) => (
               <TrajectoryOverlay
                 trajectory={trajectory}
                 viewportScale={cssViewBoxScale}
                 invalid={invalid}
                 stale={stale}
-                // Three cards that all say TRAJECTORY in the eyebrow and carry no
-                // other visible discriminator: the trajectory labels (정상/오류/
-                // 오래된 궤적) are the only thing that names which is which, and
-                // the disclosure default kept all three hidden.
-                labelVisibility="always"
               />
             )}
           </PathMap>

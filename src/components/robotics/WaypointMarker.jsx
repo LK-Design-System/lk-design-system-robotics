@@ -344,6 +344,34 @@ export function WaypointMarker({
           style={{ transform: `scale(${selected ? NAV_SELECTION.waypointScale : 1})` }}
         >
           {/*
+            The seat is the ABSOLUTE selection cue: 1.25x scale is only legible
+            next to an unselected sibling, and a marker alone on a map has none.
+            A die-cut matte behind the silhouette reads as "picked up" on its
+            own, without touching the focus ring's colour or the body's edges.
+          */}
+          {selected && (
+            <>
+              <rect
+                data-waypoint-selection-seat-rim=""
+                {...NAV_NODE.rect(NAV_NODE.radius, NAV_NODE.cornerRadius)}
+                fill={NAV_SELECTION.seat.rim}
+                stroke={NAV_SELECTION.seat.rim}
+                strokeWidth={(NAV_SELECTION.seat.margin + NAV_SELECTION.seat.borderWidth) * 2}
+                strokeLinejoin="round"
+                pointerEvents="none"
+              />
+              <rect
+                data-waypoint-selection-seat=""
+                {...NAV_NODE.rect(NAV_NODE.radius, NAV_NODE.cornerRadius)}
+                fill={NAV_SELECTION.seat.fill}
+                stroke={NAV_SELECTION.seat.fill}
+                strokeWidth={NAV_SELECTION.seat.margin * 2}
+                strokeLinejoin="round"
+                pointerEvents="none"
+              />
+            </>
+          )}
+          {/*
             Decorative depth is independent from semantic state. It scales with
             the selected marker so the body still reads as one elevated object.
           */}

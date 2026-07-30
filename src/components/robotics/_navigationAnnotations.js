@@ -64,6 +64,25 @@ export function useNavigationLabelPolicy() {
   return React.useContext(NavigationLabelPolicyContext);
 }
 
+/**
+ * Policy without negotiation. NavigationAnnotationLayer also provides this
+ * policy, but it brings label layout negotiation with it — which is exactly
+ * what spec fixtures cannot use (a Lane label larger than its panel gets 100%
+ * suppressed). Spec stories used to work around that by passing labelVisibility
+ * to every overlay individually, and forgetting one produced the recurring
+ * "comparison story with no labels" defect. This provider lets a fixture
+ * declare disclosure once at the map root; explicit per-overlay props still
+ * win because resolveNavigationLabelDisclosure checks them first.
+ */
+export function NavigationLabelPolicyProvider({ labelVisibility, detailVisibility, children }) {
+  const parent = useNavigationLabelPolicy();
+  const value = React.useMemo(() => Object.freeze({
+    labelVisibility: labelVisibility ?? parent.labelVisibility,
+    detailVisibility: detailVisibility ?? parent.detailVisibility,
+  }), [labelVisibility, detailVisibility, parent]);
+  return React.createElement(NavigationLabelPolicyContext.Provider, { value }, children);
+}
+
 export function useNavigationLabelDisclosure({
   onPointerEnter,
   onPointerLeave,

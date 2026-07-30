@@ -55,8 +55,8 @@
         "width": 900,
         "height": 720
       },
-      "bytes": 1932,
-      "sha256": "ef26b5901f4bec6c38b64eaf40e9a6f2584cfb40253770db42306aeb7f2b9aab"
+      "bytes": 2391,
+      "sha256": "247b3da8230f06ef6300ed5158d7d3179d7f0aaadbbc2f62daa3710543cdc74f"
     },
     {
       "name": "atom-facility-lift-marker@8x",
@@ -66,8 +66,8 @@
         "width": 900,
         "height": 720
       },
-      "bytes": 4783,
-      "sha256": "cffa799eec3dc97582c2dd65d9cd0877bb33172cee0cfc509d04581682166a61"
+      "bytes": 5286,
+      "sha256": "997ee67769ee5c4f34dd0176c4e1c461e6543068b56df18a2a22a973b5762c50"
     },
     {
       "name": "atom-facility-lift-marker-dark",
@@ -77,8 +77,8 @@
         "width": 980,
         "height": 760
       },
-      "bytes": 1630,
-      "sha256": "8beac712ea32753f0f50c4f395c1594506fdf95739ca6388e9ea8d01068bdabb"
+      "bytes": 2472,
+      "sha256": "e331ed614850e1574bbe7eff49c285aaf8fe93e4366cbdc1b66ecbf9be478fe9"
     },
     {
       "name": "atom-facility-lift-marker-dark@8x",
@@ -88,8 +88,8 @@
         "width": 980,
         "height": 760
       },
-      "bytes": 3654,
-      "sha256": "c48348048594fa56c00032040280365dea0c954e3b32a07ed6248da046ac414c"
+      "bytes": 5019,
+      "sha256": "89772c958284f7850a3a06db65fcb31c0ff12aa85bfdf23a7c4f320ce038267e"
     },
     {
       "name": "atom-facility-door-marker",

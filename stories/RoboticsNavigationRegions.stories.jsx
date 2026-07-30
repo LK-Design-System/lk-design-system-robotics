@@ -2,6 +2,9 @@ import React from 'react';
 import { userEvent } from 'storybook/test';
 import { Map2DCanvas } from '@lk-robotics/lds-product';
 import { SpatialRegion } from '../src/index.js';
+// 반드시 컴포넌트와 같은 모듈 인스턴스(../src)에서 가져와야 한다. dist 경로로
+// 가져오면 React 컨텍스트가 두 개가 되어 프로바이더가 조용히 무력화된다.
+import { NavigationLabelPolicyProvider } from '../src/components/robotics/_navigationAnnotations.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
 import { NavigationLegend, NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
 import { assertSharedFocusIndicator } from './RoboticsNavigationAssert.shared.jsx';
@@ -74,7 +77,7 @@ const slopeRegion = {
   },
 };
 
-function RegionMap({ children, appearance = 'light', width = 480, height = 288, label = '공간 영역 지도', testId, eyebrow = 'ZONES · L1' }) {
+function RegionMap({ children, appearance = 'light', width = 480, height = 288, label = '공간 영역 지도', testId, eyebrow = 'ZONES · L1', labelPolicy, detailPolicy }) {
   return (
     <Map2DCanvas
       data-testid={testId}
@@ -89,7 +92,10 @@ function RegionMap({ children, appearance = 'light', width = 480, height = 288, 
     >
       <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="group" style={{ display: 'block', width: '100%', height: 'auto' }} aria-label={label}>
         <NavigationMapStage width={width} height={height} eyebrow={eyebrow} north>
-          {children}
+          {/* 명세 픽스처의 라벨 정책은 지도에서 한 번 선언한다(오버레이별 반복 금지). */}
+          <NavigationLabelPolicyProvider labelVisibility={labelPolicy} detailVisibility={detailPolicy}>
+            {children}
+          </NavigationLabelPolicyProvider>
         </NavigationMapStage>
       </svg>
     </Map2DCanvas>
@@ -184,10 +190,10 @@ export const DarkPatternsAndStates = {
       {/* Four categories/states are the whole comparison, so the labels have to be
           asked for - the disclosure default is `interaction` and only the selected
           region named itself at rest. */}
-      <RegionMap appearance="dark" label="다크 공간 영역 지도">
-        <SpatialRegion region={speedRegion} labelVisibility="always" />
-        <SpatialRegion region={unknownTerrain} labelVisibility="always" />
-        <SpatialRegion region={liftCabinRegion} selected stale labelVisibility="always" />
+      <RegionMap appearance="dark" label="다크 공간 영역 지도" labelPolicy="always">
+        <SpatialRegion region={speedRegion} />
+        <SpatialRegion region={unknownTerrain} />
+        <SpatialRegion region={liftCabinRegion} selected stale />
         <SpatialRegion
           region={{
             ...liftCabinRegion,
@@ -204,7 +210,6 @@ export const DarkPatternsAndStates = {
             shape: { kind: 'circle', center: { x: 411, y: 134 }, radius: 30 },
           }}
           invalid
-          labelVisibility="always"
         />
       </RegionMap>
     </main>
@@ -508,9 +513,9 @@ export const NarrowWidth = {
     <div data-testid="narrow-region-shell" style={{ width: 320, maxWidth: '100%', minWidth: 0 }}>
       {/* 이 스토리의 본문이 "라벨을 함께 읽는 상황"인데 disclosure 기본값이
           `interaction`이라 라벨이 아예 없었다 — 다크 비교 스토리(§4.1)와 같은 뿌리. */}
-      <RegionMap width={320} height={280} label="320px 공간 영역 지도" testId="narrow-region-map">
-        <SpatialRegion region={narrowSpeedRegion} labelVisibility="always" />
-        <SpatialRegion region={narrowSlopeRegion} labelVisibility="always" />
+      <RegionMap width={320} height={280} label="320px 공간 영역 지도" testId="narrow-region-map" labelPolicy="always">
+        <SpatialRegion region={narrowSpeedRegion} />
+        <SpatialRegion region={narrowSlopeRegion} />
       </RegionMap>
     </div>
   ),

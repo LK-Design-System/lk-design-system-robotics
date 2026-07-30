@@ -10,6 +10,9 @@ import {
   adaptWorldTrajectoryToTrajectory,
   createNavigationMapTransform,
 } from '../src/index.js';
+// 반드시 컴포넌트와 같은 모듈 인스턴스(../src)에서 가져와야 한다. dist 경로로
+// 가져오면 React 컨텍스트가 두 개가 되어 프로바이더가 조용히 무력화된다.
+import { NavigationLabelPolicyProvider } from '../src/components/robotics/_navigationAnnotations.js';
 import { NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';
 
 function createFixtureTransform(mapId, frameId) {
@@ -147,6 +150,11 @@ export function PathMap({
   // The card also caps at the SVG footprint (540 + canvas padding): the SVG never
   // grows past 540px, so a wider card is just empty surface to the right of it.
   aspectRatio,
+  // Spec fixtures declare label disclosure once at the map root instead of on
+  // every overlay — forgetting a single per-overlay labelVisibility was the
+  // recurring "comparison story with no labels" defect.
+  labelPolicy,
+  detailPolicy,
 }) {
   const svgRef = React.useRef(null);
   const [cssViewBoxScale, setCssViewBoxScale] = React.useState(1);
@@ -173,7 +181,9 @@ export function PathMap({
 
   const stage = (
     <NavigationMapStage width={540} height={svgHeight} eyebrow={eyebrow} scaleBar={{ px: 100, label: '5 m' }}>
-      {typeof children === 'function' ? children(cssViewBoxScale) : children}
+      <NavigationLabelPolicyProvider labelVisibility={labelPolicy} detailVisibility={detailPolicy}>
+        {typeof children === 'function' ? children(cssViewBoxScale) : children}
+      </NavigationLabelPolicyProvider>
     </NavigationMapStage>
   );
 
