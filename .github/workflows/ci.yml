@@ -23,9 +23,17 @@ jobs:
       NODE_AUTH_TOKEN: ${{ secrets.LK_PACKAGES_READ_TOKEN || github.token }}
     steps:
       - uses: actions/checkout@v7
+      # The conformance CLI and the upstream token manifest both live in
+      # lk-design-system, so this pin decides which manifest Robotics is checked
+      # against. e37372d2 was 20 commits stale and predated the token additions
+      # Robotics already ships, so every run failed here - before npm ci, before
+      # npm run check, before check:storybook - reporting --space-1-5, --radius-4,
+      # --color-semantic-data-viz-series-5 and the --component-viewer-*map tokens as
+      # undefined even though the current manifest lists all of them. Advancing the
+      # pin has to happen in the same change as any Robotics token-usage change.
       - name: Run pinned LDS conformance
         id: lds_conformance
-        uses: LK-Design-System/lk-design-system/.github/actions/lds-conformance@e37372d2660b4ac76dcd6ea4fda40dbdc6378b93
+        uses: LK-Design-System/lk-design-system/.github/actions/lds-conformance@162bc0f242845b17e9b68980a85984bdf13fcd36
         with:
           profile: robotics-ui
           root: .
