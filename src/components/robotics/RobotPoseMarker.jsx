@@ -348,6 +348,23 @@ export function RobotPoseMarker({
           </g>
         )}
 
+        {/* Absolute preview cue — see NAV_SELECTION.preview. Outside the scale
+            group on purpose: the ring must hold still while the body grows
+            under it, or the two cues blur into one vague swell. Suppressed
+            while selected (the seat already owns that marker) and while
+            focused (the accent ring owns it). */}
+        {highlighted && !selected && !focusVisible && (
+          <circle
+            data-robot-pose-preview-ring=""
+            r={BODY_RADIUS + NAV_SELECTION.preview.offset}
+            fill="none"
+            stroke={NAV_SELECTION.preview.stroke}
+            strokeWidth={NAV_SELECTION.preview.strokeWidth}
+            vectorEffect="non-scaling-stroke"
+            pointerEvents="none"
+          />
+        )}
+
         <circle
           data-robot-pose-hit-area=""
           data-screen-target-size={NAV_HIT.screenTargetSize}

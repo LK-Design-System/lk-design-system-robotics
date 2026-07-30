@@ -60,10 +60,23 @@
   animation: lds-navigation-freshness-pulse 1.7s var(--ease-out) infinite;
 }
 
+/* Selection geometry is static — a classification, not an entrance. The
+   transition used to sit here and ran on ARRIVAL for already-selected markers:
+   on a cold first paint the group resolved at scale(1) and then animated up to
+   1.25, so for ~1.3s the map showed the wrong selection size (measured), and
+   any assertion reading geometry in that window raced the animation. Motion now
+   lives only on the transient hover preview below, which by construction is
+   never true at mount, so it can never animate on arrival. */
 [data-navigation-selection-scale] {
   transform: scale(1);
   transform-box: view-box;
   transform-origin: 0 0;
+}
+
+/* Hover/list preview: the enlargement is small and the cursor is often far away
+   (a linked list row), so the motion itself is part of the cue — it is what
+   draws the eye to which marker changed. */
+[data-navigation-selection-scale][data-robot-pose-highlighted-scale] {
   transition: transform 160ms var(--ease-out);
 }
 

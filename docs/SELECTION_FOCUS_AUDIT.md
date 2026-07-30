@@ -35,9 +35,22 @@ it stacks under semantic paint and stays clear of the blue focus ring.
 All interactive SVG fragments mirror native `:focus-visible`, suppress the
 duplicate rectangular browser outline, keep `aria-pressed` for selection, and
 preserve controlled `selected` / `focused` props for passive renderers.
-`RobotPoseMarker highlighted` is a separate 1.12× linked-preview cue
-(`NAV_SELECTION.robotPoseHighlightScale`) and never sets `data-focused` or
-paints the keyboard focus ring.
+`RobotPoseMarker highlighted` is a separate transient linked-preview cue and
+never sets `data-focused` or paints the keyboard focus ring. Like selection it
+is a PAIR — 1.12× scale (`robotPoseHighlightScale`, relative) plus a standoff
+hairline ring (`NAV_SELECTION.preview`, absolute). The pair exists because the
+preview is usually driven from a linked list row: measured on the fleet console,
+the scale grows the body 3.34px while the cursor that triggered it sits 771px
+away, so scale alone left the operator hunting for which of ten markers moved.
+The ring is suppressed while selected or focused (the seat and the accent ring
+already own those markers) and sits outside the scale group so it holds still
+while the body grows under it.
+
+Motion policy: selection geometry is static — the scale transition that used to
+apply to every selection-scale group ran on ARRIVAL for already-selected markers
+(measured: ~1.3s of wrong geometry on a cold first paint, and a matching
+intermittent failure in geometry assertions). Motion now applies only to the
+preview scale, which is never true at mount.
 
 ## Robotics DOM surfaces
 

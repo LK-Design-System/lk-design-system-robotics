@@ -575,8 +575,27 @@ export const Overview = {
       ) {
         throw new Error('Row preview must highlight the corresponding map marker.');
       }
+      // The pointer is on the list, far from the map, so the 1.12x growth has
+      // no cursor to anchor it and no sibling to be compared against: the ring
+      // is what says WHICH marker the row points at. It must also be the only
+      // one on the map, or "which" stops being answered.
+      const ring = marker.querySelector('[data-robot-pose-preview-ring]');
+      if (!ring) throw new Error('Row preview must draw the absolute preview ring, not scale alone.');
+      if (root.querySelectorAll('[data-robot-pose-preview-ring]').length !== 1) {
+        throw new Error('Exactly one marker may carry the preview ring at a time.');
+      }
+      // Outside the scale group: a ring that grew with the body would blur the
+      // relative and absolute cues into one vague swell.
+      if (ring.closest('[data-navigation-selection-scale]')) {
+        throw new Error('The preview ring must sit outside the selection-scale group.');
+      }
     });
     await userEvent.unhover(criticalRows[0]);
+    await waitFor(() => {
+      if (root.querySelector('[data-robot-pose-preview-ring]')) {
+        throw new Error('The preview ring must close with the pointer — it is transient, not a state.');
+      }
+    });
 
     const firstMarker = root.querySelector('[data-robot-pose-marker]');
     await userEvent.click(firstMarker);

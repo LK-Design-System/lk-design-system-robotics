@@ -81,13 +81,28 @@ export const NAV_SELECTION = {
   // edge. Matched to waypointScale instead of inventing a fourth number.
   pinScale: 1.25,
   /**
-   * Hover/list-preview enlargement for the pose body. 1.08 was under 3px on a
-   * ~34px circle and read as "no change"; 1.12 is perceptible while staying
-   * clearly below the 1.25 selection scale — hover is transient and has the
-   * cursor for context, so it may be subtler than selection. Lives here (like
-   * regionHoverStrokeWidth) so stories assert the constant, not a literal.
+   * Hover/list-preview enlargement for the pose body, paired with `preview`
+   * below. Scale stays subtler than selection's 1.25 because preview is
+   * transient — but scale alone is not enough here for the same reason it was
+   * not enough for selection: it is a RELATIVE cue. Measured on the fleet
+   * console, 1.12 grows the body 3.34px while the cursor that triggered it sits
+   * 771px away on a linked list row, so nothing marks WHICH of ten markers
+   * changed. `preview` is the absolute half of the pair.
    */
   robotPoseHighlightScale: 1.12,
+  /**
+   * Preview halo: a hairline ring standing off the marker, drawn for the
+   * transient hover/list-preview state. Distinct from both neighbours in the
+   * vocabulary by construction — the selection seat is a FILLED matte behind
+   * the silhouette, and focus is an ACCENT ring tight to the body, so an offset
+   * muted outline cannot be mistaken for either. Sits outside the scale group
+   * so it stays a stable target while the body grows under it.
+   */
+  preview: {
+    offset: 7,
+    strokeWidth: 1.5,
+    stroke: 'var(--viewer-muted, var(--color-semantic-label-neutral))',
+  },
   /**
    * Selection seat: a die-cut matte behind the selected point marker — the
    * silhouette re-drawn in `--viewer-surface-elevated` with a hairline
