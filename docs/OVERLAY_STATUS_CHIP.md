@@ -6,7 +6,7 @@
 | Status | Adopted upstream — 코어 `OverlayStatusChip`(lds-core 0.1.0-rc.2) 소비 중 |
 | Owner | Robotics domain engineering (구현 소유: LDS Core Status) |
 | Last reviewed | 2026-07-30 |
-| Source | `@lk-robotics/lds-core/components/status/OverlayStatusChip` · 코어 가이드: `lk-design-system/docs/components/guides/core-components-status-overlay-status-chip.md` |
+| Source | `@lk-design-system/lds-core/components/status/OverlayStatusChip` · 코어 가이드: `lk-design-system/docs/components/guides/core-components-status-overlay-status-chip.md` |
 
 상호작용 표면(제어 영역, 뷰어 프레임)이 **떠 있는 채로 비활성**일 때, 그 이유를
 표면 위에 얹어 말하는 알약형 상태 표시다. 업스트림 표현 규약의 "새 표현은

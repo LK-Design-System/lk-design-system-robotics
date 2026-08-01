@@ -1,5 +1,5 @@
 import React from 'react';
-import { Map2DCanvas } from '@lk-robotics/lds-product';
+import { Map2DCanvas } from '@lk-design-system/lds-product';
 import {
   NavigationAnnotationLayer,
   NavigationCoordinateBoundary,

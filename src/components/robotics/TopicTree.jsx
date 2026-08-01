@@ -1,6 +1,6 @@
 import React from 'react';
-import { Tree } from '@lk-robotics/lds-product/components/data/Tree';
-import { Switch } from '@lk-robotics/lds-core/components/selection/Switch';
+import { Tree } from '@lk-design-system/lds-product/components/data/Tree';
+import { Switch } from '@lk-design-system/lds-core/components/selection/Switch';
 
 function nodePath(parentPath, index) {
   return parentPath === '' ? String(index) : `${parentPath}.${index}`;

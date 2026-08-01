@@ -1,5 +1,5 @@
 import React from 'react';
-import { Map2DCanvas } from '@lk-robotics/lds-product';
+import { Map2DCanvas } from '@lk-design-system/lds-product';
 import { Joystick } from '../src/index.js';
 import { JoystickCard as JoystickCardStory } from './RoboticsAndViz.shared.jsx';
 import { assertOverlayOpaque, contrastRatio } from './RoboticsNavigationAssert.shared.jsx';

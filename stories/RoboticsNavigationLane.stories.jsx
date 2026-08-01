@@ -1,7 +1,7 @@
 import React from 'react';
 import { userEvent, waitFor } from 'storybook/test';
-import { Button } from '@lk-robotics/lds-core';
-import { Map2DCanvas } from '@lk-robotics/lds-product';
+import { Button } from '@lk-design-system/lds-core';
+import { Map2DCanvas } from '@lk-design-system/lds-product';
 import {
   HazardMarker,
   LaneOverlay,

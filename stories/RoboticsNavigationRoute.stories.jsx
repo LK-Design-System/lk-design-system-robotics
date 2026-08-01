@@ -1,6 +1,6 @@
 import React from 'react';
 import { userEvent } from 'storybook/test';
-import { SegmentedControl } from '@lk-robotics/lds-core';
+import { SegmentedControl } from '@lk-design-system/lds-core';
 import {
   NavigationAnnotationLayer,
   NavigationCoordinateBoundary,

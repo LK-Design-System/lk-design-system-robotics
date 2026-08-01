@@ -1,6 +1,6 @@
 import React from 'react';
 import { userEvent, waitFor } from 'storybook/test';
-import { LayerPanel, Legend, Map2DCanvas, SelectionInspector } from '@lk-robotics/lds-product';
+import { LayerPanel, Legend, Map2DCanvas, SelectionInspector } from '@lk-design-system/lds-product';
 import {
   RouteOverlay,
   TrajectoryOverlay,

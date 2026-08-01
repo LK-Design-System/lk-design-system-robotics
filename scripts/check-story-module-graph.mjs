@@ -1,5 +1,5 @@
 // One module graph for stories: importing this package by its own name
-// ('@lk-robotics/lds-robotics-ui/...') resolves through the exports map into
+// ('@lk-design-system/lds-robotics-ui/...') resolves through the exports map into
 // dist/, while components import each other through relative src/ paths. Mixing
 // the two loads the same module twice — constants go stale until a rebuild, and
 // React contexts DUPLICATE, so a provider from one graph silently never reaches
@@ -20,7 +20,7 @@ function scan(dir) {
     if (!/\.(jsx?|mjs|ts|tsx)$/.test(entry.name)) continue;
     const source = readFileSync(path.join(root, rel), 'utf8');
     for (const [index, line] of source.split('\n').entries()) {
-      if (line.includes("'@lk-robotics/lds-robotics-ui") || line.includes('"@lk-robotics/lds-robotics-ui')) {
+      if (line.includes("'@lk-design-system/lds-robotics-ui") || line.includes('"@lk-design-system/lds-robotics-ui')) {
         violations.push(`${rel}:${index + 1}  ${line.trim()}`);
       }
     }

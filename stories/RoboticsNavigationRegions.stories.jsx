@@ -1,6 +1,6 @@
 import React from 'react';
 import { userEvent } from 'storybook/test';
-import { Map2DCanvas } from '@lk-robotics/lds-product';
+import { Map2DCanvas } from '@lk-design-system/lds-product';
 import { SpatialRegion } from '../src/index.js';
 // 반드시 컴포넌트와 같은 모듈 인스턴스(../src)에서 가져와야 한다. dist 경로로
 // 가져오면 React 컨텍스트가 두 개가 되어 프로바이더가 조용히 무력화된다.

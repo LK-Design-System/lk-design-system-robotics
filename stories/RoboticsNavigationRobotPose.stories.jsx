@@ -1,5 +1,5 @@
 import React from 'react';
-import { Map2DCanvas } from '@lk-robotics/lds-product';
+import { Map2DCanvas } from '@lk-design-system/lds-product';
 import { NavigationAnnotationLayer, RobotPoseMarker } from '../src/index.js';
 import { NAV_SELECTION } from '../src/components/robotics/_navigationVocabulary.js';
 import { NavigationMapStage } from './RoboticsNavigationStage.shared.jsx';

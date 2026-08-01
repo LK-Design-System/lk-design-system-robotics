@@ -1,6 +1,6 @@
 import React from 'react';
 import { fireEvent, userEvent, waitFor } from 'storybook/test';
-import { Button, SegmentedControl } from '@lk-robotics/lds-core';
+import { Button, SegmentedControl } from '@lk-design-system/lds-core';
 import { DirectionalPad, Joystick, ManualControlSession } from '../src/index.js';
 import { storyDescription } from './StoryGuide.shared.jsx';
 

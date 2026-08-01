@@ -1,6 +1,6 @@
 import React from 'react';
-import { Icon } from '@lk-robotics/lds-core/components/icon/Icon';
-import { IconButton } from '@lk-robotics/lds-core/components/buttons/IconButton';
+import { Icon } from '@lk-design-system/lds-core/components/icon/Icon';
+import { IconButton } from '@lk-design-system/lds-core/components/buttons/IconButton';
 import { VIEWER_OVERLAY } from './_viewerOverlay.js';
 
 /**

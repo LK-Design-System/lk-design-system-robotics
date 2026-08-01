@@ -1,6 +1,6 @@
 import React from 'react';
-import { ListCell } from '@lk-robotics/lds-core/components/content/ListCell';
-import { Avatar } from '@lk-robotics/lds-core/components/feedback/Avatar';
+import { ListCell } from '@lk-design-system/lds-core/components/content/ListCell';
+import { Avatar } from '@lk-design-system/lds-core/components/feedback/Avatar';
 
 const DENSITY = {
   comfortable: {

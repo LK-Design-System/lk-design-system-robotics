@@ -1,4 +1,4 @@
-import { VIEWER_OVERLAY_SURFACE } from '@lk-robotics/lds-product/components/viz/_viewerOverlaySurface';
+import { VIEWER_OVERLAY_SURFACE } from '@lk-design-system/lds-product/components/viz/_viewerOverlaySurface';
 
 /**
  * LK ROBOTICS — viewer-overlay treatment shared by manual controls that float

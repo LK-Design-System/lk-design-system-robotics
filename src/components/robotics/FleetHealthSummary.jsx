@@ -1,6 +1,6 @@
 import React from 'react';
-import { FilterChip } from '@lk-robotics/lds-core/components/selection/FilterChip';
-import { StatList } from '@lk-robotics/lds-product/components/content/StatList';
+import { FilterChip } from '@lk-design-system/lds-core/components/selection/FilterChip';
+import { StatList } from '@lk-design-system/lds-product/components/content/StatList';
 
 // Total and connected describe a healthy scope and stay achromatic; only the
 // scopes that need an operator's attention carry a severity dot. Core's

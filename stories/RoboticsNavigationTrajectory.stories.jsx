@@ -1,6 +1,6 @@
 import React from 'react';
 import { waitFor } from 'storybook/test';
-import { Button } from '@lk-robotics/lds-core';
+import { Button } from '@lk-design-system/lds-core';
 import {
   NavigationAnnotationLayer,
   RobotPoseMarker,

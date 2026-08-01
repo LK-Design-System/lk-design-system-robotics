@@ -8,7 +8,7 @@
 | Last reviewed | 2026-07-30 |
 | Research date | 2026-07-28 |
 
-Target package: `@lk-robotics/lds-robotics-ui`
+Target package: `@lk-design-system/lds-robotics-ui`
 
 Implemented in this increment:
 

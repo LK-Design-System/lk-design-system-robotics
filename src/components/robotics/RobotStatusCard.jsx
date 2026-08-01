@@ -1,9 +1,9 @@
 import React from 'react';
-import { Card } from '@lk-robotics/lds-core/components/cards/Card';
-import { StatusBadge } from '@lk-robotics/lds-core/components/content/StatusBadge';
-import { VisuallyHidden } from '@lk-robotics/lds-core/components/layout/VisuallyHidden';
-import { BatteryGauge } from '@lk-robotics/lds-product/components/robotics/BatteryGauge';
-import { ConnectionBadge } from '@lk-robotics/lds-product/components/robotics/ConnectionBadge';
+import { Card } from '@lk-design-system/lds-core/components/cards/Card';
+import { StatusBadge } from '@lk-design-system/lds-core/components/content/StatusBadge';
+import { VisuallyHidden } from '@lk-design-system/lds-core/components/layout/VisuallyHidden';
+import { BatteryGauge } from '@lk-design-system/lds-product/components/robotics/BatteryGauge';
+import { ConnectionBadge } from '@lk-design-system/lds-product/components/robotics/ConnectionBadge';
 import { RobotStatusCell } from './_RobotStatusCell.jsx';
 
 function statusTone(tone) {

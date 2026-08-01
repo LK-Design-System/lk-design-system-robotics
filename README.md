@@ -1,6 +1,6 @@
 # LK Robotics UI
 
-`@lk-robotics/lds-robotics-ui` is the independent Robotics UI package for
+`@lk-design-system/lds-robotics-ui` is the independent Robotics UI package for
 LK ROBOTICS products. It owns DOM, SVG, editor, viewer, telemetry, and robotics
 operation UI. It owns the renderer-facing navigation coordinate contract and
 pure world/SVG/screen projection helpers, but not transport, TF authority,
@@ -15,8 +15,8 @@ before integrating ROS maps, paths, poses, multi-floor frames, or map editing.
 
 ## Dependencies
 
-The package consumes released `@lk-robotics/lds-core` and
-`@lk-robotics/lds-product` versions. It must not add an LDS3D runtime dependency.
+The package consumes released `@lk-design-system/lds-core` and
+`@lk-design-system/lds-product` versions. It must not add an LDS3D runtime dependency.
 Products and documentation integrations compose Robotics UI with LDS3D when needed.
 
 ## Development

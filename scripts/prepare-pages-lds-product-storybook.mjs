@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const productRoot = path.join(root, 'node_modules', '@lk-robotics', 'lds-product');
+const productRoot = path.join(root, 'node_modules', '@lk-design-system', 'lds-product');
 const manifestPath = path.join(productRoot, 'package.json');
 const storybookRoot = path.join(productRoot, 'storybook');
 

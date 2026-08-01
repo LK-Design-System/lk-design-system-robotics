@@ -1,5 +1,5 @@
 import React from 'react';
-import { ICON_NAMES, Icon } from '@lk-robotics/lds-core';
+import { ICON_NAMES, Icon } from '@lk-design-system/lds-core';
 import { storyDescription } from './StoryGuide.shared.jsx';
 
 /* Curated by hand — deliberately NOT the registry's extension tail. The

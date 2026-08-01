@@ -29,7 +29,7 @@ Upstream: <https://github.com/google/material-design-icons>
 ## Pretendard
 
 The Storybook Pages artifact bundles unmodified Pretendard webfont files from
-the `@lk-robotics/lds-theme` dependency. Pretendard is licensed under SIL Open
+the `@lk-design-system/lds-theme` dependency. Pretendard is licensed under SIL Open
 Font License 1.1; the copyright notices, reserved names, and full license are
 retained in
 [`licenses/PRETENDARD-OFL-1.1.txt`](../../licenses/PRETENDARD-OFL-1.1.txt).

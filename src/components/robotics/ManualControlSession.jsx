@@ -1,13 +1,13 @@
 import React from 'react';
-import { Button } from '@lk-robotics/lds-core/components/buttons/Button';
-import { Card } from '@lk-robotics/lds-core/components/cards/Card';
-import { StatusBadge } from '@lk-robotics/lds-core/components/content/StatusBadge';
-import { EmptyState } from '@lk-robotics/lds-core/components/status/EmptyState';
-import { Spinner } from '@lk-robotics/lds-core/components/status/Spinner';
-import { Icon } from '@lk-robotics/lds-core/components/icon/Icon';
-import { ConnectionBadge } from '@lk-robotics/lds-product/components/robotics/ConnectionBadge';
-import { OverlayStatusChip } from '@lk-robotics/lds-core/components/status/OverlayStatusChip';
-import { StatusIndicator } from '@lk-robotics/lds-core/components/content/StatusIndicator';
+import { Button } from '@lk-design-system/lds-core/components/buttons/Button';
+import { Card } from '@lk-design-system/lds-core/components/cards/Card';
+import { StatusBadge } from '@lk-design-system/lds-core/components/content/StatusBadge';
+import { EmptyState } from '@lk-design-system/lds-core/components/status/EmptyState';
+import { Spinner } from '@lk-design-system/lds-core/components/status/Spinner';
+import { Icon } from '@lk-design-system/lds-core/components/icon/Icon';
+import { ConnectionBadge } from '@lk-design-system/lds-product/components/robotics/ConnectionBadge';
+import { OverlayStatusChip } from '@lk-design-system/lds-core/components/status/OverlayStatusChip';
+import { StatusIndicator } from '@lk-design-system/lds-core/components/content/StatusIndicator';
 
 const LINK_LABELS = {
   ready: '연결 준비됨',

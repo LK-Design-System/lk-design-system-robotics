@@ -124,7 +124,7 @@ if (existsSync(path.join(storiesRoot, 'lds.js'))) {
 
 const storyGuidePath = path.join(storiesRoot, 'StoryGuide.shared.jsx');
 const storyGuideSource = await readFile(storyGuidePath, 'utf8');
-if (!/import\s*\{\s*PageHeader\s*\}\s*from\s*['"]@lk-robotics\/lds-product['"]/.test(storyGuideSource)) {
+if (!/import\s*\{\s*PageHeader\s*\}\s*from\s*['"]@lk-design-system\/lds-product['"]/.test(storyGuideSource)) {
   fail('stories/StoryGuide.shared.jsx must use the LDS Product PageHeader contract.');
 }
 if (/<h1\b/.test(storyGuideSource)) {
@@ -133,7 +133,7 @@ if (/<h1\b/.test(storyGuideSource)) {
 
 const previewPath = path.join(root, '.storybook', 'preview.jsx');
 const previewSource = await readFile(previewPath, 'utf8');
-if (!/from\s*['"]@lk-robotics\/lds-product\/storybook['"]/.test(previewSource)) {
+if (!/from\s*['"]@lk-design-system\/lds-product\/storybook['"]/.test(previewSource)) {
   fail('.storybook/preview.jsx must consume the main LDS Storybook Docs surface.');
 }
 if (/\b(?:DOCS_SURFACE|DOCS_MOTION|guideShell)\b/.test(previewSource)) {

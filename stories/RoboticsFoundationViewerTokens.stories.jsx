@@ -1,5 +1,5 @@
 import React from 'react';
-import { ViewerFrame } from '@lk-robotics/lds-product';
+import { ViewerFrame } from '@lk-design-system/lds-product';
 import { storyDescription } from './StoryGuide.shared.jsx';
 
 // This page renders the REAL --viewer-* color tokens LIVE. Each swatch's

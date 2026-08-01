@@ -23,7 +23,7 @@
 
 ### 레이어링이 실제로 지켜진다
 
-토큰·코어(`@lk-robotics/lds-core`·`lds-product`, 고정 버전 소비) → 로보틱스
+토큰·코어(`@lk-design-system/lds-core`·`lds-product`, 고정 버전 소비) → 로보틱스
 도메인 레이어 → 스토리/문서. 로보틱스에서 코어를 못 고치는 불편(예:
 `ViewerFrame`의 200px min-height)이 곧 레이어가 살아있다는 증거다. 경계 위반이
 물리적으로 불가능하다.

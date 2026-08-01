@@ -1,5 +1,5 @@
 import React from 'react';
-import { PageHeader } from '@lk-robotics/lds-product';
+import { PageHeader } from '@lk-design-system/lds-product';
 
 /**
  * Keep the Robotics canvas masthead on the same LDS Product page-header

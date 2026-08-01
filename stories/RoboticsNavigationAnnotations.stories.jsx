@@ -1,6 +1,6 @@
 import React from 'react';
 import { userEvent, waitFor } from 'storybook/test';
-import { Map2DCanvas } from '@lk-robotics/lds-product';
+import { Map2DCanvas } from '@lk-design-system/lds-product';
 import {
   FacilityTransition,
   LaneOverlay,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Legend, Map2DCanvas } from '@lk-robotics/lds-product';
+import { Legend, Map2DCanvas } from '@lk-design-system/lds-product';
 import { userEvent, waitFor } from 'storybook/test';
 import {
   FleetHealthSummary,

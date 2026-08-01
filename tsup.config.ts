@@ -22,8 +22,8 @@ export default defineConfig({
   external: [
     'react',
     'react-dom',
-    '@lk-robotics/lds-core',
-    '@lk-robotics/lds-product',
+    '@lk-design-system/lds-core',
+    '@lk-design-system/lds-product',
   ],
   sourcemap: true,
   splitting: true,

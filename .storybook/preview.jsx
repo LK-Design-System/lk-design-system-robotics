@@ -1,13 +1,13 @@
-import '@lk-robotics/lds-core/styles.css';
-import '@lk-robotics/lds-theme/styles.css';
-import '@lk-robotics/lds-product/styles.css';
+import '@lk-design-system/lds-core/styles.css';
+import '@lk-design-system/lds-theme/styles.css';
+import '@lk-design-system/lds-product/styles.css';
 import '../styles.css';
 import React from 'react';
 import {
   LdsStorybookDecisionGuide,
   LdsStorybookDocsStyles,
   LdsStorybookGuideLayout,
-} from '@lk-robotics/lds-product/storybook';
+} from '@lk-design-system/lds-product/storybook';
 import {
   Description,
   DocsContext,

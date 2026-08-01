@@ -46,7 +46,7 @@ The full Apache-2.0 license is included in
 ## Pretendard
 
 The GitHub Pages Storybook artifact embeds Pretendard webfont files received
-from `@lk-robotics/lds-theme`. Pretendard is distributed under the SIL Open
+from `@lk-design-system/lds-theme`. Pretendard is distributed under the SIL Open
 Font License 1.1 (OFL-1.1).
 
 **Attribution:** [Pretendard by Kil Hyung-jin](https://github.com/orioncactus/pretendard)
