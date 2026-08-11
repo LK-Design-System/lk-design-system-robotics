@@ -28,10 +28,6 @@ jobs:
           node-version: 22.17.1
           cache: npm
       - run: npm ci
-      - name: Debug generated package manifest
-        run: |
-          npm run generate:docs
-          git diff -- docs/package/manifest.json
       # Cross-repository conformance is isolated in release-gate.yml. PR CI must
       # not treat a mutable branch or an obsolete action SHA as release evidence.
       - run: npm run check:local
