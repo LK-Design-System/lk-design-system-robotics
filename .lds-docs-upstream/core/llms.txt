@@ -1,0 +1,232 @@
+# LK Design System AI entry
+
+Canonical machine contract: [docs/references/adoption/LDS_UI_ADOPTION_CONTRACT.json](./adoption-checklist.json)
+Human workflow: [docs/LDS_UI_ADOPTION_WORKFLOW.md](./adoption-workflow.md)
+Report schema: [docs/references/adoption/LDS_UI_ADOPTION_REPORT.schema.json](./adoption-report.schema.json)
+Contract version: 1
+
+MANDATORY: 컴포넌트 교체만으로 LDS 전환은 완료되지 않는다.
+
+For every new product UI, LDS adoption, migration, conversion, restyle, parity implementation, or material redesign:
+
+1. Read docs/LDS_UI_ADOPTION_WORKFLOW.md before editing.
+2. Use `full-surface` for an existing-surface migration, conversion, restyle, parity implementation, or material redesign; `changed-ui` is only for an explicitly bounded incremental adoption with the untouched boundary documented.
+3. Review all six non-component facets and componentMapping for every surface.
+4. Use exactly one verdict per facet decision: reviewed | not-applicable | blocked.
+5. componentMapping must be reviewed or blocked; it cannot be not-applicable.
+6. A not-applicable facet verdict requires a concrete reason; a blocked verdict prevents completion.
+7. Record typed, reproducible evidence using: source | token | story | check | visual | asset | copy-catalog | decision.
+8. Validate durable attestations against docs/references/adoption/LDS_UI_ADOPTION_REPORT.schema.json.
+9. Create a separate consumer report from docs/references/adoption/LDS_UI_ADOPTION_REPORT.example.json; never edit the generated checklist in a package or `node_modules`.
+10. Run `check-adoption` locally and the pinned `.github/actions/lds-adoption` composite action in CI with full git history.
+
+The six required facets are:
+
+1. tokensAndTheme — Tokens and theme runtime: Install the complete LDS runtime and map visual values to the owned semantic and component token layers.
+2. layoutAndVisualFoundations — Layout and visual foundations: Preserve information hierarchy across real content, narrow viewports, overflow, and the LDS visual foundation scales.
+3. statePatternsAndMotion — State, cross-component patterns, and motion: Model asynchronous and interaction states explicitly and select feedback and motion patterns by scope and duration.
+4. assetsIconographyAndBrand — Assets, iconography, and brand: Reuse owned registries and preserve provenance, semantic meaning, accessibility, and brand boundaries for every visual asset.
+5. contentAndInternationalization — Content and internationalization: Keep product meaning, voice, locale boundaries, and user-visible data formatting explicit and reviewable.
+6. accessibility — Accessibility and inclusive interaction: Verify semantic structure, keyboard and focus behavior, perceivable state, target size, contrast, and inclusive use.
+
+Component selection happens only after those decisions:
+
+- componentMapping — Choose owner-package components only after the applicable non-component decisions have been recorded.
+
+## Facet contract
+
+### tokensAndTheme: Tokens and theme runtime
+
+Purpose: Install the complete LDS runtime and map visual values to the owned semantic and component token layers.
+
+Foundation ids: design-token | color
+
+Required decisions:
+
+- `owner-package-css-order`: owner package and CSS import order
+- `font-theme-scope`: font and theme provider scope
+- `color-scheme-behavior`: light, dark, and auto behavior
+- `token-mapping`: semantic or component token mapping
+- `raw-visual-literals`: raw visual literal disposition
+
+Hard triggers:
+
+- visual-source-change: A changed UI source or stylesheet contains visual declarations or LDS imports. Evidence: source | token | check.
+
+References:
+
+- [docs/TOKEN_GOVERNANCE.md](./policies/TOKEN_GOVERNANCE.md)
+- [docs/PACKAGE_MIGRATION_GUIDE.md](./policies/PACKAGE_MIGRATION_GUIDE.md)
+- [docs/foundations/design-token.md](./foundations/design-token.md)
+- [docs/foundations/color.md](./foundations/color.md)
+- [tokens/source.json](./token-reference.json)
+
+### layoutAndVisualFoundations: Layout and visual foundations
+
+Purpose: Preserve information hierarchy across real content, narrow viewports, overflow, and the LDS visual foundation scales.
+
+Foundation ids: typography | layout | spacing | radius | elevation | gradient | aspect-ratio
+
+Required decisions:
+
+- `semantic-reading-order`: semantic structure and reading order
+- `grid-container-mapping`: grid and container mapping
+- `responsive-overflow-ownership`: responsive and overflow ownership
+- `typography-data-formatting`: typography hierarchy and data formatting
+- `visual-foundation-mapping`: spacing, radius, elevation, gradient, and aspect-ratio mapping
+
+Hard triggers:
+
+- layout-source-change: A changed UI source or stylesheet changes layout, dimensions, typography, or overflow. Evidence: source | visual.
+
+References:
+
+- [docs/foundations/typography.md](./foundations/typography.md)
+- [docs/foundations/layout.md](./foundations/layout.md)
+- [docs/foundations/spacing.md](./foundations/spacing.md)
+- [docs/foundations/radius.md](./foundations/radius.md)
+- [docs/foundations/elevation.md](./foundations/elevation.md)
+- [docs/foundations/gradient.md](./foundations/gradient.md)
+- [docs/foundations/aspect-ratio.md](./foundations/aspect-ratio.md)
+
+### statePatternsAndMotion: State, cross-component patterns, and motion
+
+Purpose: Model asynchronous and interaction states explicitly and select feedback and motion patterns by scope and duration.
+
+Foundation ids: state | motion
+
+Required decisions:
+
+- `async-state-model`: ready, loading, empty, error, stale, offline, disabled, and recovery states
+- `loading-pattern-scope`: Loading pattern element and scope
+- `retained-content-refresh`: retained-content and refreshing behavior
+- `motion-reduced-motion`: motion purpose, duration, and reduced-motion behavior
+
+Hard triggers:
+
+- async-state-change: A changed UI source adds a loading indicator, aria-busy, loading prop, or asynchronous state surface. Evidence: source | story | decision.
+- motion-change: A changed UI source or stylesheet adds animation, transition, or motion behavior. Evidence: source | check.
+
+References:
+
+- [docs/foundations/state.md](./foundations/state.md)
+- [docs/foundations/motion.md](./foundations/motion.md)
+- [docs/LOADING_PATTERN.md](./patterns/loading.md)
+
+### assetsIconographyAndBrand: Assets, iconography, and brand
+
+Purpose: Reuse owned registries and preserve provenance, semantic meaning, accessibility, and brand boundaries for every visual asset.
+
+Foundation ids: iconography
+
+Required decisions:
+
+- `registry-search`: existing icon and asset registry search
+- `asset-owner-public-path`: asset owner package and public path
+- `provenance-license`: provenance and license
+- `asset-semantics-alt`: decorative or informative semantics and alternative text
+- `theme-suitability`: light and dark suitability
+
+Hard triggers:
+
+- asset-change: A changed UI surface adds or modifies SVG, raster image, font, inline SVG, or image markup. Evidence: source | asset.
+
+References:
+
+- [docs/foundations/iconography.md](./foundations/iconography.md)
+- [packages/core/assets/icons/manifest.json](./assets/icons/manifest.json)
+
+### contentAndInternationalization: Content and internationalization
+
+Purpose: Keep product meaning, voice, locale boundaries, and user-visible data formatting explicit and reviewable.
+
+Foundation ids: writing | voice-and-tone | international-design
+
+Required decisions:
+
+- `copy-product-truth`: user-visible copy set and product truth
+- `writing-voice`: Writing and Voice disposition
+- `locale-language-boundary`: locale and document language boundary
+- `data-formatting`: date, time, number, unit, and missing-value formatting
+- `translation-truncation`: translation and truncation behavior
+
+Hard triggers:
+
+- visible-copy-change: A changed UI source adds or modifies visible text or an accessible text prop. Evidence: source | copy-catalog.
+
+References:
+
+- [docs/foundations/writing.md](./foundations/writing.md)
+- [docs/foundations/voice-and-tone.md](./foundations/voice-and-tone.md)
+- [docs/foundations/international-design.md](./foundations/international-design.md)
+- [docs/COPY_REVIEW_CONTRACT.md](./policies/COPY_REVIEW_CONTRACT.md)
+
+### accessibility: Accessibility and inclusive interaction
+
+Purpose: Verify semantic structure, keyboard and focus behavior, perceivable state, target size, contrast, and inclusive use.
+
+Foundation ids: inclusive-design
+
+Required decisions:
+
+- `landmarks-dom-order`: landmarks and semantic DOM order
+- `keyboard-focus-restoration`: keyboard path and focus restoration
+- `accessible-name-role-state`: accessible names, roles, states, and messages
+- `target-pointer-alternatives`: target size and pointer alternatives
+- `contrast-non-color-cues`: contrast and non-color state cues
+- `reduced-motion`: reduced-motion behavior
+
+Hard triggers:
+
+- interactive-source-change: A changed UI source adds or modifies an interactive element, handler, or LDS control. Evidence: source | story | check.
+
+References:
+
+- [docs/foundations/inclusive-design.md](./foundations/inclusive-design.md)
+- [docs/ACCESSIBILITY_CONTRACTS.md](./policies/ACCESSIBILITY_CONTRACTS.md)
+
+## componentMapping contract
+
+Purpose: Choose owner-package components only after the applicable non-component decisions have been recorded.
+
+Required decisions:
+
+- `owner-public-export`: owner package public export
+- `reuse-composition-choice`: existing component or composition choice
+- `product-orchestration-boundary`: product-owned orchestration boundary
+- `exception-shared-authoring`: remaining exception or shared LDS authoring need
+
+References:
+
+- [docs/components/README.md](./components/README.md)
+- [docs/PACKAGE_MIGRATION_GUIDE.md](./policies/PACKAGE_MIGRATION_GUIDE.md)
+- [docs/COMPONENT_WORKFLOW.md](./policies/COMPONENT_WORKFLOW.md)
+
+componentMapping must be reviewed or blocked and must include typed evidence when reviewed.
+
+## Completion contract
+
+- Required facet ids: tokensAndTheme | layoutAndVisualFoundations | statePatternsAndMotion | assetsIconographyAndBrand | contentAndInternationalization | accessibility
+- componentMapping required: true
+- blocked verdict fails completion: true
+- not-applicable facet requires reason: true
+- exception fields: rule | path | signature | owner | reason | expiresAt
+
+Verification:
+
+- normal and narrow viewport
+- light and dark appearance when supported
+- representative ready and non-ready states
+- keyboard and focus path
+- reduced motion when motion exists
+- remaining exceptions and product-owned seams
+
+Detailed non-component guidance:
+
+- [docs/foundations/README.md](./foundations/README.md) — human Foundation index
+- [docs/foundations/llms.txt](./foundations/llms.txt) — complete generated Foundation context
+- [tokens/source.json](./token-reference.json) — structured token source of truth
+- [docs/LOADING_PATTERN.md](./patterns/loading.md) — cross-component loading selection
+- [packages/core/assets/icons/manifest.json](./assets/icons/manifest.json) — icon inventory
+- [docs/components/README.md](./components/README.md) — targeted component-guide entry
+- [docs/components/llms.txt](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.5/docs/components/llms.txt) — large retrieval bundle; load selectively

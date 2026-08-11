@@ -1,0 +1,472 @@
+{
+  "$schema": "./adoption-report.schema.json",
+  "schemaVersion": 1,
+  "kind": "lds-ui-adoption-report",
+  "contractVersion": "1",
+  "id": "replace-with-adoption-id",
+  "scope": {
+    "mode": "full-surface",
+    "paths": [
+      "src/ui/**"
+    ],
+    "excluded": []
+  },
+  "surfaces": [
+    {
+      "id": "replace-with-surface-id",
+      "paths": [
+        "src/ui/**"
+      ],
+      "facets": {
+        "tokensAndTheme": {
+          "verdict": "reviewed",
+          "detail": "Replace with the reviewed Tokens and theme runtime decision summary and ownership boundary.",
+          "evidence": [
+            {
+              "kind": "decision",
+              "ref": "replace-with-reproducible-evidence"
+            }
+          ],
+          "decisions": [
+            {
+              "decisionId": "owner-package-css-order",
+              "outcome": "Replace with the concrete owner package and CSS import order outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-owner-package-css-order-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "font-theme-scope",
+              "outcome": "Replace with the concrete font and theme provider scope outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-font-theme-scope-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "color-scheme-behavior",
+              "outcome": "Replace with the concrete light, dark, and auto behavior outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-color-scheme-behavior-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "token-mapping",
+              "outcome": "Replace with the concrete semantic or component token mapping outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-token-mapping-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "raw-visual-literals",
+              "outcome": "Replace with the concrete raw visual literal disposition outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-raw-visual-literals-evidence"
+                }
+              ]
+            }
+          ]
+        },
+        "layoutAndVisualFoundations": {
+          "verdict": "reviewed",
+          "detail": "Replace with the reviewed Layout and visual foundations decision summary and ownership boundary.",
+          "evidence": [
+            {
+              "kind": "decision",
+              "ref": "replace-with-reproducible-evidence"
+            }
+          ],
+          "decisions": [
+            {
+              "decisionId": "semantic-reading-order",
+              "outcome": "Replace with the concrete semantic structure and reading order outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-semantic-reading-order-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "grid-container-mapping",
+              "outcome": "Replace with the concrete grid and container mapping outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-grid-container-mapping-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "responsive-overflow-ownership",
+              "outcome": "Replace with the concrete responsive and overflow ownership outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-responsive-overflow-ownership-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "typography-data-formatting",
+              "outcome": "Replace with the concrete typography hierarchy and data formatting outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-typography-data-formatting-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "visual-foundation-mapping",
+              "outcome": "Replace with the concrete spacing, radius, elevation, gradient, and aspect-ratio mapping outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-visual-foundation-mapping-evidence"
+                }
+              ]
+            }
+          ]
+        },
+        "statePatternsAndMotion": {
+          "verdict": "reviewed",
+          "detail": "Replace with the reviewed State, cross-component patterns, and motion decision summary and ownership boundary.",
+          "evidence": [
+            {
+              "kind": "decision",
+              "ref": "replace-with-reproducible-evidence"
+            }
+          ],
+          "decisions": [
+            {
+              "decisionId": "async-state-model",
+              "outcome": "Replace with the concrete ready, loading, empty, error, stale, offline, disabled, and recovery states outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-async-state-model-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "loading-pattern-scope",
+              "outcome": "Replace with the concrete Loading pattern element and scope outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-loading-pattern-scope-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "retained-content-refresh",
+              "outcome": "Replace with the concrete retained-content and refreshing behavior outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-retained-content-refresh-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "motion-reduced-motion",
+              "outcome": "Replace with the concrete motion purpose, duration, and reduced-motion behavior outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-motion-reduced-motion-evidence"
+                }
+              ]
+            }
+          ]
+        },
+        "assetsIconographyAndBrand": {
+          "verdict": "reviewed",
+          "detail": "Replace with the reviewed Assets, iconography, and brand decision summary and ownership boundary.",
+          "evidence": [
+            {
+              "kind": "decision",
+              "ref": "replace-with-reproducible-evidence"
+            }
+          ],
+          "decisions": [
+            {
+              "decisionId": "registry-search",
+              "outcome": "Replace with the concrete existing icon and asset registry search outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-registry-search-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "asset-owner-public-path",
+              "outcome": "Replace with the concrete asset owner package and public path outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-asset-owner-public-path-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "provenance-license",
+              "outcome": "Replace with the concrete provenance and license outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-provenance-license-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "asset-semantics-alt",
+              "outcome": "Replace with the concrete decorative or informative semantics and alternative text outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-asset-semantics-alt-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "theme-suitability",
+              "outcome": "Replace with the concrete light and dark suitability outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-theme-suitability-evidence"
+                }
+              ]
+            }
+          ]
+        },
+        "contentAndInternationalization": {
+          "verdict": "reviewed",
+          "detail": "Replace with the reviewed Content and internationalization decision summary and ownership boundary.",
+          "evidence": [
+            {
+              "kind": "decision",
+              "ref": "replace-with-reproducible-evidence"
+            }
+          ],
+          "decisions": [
+            {
+              "decisionId": "copy-product-truth",
+              "outcome": "Replace with the concrete user-visible copy set and product truth outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-copy-product-truth-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "writing-voice",
+              "outcome": "Replace with the concrete Writing and Voice disposition outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-writing-voice-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "locale-language-boundary",
+              "outcome": "Replace with the concrete locale and document language boundary outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-locale-language-boundary-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "data-formatting",
+              "outcome": "Replace with the concrete date, time, number, unit, and missing-value formatting outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-data-formatting-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "translation-truncation",
+              "outcome": "Replace with the concrete translation and truncation behavior outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-translation-truncation-evidence"
+                }
+              ]
+            }
+          ]
+        },
+        "accessibility": {
+          "verdict": "reviewed",
+          "detail": "Replace with the reviewed Accessibility and inclusive interaction decision summary and ownership boundary.",
+          "evidence": [
+            {
+              "kind": "decision",
+              "ref": "replace-with-reproducible-evidence"
+            }
+          ],
+          "decisions": [
+            {
+              "decisionId": "landmarks-dom-order",
+              "outcome": "Replace with the concrete landmarks and semantic DOM order outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-landmarks-dom-order-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "keyboard-focus-restoration",
+              "outcome": "Replace with the concrete keyboard path and focus restoration outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-keyboard-focus-restoration-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "accessible-name-role-state",
+              "outcome": "Replace with the concrete accessible names, roles, states, and messages outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-accessible-name-role-state-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "target-pointer-alternatives",
+              "outcome": "Replace with the concrete target size and pointer alternatives outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-target-pointer-alternatives-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "contrast-non-color-cues",
+              "outcome": "Replace with the concrete contrast and non-color state cues outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-contrast-non-color-cues-evidence"
+                }
+              ]
+            },
+            {
+              "decisionId": "reduced-motion",
+              "outcome": "Replace with the concrete reduced-motion behavior outcome.",
+              "evidence": [
+                {
+                  "kind": "source",
+                  "ref": "replace-with-reduced-motion-evidence"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "componentMapping": {
+        "verdict": "reviewed",
+        "detail": "Replace with the reviewed owner-package component and composition mapping summary.",
+        "evidence": [
+          {
+            "kind": "decision",
+            "ref": "replace-with-reproducible-evidence"
+          }
+        ],
+        "decisions": [
+          {
+            "decisionId": "owner-public-export",
+            "outcome": "Replace with the concrete owner package public export outcome.",
+            "evidence": [
+              {
+                "kind": "source",
+                "ref": "replace-with-owner-public-export-evidence"
+              }
+            ]
+          },
+          {
+            "decisionId": "reuse-composition-choice",
+            "outcome": "Replace with the concrete existing component or composition choice outcome.",
+            "evidence": [
+              {
+                "kind": "source",
+                "ref": "replace-with-reuse-composition-choice-evidence"
+              }
+            ]
+          },
+          {
+            "decisionId": "product-orchestration-boundary",
+            "outcome": "Replace with the concrete product-owned orchestration boundary outcome.",
+            "evidence": [
+              {
+                "kind": "source",
+                "ref": "replace-with-product-orchestration-boundary-evidence"
+              }
+            ]
+          },
+          {
+            "decisionId": "exception-shared-authoring",
+            "outcome": "Replace with the concrete remaining exception or shared LDS authoring need outcome.",
+            "evidence": [
+              {
+                "kind": "source",
+                "ref": "replace-with-exception-shared-authoring-evidence"
+              }
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "viewports": [
+          "1280x800",
+          "360x800"
+        ],
+        "viewportDisposition": "Replace with normal and narrow viewport verification results.",
+        "themes": [
+          "light",
+          "dark"
+        ],
+        "themeDisposition": "Replace with supported theme and color-scheme verification results.",
+        "states": [
+          "ready",
+          "loading"
+        ],
+        "stateDisposition": "Replace with representative ready and non-ready state verification results.",
+        "evidence": [
+          {
+            "kind": "check",
+            "ref": "replace-with-verification-artifact-path"
+          }
+        ]
+      }
+    }
+  ],
+  "exceptions": []
+}

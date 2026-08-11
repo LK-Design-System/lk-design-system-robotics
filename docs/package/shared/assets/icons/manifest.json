@@ -1,0 +1,2533 @@
+{
+  "source": {
+    "name": "Base icon source / Icon",
+    "importedFrom": "C:/Users/MSI/Downloads/Icon",
+    "importedAt": "2026-08-09",
+    "note": "SVG files are normalized for LDS Icon usage. Color logo SVGs keep original fills and embedded image data. Repository-local additions live in assets/icon-source-overrides/."
+  },
+  "counts": {
+    "svgImported": 339,
+    "customSvgImported": 19,
+    "rasterCopied": 1,
+    "publicIconNames": 359,
+    "sourceIconNames": 358,
+    "ldsLegacyFallbacks": 1
+  },
+  "icons": [
+    {
+      "name": "nav-career",
+      "source": "base-navigation",
+      "sourcePath": "Navigation/Name=navigationCareer.svg",
+      "assetPath": "assets/icons/nav-career.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "nav-menu",
+      "source": "base-navigation",
+      "sourcePath": "Navigation/Name=navigationMenu.svg",
+      "assetPath": "assets/icons/nav-menu.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "nav-mypage",
+      "source": "base-navigation",
+      "sourcePath": "Navigation/Name=navigationMypage.svg",
+      "assetPath": "assets/icons/nav-mypage.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "nav-recruit",
+      "source": "base-navigation",
+      "sourcePath": "Navigation/Name=navigationRecruit.svg",
+      "assetPath": "assets/icons/nav-recruit.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "nav-social",
+      "source": "base-navigation",
+      "sourcePath": "Navigation/Name=navigationSocial.svg",
+      "assetPath": "assets/icons/nav-social.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "nav-shape",
+      "source": "base-navigation",
+      "sourcePath": "Navigation/Shape.svg",
+      "assetPath": "assets/icons/nav-shape.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "agent",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=agent.svg",
+      "assetPath": "assets/icons/agent.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "ai-review-1",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=aiReview-1.svg",
+      "assetPath": "assets/icons/ai-review-1.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "ai-review",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=aiReview.svg",
+      "assetPath": "assets/icons/ai-review.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "align-center",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=alignCenter.svg",
+      "assetPath": "assets/icons/align-center.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "align-justify",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=alignJustify.svg",
+      "assetPath": "assets/icons/align-justify.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "align-left",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=alignLeft.svg",
+      "assetPath": "assets/icons/align-left.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "align-right",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=alignRight.svg",
+      "assetPath": "assets/icons/align-right.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "android",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=android.svg",
+      "assetPath": "assets/icons/android.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "apps",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=apps.svg",
+      "assetPath": "assets/icons/apps.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "arrow-down",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=arrowDown, Thick=False.svg",
+      "assetPath": "assets/icons/arrow-down.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "arrow-down-thick",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=arrowDownThick, Thick=True.svg",
+      "assetPath": "assets/icons/arrow-down-thick.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "arrow-left",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=arrowLeft, Thick=False.svg",
+      "assetPath": "assets/icons/arrow-left.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "arrow-left-thick",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=arrowLeftThick, Thick=True.svg",
+      "assetPath": "assets/icons/arrow-left-thick.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "arrow-right",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=arrowRight, Thick=False.svg",
+      "assetPath": "assets/icons/arrow-right.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "arrow-right-thick",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=arrowRightThick, Thick=True.svg",
+      "assetPath": "assets/icons/arrow-right-thick.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "arrow-turn-down-left",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=arrowTurnDownLeft.svg",
+      "assetPath": "assets/icons/arrow-turn-down-left.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "arrow-turn-down-right",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=arrowTurnDownRight.svg",
+      "assetPath": "assets/icons/arrow-turn-down-right.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "arrow-up",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=arrowUp, Thick=False.svg",
+      "assetPath": "assets/icons/arrow-up.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "arrow-up-right",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=arrowUpRight, Thick=False.svg",
+      "assetPath": "assets/icons/arrow-up-right.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "arrow-up-right-thick",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=arrowUpRightThick, Thick=True.svg",
+      "assetPath": "assets/icons/arrow-up-right-thick.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "arrow-up-thick",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=arrowUpThick, Thick=True.svg",
+      "assetPath": "assets/icons/arrow-up-thick.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "attachment",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=attachment.svg",
+      "assetPath": "assets/icons/attachment.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "bell",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=bell, Fill=False.svg",
+      "assetPath": "assets/icons/bell.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "bell-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=bellFill, Fill=True.svg",
+      "assetPath": "assets/icons/bell-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "bell-plus",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=bellPlus.svg",
+      "assetPath": "assets/icons/bell-plus.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "blank",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=blank.svg",
+      "assetPath": "assets/icons/blank.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "bold",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=bold.svg",
+      "assetPath": "assets/icons/bold.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "book",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=book, Fill=False.svg",
+      "assetPath": "assets/icons/book.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "book-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=bookFill, Fill=True.svg",
+      "assetPath": "assets/icons/book-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "bookmark",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=bookmark, Fill=False.svg",
+      "assetPath": "assets/icons/bookmark.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "bookmark-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=bookmarkFill, Fill=True.svg",
+      "assetPath": "assets/icons/bookmark-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "bubble",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=bubble, Fill=False.svg",
+      "assetPath": "assets/icons/bubble.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "bubble-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=bubbleFill, Fill=True.svg",
+      "assetPath": "assets/icons/bubble-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "bubble-plus",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=bubblePlus, Fill=False.svg",
+      "assetPath": "assets/icons/bubble-plus.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "bubble-plus-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=bubblePlusFill, Fill=True.svg",
+      "assetPath": "assets/icons/bubble-plus-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "bulb",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=bulb.svg",
+      "assetPath": "assets/icons/bulb.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "business-bag",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=businessBag, Fill=False.svg",
+      "assetPath": "assets/icons/business-bag.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "business-bag-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=businessBagFill, Fill=True.svg",
+      "assetPath": "assets/icons/business-bag-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "calendar",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=calendar.svg",
+      "assetPath": "assets/icons/calendar.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "calendar-person",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=calendarPerson.svg",
+      "assetPath": "assets/icons/calendar-person.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "camera",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=camera, Fill=False.svg",
+      "assetPath": "assets/icons/camera.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "camera-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=cameraFill, Fill=True.svg",
+      "assetPath": "assets/icons/camera-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "caret-down",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=caretDown.svg",
+      "assetPath": "assets/icons/caret-down.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "caret-up",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=caretUp.svg",
+      "assetPath": "assets/icons/caret-up.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "certificate",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=certificate.svg",
+      "assetPath": "assets/icons/certificate.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "change",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=change.svg",
+      "assetPath": "assets/icons/change.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chat",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chat.svg",
+      "assetPath": "assets/icons/chat.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "check",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=check, Thick=False.svg",
+      "assetPath": "assets/icons/check.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "check-thick",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=checkThick, Thick=True.svg",
+      "assetPath": "assets/icons/check-thick.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-double-left",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronDoubleLeft, Thick=False, Small=False.svg",
+      "assetPath": "assets/icons/chevron-double-left.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-double-left-small",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronDoubleLeftSmall, Thick=False, Small=True.svg",
+      "assetPath": "assets/icons/chevron-double-left-small.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-double-left-thick",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronDoubleLeftThick, Thick=True, Small=False.svg",
+      "assetPath": "assets/icons/chevron-double-left-thick.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-double-left-thick-small",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronDoubleLeftThickSmall, Thick=True, Small=True.svg",
+      "assetPath": "assets/icons/chevron-double-left-thick-small.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-double-right",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronDoubleRight, Thick=False, Small=False.svg",
+      "assetPath": "assets/icons/chevron-double-right.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-double-right-small",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronDoubleRightSmall, Thick=False, Small=True.svg",
+      "assetPath": "assets/icons/chevron-double-right-small.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-double-right-thick",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronDoubleRightThick, Thick=True, Small=False.svg",
+      "assetPath": "assets/icons/chevron-double-right-thick.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-double-right-thick-small",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronDoubleRightThickSmall, Thick=True, Small=True.svg",
+      "assetPath": "assets/icons/chevron-double-right-thick-small.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-down",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronDown, Thick=False, Small=False.svg",
+      "assetPath": "assets/icons/chevron-down.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-down-small",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronDownSmall, Thick=False, Small=True.svg",
+      "assetPath": "assets/icons/chevron-down-small.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-down-thick",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronDownThick, Thick=True, Small=False.svg",
+      "assetPath": "assets/icons/chevron-down-thick.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-down-thick-small",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronDownThickSmall, Thick=True, Small=True.svg",
+      "assetPath": "assets/icons/chevron-down-thick-small.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-left",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronLeft, Tight=False, Thick=False, Small=False.svg",
+      "assetPath": "assets/icons/chevron-left.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-left-small",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronLeftSmall, Tight=False, Thick=False, Small=True.svg",
+      "assetPath": "assets/icons/chevron-left-small.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-left-thick",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronLeftThick, Tight=False, Thick=True, Small=False.svg",
+      "assetPath": "assets/icons/chevron-left-thick.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-left-thick-small",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronLeftThickSmall, Tight=False, Thick=True, Small=True.svg",
+      "assetPath": "assets/icons/chevron-left-thick-small.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-left-tight",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronLeftTight, Tight=True, Thick=False, Small=False.svg",
+      "assetPath": "assets/icons/chevron-left-tight.svg",
+      "viewBox": "0 0 12 24"
+    },
+    {
+      "name": "chevron-left-tight-small",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronLeftTightSmall, Tight=True, Thick=False, Small=True.svg",
+      "assetPath": "assets/icons/chevron-left-tight-small.svg",
+      "viewBox": "0 0 12 24"
+    },
+    {
+      "name": "chevron-left-tight-thick",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronLeftTightThick, Tight=True, Thick=True, Small=False.svg",
+      "assetPath": "assets/icons/chevron-left-tight-thick.svg",
+      "viewBox": "0 0 12 24"
+    },
+    {
+      "name": "chevron-left-tight-thick-small",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronLeftTightThickSmall, Tight=True, Thick=True, Small=True.svg",
+      "assetPath": "assets/icons/chevron-left-tight-thick-small.svg",
+      "viewBox": "0 0 12 24"
+    },
+    {
+      "name": "chevron-right",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronRight, Tight=False, Thick=False, Small=False.svg",
+      "assetPath": "assets/icons/chevron-right.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-right-small",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronRightSmall, Tight=False, Thick=False, Small=True.svg",
+      "assetPath": "assets/icons/chevron-right-small.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-right-thick",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronRightThick, Tight=False, Thick=True, Small=False.svg",
+      "assetPath": "assets/icons/chevron-right-thick.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-right-thick-small",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronRightThickSmall, Tight=False, Thick=True, Small=True.svg",
+      "assetPath": "assets/icons/chevron-right-thick-small.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-right-tight",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronRightTight, Tight=True, Thick=False, Small=False.svg",
+      "assetPath": "assets/icons/chevron-right-tight.svg",
+      "viewBox": "0 0 12 24"
+    },
+    {
+      "name": "chevron-right-tight-small",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronRightTightSmall, Tight=True, Thick=False, Small=True.svg",
+      "assetPath": "assets/icons/chevron-right-tight-small.svg",
+      "viewBox": "0 0 12 24"
+    },
+    {
+      "name": "chevron-right-tight-thick",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronRightTightThick, Tight=True, Thick=True, Small=False.svg",
+      "assetPath": "assets/icons/chevron-right-tight-thick.svg",
+      "viewBox": "0 0 12 24"
+    },
+    {
+      "name": "chevron-right-tight-thick-small",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronRightTightThickSmall, Tight=True, Thick=True, Small=True.svg",
+      "assetPath": "assets/icons/chevron-right-tight-thick-small.svg",
+      "viewBox": "0 0 12 24"
+    },
+    {
+      "name": "chevron-up",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronUp, Thick=False, Small=False.svg",
+      "assetPath": "assets/icons/chevron-up.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-up-small",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronUpSmall, Thick=False, Small=True.svg",
+      "assetPath": "assets/icons/chevron-up-small.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-up-thick",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronUpThick, Thick=True, Small=False.svg",
+      "assetPath": "assets/icons/chevron-up-thick.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "chevron-up-thick-small",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=chevronUpThickSmall, Thick=True, Small=True.svg",
+      "assetPath": "assets/icons/chevron-up-thick-small.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "circle",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=circle, Fill=False.svg",
+      "assetPath": "assets/icons/circle.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "circle-block",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=circleBlock.svg",
+      "assetPath": "assets/icons/circle-block.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "circle-check",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=circleCheck, Fill=False.svg",
+      "assetPath": "assets/icons/circle-check.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "circle-check-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=circleCheckFill, Fill=True.svg",
+      "assetPath": "assets/icons/circle-check-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "circle-close",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=circleClose, Fill=False.svg",
+      "assetPath": "assets/icons/circle-close.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "circle-close-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=circleCloseFill, Fill=True.svg",
+      "assetPath": "assets/icons/circle-close-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "circle-dot",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=circleDot.svg",
+      "assetPath": "assets/icons/circle-dot.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "circle-exclamation",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=circleExclamation, Fill=False.svg",
+      "assetPath": "assets/icons/circle-exclamation.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "circle-exclamation-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=circleExclamationFill, Fill=True.svg",
+      "assetPath": "assets/icons/circle-exclamation-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "circle-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=circleFill, Fill=True.svg",
+      "assetPath": "assets/icons/circle-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "circle-info",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=circleInfo, Fill=False.svg",
+      "assetPath": "assets/icons/circle-info.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "circle-info-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=circleInfoFill, Fill=True.svg",
+      "assetPath": "assets/icons/circle-info-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "circle-plus",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=circlePlus, Fill=False.svg",
+      "assetPath": "assets/icons/circle-plus.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "circle-plus-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=circlePlusFill, Fill=True.svg",
+      "assetPath": "assets/icons/circle-plus-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "circle-point",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=circlePoint.svg",
+      "assetPath": "assets/icons/circle-point.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "circle-question",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=circleQuestion, Fill=False.svg",
+      "assetPath": "assets/icons/circle-question.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "circle-question-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=circleQuestionFill, Fill=True.svg",
+      "assetPath": "assets/icons/circle-question-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "circle-up-right",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=circleUpRight, Fill=False.svg",
+      "assetPath": "assets/icons/circle-up-right.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "circle-up-right-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=circleUpRightFill, Fill=True.svg",
+      "assetPath": "assets/icons/circle-up-right-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "clock",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=clock, Fill=False.svg",
+      "assetPath": "assets/icons/clock.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "clock-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=clockFill, Fill=True.svg",
+      "assetPath": "assets/icons/clock-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "close",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=close, Thick=False.svg",
+      "assetPath": "assets/icons/close.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "close-thick",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=closeThick, Thick=True.svg",
+      "assetPath": "assets/icons/close-thick.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "code",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=code.svg",
+      "assetPath": "assets/icons/code.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "coffee",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=coffee, Fill=False.svg",
+      "assetPath": "assets/icons/coffee.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "coffee-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=coffeeFill, Fill=True.svg",
+      "assetPath": "assets/icons/coffee-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "coins",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=coins, Fill=False.svg",
+      "assetPath": "assets/icons/coins.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "coins-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=coinsFill, Fill=True.svg",
+      "assetPath": "assets/icons/coins-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "column",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=column.svg",
+      "assetPath": "assets/icons/column.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "company",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=company, Fill=False.svg",
+      "assetPath": "assets/icons/company.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "company-check",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=companyCheck, Fill=False.svg",
+      "assetPath": "assets/icons/company-check.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "company-check-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=companyCheckFill, Fill=True.svg",
+      "assetPath": "assets/icons/company-check-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "company-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=companyFill, Fill=True.svg",
+      "assetPath": "assets/icons/company-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "company-plus",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=companyPlus, Fill=False.svg",
+      "assetPath": "assets/icons/company-plus.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "company-plus-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=companyPlusFill, Fill=True.svg",
+      "assetPath": "assets/icons/company-plus-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "compass",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=compass, Fill=False.svg",
+      "assetPath": "assets/icons/compass.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "compass-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=compassFill, Fill=True.svg",
+      "assetPath": "assets/icons/compass-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "component",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=component, Fill=False.svg",
+      "assetPath": "assets/icons/component.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "component-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=componentFill, Fill=True.svg",
+      "assetPath": "assets/icons/component-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "copy",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=copy.svg",
+      "assetPath": "assets/icons/copy.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "crown",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=crown, Fill=False.svg",
+      "assetPath": "assets/icons/crown.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "crown-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=crownFill, Fill=True.svg",
+      "assetPath": "assets/icons/crown-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "deep-search",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=deepSearch.svg",
+      "assetPath": "assets/icons/deep-search.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "desktop",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=desktop, Fill=False.svg",
+      "assetPath": "assets/icons/desktop.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "desktop-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=desktopFill, Fill=True.svg",
+      "assetPath": "assets/icons/desktop-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "diamond",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=diamond, Fill=False.svg",
+      "assetPath": "assets/icons/diamond.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "diamond-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=diamondFill, Fill=True.svg",
+      "assetPath": "assets/icons/diamond-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "dislike",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=dislike, Fill=False.svg",
+      "assetPath": "assets/icons/dislike.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "dislike-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=dislikeFill, Fill=True.svg",
+      "assetPath": "assets/icons/dislike-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "document",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=document, Fill=False.svg",
+      "assetPath": "assets/icons/document.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "document-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=documentFill, Fill=True.svg",
+      "assetPath": "assets/icons/document-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "document-person",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=documentPerson, Fill=False.svg",
+      "assetPath": "assets/icons/document-person.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "document-person-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=documentPersonFill, Fill=True.svg",
+      "assetPath": "assets/icons/document-person-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "document-search",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=documentSearch.svg",
+      "assetPath": "assets/icons/document-search.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "document-text",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=documentText, Fill=False.svg",
+      "assetPath": "assets/icons/document-text.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "document-text-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=documentTextFill, Fill=True.svg",
+      "assetPath": "assets/icons/document-text-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "dot",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=dot.svg",
+      "assetPath": "assets/icons/dot.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "download",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=download.svg",
+      "assetPath": "assets/icons/download.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "exclamation",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=exclamation.svg",
+      "assetPath": "assets/icons/exclamation.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "external-link",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=externalLink.svg",
+      "assetPath": "assets/icons/external-link.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "eye",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=eye, Fill=False.svg",
+      "assetPath": "assets/icons/eye.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "eye-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=eyeFill, Fill=True.svg",
+      "assetPath": "assets/icons/eye-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "eye-slash",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=eyeSlash, Fill=False.svg",
+      "assetPath": "assets/icons/eye-slash.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "eye-slash-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=eyeSlashFill, Fill=True.svg",
+      "assetPath": "assets/icons/eye-slash-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "face-smile",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=faceSmile, Fill=False.svg",
+      "assetPath": "assets/icons/face-smile.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "face-smile-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=faceSmileFill, Fill=True.svg",
+      "assetPath": "assets/icons/face-smile-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "filter",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=filter, Fill=False.svg",
+      "assetPath": "assets/icons/filter.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "filter-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=filterFill, Fill=True.svg",
+      "assetPath": "assets/icons/filter-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "fire",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=fire, Fill=False.svg",
+      "assetPath": "assets/icons/fire.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "fire-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=fireFill, Fill=True.svg",
+      "assetPath": "assets/icons/fire-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "flag",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=flag, Fill=False.svg",
+      "assetPath": "assets/icons/flag.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "flag-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=flagFill, Fill=True.svg",
+      "assetPath": "assets/icons/flag-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "flip-backward",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=flipBackward.svg",
+      "assetPath": "assets/icons/flip-backward.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "folder",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=folder, Fill=False.svg",
+      "assetPath": "assets/icons/folder.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "folder-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=folderFill, Fill=True.svg",
+      "assetPath": "assets/icons/folder-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "folder-job",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=folderJob, Fill=False.svg",
+      "assetPath": "assets/icons/folder-job.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "folder-job-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=folderJobFill, Fill=True.svg",
+      "assetPath": "assets/icons/folder-job-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "folder-star",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=folderStar, Fill=False.svg",
+      "assetPath": "assets/icons/folder-star.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "folder-star-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=folderStarFill, Fill=True.svg",
+      "assetPath": "assets/icons/folder-star-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "full",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=full.svg",
+      "assetPath": "assets/icons/full.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "globe",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=globe, Fill=False.svg",
+      "assetPath": "assets/icons/globe.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "globe-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=globeFill, Fill=True.svg",
+      "assetPath": "assets/icons/globe-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "graduation",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=graduation, Fill=False.svg",
+      "assetPath": "assets/icons/graduation.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "graduation-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=graduationFill, Fill=True.svg",
+      "assetPath": "assets/icons/graduation-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "handle",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=handle.svg",
+      "assetPath": "assets/icons/handle.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "handle-desktop",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=handleDesktop.svg",
+      "assetPath": "assets/icons/handle-desktop.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "heart",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=heart, Fill=False.svg",
+      "assetPath": "assets/icons/heart.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "heart-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=heartFill, Fill=True.svg",
+      "assetPath": "assets/icons/heart-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "heart-in-heart",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=heartInHeart, Fill=False.svg",
+      "assetPath": "assets/icons/heart-in-heart.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "heart-in-heart-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=heartInHeartFill, Fill=True.svg",
+      "assetPath": "assets/icons/heart-in-heart-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "history",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=history.svg",
+      "assetPath": "assets/icons/history.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "home",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=home, Fill=False.svg",
+      "assetPath": "assets/icons/home.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "home-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=homeFill, Fill=True.svg",
+      "assetPath": "assets/icons/home-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "hourglass",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=hourglass.svg",
+      "assetPath": "assets/icons/hourglass.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "image",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=image.svg",
+      "assetPath": "assets/icons/image.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "inbox",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=inbox.svg",
+      "assetPath": "assets/icons/inbox.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "instance",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=instance.svg",
+      "assetPath": "assets/icons/instance.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "keyboard",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=keyboard.svg",
+      "assetPath": "assets/icons/keyboard.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "left-side",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=leftSide.svg",
+      "assetPath": "assets/icons/left-side.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "like",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=like, Fill=False.svg",
+      "assetPath": "assets/icons/like.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "like-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=likeFill, Fill=True.svg",
+      "assetPath": "assets/icons/like-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "line-horizontal",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=lineHorizontal, Thick=False.svg",
+      "assetPath": "assets/icons/line-horizontal.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "line-horizontal-thick",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=lineHorizontalThick, Thick=True.svg",
+      "assetPath": "assets/icons/line-horizontal-thick.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "link",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=link.svg",
+      "assetPath": "assets/icons/link.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "list",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=list.svg",
+      "assetPath": "assets/icons/list.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "list-category",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=listCategory.svg",
+      "assetPath": "assets/icons/list-category.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "list-ordered",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=listOrdered.svg",
+      "assetPath": "assets/icons/list-ordered.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "location",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=location, Fill=False.svg",
+      "assetPath": "assets/icons/location.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "location-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=locationFill, Fill=True.svg",
+      "assetPath": "assets/icons/location-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "lock",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=lock, Fill=False.svg",
+      "assetPath": "assets/icons/lock.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "lock-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=lockFill, Fill=True.svg",
+      "assetPath": "assets/icons/lock-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "lock-open",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=lockOpen, Fill=False.svg",
+      "assetPath": "assets/icons/lock-open.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "lock-open-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=lockOpenFill, Fill=True.svg",
+      "assetPath": "assets/icons/lock-open-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "login",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=login.svg",
+      "assetPath": "assets/icons/login.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "logo-apple",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=logoApple.svg",
+      "assetPath": "assets/icons/logo-apple.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "logo-brunch",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=logoBrunch.svg",
+      "assetPath": "assets/icons/logo-brunch.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "logo-facebook",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=logoFacebook.svg",
+      "assetPath": "assets/icons/logo-facebook.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "logo-google-play",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=logoGooglePlay.svg",
+      "assetPath": "assets/icons/logo-google-play.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "logo-instagram",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=logoInstagram.svg",
+      "assetPath": "assets/icons/logo-instagram.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "logo-kakao",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=logoKakao.svg",
+      "assetPath": "assets/icons/logo-kakao.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "logo-linked-in",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=logoLinkedIn.svg",
+      "assetPath": "assets/icons/logo-linked-in.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "logo-microsoft",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=logoMicrosoft.svg",
+      "assetPath": "assets/icons/logo-microsoft.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "logo-naver-blog",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=logoNaverBlog.svg",
+      "assetPath": "assets/icons/logo-naver-blog.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "logout",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=logout.svg",
+      "assetPath": "assets/icons/logout.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "logo-x",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=logoX.svg",
+      "assetPath": "assets/icons/logo-x.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "logo-youtube",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=logoYoutube.svg",
+      "assetPath": "assets/icons/logo-youtube.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "magic-wand",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=magicWand.svg",
+      "assetPath": "assets/icons/magic-wand.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "mail",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=mail.svg",
+      "assetPath": "assets/icons/mail.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "mail-open",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=mailOpen.svg",
+      "assetPath": "assets/icons/mail-open.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "medal",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=medal.svg",
+      "assetPath": "assets/icons/medal.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "megaphone",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=megaphone, Fill=False.svg",
+      "assetPath": "assets/icons/megaphone.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "megaphone-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=megaphoneFill, Fill=True.svg",
+      "assetPath": "assets/icons/megaphone-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "menu",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=menu, Thick=False.svg",
+      "assetPath": "assets/icons/menu.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "menu-thick",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=menuThick, Thick=True.svg",
+      "assetPath": "assets/icons/menu-thick.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "message",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=message, Fill=False.svg",
+      "assetPath": "assets/icons/message.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "message-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=messageFill, Fill=True.svg",
+      "assetPath": "assets/icons/message-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "microphone",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=microphone, Fill=False.svg",
+      "assetPath": "assets/icons/microphone.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "microphone-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=microphoneFill, Fill=True.svg",
+      "assetPath": "assets/icons/microphone-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "microphone-slash",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=microphoneSlash, Fill=False.svg",
+      "assetPath": "assets/icons/microphone-slash.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "microphone-slash-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=microphoneSlashFill, Fill=True.svg",
+      "assetPath": "assets/icons/microphone-slash-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "minus",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=minus, Thick=False.svg",
+      "assetPath": "assets/icons/minus.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "minus-thick",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=minusThick, Thick=True.svg",
+      "assetPath": "assets/icons/minus-thick.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "mobile",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=mobile, Fill=False.svg",
+      "assetPath": "assets/icons/mobile.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "mobile-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=mobileFill, Fill=True.svg",
+      "assetPath": "assets/icons/mobile-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "moon",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=moon.svg",
+      "assetPath": "assets/icons/moon.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "more-horizontal",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=moreHorizontal.svg",
+      "assetPath": "assets/icons/more-horizontal.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "more-vertical",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=moreVertical, Tight=False.svg",
+      "assetPath": "assets/icons/more-vertical.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "more-vertical-tight",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=moreVerticalTight, Tight=True.svg",
+      "assetPath": "assets/icons/more-vertical-tight.svg",
+      "viewBox": "0 0 12 24"
+    },
+    {
+      "name": "music-microphone",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=musicMicrophone.svg",
+      "assetPath": "assets/icons/music-microphone.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "palette",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=palette, Fill=False.svg",
+      "assetPath": "assets/icons/palette.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "palette-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=paletteFill, Fill=True.svg",
+      "assetPath": "assets/icons/palette-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "passport",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=passport, Fill=False.svg",
+      "assetPath": "assets/icons/passport.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "passport-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=passportFill, Fill=True.svg",
+      "assetPath": "assets/icons/passport-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "pause",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=pause.svg",
+      "assetPath": "assets/icons/pause.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "pencil",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=pencil, Fill=False.svg",
+      "assetPath": "assets/icons/pencil.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "pencil-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=pencilFill, Fill=True.svg",
+      "assetPath": "assets/icons/pencil-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "person",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=person, Fill=False.svg",
+      "assetPath": "assets/icons/person.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "person-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=personFill, Fill=True.svg",
+      "assetPath": "assets/icons/person-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "person-plus",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=personPlus, Fill=False.svg",
+      "assetPath": "assets/icons/person-plus.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "person-plus-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=personPlusFill, Fill=True.svg",
+      "assetPath": "assets/icons/person-plus-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "persons",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=persons, Fill=False.svg",
+      "assetPath": "assets/icons/persons.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "persons-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=personsFill, Fill=True.svg",
+      "assetPath": "assets/icons/persons-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "phone",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=phone, Fill=False.svg",
+      "assetPath": "assets/icons/phone.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "phone-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=phoneFill, Fill=True.svg",
+      "assetPath": "assets/icons/phone-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "pin",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=pin, Fill=False.svg",
+      "assetPath": "assets/icons/pin.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "pin-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=pinFill, Fill=True.svg",
+      "assetPath": "assets/icons/pin-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "play",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=play.svg",
+      "assetPath": "assets/icons/play.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "plus",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=plus, Thick=False.svg",
+      "assetPath": "assets/icons/plus.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "plus-thick",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=plusThick, Thick=True.svg",
+      "assetPath": "assets/icons/plus-thick.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "presentation",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=presentation.svg",
+      "assetPath": "assets/icons/presentation.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "printer",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=printer.svg",
+      "assetPath": "assets/icons/printer.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "question",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=question.svg",
+      "assetPath": "assets/icons/question.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "quote",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=quote.svg",
+      "assetPath": "assets/icons/quote.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "refresh",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=refresh.svg",
+      "assetPath": "assets/icons/refresh.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "regex",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=regex.svg",
+      "assetPath": "assets/icons/regex.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "replace",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=replace.svg",
+      "assetPath": "assets/icons/replace.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "replace-all",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=replaceAll.svg",
+      "assetPath": "assets/icons/replace-all.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "reset",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=reset.svg",
+      "assetPath": "assets/icons/reset.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "search",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=search, Thick=False.svg",
+      "assetPath": "assets/icons/search.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "search-thick",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=searchThick, Thick=True.svg",
+      "assetPath": "assets/icons/search-thick.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "send",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=send, Fill=False.svg",
+      "assetPath": "assets/icons/send.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "send-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=sendFill, Fill=True.svg",
+      "assetPath": "assets/icons/send-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "setting",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=setting.svg",
+      "assetPath": "assets/icons/setting.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "share",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=share.svg",
+      "assetPath": "assets/icons/share.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "share-ios",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=shareIos.svg",
+      "assetPath": "assets/icons/share-ios.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "sparkle",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=sparkle, Fill=False.svg",
+      "assetPath": "assets/icons/sparkle.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "sparkle-2",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=sparkle.svg",
+      "assetPath": "assets/icons/sparkle-2.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "sparkle-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=sparkleFill, Fill=True.svg",
+      "assetPath": "assets/icons/sparkle-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "square",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=square, Fill=False.svg",
+      "assetPath": "assets/icons/square.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "square-caret",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=squareCaret.svg",
+      "assetPath": "assets/icons/square-caret.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "square-check",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=squareCheck.svg",
+      "assetPath": "assets/icons/square-check.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "square-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=squareFill, Fill=True.svg",
+      "assetPath": "assets/icons/square-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "square-han",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=squareHan.svg",
+      "assetPath": "assets/icons/square-han.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "square-hangul",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=squareHangul.svg",
+      "assetPath": "assets/icons/square-hangul.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "square-kana",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=squareKana.svg",
+      "assetPath": "assets/icons/square-kana.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "square-latin",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=squareLatin, Fill=False.svg",
+      "assetPath": "assets/icons/square-latin.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "square-latin-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=squareLatinFill, Fill=True.svg",
+      "assetPath": "assets/icons/square-latin-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "square-more",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=squareMore.svg",
+      "assetPath": "assets/icons/square-more.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "square-play",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=squarePlay.svg",
+      "assetPath": "assets/icons/square-play.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "square-plus",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=squarePlus, Fill=False.svg",
+      "assetPath": "assets/icons/square-plus.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "square-plus-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=squarePlusFill, Fill=True.svg",
+      "assetPath": "assets/icons/square-plus-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "star",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=star, Fill=False.svg",
+      "assetPath": "assets/icons/star.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "star-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=starFill, Fill=True.svg",
+      "assetPath": "assets/icons/star-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "storage",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=storage.svg",
+      "assetPath": "assets/icons/storage.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "strikethrough",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=strikethrough.svg",
+      "assetPath": "assets/icons/strikethrough.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "sun",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=sun.svg",
+      "assetPath": "assets/icons/sun.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "tag",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=tag, Fill=False.svg",
+      "assetPath": "assets/icons/tag.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "tag-2",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=tag.svg",
+      "assetPath": "assets/icons/tag-2.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "tag-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=tagFill, Fill=True.svg",
+      "assetPath": "assets/icons/tag-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "telescope",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=telescope.svg",
+      "assetPath": "assets/icons/telescope.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "template",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=template, Fill=False.svg",
+      "assetPath": "assets/icons/template.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "template-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=templateFill, Fill=True.svg",
+      "assetPath": "assets/icons/template-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "text-format",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=textFormat.svg",
+      "assetPath": "assets/icons/text-format.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "text-variable",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=textVariable.svg",
+      "assetPath": "assets/icons/text-variable.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "thumbnail",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=thumbnail.svg",
+      "assetPath": "assets/icons/thumbnail.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "thunder",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=thunder, Fill=False.svg",
+      "assetPath": "assets/icons/thunder.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "thunder-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=thunderFill, Fill=True.svg",
+      "assetPath": "assets/icons/thunder-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "ticket",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=ticket, Fill=False.svg",
+      "assetPath": "assets/icons/ticket.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "ticket-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=ticketFill, Fill=True.svg",
+      "assetPath": "assets/icons/ticket-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "trash",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=trash.svg",
+      "assetPath": "assets/icons/trash.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "triangle",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=triangle, Fill=False.svg",
+      "assetPath": "assets/icons/triangle.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "triangle-exclamation",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=triangleExclamation, Fill=False.svg",
+      "assetPath": "assets/icons/triangle-exclamation.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "triangle-exclamation-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=triangleExclamationFill, Fill=True.svg",
+      "assetPath": "assets/icons/triangle-exclamation-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "triangle-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=triangleFill, Fill=True.svg",
+      "assetPath": "assets/icons/triangle-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "trophy",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=trophy, Fill=False.svg",
+      "assetPath": "assets/icons/trophy.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "trophy-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=trophyFill, Fill=True.svg",
+      "assetPath": "assets/icons/trophy-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "tune",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=tune.svg",
+      "assetPath": "assets/icons/tune.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "umbrella",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=umbrella, Fill=False.svg",
+      "assetPath": "assets/icons/umbrella.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "umbrella-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=umbrellaFill, Fill=True.svg",
+      "assetPath": "assets/icons/umbrella-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "underline",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=underline.svg",
+      "assetPath": "assets/icons/underline.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "upload",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=upload.svg",
+      "assetPath": "assets/icons/upload.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "utility",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=utility, Fill=False.svg",
+      "assetPath": "assets/icons/utility.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "utility-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=utilityFill, Fill=True.svg",
+      "assetPath": "assets/icons/utility-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "verified-check",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=verifiedCheck, Fill=False.svg",
+      "assetPath": "assets/icons/verified-check.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "verified-check-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=verifiedCheckFill, Fill=True.svg",
+      "assetPath": "assets/icons/verified-check-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "verified-star",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=verifiedStar, Fill=False.svg",
+      "assetPath": "assets/icons/verified-star.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "verified-star-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=verifiedStarFill, Fill=True.svg",
+      "assetPath": "assets/icons/verified-star-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "video",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=video.svg",
+      "assetPath": "assets/icons/video.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "webinar",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=webinar.svg",
+      "assetPath": "assets/icons/webinar.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "whole-word",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=wholeWord.svg",
+      "assetPath": "assets/icons/whole-word.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "write",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=write.svg",
+      "assetPath": "assets/icons/write.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "zep-fast",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=zepFast, Fill=False.svg",
+      "assetPath": "assets/icons/zep-fast.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "zep-fast-fill",
+      "source": "base-normal",
+      "sourcePath": "Normal/Name=zepFastFill, Fill=True.svg",
+      "assetPath": "assets/icons/zep-fast-fill.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "normal",
+      "source": "base-normal",
+      "sourcePath": "Normal/Normal.svg",
+      "assetPath": "assets/icons/normal.svg",
+      "viewBox": "0 0 18 19"
+    },
+    {
+      "name": "battery-charging",
+      "source": "material-symbols",
+      "sourcePath": "assets/icon-source-overrides/battery-charging.svg",
+      "assetPath": "assets/icons/battery-charging.svg",
+      "viewBox": "0 -960 960 960"
+    },
+    {
+      "name": "battery",
+      "source": "material-symbols",
+      "sourcePath": "assets/icon-source-overrides/battery.svg",
+      "assetPath": "assets/icons/battery.svg",
+      "viewBox": "0 -960 960 960"
+    },
+    {
+      "name": "cpu",
+      "source": "material-symbols",
+      "sourcePath": "assets/icon-source-overrides/cpu.svg",
+      "assetPath": "assets/icons/cpu.svg",
+      "viewBox": "0 -960 960 960"
+    },
+    {
+      "name": "crosshair",
+      "source": "material-symbols",
+      "sourcePath": "assets/icon-source-overrides/crosshair.svg",
+      "assetPath": "assets/icons/crosshair.svg",
+      "viewBox": "0 -960 960 960"
+    },
+    {
+      "name": "gauge",
+      "source": "material-symbols",
+      "sourcePath": "assets/icon-source-overrides/gauge.svg",
+      "assetPath": "assets/icons/gauge.svg",
+      "viewBox": "0 -960 960 960"
+    },
+    {
+      "name": "joystick",
+      "source": "material-symbols",
+      "sourcePath": "assets/icon-source-overrides/joystick.svg",
+      "assetPath": "assets/icons/joystick.svg",
+      "viewBox": "0 -960 960 960"
+    },
+    {
+      "name": "layers",
+      "source": "material-symbols",
+      "sourcePath": "assets/icon-source-overrides/layers.svg",
+      "assetPath": "assets/icons/layers.svg",
+      "viewBox": "0 -960 960 960"
+    },
+    {
+      "name": "lidar",
+      "source": "material-symbols",
+      "sourcePath": "assets/icon-source-overrides/lidar.svg",
+      "assetPath": "assets/icons/lidar.svg",
+      "viewBox": "0 -960 960 960"
+    },
+    {
+      "name": "map",
+      "source": "material-symbols",
+      "sourcePath": "assets/icon-source-overrides/map.svg",
+      "assetPath": "assets/icons/map.svg",
+      "viewBox": "0 -960 960 960"
+    },
+    {
+      "name": "maximize",
+      "source": "material-symbols",
+      "sourcePath": "assets/icon-source-overrides/maximize.svg",
+      "assetPath": "assets/icons/maximize.svg",
+      "viewBox": "0 -960 960 960"
+    },
+    {
+      "name": "model",
+      "source": "material-symbols",
+      "sourcePath": "assets/icon-source-overrides/model.svg",
+      "assetPath": "assets/icons/model.svg",
+      "viewBox": "0 -960 960 960"
+    },
+    {
+      "name": "robot",
+      "source": "material-symbols",
+      "sourcePath": "assets/icon-source-overrides/robot.svg",
+      "assetPath": "assets/icons/robot.svg",
+      "viewBox": "0 -960 960 960"
+    },
+    {
+      "name": "route",
+      "source": "material-symbols",
+      "sourcePath": "assets/icon-source-overrides/route.svg",
+      "assetPath": "assets/icons/route.svg",
+      "viewBox": "0 -960 960 960"
+    },
+    {
+      "name": "signal",
+      "source": "material-symbols",
+      "sourcePath": "assets/icon-source-overrides/signal.svg",
+      "assetPath": "assets/icons/signal.svg",
+      "viewBox": "0 -960 960 960"
+    },
+    {
+      "name": "unlink",
+      "source": "material-symbols",
+      "sourcePath": "assets/icon-source-overrides/unlink.svg",
+      "assetPath": "assets/icons/unlink.svg",
+      "viewBox": "0 -960 960 960"
+    },
+    {
+      "name": "volume-2",
+      "source": "material-symbols",
+      "sourcePath": "assets/icon-source-overrides/volume-2.svg",
+      "assetPath": "assets/icons/volume-2.svg",
+      "viewBox": "0 -960 960 960"
+    },
+    {
+      "name": "volume-x",
+      "source": "material-symbols",
+      "sourcePath": "assets/icon-source-overrides/volume-x.svg",
+      "assetPath": "assets/icons/volume-x.svg",
+      "viewBox": "0 -960 960 960"
+    },
+    {
+      "name": "waypoint",
+      "source": "material-symbols",
+      "sourcePath": "assets/icon-source-overrides/waypoint.svg",
+      "assetPath": "assets/icons/waypoint.svg",
+      "viewBox": "0 -960 960 960"
+    },
+    {
+      "name": "zone",
+      "source": "material-symbols",
+      "sourcePath": "assets/icon-source-overrides/zone.svg",
+      "assetPath": "assets/icons/zone.svg",
+      "viewBox": "0 -960 960 960"
+    },
+    {
+      "name": "color-logo-apple",
+      "source": "base-color",
+      "sourcePath": "Color/Name=logoApple.svg",
+      "assetPath": "assets/icons/color-logo-apple.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "color-logo-facebook",
+      "source": "base-color",
+      "sourcePath": "Color/Name=logoFacebook.svg",
+      "assetPath": "assets/icons/color-logo-facebook.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "color-logo-google-play",
+      "source": "base-color",
+      "sourcePath": "Color/Name=logoGooglePlay.svg",
+      "assetPath": "assets/icons/color-logo-google-play.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "color-logo-instagram",
+      "source": "base-color",
+      "sourcePath": "Color/Name=logoInstagram.svg",
+      "assetPath": "assets/icons/color-logo-instagram.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "color-logo-kakao",
+      "source": "base-color",
+      "sourcePath": "Color/Name=logoKakao.svg",
+      "assetPath": "assets/icons/color-logo-kakao.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "color-logo-linked-in",
+      "source": "base-color",
+      "sourcePath": "Color/Name=logoLinkedIn.svg",
+      "assetPath": "assets/icons/color-logo-linked-in.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "color-logo-naver-blog",
+      "source": "base-color",
+      "sourcePath": "Color/Name=logoNaverBlog.svg",
+      "assetPath": "assets/icons/color-logo-naver-blog.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "color-logo-youtube",
+      "source": "base-color",
+      "sourcePath": "Color/Name=logoYoutube.svg",
+      "assetPath": "assets/icons/color-logo-youtube.svg",
+      "viewBox": "0 0 24 24"
+    },
+    {
+      "name": "apple",
+      "source": "lds-legacy",
+      "sourcePath": "components/icon/Icon.jsx",
+      "viewBox": "0 0 24 24"
+    }
+  ],
+  "rasterAssets": [
+    "assets/icons/source/Normal/Book.png"
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "kind": "lds-robotics-domain-symbol-registry",
+  "package": {
+    "name": "@lk-design-system/lds-robotics-ui",
+    "version": "0.1.0-rc.5"
+  },
+  "glyphs": [
+    {
+      "id": "facility-glyph",
+      "source": {
+        "repositoryPath": "src/components/robotics/_FacilityGlyph.js",
+        "sha256": "77b2ae4804a0e7bc3973baa9afb35a4aa2b7abcb94919b6feef68c06032762f5"
+      },
+      "definitions": [
+        "FACILITY_GLYPH_PATHS",
+        "FacilityGlyph"
+      ],
+      "publicBindings": [
+        {
+          "package": "@lk-design-system/lds-robotics-ui",
+          "export": "FacilityTransition",
+          "source": "src/components/robotics/FacilityTransition.jsx"
+        },
+        {
+          "package": "@lk-design-system/lds-robotics-ui",
+          "export": "HazardMarker",
+          "source": "src/components/robotics/HazardMarker.jsx"
+        }
+      ],
+      "storyId": "lds-robotics-foundation-facility-glyph--overview"
+    },
+    {
+      "id": "hazard-glyph",
+      "source": {
+        "repositoryPath": "src/components/robotics/_HazardGlyph.js",
+        "sha256": "c4d592a1916b3d463f8a5665c04a47903f5ad72245ffa298c10799c2bf417b6a"
+      },
+      "definitions": [
+        "HAZARD_GLYPH_PATHS",
+        "HAZARD_GLYPH_FIT"
+      ],
+      "publicBindings": [
+        {
+          "package": "@lk-design-system/lds-robotics-ui",
+          "export": "HazardMarker",
+          "source": "src/components/robotics/HazardMarker.jsx"
+        }
+      ],
+      "storyId": "lds-robotics-foundation-hazard-glyph--overview"
+    },
+    {
+      "id": "navigation-role-glyph",
+      "source": {
+        "repositoryPath": "src/components/robotics/_navigationRoleGlyph.js",
+        "sha256": "ffb4616ebd68b96ed60794e15d7123f2173a51473834dbac885d72aa04f32b50"
+      },
+      "definitions": [
+        "ROLE_GLYPH_KINDS",
+        "NavigationRoleGlyph"
+      ],
+      "publicBindings": [
+        {
+          "package": "@lk-design-system/lds-robotics-ui",
+          "export": "WaypointMarker",
+          "source": "src/components/robotics/WaypointMarker.jsx"
+        }
+      ],
+      "storyId": "lds-robotics-foundation-marker-pin--overview"
+    },
+    {
+      "id": "navigation-state-glyph",
+      "source": {
+        "repositoryPath": "src/components/robotics/_NavigationStateGlyph.js",
+        "sha256": "70b1298b407377dc44498db3596dffbce9ab27fd3a339cb06b5c5284a022796b"
+      },
+      "definitions": [
+        "NavigationStateGlyph"
+      ],
+      "publicBindings": [
+        {
+          "package": "@lk-design-system/lds-robotics-ui",
+          "export": "FacilityTransition",
+          "source": "src/components/robotics/FacilityTransition.jsx"
+        },
+        {
+          "package": "@lk-design-system/lds-robotics-ui",
+          "export": "LaneOverlay",
+          "source": "src/components/robotics/LaneOverlay.jsx"
+        },
+        {
+          "package": "@lk-design-system/lds-robotics-ui",
+          "export": "WaypointMarker",
+          "source": "src/components/robotics/WaypointMarker.jsx"
+        }
+      ],
+      "storyId": "lds-robotics-foundation-state-badge--overview"
+    }
+  ],
+  "publicConstants": [
+    {
+      "name": "FLEET_ATTENTION_LEVELS",
+      "source": "src/components/robotics/FleetState",
+      "package": "@lk-design-system/lds-robotics-ui"
+    },
+    {
+      "name": "FLEET_AUTHORITY_STATES",
+      "source": "src/components/robotics/FleetState",
+      "package": "@lk-design-system/lds-robotics-ui"
+    },
+    {
+      "name": "FLEET_CAPABILITY_STATES",
+      "source": "src/components/robotics/FleetState",
+      "package": "@lk-design-system/lds-robotics-ui"
+    },
+    {
+      "name": "FLEET_CONTROL_STATES",
+      "source": "src/components/robotics/FleetState",
+      "package": "@lk-design-system/lds-robotics-ui"
+    },
+    {
+      "name": "FLEET_FRESHNESS_STATES",
+      "source": "src/components/robotics/FleetState",
+      "package": "@lk-design-system/lds-robotics-ui"
+    },
+    {
+      "name": "FLEET_MISSION_STATES",
+      "source": "src/components/robotics/FleetState",
+      "package": "@lk-design-system/lds-robotics-ui"
+    },
+    {
+      "name": "FLEET_OPERABILITY_STATES",
+      "source": "src/components/robotics/FleetState",
+      "package": "@lk-design-system/lds-robotics-ui"
+    },
+    {
+      "name": "FLEET_SAFETY_STATES",
+      "source": "src/components/robotics/FleetState",
+      "package": "@lk-design-system/lds-robotics-ui"
+    },
+    {
+      "name": "NAVIGATION_GEOMETRY_SPACE",
+      "source": "src/components/robotics/NavigationGeometryAdapters",
+      "package": "@lk-design-system/lds-robotics-ui"
+    },
+    {
+      "name": "NAVIGATION_COORDINATE_CONVENTION",
+      "source": "src/components/robotics/NavigationCoordinateSystem",
+      "package": "@lk-design-system/lds-robotics-ui"
+    }
+  ]
+}

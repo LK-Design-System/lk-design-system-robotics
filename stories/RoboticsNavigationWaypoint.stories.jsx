@@ -606,7 +606,9 @@ export const SelectionSync = {
       if (passthrough.getAttribute('aria-pressed') !== 'true') throw new Error('Space did not activate the focused waypoint.');
     });
 
-    if (canvasElement.querySelector('[aria-live], [role="status"], [role="alert"]')) {
+    const redundantSelectionLiveRegion = [...canvasElement.querySelectorAll('[aria-live], [role="status"], [role="alert"]')]
+      .find((node) => !node.matches('[data-viewer-state-live]'));
+    if (redundantSelectionLiveRegion) {
       throw new Error('Waypoint selection must not create a redundant live region.');
     }
     const activationCount = () => canvasElement.querySelector('[data-activation-count]')?.textContent ?? '';

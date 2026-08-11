@@ -1,0 +1,390 @@
+{
+  "$schema": "./LDS_UI_ADOPTION_CONTRACT.schema.json",
+  "schemaVersion": 1,
+  "kind": "lds-ui-adoption-contract",
+  "contractVersion": "1",
+  "invariant": "컴포넌트 교체만으로 LDS 전환은 완료되지 않는다.",
+  "triggers": [
+    "new product UI",
+    "LDS adoption",
+    "LDS migration",
+    "LDS conversion",
+    "UI restyle",
+    "UI parity implementation",
+    "material product UI redesign"
+  ],
+  "scopeModes": {
+    "default": "full-surface",
+    "fullSurfaceRule": "Required for adoption, migration, conversion, restyle, parity, or material redesign of an existing UI surface. Inspect every in-scope source file, including unchanged legacy code.",
+    "changedUiRule": "Allowed only for an explicitly bounded incremental adoption whose unchanged legacy UI is outside the requested scope. Document that boundary and inspect the relevant changed UI lines."
+  },
+  "verdicts": [
+    "reviewed",
+    "not-applicable",
+    "blocked"
+  ],
+  "evidenceKinds": [
+    "source",
+    "token",
+    "story",
+    "check",
+    "visual",
+    "asset",
+    "copy-catalog",
+    "decision"
+  ],
+  "facets": [
+    {
+      "id": "tokensAndTheme",
+      "title": "Tokens and theme runtime",
+      "purpose": "Install the complete LDS runtime and map visual values to the owned semantic and component token layers.",
+      "foundationIds": [
+        "design-token",
+        "color"
+      ],
+      "requiredDecisions": [
+        {
+          "id": "owner-package-css-order",
+          "label": "owner package and CSS import order"
+        },
+        {
+          "id": "font-theme-scope",
+          "label": "font and theme provider scope"
+        },
+        {
+          "id": "color-scheme-behavior",
+          "label": "light, dark, and auto behavior"
+        },
+        {
+          "id": "token-mapping",
+          "label": "semantic or component token mapping"
+        },
+        {
+          "id": "raw-visual-literals",
+          "label": "raw visual literal disposition"
+        }
+      ],
+      "references": [
+        "./policies/TOKEN_GOVERNANCE.md",
+        "./policies/PACKAGE_MIGRATION_GUIDE.md",
+        "./foundations/design-token.md",
+        "./foundations/color.md",
+        "./token-reference.json"
+      ],
+      "hardTriggers": [
+        {
+          "id": "visual-source-change",
+          "fact": "A changed UI source or stylesheet contains visual declarations or LDS imports.",
+          "requiredEvidenceKinds": [
+            "source",
+            "token",
+            "check"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "layoutAndVisualFoundations",
+      "title": "Layout and visual foundations",
+      "purpose": "Preserve information hierarchy across real content, narrow viewports, overflow, and the LDS visual foundation scales.",
+      "foundationIds": [
+        "typography",
+        "layout",
+        "spacing",
+        "radius",
+        "elevation",
+        "gradient",
+        "aspect-ratio"
+      ],
+      "requiredDecisions": [
+        {
+          "id": "semantic-reading-order",
+          "label": "semantic structure and reading order"
+        },
+        {
+          "id": "grid-container-mapping",
+          "label": "grid and container mapping"
+        },
+        {
+          "id": "responsive-overflow-ownership",
+          "label": "responsive and overflow ownership"
+        },
+        {
+          "id": "typography-data-formatting",
+          "label": "typography hierarchy and data formatting"
+        },
+        {
+          "id": "visual-foundation-mapping",
+          "label": "spacing, radius, elevation, gradient, and aspect-ratio mapping"
+        }
+      ],
+      "references": [
+        "./foundations/typography.md",
+        "./foundations/layout.md",
+        "./foundations/spacing.md",
+        "./foundations/radius.md",
+        "./foundations/elevation.md",
+        "./foundations/gradient.md",
+        "./foundations/aspect-ratio.md"
+      ],
+      "hardTriggers": [
+        {
+          "id": "layout-source-change",
+          "fact": "A changed UI source or stylesheet changes layout, dimensions, typography, or overflow.",
+          "requiredEvidenceKinds": [
+            "source",
+            "visual"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "statePatternsAndMotion",
+      "title": "State, cross-component patterns, and motion",
+      "purpose": "Model asynchronous and interaction states explicitly and select feedback and motion patterns by scope and duration.",
+      "foundationIds": [
+        "state",
+        "motion"
+      ],
+      "requiredDecisions": [
+        {
+          "id": "async-state-model",
+          "label": "ready, loading, empty, error, stale, offline, disabled, and recovery states"
+        },
+        {
+          "id": "loading-pattern-scope",
+          "label": "Loading pattern element and scope"
+        },
+        {
+          "id": "retained-content-refresh",
+          "label": "retained-content and refreshing behavior"
+        },
+        {
+          "id": "motion-reduced-motion",
+          "label": "motion purpose, duration, and reduced-motion behavior"
+        }
+      ],
+      "references": [
+        "./foundations/state.md",
+        "./foundations/motion.md",
+        "./patterns/loading.md"
+      ],
+      "hardTriggers": [
+        {
+          "id": "async-state-change",
+          "fact": "A changed UI source adds a loading indicator, aria-busy, loading prop, or asynchronous state surface.",
+          "requiredEvidenceKinds": [
+            "source",
+            "story",
+            "decision"
+          ]
+        },
+        {
+          "id": "motion-change",
+          "fact": "A changed UI source or stylesheet adds animation, transition, or motion behavior.",
+          "requiredEvidenceKinds": [
+            "source",
+            "check"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "assetsIconographyAndBrand",
+      "title": "Assets, iconography, and brand",
+      "purpose": "Reuse owned registries and preserve provenance, semantic meaning, accessibility, and brand boundaries for every visual asset.",
+      "foundationIds": [
+        "iconography"
+      ],
+      "requiredDecisions": [
+        {
+          "id": "registry-search",
+          "label": "existing icon and asset registry search"
+        },
+        {
+          "id": "asset-owner-public-path",
+          "label": "asset owner package and public path"
+        },
+        {
+          "id": "provenance-license",
+          "label": "provenance and license"
+        },
+        {
+          "id": "asset-semantics-alt",
+          "label": "decorative or informative semantics and alternative text"
+        },
+        {
+          "id": "theme-suitability",
+          "label": "light and dark suitability"
+        }
+      ],
+      "references": [
+        "./foundations/iconography.md",
+        "./assets/icons/manifest.json"
+      ],
+      "hardTriggers": [
+        {
+          "id": "asset-change",
+          "fact": "A changed UI surface adds or modifies SVG, raster image, font, inline SVG, or image markup.",
+          "requiredEvidenceKinds": [
+            "source",
+            "asset"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contentAndInternationalization",
+      "title": "Content and internationalization",
+      "purpose": "Keep product meaning, voice, locale boundaries, and user-visible data formatting explicit and reviewable.",
+      "foundationIds": [
+        "writing",
+        "voice-and-tone",
+        "international-design"
+      ],
+      "requiredDecisions": [
+        {
+          "id": "copy-product-truth",
+          "label": "user-visible copy set and product truth"
+        },
+        {
+          "id": "writing-voice",
+          "label": "Writing and Voice disposition"
+        },
+        {
+          "id": "locale-language-boundary",
+          "label": "locale and document language boundary"
+        },
+        {
+          "id": "data-formatting",
+          "label": "date, time, number, unit, and missing-value formatting"
+        },
+        {
+          "id": "translation-truncation",
+          "label": "translation and truncation behavior"
+        }
+      ],
+      "references": [
+        "./foundations/writing.md",
+        "./foundations/voice-and-tone.md",
+        "./foundations/international-design.md",
+        "./policies/COPY_REVIEW_CONTRACT.md"
+      ],
+      "hardTriggers": [
+        {
+          "id": "visible-copy-change",
+          "fact": "A changed UI source adds or modifies visible text or an accessible text prop.",
+          "requiredEvidenceKinds": [
+            "source",
+            "copy-catalog"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "accessibility",
+      "title": "Accessibility and inclusive interaction",
+      "purpose": "Verify semantic structure, keyboard and focus behavior, perceivable state, target size, contrast, and inclusive use.",
+      "foundationIds": [
+        "inclusive-design"
+      ],
+      "requiredDecisions": [
+        {
+          "id": "landmarks-dom-order",
+          "label": "landmarks and semantic DOM order"
+        },
+        {
+          "id": "keyboard-focus-restoration",
+          "label": "keyboard path and focus restoration"
+        },
+        {
+          "id": "accessible-name-role-state",
+          "label": "accessible names, roles, states, and messages"
+        },
+        {
+          "id": "target-pointer-alternatives",
+          "label": "target size and pointer alternatives"
+        },
+        {
+          "id": "contrast-non-color-cues",
+          "label": "contrast and non-color state cues"
+        },
+        {
+          "id": "reduced-motion",
+          "label": "reduced-motion behavior"
+        }
+      ],
+      "references": [
+        "./foundations/inclusive-design.md",
+        "./policies/ACCESSIBILITY_CONTRACTS.md"
+      ],
+      "hardTriggers": [
+        {
+          "id": "interactive-source-change",
+          "fact": "A changed UI source adds or modifies an interactive element, handler, or LDS control.",
+          "requiredEvidenceKinds": [
+            "source",
+            "story",
+            "check"
+          ]
+        }
+      ]
+    }
+  ],
+  "componentMapping": {
+    "title": "Component and composition mapping",
+    "purpose": "Choose owner-package components only after the applicable non-component decisions have been recorded.",
+    "requiredDecisions": [
+      {
+        "id": "owner-public-export",
+        "label": "owner package public export"
+      },
+      {
+        "id": "reuse-composition-choice",
+        "label": "existing component or composition choice"
+      },
+      {
+        "id": "product-orchestration-boundary",
+        "label": "product-owned orchestration boundary"
+      },
+      {
+        "id": "exception-shared-authoring",
+        "label": "remaining exception or shared LDS authoring need"
+      }
+    ],
+    "references": [
+      "./components/README.md",
+      "./policies/PACKAGE_MIGRATION_GUIDE.md",
+      "./policies/COMPONENT_WORKFLOW.md"
+    ]
+  },
+  "completion": {
+    "requiredFacetIds": [
+      "tokensAndTheme",
+      "layoutAndVisualFoundations",
+      "statePatternsAndMotion",
+      "assetsIconographyAndBrand",
+      "contentAndInternationalization",
+      "accessibility"
+    ],
+    "requiresComponentMapping": true,
+    "blockedVerdictFails": true,
+    "notApplicableRequiresReason": true,
+    "exceptionRequirements": [
+      "rule",
+      "path",
+      "signature",
+      "owner",
+      "reason",
+      "expiresAt"
+    ],
+    "verification": [
+      "normal and narrow viewport",
+      "light and dark appearance when supported",
+      "representative ready and non-ready states",
+      "keyboard and focus path",
+      "reduced motion when motion exists",
+      "remaining exceptions and product-owned seams"
+    ]
+  }
+}

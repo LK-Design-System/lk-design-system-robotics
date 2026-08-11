@@ -1,0 +1,26 @@
+# LDS Robotics UI AI entrypoint
+
+Package: @lk-design-system/lds-robotics-ui
+Layer: robotics
+
+Component replacement alone is not LDS adoption completion.
+
+Before implementation:
+
+1. Read `AGENTS.md`.
+2. Read `docs/package/adoption-workflow.md` and the machine contract at `docs/package/adoption-checklist.json`.
+3. Read `docs/package/domain/ROBOTICS_UI_ADOPTION.md` and every applicable Robotics domain contract linked there.
+4. For an existing-surface migration use `full-surface` unless the requested incremental boundary is explicitly documented.
+5. Complete all six non-component facet decisions plus component mapping with typed evidence.
+
+Installed-package entrypoints:
+
+- `@lk-design-system/lds-robotics-ui/llms.txt`
+- `@lk-design-system/lds-robotics-ui/design-system.json`
+- `@lk-design-system/lds-robotics-ui/adoption-checklist.json`
+- `@lk-design-system/lds-robotics-ui/docs/adoption-report.schema.json`
+- `@lk-design-system/lds-robotics-ui/docs/domain/ROBOTICS_UI_ADOPTION.md`
+
+Robotics owns DOM, SVG, editor, 2D viewer, telemetry, navigation presentation, projection helpers, and domain semantics. It does not own transport, TF authority, localization, safety decisions, WebGL/Three/R3F lifecycle, or product orchestration.
+
+The generated `docs/package/` tree is read-only. Update authored Robotics documents or the pinned upstream snapshot, regenerate, and run `npm run check:docs`.

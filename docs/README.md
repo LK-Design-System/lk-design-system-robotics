@@ -5,11 +5,19 @@
 | Type | Documentation index |
 | Status | Current |
 | Owner | Robotics domain engineering |
-| Last reviewed | 2026-07-30 |
+| Last reviewed | 2026-08-09 |
 
-`docs/`의 탐색 진입점이다. 문서 규약(메타데이터 헤더, source-of-truth 순서)은
-업스트림 [`lk-design-system/docs/README.md`](../../lk-design-system/docs/README.md)를
-따른다. 여기서는 로보틱스 소관 문서만 나열한다.
+`docs/`의 탐색 진입점이다. 공통 LDS 규약과 source-of-truth는 해시가 고정된
+[`package/shared/manifest.json`](package/shared/manifest.json) 투영을 따른다.
+여기서는 로보틱스 소관 문서만 나열한다.
+
+## 작업 시작 경로
+
+- 제품 UI 신규 구현·LDS 전환: [`ROBOTICS_UI_ADOPTION.md`](ROBOTICS_UI_ADOPTION.md)와 생성된 [`package/adoption-workflow.md`](package/adoption-workflow.md)
+- 기계 판독 계약: [`package/adoption-checklist.json`](package/adoption-checklist.json), [`package/manifest.json`](package/manifest.json), [`package/llms.txt`](package/llms.txt)
+- 좌표·지도·내비게이션 통합: 아래 Current 계약 중 해당 문서
+
+컴포넌트 교체만으로 LDS 전환은 완료되지 않는다.
 
 ## 규약과 계약 (Current)
 

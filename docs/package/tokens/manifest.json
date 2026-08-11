@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "kind": "lds-robotics-token-manifest",
+  "package": {
+    "name": "@lk-design-system/lds-robotics-ui",
+    "version": "0.1.0-rc.5"
+  },
+  "sources": [
+    {
+      "path": "tokens/components.css",
+      "sha256": "a290469104de82092f22851cd0fb9aeba5c33fc78cc6d3b324fdb36dfe983e9e",
+      "definitions": [
+        "--component-viewer-light-map-boundary",
+        "--component-viewer-light-map-free",
+        "--component-viewer-light-map-occupied",
+        "--component-viewer-light-map-unknown",
+        "--component-viewer-map-boundary",
+        "--component-viewer-map-free",
+        "--component-viewer-map-occupied",
+        "--component-viewer-map-unknown"
+      ],
+      "references": [
+        "--color-semantic-primary-normal",
+        "--color-semantic-static-black",
+        "--color-semantic-static-white",
+        "--component-viewer-map-boundary",
+        "--component-viewer-map-free",
+        "--component-viewer-map-occupied",
+        "--component-viewer-map-unknown",
+        "--ease-out"
+      ]
+    },
+    {
+      "path": "tokens/focus.css",
+      "sha256": "457e04ec2740c5fbac74964e788bc2173be74bd9d13c163f1ff8f196d83a5cde",
+      "definitions": [],
+      "references": [
+        "--color-semantic-focus-ring"
+      ]
+    }
+  ]
+}
