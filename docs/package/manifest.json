@@ -1,0 +1,444 @@
+{
+  "schemaVersion": 1,
+  "kind": "lds-package-documentation",
+  "package": {
+    "name": "@lk-design-system/lds-robotics-ui",
+    "version": "0.1.0-rc.5",
+    "layer": "robotics"
+  },
+  "adoption": {
+    "contractKind": "lds-ui-adoption-contract",
+    "contractVersion": "1",
+    "invariant": "컴포넌트 교체만으로 LDS 전환은 완료되지 않는다.",
+    "facetIds": [
+      "tokensAndTheme",
+      "layoutAndVisualFoundations",
+      "statePatternsAndMotion",
+      "assetsIconographyAndBrand",
+      "contentAndInternationalization",
+      "accessibility"
+    ],
+    "componentMappingRequired": true,
+    "verdicts": [
+      "reviewed",
+      "not-applicable",
+      "blocked"
+    ]
+  },
+  "entrypoints": {
+    "llms": "./llms.txt",
+    "adoptionChecklist": "./adoption-checklist.json",
+    "adoptionReportSchema": "./adoption-report.schema.json",
+    "adoptionReportExample": "./adoption-report.example.json",
+    "adoptionConfigSchema": "./adoption-config.schema.json",
+    "adoptionWorkflow": "./adoption-workflow.md",
+    "domainIndex": "./domain/README.md",
+    "tokenManifest": "./tokens/manifest.json",
+    "domainSymbolRegistry": "./domain-symbol-registry.json"
+  },
+  "foundations": [
+    "design-token",
+    "color",
+    "typography",
+    "iconography",
+    "elevation",
+    "gradient",
+    "inclusive-design",
+    "international-design",
+    "layout",
+    "motion",
+    "radius",
+    "spacing",
+    "state",
+    "voice-and-tone",
+    "writing",
+    "aspect-ratio"
+  ],
+  "patterns": [
+    "robotics-navigation",
+    "robotics-map",
+    "robotics-state"
+  ],
+  "domain": {
+    "documents": [
+      {
+        "path": "domain/ROBOTICS_UI_ADOPTION.md",
+        "sourcePath": "docs/ROBOTICS_UI_ADOPTION.md",
+        "sourceSha256": "3eae094e953ad4727203ffe5e63c9edb1ec15b353fefed70fa7c1126591c7e6e",
+        "sha256": "dc2666277cd69b100b5a656982538141bb49f31be30db786562c255c53a9347f"
+      },
+      {
+        "path": "domain/FLEET_UI_REFERENCE_PLAN.md",
+        "sourcePath": "docs/FLEET_UI_REFERENCE_PLAN.md",
+        "sourceSha256": "48b98075f2c0bb3106d8c537e9989b57368cb2af3f07fddf263c76b7286b847f",
+        "sha256": "48b98075f2c0bb3106d8c537e9989b57368cb2af3f07fddf263c76b7286b847f"
+      },
+      {
+        "path": "domain/NAVIGATION_COORDINATE_CONTRACT.md",
+        "sourcePath": "docs/NAVIGATION_COORDINATE_CONTRACT.md",
+        "sourceSha256": "9ddbb2c8bd3731834054a244e96593bc7c1c6455b9888b503fe5d992b7d569d8",
+        "sha256": "9ddbb2c8bd3731834054a244e96593bc7c1c6455b9888b503fe5d992b7d569d8"
+      },
+      {
+        "path": "domain/NAVIGATION_EXPRESSION_CONVENTIONS.md",
+        "sourcePath": "docs/NAVIGATION_EXPRESSION_CONVENTIONS.md",
+        "sourceSha256": "84b020fbdeb3fa1c318fa1d6e7322683d441edc40068ea83e49dbfd85caa75c2",
+        "sha256": "84b020fbdeb3fa1c318fa1d6e7322683d441edc40068ea83e49dbfd85caa75c2"
+      },
+      {
+        "path": "domain/OCCUPANCY_MAP_CONVENTIONS.md",
+        "sourcePath": "docs/OCCUPANCY_MAP_CONVENTIONS.md",
+        "sourceSha256": "bbf3b9a599db08a34120998dae9a736ea2f27972aed1d3aa664167b6b6ef8a34",
+        "sha256": "bbf3b9a599db08a34120998dae9a736ea2f27972aed1d3aa664167b6b6ef8a34"
+      },
+      {
+        "path": "domain/OVERLAY_STATUS_CHIP.md",
+        "sourcePath": "docs/OVERLAY_STATUS_CHIP.md",
+        "sourceSha256": "eeb8d47501c394e9f0fbacc46bf7efb9fa6293729f2ee4b55ebb014da809f409",
+        "sha256": "eeb8d47501c394e9f0fbacc46bf7efb9fa6293729f2ee4b55ebb014da809f409"
+      },
+      {
+        "path": "domain/SELECTION_FOCUS_AUDIT.md",
+        "sourcePath": "docs/SELECTION_FOCUS_AUDIT.md",
+        "sourceSha256": "4b8eb90f942f8381f063297cde965dc9563ddd2eebfb8027fe7cc5153f1cbbe8",
+        "sha256": "4b8eb90f942f8381f063297cde965dc9563ddd2eebfb8027fe7cc5153f1cbbe8"
+      },
+      {
+        "path": "domain/STRUCTURE_ASSESSMENT.md",
+        "sourcePath": "docs/STRUCTURE_ASSESSMENT.md",
+        "sourceSha256": "8404cc863e567a7452ac10a30e08d86e97bfc420a614ef892fe639dcbc68a4bc",
+        "sha256": "8404cc863e567a7452ac10a30e08d86e97bfc420a614ef892fe639dcbc68a4bc"
+      },
+      {
+        "path": "domain/ATTRIBUTIONS.md",
+        "sourcePath": "docs/references/ATTRIBUTIONS.md",
+        "sourceSha256": "08cfdd805e7f605f52ac31f10e86ba76404247d4fb808837be4f069c211c1055",
+        "sha256": "6ba6c5b00841659c322dc95f950d58fe9a61c9125521053407ba74ca5f01556a"
+      }
+    ],
+    "foundationStories": [
+      {
+        "id": "unit-format",
+        "storyId": "lds-robotics-foundation-unit-format--overview",
+        "source": "stories/RoboticsFoundationUnitFormat.stories.jsx"
+      },
+      {
+        "id": "viewer-tokens",
+        "storyId": "lds-robotics-foundation-viewer-tokens--overview",
+        "source": "stories/RoboticsFoundationViewerTokens.stories.jsx"
+      },
+      {
+        "id": "state-badge",
+        "storyId": "lds-robotics-foundation-state-badge--overview",
+        "source": "stories/RoboticsFoundationStateBadge.stories.jsx"
+      },
+      {
+        "id": "marker-pin",
+        "storyId": "lds-robotics-foundation-marker-pin--overview",
+        "source": "stories/RoboticsFoundationMarkerPin.stories.jsx"
+      },
+      {
+        "id": "facility-glyph",
+        "storyId": "lds-robotics-foundation-facility-glyph--overview",
+        "source": "stories/RoboticsFoundationFacilityGlyph.stories.jsx"
+      },
+      {
+        "id": "hazard-glyph",
+        "storyId": "lds-robotics-foundation-hazard-glyph--overview",
+        "source": "stories/RoboticsFoundationHazardGlyph.stories.jsx"
+      }
+    ]
+  },
+  "publicDocs": {
+    "storybook": "https://lk-design-system.github.io/lk-design-system-robotics/?path=/docs/lds-robotics-foundation-viewer-tokens--docs",
+    "llms": "https://lk-design-system.github.io/lk-design-system-robotics/llms.txt",
+    "designSystem": "https://lk-design-system.github.io/lk-design-system-robotics/design-system.json",
+    "adoptionChecklist": "https://lk-design-system.github.io/lk-design-system-robotics/adoption-checklist.json",
+    "adoptionReportSchema": "https://lk-design-system.github.io/lk-design-system-robotics/adoption-report.schema.json",
+    "adoptionReportExample": "https://lk-design-system.github.io/lk-design-system-robotics/adoption-report.example.json",
+    "adoptionWorkflow": "https://lk-design-system.github.io/lk-design-system-robotics/adoption-workflow.md"
+  },
+  "source": {
+    "robotics": {
+      "repository": "LK-Design-System/lk-design-system-robotics",
+      "ref": "v0.1.0-rc.5",
+      "refStatus": "published"
+    },
+    "canonicalAdoption": {
+      "kind": "lds-ui-adoption-contract",
+      "version": "1",
+      "source": {
+        "repository": "LK-Design-System/lk-design-system",
+        "ref": "lds-v0.1.0-rc.69.5",
+        "refStatus": "release-candidate",
+        "path": "docs/references/adoption/LDS_UI_ADOPTION_CONTRACT.json",
+        "sha256": "f4c4f71cff9f9108246a5f7cc5520d6095d599027adb75d0b61e385c5b7fef80"
+      },
+      "snapshotManifestSha256": "a6b0ebaf1d3d12a2fdd236a148b94ffe2c2129704c09e836446022d3183a50b4"
+    }
+  },
+  "resources": {
+    "tokens": {
+      "path": "./tokens/manifest.json",
+      "sha256": "30e04076d27a27ffd3f6348e4e05e8cb5aa6495e82afbb80b05eab4a11e373fb"
+    },
+    "domainSymbols": {
+      "path": "./domain-symbol-registry.json",
+      "sha256": "864693636d689055551778e6268c749313dcee0baa6e3557126fde049c261c63"
+    }
+  },
+  "documents": [
+    {
+      "path": "adoption-checklist.json",
+      "sha256": "54d4804d11838bd748e7058319c7b9897763034603fffa1046b233fb72cdfe86"
+    },
+    {
+      "path": "adoption-config.schema.json",
+      "sha256": "650759624b2a96020eeb70393a1b7c74b23a40af240727a72a0fd5455ae0dca5"
+    },
+    {
+      "path": "adoption-report.example.json",
+      "sha256": "9a7948b02727a527f3da188bfbf2725283720ef36a427872fbfb9cc0b0dd92d9"
+    },
+    {
+      "path": "adoption-report.schema.json",
+      "sha256": "4ce25e058235e6b124d127321a4549c49da4efbdf1dcda22c79d4c83d3645a2f"
+    },
+    {
+      "path": "adoption-workflow.md",
+      "sha256": "a15ae380af6c2b5f4d254dc9790a3a508b7d4f342f110bdb3ff73c901038e8c7"
+    },
+    {
+      "path": "domain-symbol-registry.json",
+      "sha256": "864693636d689055551778e6268c749313dcee0baa6e3557126fde049c261c63"
+    },
+    {
+      "path": "domain/ATTRIBUTIONS.md",
+      "sha256": "6ba6c5b00841659c322dc95f950d58fe9a61c9125521053407ba74ca5f01556a"
+    },
+    {
+      "path": "domain/FLEET_UI_REFERENCE_PLAN.md",
+      "sha256": "48b98075f2c0bb3106d8c537e9989b57368cb2af3f07fddf263c76b7286b847f"
+    },
+    {
+      "path": "domain/NAVIGATION_COORDINATE_CONTRACT.md",
+      "sha256": "9ddbb2c8bd3731834054a244e96593bc7c1c6455b9888b503fe5d992b7d569d8"
+    },
+    {
+      "path": "domain/NAVIGATION_EXPRESSION_CONVENTIONS.md",
+      "sha256": "84b020fbdeb3fa1c318fa1d6e7322683d441edc40068ea83e49dbfd85caa75c2"
+    },
+    {
+      "path": "domain/OCCUPANCY_MAP_CONVENTIONS.md",
+      "sha256": "bbf3b9a599db08a34120998dae9a736ea2f27972aed1d3aa664167b6b6ef8a34"
+    },
+    {
+      "path": "domain/OVERLAY_STATUS_CHIP.md",
+      "sha256": "eeb8d47501c394e9f0fbacc46bf7efb9fa6293729f2ee4b55ebb014da809f409"
+    },
+    {
+      "path": "domain/README.md",
+      "sha256": "b5f0a4a3441ef88f2a8fc89e628aedb09a6b36663f787f2668e607e675c60d63"
+    },
+    {
+      "path": "domain/ROBOTICS_UI_ADOPTION.md",
+      "sha256": "dc2666277cd69b100b5a656982538141bb49f31be30db786562c255c53a9347f"
+    },
+    {
+      "path": "domain/SELECTION_FOCUS_AUDIT.md",
+      "sha256": "4b8eb90f942f8381f063297cde965dc9563ddd2eebfb8027fe7cc5153f1cbbe8"
+    },
+    {
+      "path": "domain/STRUCTURE_ASSESSMENT.md",
+      "sha256": "8404cc863e567a7452ac10a30e08d86e97bfc420a614ef892fe639dcbc68a4bc"
+    },
+    {
+      "path": "LDS_UI_ADOPTION_CONTRACT.schema.json",
+      "sha256": "93a5e8f73cc18f26946e71bfbb8ed9235f4fd58dbdb9fc55547141529cae0039"
+    },
+    {
+      "path": "licenses/Apache-2.0.txt",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    {
+      "path": "licenses/LICENSE",
+      "sha256": "3445907cd1d3d06ed17b706655b020c021312ee23080ecf83171083fbf98c356"
+    },
+    {
+      "path": "licenses/MIT-WDS.txt",
+      "sha256": "c009c001bfe471ed239b5ab96b8a8fbd0d63aea759cf9e5aec434fae68e53b9c"
+    },
+    {
+      "path": "licenses/PRETENDARD-OFL-1.1.txt",
+      "sha256": "262c3715d9d5ac7c750e250e9b19d231c9ddd4d2559029a0cfdb7262dd458594"
+    },
+    {
+      "path": "licenses/THIRD_PARTY_NOTICES.md",
+      "sha256": "e28b3866ae9c210eacaa27832c42c3f3ad681f3604e19a2c003384c455229dc5"
+    },
+    {
+      "path": "llms.txt",
+      "sha256": "196f80397daa87975748f73d7a1d6d0c8e60de8871664674cd022f2859d13c5b"
+    },
+    {
+      "path": "shared/adoption-checklist.json",
+      "sha256": "fd88b5ecb9cd5367387d7e67539697fb49aa3e4e9ef552b6ef723e9ae826b27a"
+    },
+    {
+      "path": "shared/adoption-config.schema.json",
+      "sha256": "650759624b2a96020eeb70393a1b7c74b23a40af240727a72a0fd5455ae0dca5"
+    },
+    {
+      "path": "shared/adoption-report.example.json",
+      "sha256": "9a7948b02727a527f3da188bfbf2725283720ef36a427872fbfb9cc0b0dd92d9"
+    },
+    {
+      "path": "shared/adoption-report.schema.json",
+      "sha256": "4ce25e058235e6b124d127321a4549c49da4efbdf1dcda22c79d4c83d3645a2f"
+    },
+    {
+      "path": "shared/adoption-workflow.md",
+      "sha256": "072e16cf93a50a9082322feb83740a38bf8835fd126fe1216ff9e52536a830d2"
+    },
+    {
+      "path": "shared/assets/icons/manifest.json",
+      "sha256": "0530d2bce2947affd03385fa56cb72d596258ff78242b49aa2c478026765f65b"
+    },
+    {
+      "path": "shared/components/README.md",
+      "sha256": "d3ce93fc0df8da25bc57f18505d61338f19f49f1947360a2d70a59be654f42ef"
+    },
+    {
+      "path": "shared/foundations/aspect-ratio.md",
+      "sha256": "94bba71d46ad10d224ed68acd828742737ef0a83d7d629c44d56de57885de3b1"
+    },
+    {
+      "path": "shared/foundations/color.md",
+      "sha256": "069ab8d7583a27c3edd0e5a4dc4da59dfe0177cd980e71cbf2abfd063683b9d8"
+    },
+    {
+      "path": "shared/foundations/design-token.md",
+      "sha256": "1c6227a9a2e155b54cf7892f4672c545bdd908351fc3dd081f4358271cdbcd0b"
+    },
+    {
+      "path": "shared/foundations/elevation.md",
+      "sha256": "dfa5f9eb4ffa7ae09a002e07ede7f932c8b259d965e4fd74d40b80fd72073598"
+    },
+    {
+      "path": "shared/foundations/foundation-content.json",
+      "sha256": "9e79a34cb57cd45625b0e895fd9737fd65e0e9f457aadbcca3ab4dadb60f4f20"
+    },
+    {
+      "path": "shared/foundations/foundation-content.schema.json",
+      "sha256": "c38a1d94620e4ec12101cb5e20fa3f07e2052d2debae2ceda8bda018630b792f"
+    },
+    {
+      "path": "shared/foundations/gradient.md",
+      "sha256": "99e2ae8681847258e090ec1695d45d28106588385f979bfeaaa3e45491331ec6"
+    },
+    {
+      "path": "shared/foundations/iconography.md",
+      "sha256": "546d83898ec10107c3bc6cee6f1f6e82caf2eaa7dd31fcd1a70f941a9430fbc7"
+    },
+    {
+      "path": "shared/foundations/inclusive-design.md",
+      "sha256": "e365affe7b414e03ed4bf8e25b5e774c9b38220ceb3688746038c3f92edb7694"
+    },
+    {
+      "path": "shared/foundations/international-design.md",
+      "sha256": "75ad35f203b565f4eba5bad6d30097f58b92a8dcd8676ea05ae5789931de07ca"
+    },
+    {
+      "path": "shared/foundations/layout.md",
+      "sha256": "f173d36e4a3062d93325ad7cfc682d7a5015b71848a0de0619149eaa4da32ae0"
+    },
+    {
+      "path": "shared/foundations/llms.txt",
+      "sha256": "087941f920544b234a54ba465dd72165d1e0c7ea0b7338a5401af4815da54d29"
+    },
+    {
+      "path": "shared/foundations/motion.md",
+      "sha256": "c6a909e23814fc6a6a8b6f2b112181d8b1a3ae2bb310487bb672aa15c7061a10"
+    },
+    {
+      "path": "shared/foundations/radius.md",
+      "sha256": "bd77c1a08a101246559ba0fc1a41537f530ec2a1f164cca705e9c5c749d7d0df"
+    },
+    {
+      "path": "shared/foundations/README.md",
+      "sha256": "a331773b9ee3560e2fd64824b3945fd380e5423f4049b0c02c1cdc861470ae62"
+    },
+    {
+      "path": "shared/foundations/spacing.md",
+      "sha256": "a0266898eeacae4f1a917db285d1f15c77ddd3d575db20388e7a14043e672b68"
+    },
+    {
+      "path": "shared/foundations/state.md",
+      "sha256": "6c71a3df654d7ebc1e6be331c1a9fd94c1716a49e71adef3db4843759c2ec1d4"
+    },
+    {
+      "path": "shared/foundations/TOKEN_REFERENCE.md",
+      "sha256": "f66bedec07df45d452539c9f9ea6a8cea97578560e07741bc7e73cf0c06618b8"
+    },
+    {
+      "path": "shared/foundations/typography.md",
+      "sha256": "b1f275cb86688f536f2d7b766d9cf35bc7a08835f2a34b116649d6cb726a677f"
+    },
+    {
+      "path": "shared/foundations/voice-and-tone.md",
+      "sha256": "85a5f83c8736226a4e93e37634df40dca17fc11694003ba46324c9cc70c504e8"
+    },
+    {
+      "path": "shared/foundations/writing.md",
+      "sha256": "6fd4c0a7e135a08efe7501373b017c0b2759bf9fd7d7038bfeb507f46a643e4f"
+    },
+    {
+      "path": "shared/LDS_UI_ADOPTION_CONTRACT.schema.json",
+      "sha256": "93a5e8f73cc18f26946e71bfbb8ed9235f4fd58dbdb9fc55547141529cae0039"
+    },
+    {
+      "path": "shared/llms.txt",
+      "sha256": "93997b631d8fe9b50f799a955701827a8bb6e1388734eae5edef5340cc0b34d5"
+    },
+    {
+      "path": "shared/manifest.json",
+      "sha256": "a6b0ebaf1d3d12a2fdd236a148b94ffe2c2129704c09e836446022d3183a50b4"
+    },
+    {
+      "path": "shared/patterns/loading.md",
+      "sha256": "170450777f0428baff270ca86c4c331ca094110915615e1fd9c5bfc9d166a174"
+    },
+    {
+      "path": "shared/policies/ACCESSIBILITY_CONTRACTS.md",
+      "sha256": "add36a76b095f6e8d41db37b1e16935fa633558b16c2409f1bd2f55d0abbdc04"
+    },
+    {
+      "path": "shared/policies/COMPONENT_WORKFLOW.md",
+      "sha256": "a77e483b75dbbc40317e05e297b29888245661afd2e46e0cb2b2d8317871583f"
+    },
+    {
+      "path": "shared/policies/COPY_REVIEW_CONTRACT.md",
+      "sha256": "e642d829ceb6e9b8f407d2fce1969302b989460454c68044785f7b274f1f3d06"
+    },
+    {
+      "path": "shared/policies/PACKAGE_MIGRATION_GUIDE.md",
+      "sha256": "e2aee36eed3f87dfe91fc5b2e1998524bc555bcb910cc3dbaea5f31e4b14dde2"
+    },
+    {
+      "path": "shared/policies/TOKEN_GOVERNANCE.md",
+      "sha256": "829219b6b777bd25e95ed6a564400a4898c9ab19d205b8f02c7ed873f41169d6"
+    },
+    {
+      "path": "shared/token-reference.json",
+      "sha256": "aaab3894651e7411de1c8f798747b9cf61df1478934216d07ed2b7b69208c154"
+    },
+    {
+      "path": "tokens/manifest.json",
+      "sha256": "30e04076d27a27ffd3f6348e4e05e8cb5aa6495e82afbb80b05eab4a11e373fb"
+    },
+    {
+      "path": "upstream-snapshot.json",
+      "sha256": "c8facb23e29f95bec7f0601b84c9b41f333f7031821f6e5cc058cee6f56d17f4"
+    }
+  ]
+}

@@ -1,0 +1,600 @@
+{
+  "schemaVersion": 1,
+  "kind": "lds-package-documentation",
+  "package": {
+    "name": "@lk-design-system/lds-core",
+    "version": "0.1.0-rc.69.5",
+    "layer": "core"
+  },
+  "adoption": {
+    "contractKind": "lds-ui-adoption-contract",
+    "contractVersion": "1",
+    "invariant": "컴포넌트 교체만으로 LDS 전환은 완료되지 않는다.",
+    "facetIds": [
+      "tokensAndTheme",
+      "layoutAndVisualFoundations",
+      "statePatternsAndMotion",
+      "assetsIconographyAndBrand",
+      "contentAndInternationalization",
+      "accessibility"
+    ],
+    "componentMappingRequired": true,
+    "verdicts": [
+      "reviewed",
+      "not-applicable",
+      "blocked"
+    ]
+  },
+  "entrypoints": {
+    "llms": "./llms.txt",
+    "adoptionChecklist": "./adoption-checklist.json",
+    "adoptionReportSchema": "./adoption-report.schema.json",
+    "adoptionReportExample": "./adoption-report.example.json",
+    "adoptionWorkflow": "./adoption-workflow.md"
+  },
+  "foundations": [
+    "design-token",
+    "color",
+    "typography",
+    "iconography",
+    "elevation",
+    "gradient",
+    "inclusive-design",
+    "international-design",
+    "layout",
+    "motion",
+    "radius",
+    "spacing",
+    "state",
+    "voice-and-tone",
+    "writing",
+    "aspect-ratio"
+  ],
+  "patterns": [],
+  "publicDocs": {
+    "storybook": "https://lk-design-system.github.io/lk-design-system/?path=/docs/lds-core-foundation-design-token--docs",
+    "llms": "https://lk-design-system.github.io/lk-design-system/llms.txt",
+    "designSystem": "https://lk-design-system.github.io/lk-design-system/design-system.json",
+    "adoptionChecklist": "https://lk-design-system.github.io/lk-design-system/adoption-checklist.json",
+    "adoptionReportSchema": "https://lk-design-system.github.io/lk-design-system/adoption-report.schema.json",
+    "adoptionReportExample": "https://lk-design-system.github.io/lk-design-system/adoption-report.example.json"
+  },
+  "source": {
+    "repository": "LK-Design-System/lk-design-system",
+    "ref": "lds-v0.1.0-rc.69.5",
+    "documents": [
+      {
+        "path": "docs/ACCESSIBILITY_CONTRACTS.md",
+        "sha256": "add36a76b095f6e8d41db37b1e16935fa633558b16c2409f1bd2f55d0abbdc04"
+      },
+      {
+        "path": "docs/COMPONENT_WORKFLOW.md",
+        "sha256": "73ce07ebe9a03d49efa7382d4ebd4953170db1a1cfc055a17c52ca27a20254c9"
+      },
+      {
+        "path": "docs/components/README.md",
+        "sha256": "6187c3b8ae8f3f16e39920694d6b6b79639468cba4a328a1b51a77a19f267e8c"
+      },
+      {
+        "path": "docs/COPY_REVIEW_CONTRACT.md",
+        "sha256": "1877e4ca6c71058ef3816c044932f55d68f013c1cc0a0cac55309f03dc3f4899"
+      },
+      {
+        "path": "docs/foundations/aspect-ratio.md",
+        "sha256": "94bba71d46ad10d224ed68acd828742737ef0a83d7d629c44d56de57885de3b1"
+      },
+      {
+        "path": "docs/foundations/color.md",
+        "sha256": "069ab8d7583a27c3edd0e5a4dc4da59dfe0177cd980e71cbf2abfd063683b9d8"
+      },
+      {
+        "path": "docs/foundations/design-token.md",
+        "sha256": "1c6227a9a2e155b54cf7892f4672c545bdd908351fc3dd081f4358271cdbcd0b"
+      },
+      {
+        "path": "docs/foundations/elevation.md",
+        "sha256": "dfa5f9eb4ffa7ae09a002e07ede7f932c8b259d965e4fd74d40b80fd72073598"
+      },
+      {
+        "path": "docs/foundations/foundation-content.json",
+        "sha256": "9e79a34cb57cd45625b0e895fd9737fd65e0e9f457aadbcca3ab4dadb60f4f20"
+      },
+      {
+        "path": "docs/foundations/foundation-content.schema.json",
+        "sha256": "c38a1d94620e4ec12101cb5e20fa3f07e2052d2debae2ceda8bda018630b792f"
+      },
+      {
+        "path": "docs/foundations/gradient.md",
+        "sha256": "99e2ae8681847258e090ec1695d45d28106588385f979bfeaaa3e45491331ec6"
+      },
+      {
+        "path": "docs/foundations/iconography.md",
+        "sha256": "546d83898ec10107c3bc6cee6f1f6e82caf2eaa7dd31fcd1a70f941a9430fbc7"
+      },
+      {
+        "path": "docs/foundations/inclusive-design.md",
+        "sha256": "e365affe7b414e03ed4bf8e25b5e774c9b38220ceb3688746038c3f92edb7694"
+      },
+      {
+        "path": "docs/foundations/international-design.md",
+        "sha256": "75ad35f203b565f4eba5bad6d30097f58b92a8dcd8676ea05ae5789931de07ca"
+      },
+      {
+        "path": "docs/foundations/layout.md",
+        "sha256": "f173d36e4a3062d93325ad7cfc682d7a5015b71848a0de0619149eaa4da32ae0"
+      },
+      {
+        "path": "docs/foundations/llms.txt",
+        "sha256": "087941f920544b234a54ba465dd72165d1e0c7ea0b7338a5401af4815da54d29"
+      },
+      {
+        "path": "docs/foundations/motion.md",
+        "sha256": "c6a909e23814fc6a6a8b6f2b112181d8b1a3ae2bb310487bb672aa15c7061a10"
+      },
+      {
+        "path": "docs/foundations/radius.md",
+        "sha256": "bd77c1a08a101246559ba0fc1a41537f530ec2a1f164cca705e9c5c749d7d0df"
+      },
+      {
+        "path": "docs/foundations/README.md",
+        "sha256": "fcd9b0dd0a750d275df69d901ab2a62edc6f4477b0474abd7e009b56f2e0281d"
+      },
+      {
+        "path": "docs/foundations/spacing.md",
+        "sha256": "a0266898eeacae4f1a917db285d1f15c77ddd3d575db20388e7a14043e672b68"
+      },
+      {
+        "path": "docs/foundations/state.md",
+        "sha256": "6c71a3df654d7ebc1e6be331c1a9fd94c1716a49e71adef3db4843759c2ec1d4"
+      },
+      {
+        "path": "docs/foundations/TOKEN_REFERENCE.md",
+        "sha256": "f66bedec07df45d452539c9f9ea6a8cea97578560e07741bc7e73cf0c06618b8"
+      },
+      {
+        "path": "docs/foundations/typography.md",
+        "sha256": "b1f275cb86688f536f2d7b766d9cf35bc7a08835f2a34b116649d6cb726a677f"
+      },
+      {
+        "path": "docs/foundations/voice-and-tone.md",
+        "sha256": "85a5f83c8736226a4e93e37634df40dca17fc11694003ba46324c9cc70c504e8"
+      },
+      {
+        "path": "docs/foundations/writing.md",
+        "sha256": "6fd4c0a7e135a08efe7501373b017c0b2759bf9fd7d7038bfeb507f46a643e4f"
+      },
+      {
+        "path": "docs/LDS_UI_ADOPTION_WORKFLOW.md",
+        "sha256": "2fa043205cbe313398cd3b5cf7dbcb4b48869dcab7332ad8e8c1d49e765ccddf"
+      },
+      {
+        "path": "docs/LOADING_PATTERN.md",
+        "sha256": "170450777f0428baff270ca86c4c331ca094110915615e1fd9c5bfc9d166a174"
+      },
+      {
+        "path": "docs/PACKAGE_MIGRATION_GUIDE.md",
+        "sha256": "e2aee36eed3f87dfe91fc5b2e1998524bc555bcb910cc3dbaea5f31e4b14dde2"
+      },
+      {
+        "path": "docs/references/adoption/LDS_UI_ADOPTION_CONTRACT.json",
+        "sha256": "f4c4f71cff9f9108246a5f7cc5520d6095d599027adb75d0b61e385c5b7fef80"
+      },
+      {
+        "path": "docs/references/adoption/LDS_UI_ADOPTION_CONTRACT.schema.json",
+        "sha256": "93a5e8f73cc18f26946e71bfbb8ed9235f4fd58dbdb9fc55547141529cae0039"
+      },
+      {
+        "path": "docs/references/adoption/LDS_UI_ADOPTION_REPORT.example.json",
+        "sha256": "2bae3fdcfcfcd5efce6d07678e7e418d2d5e680b8df5ef654ce5c27136bf97c5"
+      },
+      {
+        "path": "docs/references/adoption/LDS_UI_ADOPTION_REPORT.schema.json",
+        "sha256": "4ce25e058235e6b124d127321a4549c49da4efbdf1dcda22c79d4c83d3645a2f"
+      },
+      {
+        "path": "docs/TOKEN_GOVERNANCE.md",
+        "sha256": "829219b6b777bd25e95ed6a564400a4898c9ab19d205b8f02c7ed873f41169d6"
+      },
+      {
+        "path": "llms.txt",
+        "sha256": "c7998cbad41a10854d8d869b1b6a189681c734f5faad8ea562b37b70f9485dfc"
+      },
+      {
+        "path": "packages/conformance/schemas/lds-ui-adoption-config.schema.json",
+        "sha256": "650759624b2a96020eeb70393a1b7c74b23a40af240727a72a0fd5455ae0dca5"
+      },
+      {
+        "path": "packages/core/assets/icons/manifest.json",
+        "sha256": "0530d2bce2947affd03385fa56cb72d596258ff78242b49aa2c478026765f65b"
+      },
+      {
+        "path": "tokens/source.json",
+        "sha256": "aaab3894651e7411de1c8f798747b9cf61df1478934216d07ed2b7b69208c154"
+      }
+    ]
+  },
+  "resources": {
+    "tokens": {
+      "fileCount": 5,
+      "bytes": 29315,
+      "sha256": "99a96a83f51e835771382293396ccc7566d4f04c2d58a22aab4d3090845d5a65"
+    },
+    "assets": {
+      "fileCount": 365,
+      "bytes": 2097107,
+      "sha256": "3cc8f73f57611e5d0a4c05b20d5e8cb1335d7d74a27a8562d8ad50708a1d961e"
+    }
+  },
+  "documents": [
+    {
+      "path": "adoption-checklist.json",
+      "sha256": "fd88b5ecb9cd5367387d7e67539697fb49aa3e4e9ef552b6ef723e9ae826b27a",
+      "sources": [
+        {
+          "path": "docs/references/adoption/LDS_UI_ADOPTION_CONTRACT.json",
+          "sha256": "f4c4f71cff9f9108246a5f7cc5520d6095d599027adb75d0b61e385c5b7fef80"
+        }
+      ]
+    },
+    {
+      "path": "adoption-config.schema.json",
+      "sha256": "650759624b2a96020eeb70393a1b7c74b23a40af240727a72a0fd5455ae0dca5",
+      "sources": [
+        {
+          "path": "packages/conformance/schemas/lds-ui-adoption-config.schema.json",
+          "sha256": "650759624b2a96020eeb70393a1b7c74b23a40af240727a72a0fd5455ae0dca5"
+        }
+      ]
+    },
+    {
+      "path": "adoption-report.example.json",
+      "sha256": "9a7948b02727a527f3da188bfbf2725283720ef36a427872fbfb9cc0b0dd92d9",
+      "sources": [
+        {
+          "path": "docs/references/adoption/LDS_UI_ADOPTION_REPORT.example.json",
+          "sha256": "2bae3fdcfcfcd5efce6d07678e7e418d2d5e680b8df5ef654ce5c27136bf97c5"
+        }
+      ]
+    },
+    {
+      "path": "adoption-report.schema.json",
+      "sha256": "4ce25e058235e6b124d127321a4549c49da4efbdf1dcda22c79d4c83d3645a2f",
+      "sources": [
+        {
+          "path": "docs/references/adoption/LDS_UI_ADOPTION_REPORT.schema.json",
+          "sha256": "4ce25e058235e6b124d127321a4549c49da4efbdf1dcda22c79d4c83d3645a2f"
+        }
+      ]
+    },
+    {
+      "path": "adoption-workflow.md",
+      "sha256": "072e16cf93a50a9082322feb83740a38bf8835fd126fe1216ff9e52536a830d2",
+      "sources": [
+        {
+          "path": "docs/LDS_UI_ADOPTION_WORKFLOW.md",
+          "sha256": "2fa043205cbe313398cd3b5cf7dbcb4b48869dcab7332ad8e8c1d49e765ccddf"
+        }
+      ]
+    },
+    {
+      "path": "assets/icons/manifest.json",
+      "sha256": "0530d2bce2947affd03385fa56cb72d596258ff78242b49aa2c478026765f65b",
+      "sources": [
+        {
+          "path": "packages/core/assets/icons/manifest.json",
+          "sha256": "0530d2bce2947affd03385fa56cb72d596258ff78242b49aa2c478026765f65b"
+        }
+      ]
+    },
+    {
+      "path": "components/README.md",
+      "sha256": "d3ce93fc0df8da25bc57f18505d61338f19f49f1947360a2d70a59be654f42ef",
+      "sources": [
+        {
+          "path": "docs/components/README.md",
+          "sha256": "6187c3b8ae8f3f16e39920694d6b6b79639468cba4a328a1b51a77a19f267e8c"
+        }
+      ]
+    },
+    {
+      "path": "foundations/aspect-ratio.md",
+      "sha256": "94bba71d46ad10d224ed68acd828742737ef0a83d7d629c44d56de57885de3b1",
+      "sources": [
+        {
+          "path": "docs/foundations/aspect-ratio.md",
+          "sha256": "94bba71d46ad10d224ed68acd828742737ef0a83d7d629c44d56de57885de3b1"
+        }
+      ]
+    },
+    {
+      "path": "foundations/color.md",
+      "sha256": "069ab8d7583a27c3edd0e5a4dc4da59dfe0177cd980e71cbf2abfd063683b9d8",
+      "sources": [
+        {
+          "path": "docs/foundations/color.md",
+          "sha256": "069ab8d7583a27c3edd0e5a4dc4da59dfe0177cd980e71cbf2abfd063683b9d8"
+        }
+      ]
+    },
+    {
+      "path": "foundations/design-token.md",
+      "sha256": "1c6227a9a2e155b54cf7892f4672c545bdd908351fc3dd081f4358271cdbcd0b",
+      "sources": [
+        {
+          "path": "docs/foundations/design-token.md",
+          "sha256": "1c6227a9a2e155b54cf7892f4672c545bdd908351fc3dd081f4358271cdbcd0b"
+        }
+      ]
+    },
+    {
+      "path": "foundations/elevation.md",
+      "sha256": "dfa5f9eb4ffa7ae09a002e07ede7f932c8b259d965e4fd74d40b80fd72073598",
+      "sources": [
+        {
+          "path": "docs/foundations/elevation.md",
+          "sha256": "dfa5f9eb4ffa7ae09a002e07ede7f932c8b259d965e4fd74d40b80fd72073598"
+        }
+      ]
+    },
+    {
+      "path": "foundations/foundation-content.json",
+      "sha256": "9e79a34cb57cd45625b0e895fd9737fd65e0e9f457aadbcca3ab4dadb60f4f20",
+      "sources": [
+        {
+          "path": "docs/foundations/foundation-content.json",
+          "sha256": "9e79a34cb57cd45625b0e895fd9737fd65e0e9f457aadbcca3ab4dadb60f4f20"
+        }
+      ]
+    },
+    {
+      "path": "foundations/foundation-content.schema.json",
+      "sha256": "c38a1d94620e4ec12101cb5e20fa3f07e2052d2debae2ceda8bda018630b792f",
+      "sources": [
+        {
+          "path": "docs/foundations/foundation-content.schema.json",
+          "sha256": "c38a1d94620e4ec12101cb5e20fa3f07e2052d2debae2ceda8bda018630b792f"
+        }
+      ]
+    },
+    {
+      "path": "foundations/gradient.md",
+      "sha256": "99e2ae8681847258e090ec1695d45d28106588385f979bfeaaa3e45491331ec6",
+      "sources": [
+        {
+          "path": "docs/foundations/gradient.md",
+          "sha256": "99e2ae8681847258e090ec1695d45d28106588385f979bfeaaa3e45491331ec6"
+        }
+      ]
+    },
+    {
+      "path": "foundations/iconography.md",
+      "sha256": "546d83898ec10107c3bc6cee6f1f6e82caf2eaa7dd31fcd1a70f941a9430fbc7",
+      "sources": [
+        {
+          "path": "docs/foundations/iconography.md",
+          "sha256": "546d83898ec10107c3bc6cee6f1f6e82caf2eaa7dd31fcd1a70f941a9430fbc7"
+        }
+      ]
+    },
+    {
+      "path": "foundations/inclusive-design.md",
+      "sha256": "e365affe7b414e03ed4bf8e25b5e774c9b38220ceb3688746038c3f92edb7694",
+      "sources": [
+        {
+          "path": "docs/foundations/inclusive-design.md",
+          "sha256": "e365affe7b414e03ed4bf8e25b5e774c9b38220ceb3688746038c3f92edb7694"
+        }
+      ]
+    },
+    {
+      "path": "foundations/international-design.md",
+      "sha256": "75ad35f203b565f4eba5bad6d30097f58b92a8dcd8676ea05ae5789931de07ca",
+      "sources": [
+        {
+          "path": "docs/foundations/international-design.md",
+          "sha256": "75ad35f203b565f4eba5bad6d30097f58b92a8dcd8676ea05ae5789931de07ca"
+        }
+      ]
+    },
+    {
+      "path": "foundations/layout.md",
+      "sha256": "f173d36e4a3062d93325ad7cfc682d7a5015b71848a0de0619149eaa4da32ae0",
+      "sources": [
+        {
+          "path": "docs/foundations/layout.md",
+          "sha256": "f173d36e4a3062d93325ad7cfc682d7a5015b71848a0de0619149eaa4da32ae0"
+        }
+      ]
+    },
+    {
+      "path": "foundations/llms.txt",
+      "sha256": "087941f920544b234a54ba465dd72165d1e0c7ea0b7338a5401af4815da54d29",
+      "sources": [
+        {
+          "path": "docs/foundations/llms.txt",
+          "sha256": "087941f920544b234a54ba465dd72165d1e0c7ea0b7338a5401af4815da54d29"
+        }
+      ]
+    },
+    {
+      "path": "foundations/motion.md",
+      "sha256": "c6a909e23814fc6a6a8b6f2b112181d8b1a3ae2bb310487bb672aa15c7061a10",
+      "sources": [
+        {
+          "path": "docs/foundations/motion.md",
+          "sha256": "c6a909e23814fc6a6a8b6f2b112181d8b1a3ae2bb310487bb672aa15c7061a10"
+        }
+      ]
+    },
+    {
+      "path": "foundations/radius.md",
+      "sha256": "bd77c1a08a101246559ba0fc1a41537f530ec2a1f164cca705e9c5c749d7d0df",
+      "sources": [
+        {
+          "path": "docs/foundations/radius.md",
+          "sha256": "bd77c1a08a101246559ba0fc1a41537f530ec2a1f164cca705e9c5c749d7d0df"
+        }
+      ]
+    },
+    {
+      "path": "foundations/README.md",
+      "sha256": "a331773b9ee3560e2fd64824b3945fd380e5423f4049b0c02c1cdc861470ae62",
+      "sources": [
+        {
+          "path": "docs/foundations/README.md",
+          "sha256": "fcd9b0dd0a750d275df69d901ab2a62edc6f4477b0474abd7e009b56f2e0281d"
+        }
+      ]
+    },
+    {
+      "path": "foundations/spacing.md",
+      "sha256": "a0266898eeacae4f1a917db285d1f15c77ddd3d575db20388e7a14043e672b68",
+      "sources": [
+        {
+          "path": "docs/foundations/spacing.md",
+          "sha256": "a0266898eeacae4f1a917db285d1f15c77ddd3d575db20388e7a14043e672b68"
+        }
+      ]
+    },
+    {
+      "path": "foundations/state.md",
+      "sha256": "6c71a3df654d7ebc1e6be331c1a9fd94c1716a49e71adef3db4843759c2ec1d4",
+      "sources": [
+        {
+          "path": "docs/foundations/state.md",
+          "sha256": "6c71a3df654d7ebc1e6be331c1a9fd94c1716a49e71adef3db4843759c2ec1d4"
+        }
+      ]
+    },
+    {
+      "path": "foundations/TOKEN_REFERENCE.md",
+      "sha256": "f66bedec07df45d452539c9f9ea6a8cea97578560e07741bc7e73cf0c06618b8",
+      "sources": [
+        {
+          "path": "docs/foundations/TOKEN_REFERENCE.md",
+          "sha256": "f66bedec07df45d452539c9f9ea6a8cea97578560e07741bc7e73cf0c06618b8"
+        }
+      ]
+    },
+    {
+      "path": "foundations/typography.md",
+      "sha256": "b1f275cb86688f536f2d7b766d9cf35bc7a08835f2a34b116649d6cb726a677f",
+      "sources": [
+        {
+          "path": "docs/foundations/typography.md",
+          "sha256": "b1f275cb86688f536f2d7b766d9cf35bc7a08835f2a34b116649d6cb726a677f"
+        }
+      ]
+    },
+    {
+      "path": "foundations/voice-and-tone.md",
+      "sha256": "85a5f83c8736226a4e93e37634df40dca17fc11694003ba46324c9cc70c504e8",
+      "sources": [
+        {
+          "path": "docs/foundations/voice-and-tone.md",
+          "sha256": "85a5f83c8736226a4e93e37634df40dca17fc11694003ba46324c9cc70c504e8"
+        }
+      ]
+    },
+    {
+      "path": "foundations/writing.md",
+      "sha256": "6fd4c0a7e135a08efe7501373b017c0b2759bf9fd7d7038bfeb507f46a643e4f",
+      "sources": [
+        {
+          "path": "docs/foundations/writing.md",
+          "sha256": "6fd4c0a7e135a08efe7501373b017c0b2759bf9fd7d7038bfeb507f46a643e4f"
+        }
+      ]
+    },
+    {
+      "path": "LDS_UI_ADOPTION_CONTRACT.schema.json",
+      "sha256": "93a5e8f73cc18f26946e71bfbb8ed9235f4fd58dbdb9fc55547141529cae0039",
+      "sources": [
+        {
+          "path": "docs/references/adoption/LDS_UI_ADOPTION_CONTRACT.schema.json",
+          "sha256": "93a5e8f73cc18f26946e71bfbb8ed9235f4fd58dbdb9fc55547141529cae0039"
+        }
+      ]
+    },
+    {
+      "path": "llms.txt",
+      "sha256": "93997b631d8fe9b50f799a955701827a8bb6e1388734eae5edef5340cc0b34d5",
+      "sources": [
+        {
+          "path": "llms.txt",
+          "sha256": "c7998cbad41a10854d8d869b1b6a189681c734f5faad8ea562b37b70f9485dfc"
+        }
+      ]
+    },
+    {
+      "path": "patterns/loading.md",
+      "sha256": "170450777f0428baff270ca86c4c331ca094110915615e1fd9c5bfc9d166a174",
+      "sources": [
+        {
+          "path": "docs/LOADING_PATTERN.md",
+          "sha256": "170450777f0428baff270ca86c4c331ca094110915615e1fd9c5bfc9d166a174"
+        }
+      ]
+    },
+    {
+      "path": "policies/ACCESSIBILITY_CONTRACTS.md",
+      "sha256": "add36a76b095f6e8d41db37b1e16935fa633558b16c2409f1bd2f55d0abbdc04",
+      "sources": [
+        {
+          "path": "docs/ACCESSIBILITY_CONTRACTS.md",
+          "sha256": "add36a76b095f6e8d41db37b1e16935fa633558b16c2409f1bd2f55d0abbdc04"
+        }
+      ]
+    },
+    {
+      "path": "policies/COMPONENT_WORKFLOW.md",
+      "sha256": "a77e483b75dbbc40317e05e297b29888245661afd2e46e0cb2b2d8317871583f",
+      "sources": [
+        {
+          "path": "docs/COMPONENT_WORKFLOW.md",
+          "sha256": "73ce07ebe9a03d49efa7382d4ebd4953170db1a1cfc055a17c52ca27a20254c9"
+        }
+      ]
+    },
+    {
+      "path": "policies/COPY_REVIEW_CONTRACT.md",
+      "sha256": "e642d829ceb6e9b8f407d2fce1969302b989460454c68044785f7b274f1f3d06",
+      "sources": [
+        {
+          "path": "docs/COPY_REVIEW_CONTRACT.md",
+          "sha256": "1877e4ca6c71058ef3816c044932f55d68f013c1cc0a0cac55309f03dc3f4899"
+        }
+      ]
+    },
+    {
+      "path": "policies/PACKAGE_MIGRATION_GUIDE.md",
+      "sha256": "e2aee36eed3f87dfe91fc5b2e1998524bc555bcb910cc3dbaea5f31e4b14dde2",
+      "sources": [
+        {
+          "path": "docs/PACKAGE_MIGRATION_GUIDE.md",
+          "sha256": "e2aee36eed3f87dfe91fc5b2e1998524bc555bcb910cc3dbaea5f31e4b14dde2"
+        }
+      ]
+    },
+    {
+      "path": "policies/TOKEN_GOVERNANCE.md",
+      "sha256": "829219b6b777bd25e95ed6a564400a4898c9ab19d205b8f02c7ed873f41169d6",
+      "sources": [
+        {
+          "path": "docs/TOKEN_GOVERNANCE.md",
+          "sha256": "829219b6b777bd25e95ed6a564400a4898c9ab19d205b8f02c7ed873f41169d6"
+        }
+      ]
+    },
+    {
+      "path": "token-reference.json",
+      "sha256": "aaab3894651e7411de1c8f798747b9cf61df1478934216d07ed2b7b69208c154",
+      "sources": [
+        {
+          "path": "tokens/source.json",
+          "sha256": "aaab3894651e7411de1c8f798747b9cf61df1478934216d07ed2b7b69208c154"
+        }
+      ]
+    }
+  ]
+}

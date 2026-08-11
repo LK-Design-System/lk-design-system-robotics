@@ -3,7 +3,10 @@ const config = {
   // styles.css is imported as a module from preview.jsx; serving it as a
   // static file on the same /styles.css URL shadows Vite's module transform
   // in dev mode and breaks the preview bootstrap.
-  staticDirs: [{ from: '../tokens', to: '/tokens' }],
+  staticDirs: [
+    { from: '../tokens', to: '/tokens' },
+    { from: './public-docs', to: '/' },
+  ],
   addons: ['@storybook/addon-docs', '@storybook/addon-a11y'],
   framework: { name: '@storybook/react-vite', options: {} },
   docs: { defaultName: 'Docs' },

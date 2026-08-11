@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  packages: read
   pages: write
   id-token: write
 
@@ -19,6 +20,8 @@ jobs:
   build:
     name: Build Storybook
     runs-on: windows-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.LK_PACKAGES_READ_TOKEN || github.token }}
 
     steps:
       - name: Checkout
@@ -36,6 +39,9 @@ jobs:
       - name: Prepare LDS Product Storybook compatibility surface
         run: node scripts/prepare-pages-lds-product-storybook.mjs
 
+      - name: Verify packaged AI and adoption documentation
+        run: npm.cmd run check:docs
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
@@ -44,6 +50,9 @@ jobs:
 
       - name: Build Storybook
         run: npm run build:storybook
+
+      - name: Verify public AI and adoption documentation
+        run: npm.cmd run check:storybook-docs
 
       - name: Include third-party notices
         shell: pwsh

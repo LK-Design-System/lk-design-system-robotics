@@ -1,0 +1,45 @@
+name: Release conformance gate
+
+on:
+  workflow_dispatch:
+    inputs:
+      lds_sha:
+        description: Exact 40-character LDS candidate commit SHA
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  release-conformance:
+    runs-on: ubuntu-24.04
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.LK_PACKAGES_READ_TOKEN || github.token }}
+      LDS_CONFORMANCE_SHA: ${{ inputs.lds_sha }}
+      LDS_CONFORMANCE_ROOT: ${{ github.workspace }}/.lds-conformance/lds
+      LDS_CONFORMANCE_CLI: ${{ github.workspace }}/.lds-conformance/lds/packages/conformance/src/cli.mjs
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check out the immutable LDS candidate
+        uses: actions/checkout@v7
+        with:
+          repository: LK-Design-System/lk-design-system
+          ref: ${{ inputs.lds_sha }}
+          path: .lds-conformance/lds
+          fetch-depth: 1
+          token: ${{ secrets.LK_PACKAGES_READ_TOKEN || github.token }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22.17.1
+          cache: npm
+      - run: npm ci
+      - name: Verify immutable source and package contracts
+        run: npm run check:release
+      - name: Install Playwright Chromium
+        run: npm exec -- playwright install --with-deps chromium
+      - name: Verify rendered Storybook contracts
+        run: npm run check:storybook
+      - name: Verify publish file set
+        run: npm pack --dry-run --ignore-scripts
