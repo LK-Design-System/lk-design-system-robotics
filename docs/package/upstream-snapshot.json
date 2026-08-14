@@ -160,7 +160,7 @@
       }
     ]
   },
-  "manifestSha256": "6080e8a7306e2efa768bfb6148c8c56602816838e9b505bb2d11c3dcade132e6",
+  "manifestSha256": "2ea85b3e218fd5d1ec2a7f8f10a282426678bb8a5c4ae5a3a1181f77f7b79902",
   "files": [
     {
       "path": "LDS_UI_ADOPTION_CONTRACT.schema.json",
@@ -284,7 +284,7 @@
     },
     {
       "path": "manifest.json",
-      "sha256": "6080e8a7306e2efa768bfb6148c8c56602816838e9b505bb2d11c3dcade132e6"
+      "sha256": "2ea85b3e218fd5d1ec2a7f8f10a282426678bb8a5c4ae5a3a1181f77f7b79902"
     },
     {
       "path": "patterns/loading.md",
