@@ -169,12 +169,12 @@
       "version": "1",
       "source": {
         "repository": "LK-Design-System/lk-design-system",
-        "ref": "lds-v0.1.0-rc.69.6",
+        "ref": "lds-v0.1.0-rc.69.7",
         "refStatus": "release-candidate",
         "path": "docs/references/adoption/LDS_UI_ADOPTION_CONTRACT.json",
         "sha256": "f4c4f71cff9f9108246a5f7cc5520d6095d599027adb75d0b61e385c5b7fef80"
       },
-      "snapshotManifestSha256": "2ea85b3e218fd5d1ec2a7f8f10a282426678bb8a5c4ae5a3a1181f77f7b79902"
+      "snapshotManifestSha256": "495687edb6e69496a0fef2bb9ce99fa6c267e9dff689d74f47c451c900489b77"
     }
   },
   "resources": {
@@ -206,7 +206,7 @@
     },
     {
       "path": "adoption-workflow.md",
-      "sha256": "c81a881ad86315355a5c0c916095f84c1f102da1552793089d26ae584a1627e7"
+      "sha256": "207f549097b113c4889ebf291600a2490166c250a41cd1cbfd1b55df6c145f11"
     },
     {
       "path": "domain-symbol-registry.json",
@@ -278,7 +278,7 @@
     },
     {
       "path": "llms.txt",
-      "sha256": "6604394ac5036b90e37f51c0be456389fa3296ceeb601ea43abac2bf90c188f9"
+      "sha256": "43f0b4b5e1e10a78adde67c1553fceeef9799847f9b3ede5327614984c73a2ee"
     },
     {
       "path": "shared/adoption-checklist.json",
@@ -402,7 +402,7 @@
     },
     {
       "path": "shared/manifest.json",
-      "sha256": "2ea85b3e218fd5d1ec2a7f8f10a282426678bb8a5c4ae5a3a1181f77f7b79902"
+      "sha256": "495687edb6e69496a0fef2bb9ce99fa6c267e9dff689d74f47c451c900489b77"
     },
     {
       "path": "shared/patterns/loading.md",
@@ -438,7 +438,7 @@
     },
     {
       "path": "upstream-snapshot.json",
-      "sha256": "9a6688f6be83057501c8fe7c0da1a2ca4a02ec66b932e5bb911063b58d10980f"
+      "sha256": "45778416bfa493c0ac61f09bd59e548b7c1f79f39a49909ae3c439787332272f"
     }
   ]
 }
