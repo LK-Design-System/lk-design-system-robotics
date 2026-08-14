@@ -5,7 +5,7 @@
 
 This generated entry combines the pinned LDS Core adoption snapshot with the
 Robotics-owned domain evidence. The upstream snapshot is
-`LK-Design-System/lk-design-system@lds-v0.1.0-rc.69.9`.
+`LK-Design-System/lk-design-system@lds-v0.1.0-rc.69.10`.
 
 ## Choose the task before editing
 
