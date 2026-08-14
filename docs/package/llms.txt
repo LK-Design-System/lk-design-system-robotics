@@ -2,7 +2,7 @@
 
 Package: @lk-design-system/lds-robotics-ui
 Layer: robotics
-Canonical LDS snapshot: LK-Design-System/lk-design-system@lds-v0.1.0-rc.69.7
+Canonical LDS snapshot: LK-Design-System/lk-design-system@lds-v0.1.0-rc.69.8
 
 Read ./adoption-workflow.md before implementation. Review all six non-component
 facets and componentMapping for product UI adoption. Robotics component authoring
