@@ -3,7 +3,7 @@
   "kind": "lds-package-documentation",
   "package": {
     "name": "@lk-design-system/lds-robotics-ui",
-    "version": "0.1.0-rc.11",
+    "version": "0.1.0-rc.12",
     "layer": "robotics"
   },
   "adoption": {
@@ -161,7 +161,7 @@
   "source": {
     "robotics": {
       "repository": "LK-Design-System/lk-design-system-robotics",
-      "ref": "v0.1.0-rc.11",
+      "ref": "v0.1.0-rc.12",
       "refStatus": "published"
     },
     "canonicalAdoption": {
@@ -169,22 +169,22 @@
       "version": "1",
       "source": {
         "repository": "LK-Design-System/lk-design-system",
-        "ref": "lds-v0.1.0-rc.69.11",
+        "ref": "lds-v0.1.0-rc.69.12",
         "refStatus": "release-candidate",
         "path": "docs/references/adoption/LDS_UI_ADOPTION_CONTRACT.json",
         "sha256": "f4c4f71cff9f9108246a5f7cc5520d6095d599027adb75d0b61e385c5b7fef80"
       },
-      "snapshotManifestSha256": "bf50951f4dfa0e388e4a11723664d6fa420134402f3c8ee9a908af058035abb4"
+      "snapshotManifestSha256": "53352c2b92b432f62bd594e7559f234bbd829479daeafb827ba1ac67582959dd"
     }
   },
   "resources": {
     "tokens": {
       "path": "./tokens/manifest.json",
-      "sha256": "45692ae064d8a38ada8ed387e9877b5b1d8a722807a9e978f217748e241d71e7"
+      "sha256": "9f2dbff86435012b0d39f3ec10d734012f7fec3eaa5ec53a98337ab84ba361e2"
     },
     "domainSymbols": {
       "path": "./domain-symbol-registry.json",
-      "sha256": "ac8b79850ec29d9c789f04998080b2ab6b99e75487e6c0b35f160eb2111691a6"
+      "sha256": "1b2101444a9fabf9669388a62fd05ed0df244205f06a6a38428e3671d0867a87"
     }
   },
   "documents": [
@@ -206,11 +206,11 @@
     },
     {
       "path": "adoption-workflow.md",
-      "sha256": "d165975748ae3baea8af62020cc64c7c5ad28d2a09e31d3ee30ba871ec45102f"
+      "sha256": "628fe6c8945e1b61e3310abe2fac4d24347d06d1faba19f1b4bfdafa770ac53f"
     },
     {
       "path": "domain-symbol-registry.json",
-      "sha256": "ac8b79850ec29d9c789f04998080b2ab6b99e75487e6c0b35f160eb2111691a6"
+      "sha256": "1b2101444a9fabf9669388a62fd05ed0df244205f06a6a38428e3671d0867a87"
     },
     {
       "path": "domain/ATTRIBUTIONS.md",
@@ -278,7 +278,7 @@
     },
     {
       "path": "llms.txt",
-      "sha256": "6c81b9fa7bd4ad62d313426f25a58deaf38deb467e7ee5f07e9206bfb282cb0f"
+      "sha256": "0bf7739c7417e9033783910a5e20a0031e535ffcb5c6639b5adb76b27c3f4943"
     },
     {
       "path": "shared/adoption-checklist.json",
@@ -402,7 +402,7 @@
     },
     {
       "path": "shared/manifest.json",
-      "sha256": "bf50951f4dfa0e388e4a11723664d6fa420134402f3c8ee9a908af058035abb4"
+      "sha256": "53352c2b92b432f62bd594e7559f234bbd829479daeafb827ba1ac67582959dd"
     },
     {
       "path": "shared/patterns/loading.md",
@@ -434,11 +434,11 @@
     },
     {
       "path": "tokens/manifest.json",
-      "sha256": "45692ae064d8a38ada8ed387e9877b5b1d8a722807a9e978f217748e241d71e7"
+      "sha256": "9f2dbff86435012b0d39f3ec10d734012f7fec3eaa5ec53a98337ab84ba361e2"
     },
     {
       "path": "upstream-snapshot.json",
-      "sha256": "70403dc861c7df644e06b962fde16b2966dd17c52a8a35da1ee258aca856df7c"
+      "sha256": "92bf48c11617dbe15b1d0658e4312e4fd08d99c6d3cfce17cfa9a911e45fcda6"
     }
   ]
 }
