@@ -3,12 +3,12 @@
   "kind": "lds-upstream-documentation-snapshot",
   "package": {
     "name": "@lk-design-system/lds-core",
-    "version": "0.1.0-rc.69.14",
+    "version": "0.1.0-rc.69.15",
     "layer": "core"
   },
   "source": {
     "repository": "LK-Design-System/lk-design-system",
-    "ref": "lds-v0.1.0-rc.69.14",
+    "ref": "lds-v0.1.0-rc.69.15",
     "documents": [
       {
         "path": "docs/ACCESSIBILITY_CONTRACTS.md",
@@ -160,7 +160,7 @@
       }
     ]
   },
-  "manifestSha256": "dd68a93183d61a144734cf5bebc4d64d39fbc8705327997ef546e3a2d52c1d76",
+  "manifestSha256": "e877c1034b5d8018a3d220247bb7373ad84872e28c7941a080e6e71c0244870c",
   "files": [
     {
       "path": "LDS_UI_ADOPTION_CONTRACT.schema.json",
@@ -284,7 +284,7 @@
     },
     {
       "path": "manifest.json",
-      "sha256": "dd68a93183d61a144734cf5bebc4d64d39fbc8705327997ef546e3a2d52c1d76"
+      "sha256": "e877c1034b5d8018a3d220247bb7373ad84872e28c7941a080e6e71c0244870c"
     },
     {
       "path": "patterns/loading.md",
