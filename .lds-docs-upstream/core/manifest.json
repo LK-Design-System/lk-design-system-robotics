@@ -3,7 +3,7 @@
   "kind": "lds-package-documentation",
   "package": {
     "name": "@lk-design-system/lds-core",
-    "version": "0.1.0-rc.69.23",
+    "version": "0.1.0-rc.69.24",
     "layer": "core"
   },
   "adoption": {
@@ -62,7 +62,7 @@
   },
   "source": {
     "repository": "LK-Design-System/lk-design-system",
-    "ref": "lds-v0.1.0-rc.69.23",
+    "ref": "lds-v0.1.0-rc.69.24",
     "documents": [
       {
         "path": "docs/ACCESSIBILITY_CONTRACTS.md",
@@ -78,7 +78,7 @@
       },
       {
         "path": "docs/agent-skills/lds-ui/SKILL.md",
-        "sha256": "ab20f56b76a5be6af9fd597b524df0c8d086eede285fcddc6378e89b5984f361"
+        "sha256": "ca858cffa2a155a42ddca9b76ec15a4a28e4277219856785d8606ca9952b908b"
       },
       {
         "path": "docs/COMPONENT_WORKFLOW.md",
@@ -281,7 +281,7 @@
     },
     {
       "path": "adoption-workflow.md",
-      "sha256": "a09ba3c1f1f842c514d96a7d6fb1849b28e526edee66bfeb16ae7e49e6e6af46",
+      "sha256": "b0b8baf3c67c31480b567b8f2c00db6ae0c25f22357a81365ec4862a42e9b9d3",
       "sources": [
         {
           "path": "docs/LDS_UI_ADOPTION_WORKFLOW.md",
@@ -311,11 +311,11 @@
     },
     {
       "path": "agent-skills/lds-ui/SKILL.md",
-      "sha256": "d46fcb4acba9b147b285a4532e86b552d0bf4fc219f8455dc2eee76cdd22af8b",
+      "sha256": "9a4e6d392090f3285b8fc0b2d991791e4087257e293b1dd02d51e4fd2ee734c9",
       "sources": [
         {
           "path": "docs/agent-skills/lds-ui/SKILL.md",
-          "sha256": "ab20f56b76a5be6af9fd597b524df0c8d086eede285fcddc6378e89b5984f361"
+          "sha256": "ca858cffa2a155a42ddca9b76ec15a4a28e4277219856785d8606ca9952b908b"
         }
       ]
     },
@@ -331,7 +331,7 @@
     },
     {
       "path": "components/README.md",
-      "sha256": "0a39e370dd64c18a4372983a276a912b9732ea49938f208f55a4c4980dff8450",
+      "sha256": "240223bd7c20766b72488ece9735f931f00977b19a53b2438731a237f53ef1b5",
       "sources": [
         {
           "path": "docs/components/README.md",
@@ -561,7 +561,7 @@
     },
     {
       "path": "llms.txt",
-      "sha256": "cf2290a9f28445084ce216d0433d74576c87e48db3b46fa8199dd8666614a027",
+      "sha256": "453715855ad382d01ed3e285bc755e20b59f66e69e81905a77be239bbccfbdc0",
       "sources": [
         {
           "path": "llms.txt",
@@ -591,7 +591,7 @@
     },
     {
       "path": "policies/COMPONENT_WORKFLOW.md",
-      "sha256": "1016117d0c123dbc0d0c90b0b6e73dba09b27f23a070ac65fd3b6dec73a3b160",
+      "sha256": "450159faf8b62b84743c4b7d4bea096392dd23579dec952c70cf04504b6ad3a9",
       "sources": [
         {
           "path": "docs/COMPONENT_WORKFLOW.md",
@@ -601,7 +601,7 @@
     },
     {
       "path": "policies/COPY_REVIEW_CONTRACT.md",
-      "sha256": "33185be117129a4730a7de351325adda530f32767ec7e4fcd4f83cba318ec120",
+      "sha256": "36c8cc32df1d11b51050317ec01a5411a34a3addd66bc0f2f175164b610e2690",
       "sources": [
         {
           "path": "docs/COPY_REVIEW_CONTRACT.md",
