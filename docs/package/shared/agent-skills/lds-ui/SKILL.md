@@ -106,3 +106,4 @@ node_modules/@lk-design-system/lds-core/docs/agent-skills/lds-ui/SKILL.md
 
 - **LDS 자체의 저작·수정** (컴포넌트 추가, 토큰 값 변경, 게이트 갱신): 그것은 lk-design-system 레포의 AGENTS.md 관할이다. 도입 중 공유 컴포넌트/토큰 변경이 필요해 보이면, 이 작업 범위 안에서 고치지 말고 업스트림에 별도 스코프로 보고한다.
 - 발표 덱 저작: lk-design-system-slides 레포의 `lds-deck` 스킬 관할.
+- 슬라이드의 영상(MP4)·모션그래픽 렌더링: lk-design-system-motion 레포의 `lds-motion` 스킬과 AGENTS.md 관할 (공개 저장소: https://github.com/LK-Design-System/lk-design-system-motion).
