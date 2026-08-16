@@ -5430,6 +5430,39 @@
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
       },
       {
+        "css": "--display0-line",
+        "files": [
+          "tokens/typography.css"
+        ],
+        "values": [
+          "144px"
+        ],
+        "classification": "runtime-projection",
+        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
+      },
+      {
+        "css": "--display0-size",
+        "files": [
+          "tokens/typography.css"
+        ],
+        "values": [
+          "112px"
+        ],
+        "classification": "runtime-projection",
+        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
+      },
+      {
+        "css": "--display0-spacing",
+        "files": [
+          "tokens/typography.css"
+        ],
+        "values": [
+          "-0.034em"
+        ],
+        "classification": "runtime-projection",
+        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
+      },
+      {
         "css": "--display1-line",
         "files": [
           "tokens/typography.css"
