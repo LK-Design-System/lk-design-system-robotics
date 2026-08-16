@@ -25,7 +25,7 @@ node_modules/@lk-design-system/lds-core/docs/agent-skills/lds-ui/SKILL.md
 
 ## 시작 절차 (모든 LDS UI 작업 공통)
 
-1. 설치된 패키지의 AI 진입점을 읽는다: `node_modules/@lk-design-system/lds-core/llms.txt`. 로보틱스 UI면 `@lk-design-system/lds-robotics-ui/llms.txt`와 `/design-system.json`도 읽고, 도메인 규칙 요약 `@lk-design-system/lds-robotics-ui/docs/domain/AGENT_SKILL_REFERENCE.md`를 로드한다.
+1. 설치된 패키지의 AI 진입점을 읽는다: `node_modules/@lk-design-system/lds-core/llms.txt`. 도메인 패키지를 쓰면 그 패키지의 규칙 요약도 로드한다 — 로보틱스 UI면 `@lk-design-system/lds-robotics-ui/llms.txt`·`/design-system.json`과 `@lk-design-system/lds-robotics-ui/docs/domain/AGENT_SKILL_REFERENCE.md`, 슬라이드·에디토리얼이면 `@lk-design-system/lds-slides-ui/docs/AGENT_SKILL_REFERENCE.md`.
 2. **기존 화면의 전환·리스타일·마이그레이션이면 adoption 계약이 적용된다.** 컴포넌트 교체만으로 LDS 전환은 완료되지 않는다 — 6개 비컴포넌트 facet(토큰·테마 / 레이아웃·시각 기초 / 상태·모션 / 자산·아이콘·브랜드 / 콘텐츠·국제화 / 접근성) + 컴포넌트 매핑 전부에 증거 딸린 판정이 필요하다. 절차와 스키마: `@lk-design-system/lds-core/docs/adoption-workflow.md`. 기존 화면은 `full-surface`가 기본이다.
 3. 스타일은 레이어 순서로 import한다: Core → Theme → Product → Robotics.
 4. 화면을 조립하면서 아래 결정 규칙을 적용한다. 카피를 한 줄이라도 쓰면 [references/copy.md](./references/copy.md)를 로드한다.
@@ -98,6 +98,7 @@ node_modules/@lk-design-system/lds-core/docs/agent-skills/lds-ui/SKILL.md
 | 토큰 실명부 | `lds-core/docs/token-reference.json` |
 | 접근성·카피 리뷰·토큰 거버넌스 정책 | `lds-core/docs/policies/*.md` |
 | 로보틱스 도메인 계약 | `lds-robotics-ui/docs/domain/AGENT_SKILL_REFERENCE.md`(요약), `/docs/domain/*.md`(정본), `/llms.txt` |
+| 슬라이드·에디토리얼 도메인 계약 | `lds-slides-ui/docs/AGENT_SKILL_REFERENCE.md`(요약), `/catalogue.json`(기계 계약), `README.md`(소유 철학) |
 | 라이브 스토리북 | 각 패키지 `package.json`의 `lds.storybook` 필드 |
 
 ## 이 스킬이 다루지 않는 것
