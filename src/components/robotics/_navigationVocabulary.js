@@ -23,7 +23,8 @@
 // while runtime availability/conflict changes tone and is named in label/detail
 // text. Any small-ring availability dash stays component-local rather than
 // becoming a path or area state encoding.
-// See docs/NAVIGATION_ATOMIZATION_PLAN.md.
+// See docs/NAVIGATION_EXPRESSION_CONVENTIONS.md for the encoding conventions
+// these values implement.
 
 /**
  * State opacity. Every navigation renderer dims a disabled marker and softens

@@ -491,10 +491,3 @@ identifier, while `ANNOTATION_CODE` supplies compact secondary annotation text.
 Neither registry is a visual Foundation asset. Their value and role-glyph parity
 are guarded by `scripts/check-navigation-encoding.mjs`; the Waypoint and its
 legend stories own the actual vector-role and annotation presentation.
-
----
-
-## Appendix B — Referenced siblings
-
-- `docs/NAVIGATION_ATOMIZATION_PLAN.md` — the atomization roadmap the vocabulary
-  SCOPE RULE points to (companion doc; create alongside if it is still pending).
