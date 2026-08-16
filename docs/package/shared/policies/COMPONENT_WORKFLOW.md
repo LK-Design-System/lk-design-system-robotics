@@ -7,7 +7,7 @@
 | Owner | Design system owner |
 | Last reviewed | 2026-07-24 |
 
-Storybook 페이지 소유권, 공개/숨김 역할, 영역별 설명 순서는 [`STORYBOOK_INFORMATION_ARCHITECTURE.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.17/docs/STORYBOOK_INFORMATION_ARCHITECTURE.md)를 따른다. 전수 판정 원장은 `docs/references/quality/STORYBOOK_INFORMATION_ARCHITECTURE_AUDIT.json`에서 관리한다.
+Storybook 페이지 소유권, 공개/숨김 역할, 영역별 설명 순서는 [`STORYBOOK_INFORMATION_ARCHITECTURE.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.18/docs/STORYBOOK_INFORMATION_ARCHITECTURE.md)를 따른다. 전수 판정 원장은 `docs/references/quality/STORYBOOK_INFORMATION_ARCHITECTURE_AUDIT.json`에서 관리한다.
 
 이 문서는 신규 컴포넌트, 대규모 재설계, 재사용 패턴, 신규·변경 icon/asset/map symbol의 **공식 검토 진입점**이다. 구현 파일을 추가하는 순서만이 아니라 문제 근거, 제품 워크플로우, 공개 계약, 시각·접근성, asset 적합성, 검증과 완료 기록까지 모두 적용한다. 세부 계약 문서가 서로 다르게 읽히면 이 문서에서 요구하는 검토 순서를 먼저 따르고, 발견된 불일치는 관련 계약 문서에 함께 반영한다.
 
@@ -96,11 +96,11 @@ menu, 자체 focus trap, document 수준 outside-dismiss listener, 조건부 마
 
 | 행동 | 엔진 | 계약 문서 |
 | --- | --- | --- |
-| 메뉴 roving focus·typeahead·Escape 스택 | `components/internal/useMenuKeyboard.js` | [`useMenuKeyboard.prompt.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.17/components/internal/useMenuKeyboard.prompt.md) |
-| 서브메뉴(드릴) 브랜치·포탈 배치 | `components/internal/useSubmenuBranch.jsx` | [`useSubmenuBranch.prompt.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.17/components/internal/useSubmenuBranch.prompt.md) |
-| light dismiss(바깥 클릭·최상단 Escape·재오픈 래치)·anchored 배치·열림 triad | `components/overlay/anchored-overlay.js` | [`anchored-overlay.prompt.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.17/components/overlay/anchored-overlay.prompt.md) |
-| 모달 초점 트랩·복원·오버레이 스택·스크롤 잠금 | `components/overlay/dialog-focus.js` | [`dialog-focus.prompt.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.17/components/overlay/dialog-focus.prompt.md) |
-| 폼 필드 라벨·메시지·`aria-describedby` 메타데이터와 상태 토큰 | `components/forms/field-shared.js` | [`field-shared.prompt.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.17/components/forms/field-shared.prompt.md) |
+| 메뉴 roving focus·typeahead·Escape 스택 | `components/internal/useMenuKeyboard.js` | [`useMenuKeyboard.prompt.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.18/components/internal/useMenuKeyboard.prompt.md) |
+| 서브메뉴(드릴) 브랜치·포탈 배치 | `components/internal/useSubmenuBranch.jsx` | [`useSubmenuBranch.prompt.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.18/components/internal/useSubmenuBranch.prompt.md) |
+| light dismiss(바깥 클릭·최상단 Escape·재오픈 래치)·anchored 배치·열림 triad | `components/overlay/anchored-overlay.js` | [`anchored-overlay.prompt.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.18/components/overlay/anchored-overlay.prompt.md) |
+| 모달 초점 트랩·복원·오버레이 스택·스크롤 잠금 | `components/overlay/dialog-focus.js` | [`dialog-focus.prompt.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.18/components/overlay/dialog-focus.prompt.md) |
+| 폼 필드 라벨·메시지·`aria-describedby` 메타데이터와 상태 토큰 | `components/forms/field-shared.js` | [`field-shared.prompt.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.18/components/forms/field-shared.prompt.md) |
 
 - 엔진 구현을 바꾸면 모든 소비자가 함께 바뀐다. 동작 수정은 엔진의 `.prompt.md` 계약·전용
   테스트와 함께 진행하고, 특정 소비자만을 위한 분기를 엔진에 넣지 않는다.
@@ -153,7 +153,7 @@ menu, 자체 focus trap, document 수준 outside-dismiss listener, 조건부 마
 3. loading, empty, error, stale, offline, disabled, partial failure와 recovery 경로를 확인한다.
 4. 제품별 관계를 `supported`, `supported by composition`, `gap`, `not applicable`로 판정한다.
 5. gap이 LDS 공개 계약의 책임인지 product orchestration, backend, transport의 책임인지 분리한다.
-6. source pin과 판정은 [`PRODUCT_FRONTEND_COVERAGE.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.17/docs/PRODUCT_FRONTEND_COVERAGE.md)와 `docs/references/product-frontends/COVERAGE_AUDIT.json`에 남긴다.
+6. source pin과 판정은 [`PRODUCT_FRONTEND_COVERAGE.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.18/docs/PRODUCT_FRONTEND_COVERAGE.md)와 `docs/references/product-frontends/COVERAGE_AUDIT.json`에 남긴다.
 
 제품 page, route, backend policy, transport logic, 완성 workflow를 Storybook component로 복제하지 않는다. 이 절의 source pin과 판정은 2절에서 독립적으로 정한 설계를 실제 제품이 조합할 수 있는지 확인하는 **coverage gate**이며, 설계 선택을 승인하거나 public component의 생성·삭제·API·스타일을 단독으로 결정하는 authority가 아니다. LDS는 제품이 자체 스타일이나 접근성 동작을 다시 만들지 않고 workflow를 조합할 수 있는 primitive와 public contract를 제공한다.
 
@@ -171,7 +171,7 @@ menu, 자체 focus trap, document 수준 outside-dismiss listener, 조건부 마
 - 앱 route, 권한 정책, API 호출, transport 상태 머신은 public component contract에 넣지 않는다.
 - `editor`·`viz`·`robotics` 그룹은 계약(`.prompt.md`)이 이 저장소에, 구현·타입·스토리가 외부 Robotics 저장소에 있다. 이 이음새는 in-repo `check:api-drift`가 닿지 않으므로, 공개 prop을 바꾸면 `npm run check:robotics-contract-drift`(형제 checkout 대상, `--root=`로 위치 지정)를 통과해야 한다. 이 검사는 **양방향**이다: 구현에 있는데 계약 문서에 없는 prop(`undocumentedProps`)과, 반대로 계약 예제가 홍보하지만 구현에 없는 prop(`phantomProps` — 계약이 구현에 대해 거짓말하는 경우)을 모두 잡는다. `navigation`은 메인 레포와 이름을 공유하는 sparse 그룹이라 양쪽에 모두 존재하는 컴포넌트(예: `FloorSelector`)만 검사한다. 기존 드리프트는 `docs/references/robotics/CONTRACT_DRIFT_BASELINE.json` 래칫에 기록되어 있으며 새 드리프트만 실패한다.
 
-API와 상태 증거는 [`COMPONENT_API_STATE_MATRIX.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.17/docs/COMPONENT_API_STATE_MATRIX.md), 접근성 증거는 [`ACCESSIBILITY_CONTRACTS.md`](./ACCESSIBILITY_CONTRACTS.md)에 반영한다.
+API와 상태 증거는 [`COMPONENT_API_STATE_MATRIX.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.18/docs/COMPONENT_API_STATE_MATRIX.md), 접근성 증거는 [`ACCESSIBILITY_CONTRACTS.md`](./ACCESSIBILITY_CONTRACTS.md)에 반영한다.
 
 ### 5. Icon, asset, map symbol 적합성
 

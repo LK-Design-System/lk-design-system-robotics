@@ -3,7 +3,7 @@
   "kind": "lds-package-documentation",
   "package": {
     "name": "@lk-design-system/lds-core",
-    "version": "0.1.0-rc.69.17",
+    "version": "0.1.0-rc.69.18",
     "layer": "core"
   },
   "adoption": {
@@ -61,7 +61,7 @@
   },
   "source": {
     "repository": "LK-Design-System/lk-design-system",
-    "ref": "lds-v0.1.0-rc.69.17",
+    "ref": "lds-v0.1.0-rc.69.18",
     "documents": [
       {
         "path": "docs/ACCESSIBILITY_CONTRACTS.md",
@@ -268,7 +268,7 @@
     },
     {
       "path": "adoption-workflow.md",
-      "sha256": "3969f4b5fb3e83ae619870eb861d08c712d67ed023c681960823d2315a965dab",
+      "sha256": "83709588e9353df0141ecf3ada2e3473cb5bc8b068134248683df2a3125f17a0",
       "sources": [
         {
           "path": "docs/LDS_UI_ADOPTION_WORKFLOW.md",
@@ -288,7 +288,7 @@
     },
     {
       "path": "components/README.md",
-      "sha256": "3d527759a43abbf4c9641a9c10782caf648b0a4130c608bb586ca19fcb45d5ba",
+      "sha256": "bb69030076b395bd25384549fd56ee62af96bc96568dbdab4770ac3074395442",
       "sources": [
         {
           "path": "docs/components/README.md",
@@ -518,7 +518,7 @@
     },
     {
       "path": "llms.txt",
-      "sha256": "6436539ebaaeb47693ed45dfe61be0b9b0b553fca46b82bf76f9912cf73b2e56",
+      "sha256": "8ac659e93944b6f1007d8da12402b96fc22d3edd0d46ebed0f37bb26dd3aacac",
       "sources": [
         {
           "path": "llms.txt",
@@ -548,7 +548,7 @@
     },
     {
       "path": "policies/COMPONENT_WORKFLOW.md",
-      "sha256": "431512017d97d0047b3c7b44df85a5b6a99db28a3e42b132742ddfdcfe112b7c",
+      "sha256": "7254f9f4ccd3b9cc6daf6148f88af45b8a67fd4b8e3d5f8643b1eac2d7e45ff5",
       "sources": [
         {
           "path": "docs/COMPONENT_WORKFLOW.md",
@@ -558,7 +558,7 @@
     },
     {
       "path": "policies/COPY_REVIEW_CONTRACT.md",
-      "sha256": "2279c2bb178cb481c6e9e80e069bfd4cf658f602df6fb8066a9c998487df67ab",
+      "sha256": "f95708f46490c945bbce34f8a63a1ed8601e62254534f9b2d2587226bdcc4e59",
       "sources": [
         {
           "path": "docs/COPY_REVIEW_CONTRACT.md",
