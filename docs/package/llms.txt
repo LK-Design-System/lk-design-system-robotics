@@ -2,7 +2,7 @@
 
 Package: @lk-design-system/lds-robotics-ui
 Layer: robotics
-Canonical LDS snapshot: LK-Design-System/lk-design-system@lds-v0.1.0-rc.69.19
+Canonical LDS snapshot: LK-Design-System/lk-design-system@lds-v0.1.0-rc.69.20
 
 Read ./adoption-workflow.md before implementation. Review all six non-component
 facets and componentMapping for product UI adoption. Robotics component authoring
@@ -250,4 +250,4 @@ Detailed non-component guidance:
 - [docs/LOADING_PATTERN.md](./shared/patterns/loading.md) — cross-component loading selection
 - [packages/core/assets/icons/manifest.json](./shared/assets/icons/manifest.json) — icon inventory
 - [docs/components/README.md](./shared/components/README.md) — targeted component-guide entry
-- [docs/components/llms.txt](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.19/docs/components/llms.txt) — large retrieval bundle; load selectively
+- [docs/components/llms.txt](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.20/docs/components/llms.txt) — large retrieval bundle; load selectively

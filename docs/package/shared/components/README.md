@@ -36,12 +36,12 @@ LDS 컴포넌트 문서는 구현 예시 모음이 아니라 선택·상태·상
 
 ## Generated surfaces
 
-- [Component reference](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.19/docs/components/COMPONENT_REFERENCE.md)
-- [Progress board](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.19/docs/components/PROGRESS_BOARD.md)
-- [LLM bundle](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.19/docs/components/llms.txt)
-- [JSON Schema](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.19/docs/components/component-content.schema.json)
-- [Compiled registry](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.19/docs/components/component-content.json)
-- [Decision guides](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.19/docs/components/guides)
+- [Component reference](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.20/docs/components/COMPONENT_REFERENCE.md)
+- [Progress board](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.20/docs/components/PROGRESS_BOARD.md)
+- [LLM bundle](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.20/docs/components/llms.txt)
+- [JSON Schema](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.20/docs/components/component-content.schema.json)
+- [Compiled registry](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.20/docs/components/component-content.json)
+- [Decision guides](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.20/docs/components/guides)
 
 ## Authoring workflow
 
