@@ -1,6 +1,6 @@
 {
   "name": "@lk-design-system/lds-robotics-ui",
-  "version": "0.1.0-rc.18",
+  "version": "0.1.0-rc.19",
   "description": "Robotics DOM, SVG, and 2D UI presentation layer for LDS.",
   "license": "MIT",
   "type": "module",
@@ -53,16 +53,14 @@
     "prepublishOnly": "npm run check:release",
     "check:module-graph": "node scripts/check-story-module-graph.mjs"
   },
-  "dependencies": {
-    "@lk-design-system/lds-core": "0.1.0-rc.4",
-    "@lk-design-system/lds-product": "0.1.0-rc.4"
-  },
   "peerDependencies": {
+    "@lk-design-system/lds-core": "0.1.0-rc.69.18",
+    "@lk-design-system/lds-product": "0.1.0-rc.69.18",
     "react": ">=18 <20",
     "react-dom": ">=18 <20"
   },
   "devDependencies": {
-    "@lk-design-system/lds-theme": "0.1.0-rc.4",
+    "@lk-design-system/lds-theme": "0.1.0-rc.69.18",
     "@playwright/test": "^1.61.1",
     "@storybook/addon-a11y": "10.4.6",
     "@storybook/addon-docs": "10.4.6",

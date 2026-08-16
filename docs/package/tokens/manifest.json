@@ -3,7 +3,7 @@
   "kind": "lds-robotics-token-manifest",
   "package": {
     "name": "@lk-design-system/lds-robotics-ui",
-    "version": "0.1.0-rc.18"
+    "version": "0.1.0-rc.19"
   },
   "sources": [
     {
