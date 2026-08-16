@@ -169,7 +169,9 @@ export const DensityVariants = {
   render: () => <RobotDensityVariants />,
   play: async ({ canvasElement }) => {
     ['comfortable', 'compact', 'single-line'].forEach((density) => {
-      const cards = [...canvasElement.querySelectorAll(`[data-density="${density}"]`)];
+      // Scope to card roots: the packaged RobotStatusCell renders its own
+      // nested data-density node, so a bare density query over-matches.
+      const cards = [...canvasElement.querySelectorAll(`[data-robot-status-card][data-density="${density}"]`)];
       if (
         cards.length !== 2
         || cards.map((card) => card.getAttribute('data-selected')).join(',') !== 'false,true'
@@ -178,7 +180,7 @@ export const DensityVariants = {
       }
     });
     const singleLine = canvasElement.querySelector(
-      '[data-density-state="unselected"] [data-density="single-line"]',
+      '[data-density-state="unselected"] [data-robot-status-card][data-density="single-line"]',
     );
     if (!singleLine) throw new Error('Unselected single-line RobotStatusCard did not render.');
     const content = singleLine.children[1];
