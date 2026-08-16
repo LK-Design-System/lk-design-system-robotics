@@ -83,6 +83,26 @@ async function validateMarkdownLinks(files) {
   }
 }
 
+async function validateAuthoredDocs() {
+  const authoredRoot = path.join(root, 'docs');
+  const files = (await walk(authoredRoot)).filter((file) => file.endsWith('.md') && !file.startsWith('package/'));
+  for (const relative of files) {
+    const file = path.join(authoredRoot, relative);
+    const source = await readFile(file, 'utf8');
+    for (const match of source.matchAll(/\]\(([^)]+)\)/g)) {
+      const target = localTarget(match[1], file, root);
+      if (!target) continue;
+      invariant(await exists(target), `docs/${relative} has an unresolved link: ${match[1]}`);
+    }
+    for (const match of source.matchAll(/`((?:docs|scripts|src)\/[^`\s]+)`/g)) {
+      const reference = match[1];
+      if (reference.includes('*')) continue;
+      invariant(await exists(path.join(root, reference.split(/[?#]/, 1)[0])), `docs/${relative} references a missing repository path: ${reference}`);
+    }
+  }
+  return files.length;
+}
+
 async function main() {
   await execFileAsync(process.execPath, [path.join(root, 'scripts', 'project-package-docs.mjs'), '--check'], {
     cwd: root,
@@ -253,7 +273,8 @@ async function main() {
   }
 
   await validateMarkdownLinks(actualFiles);
-  console.log(`Validated ${actualFiles.length + 1} Robotics package docs: deterministic projection, strict schemas, hashes, self-contained refs, domain sources, tokens, symbols, and package identity.`);
+  const authoredCount = await validateAuthoredDocs();
+  console.log(`Validated ${actualFiles.length + 1} Robotics package docs (deterministic projection, strict schemas, hashes, self-contained refs, domain sources, tokens, symbols, package identity) and ${authoredCount} authored docs (links, repository path references).`);
 }
 
 await main();
