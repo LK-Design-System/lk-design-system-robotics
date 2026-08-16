@@ -92,7 +92,7 @@ LDS 저장소에는 특정 제품의 route, 객체명, 상태 enum 또는 승인
 
 `sourceHash`와 이후의 `candidateHash`는 파이프라인이 canonical serialization으로 계산한다. 모델이 hash를 만들거나 기존 값을 바꾸지 않는다.
 
-공통 machine-readable 계약은 [`references/quality/KOREAN_UI_COPY_CONTRACT.schema.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.16/docs/references/quality/KOREAN_UI_COPY_CONTRACT.schema.json)에 있다. 소비 제품은 계약 ID `https://design.lk-robotics.com/contracts/korean-ui-copy/v1`과 `contractVersion`을 함께 고정한다. 제품은 copy set의 `id`·문맥·policy tag·items·보호 항목을 key 정렬 JSON으로 직렬화하고 UTF-8 SHA-256을 계산한다. `sourceHash`는 원문 items, `candidateHash`는 `REVISE` 결정만 반영한 items에 묶인다. review와 approval 자체는 hash 입력에서 제외하며 각 기록이 두 hash와 `rulesetVersion`을 참조한다.
+공통 machine-readable 계약은 [`references/quality/KOREAN_UI_COPY_CONTRACT.schema.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.17/docs/references/quality/KOREAN_UI_COPY_CONTRACT.schema.json)에 있다. 소비 제품은 계약 ID `https://design.lk-robotics.com/contracts/korean-ui-copy/v1`과 `contractVersion`을 함께 고정한다. 제품은 copy set의 `id`·문맥·policy tag·items·보호 항목을 key 정렬 JSON으로 직렬화하고 UTF-8 SHA-256을 계산한다. `sourceHash`는 원문 items, `candidateHash`는 `REVISE` 결정만 반영한 items에 묶인다. review와 approval 자체는 hash 입력에서 제외하며 각 기록이 두 hash와 `rulesetVersion`을 참조한다.
 
 ## 보호 항목
 
@@ -211,7 +211,7 @@ AI가 `KEEP`을 반환해도 제품이 요구하는 검토를 생략하지 않�
 
 제품의 copy inventory에는 사용자에게 직접 노출되는 API 오류와 background job 상태를 포함한다. 보고서·채팅·PDF는 고정 템플릿과 사용자·AI 생성 본문을 분리한다.
 
-LDS는 schema와 결정적 fixture를 소유한다. 제품 저장소는 `canonical-names.json`, `state-dictionaries.json`, `copy-sets.json`, `exceptions.json`, baseline과 source mapping을 소유한다. [`references/quality/KOREAN_UI_COPY_BASELINE.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.16/docs/references/quality/KOREAN_UI_COPY_BASELINE.json)은 LDS 공통 verifier의 신규 finding ratchet이며 제품 위반을 대신 보관하지 않는다.
+LDS는 schema와 결정적 fixture를 소유한다. 제품 저장소는 `canonical-names.json`, `state-dictionaries.json`, `copy-sets.json`, `exceptions.json`, baseline과 source mapping을 소유한다. [`references/quality/KOREAN_UI_COPY_BASELINE.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.17/docs/references/quality/KOREAN_UI_COPY_BASELINE.json)은 LDS 공통 verifier의 신규 finding ratchet이며 제품 위반을 대신 보관하지 않는다.
 
 ## 도입과 회귀 gate
 
