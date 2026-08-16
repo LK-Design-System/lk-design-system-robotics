@@ -54,7 +54,7 @@
 1. 대상 route·surface·source file과 실제 ready/non-ready 상태, 사용자 문구, asset을 inventory합니다.
 2. [Foundation index](./foundations/README.md)에서 관련 원리와 선택 기준을 읽습니다. 단일 AI context가 필요하면 [Foundation LLM bundle](./foundations/llms.txt)을 대신 사용합니다.
 3. 관련 CSS 이름과 설명을 [token source](./token-reference.json)에서 확인합니다. generated CSS 값만 보고 의미를 추론하지 않습니다.
-4. 후보 component를 정한 뒤 [component index](./components/README.md)와 해당 targeted guide를 읽습니다. 전체 [component LLM bundle](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.21/docs/components/llms.txt)은 retrieval/indexing 용도이며 매 작업에서 통째로 읽는 필수 입력이 아닙니다.
+4. 후보 component를 정한 뒤 [component index](./components/README.md)와 해당 targeted guide를 읽습니다. 전체 [component LLM bundle](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.22/docs/components/llms.txt)은 retrieval/indexing 용도이며 매 작업에서 통째로 읽는 필수 입력이 아닙니다.
 5. hard trigger가 있으면 해당 facet이 요구하는 evidence kind와 전문 계약을 반드시 확인합니다.
 6. 아래 report schema에 surface별 판정을 기록한 뒤에 component mapping을 확정합니다.
 
@@ -266,6 +266,8 @@ Report의 기본 `scope.mode`는 `full-surface`입니다. Required for adoption,
 
 소비 저장소에 [config schema](./adoption-config.schema.json)를 따르는 `.lds/adoption.config.json`을 둡니다. 기본 report 경로는 `.lds/adoption-report.json`이며 config의 `reportDirectory`와 CLI `--report`로 명시적으로 바꿀 수 있습니다.
 
+에이전트로 UI를 조립하는 소비 저장소는 셋업 단계에서 [consumer agent skill](./agent-skills/lds-ui/SKILL.md)도 함께 설치합니다 — 규칙이 조립 시점에 push 로드되는 채널입니다. Claude Code는 설치된 `@lk-design-system/lds-core/docs/agent-skills/lds-ui/`를 `.claude/skills/lds-ui/`로 복사하고, AGENTS.md 기반 에이전트(Codex 등)는 SKILL.md 설치 섹션의 라우팅 블록을 저장소 AGENTS.md에 추가합니다. `check-adoption`은 둘 다 없으면 `AGENT_SKILL_MISSING` 경고를 출력합니다(advisory — 판정을 차단하지는 않습니다).
+
 ```json
 {
   "schemaVersion": 1,
@@ -289,7 +291,7 @@ Report의 기본 `scope.mode`는 `full-surface`입니다. Required for adoption,
 node <pinned-lds>/packages/conformance/src/cli.mjs check-adoption --root . --lds-root <pinned-lds> --config .lds/adoption.config.json --report .lds/adoption-report.json --base <base-sha> --head <head-sha> --output visual-artifacts/adoption/check-result.json
 ```
 
-GitHub Actions에서는 [composite action](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.21/.github/actions/lds-adoption/action.yml)을 immutable LDS commit SHA로 pin합니다. diff base를 읽을 수 있게 caller의 `actions/checkout`에 `fetch-depth: 0`을 설정합니다.
+GitHub Actions에서는 [composite action](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.22/.github/actions/lds-adoption/action.yml)을 immutable LDS commit SHA로 pin합니다. diff base를 읽을 수 있게 caller의 `actions/checkout`에 `fetch-depth: 0`을 설정합니다.
 
 ```yaml
 - uses: actions/checkout@<immutable-sha>
