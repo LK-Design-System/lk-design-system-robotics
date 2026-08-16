@@ -7,6 +7,7 @@ adoption and Foundation snapshot. Shared policy remains under `../shared/`.
 | Document | Role |
 | --- | --- |
 | [ROBOTICS_UI_ADOPTION.md](./ROBOTICS_UI_ADOPTION.md) | Robotics-authored domain contract |
+| [AGENT_SKILL_REFERENCE.md](./AGENT_SKILL_REFERENCE.md) | Robotics-authored domain contract |
 | [FLEET_UI_REFERENCE_PLAN.md](./FLEET_UI_REFERENCE_PLAN.md) | Robotics-authored domain contract |
 | [NAVIGATION_COORDINATE_CONTRACT.md](./NAVIGATION_COORDINATE_CONTRACT.md) | Robotics-authored domain contract |
 | [NAVIGATION_EXPRESSION_CONVENTIONS.md](./NAVIGATION_EXPRESSION_CONVENTIONS.md) | Robotics-authored domain contract |

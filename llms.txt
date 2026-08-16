@@ -20,6 +20,7 @@ Installed-package entrypoints:
 - `@lk-design-system/lds-robotics-ui/adoption-checklist.json`
 - `@lk-design-system/lds-robotics-ui/docs/adoption-report.schema.json`
 - `@lk-design-system/lds-robotics-ui/docs/domain/ROBOTICS_UI_ADOPTION.md`
+- `@lk-design-system/lds-robotics-ui/docs/domain/AGENT_SKILL_REFERENCE.md` — domain rule reference loaded by the `lds-ui` agent skill shipped in `@lk-design-system/lds-core/docs/agent-skills/lds-ui/`
 
 Robotics owns DOM, SVG, editor, 2D viewer, telemetry, navigation presentation, projection helpers, and domain semantics. It does not own transport, TF authority, localization, safety decisions, WebGL/Three/R3F lifecycle, or product orchestration.
 

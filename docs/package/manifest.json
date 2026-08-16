@@ -68,6 +68,12 @@
         "sha256": "dc2666277cd69b100b5a656982538141bb49f31be30db786562c255c53a9347f"
       },
       {
+        "path": "domain/AGENT_SKILL_REFERENCE.md",
+        "sourcePath": "docs/AGENT_SKILL_REFERENCE.md",
+        "sourceSha256": "2cdd6f290a5457acddeb464613faaf8a49830e51b7479e97c4cf3e9f0dfaa5de",
+        "sha256": "2cdd6f290a5457acddeb464613faaf8a49830e51b7479e97c4cf3e9f0dfaa5de"
+      },
+      {
         "path": "domain/FLEET_UI_REFERENCE_PLAN.md",
         "sourcePath": "docs/FLEET_UI_REFERENCE_PLAN.md",
         "sourceSha256": "48b98075f2c0bb3106d8c537e9989b57368cb2af3f07fddf263c76b7286b847f",
@@ -206,11 +212,15 @@
     },
     {
       "path": "adoption-workflow.md",
-      "sha256": "1ca4c502e445d493c4290c7a3fbd843e4f09b8108cef80eebc1982361fde0410"
+      "sha256": "2efc989d76f94c4df96162e81beb4f81b965716b19c7f89d4694d824f639dfb1"
     },
     {
       "path": "domain-symbol-registry.json",
       "sha256": "2290784399d38b2a2afd14662c8b9e76f8eee80603dfbe8a4997e9d8eb16c6c1"
+    },
+    {
+      "path": "domain/AGENT_SKILL_REFERENCE.md",
+      "sha256": "2cdd6f290a5457acddeb464613faaf8a49830e51b7479e97c4cf3e9f0dfaa5de"
     },
     {
       "path": "domain/ATTRIBUTIONS.md",
@@ -238,7 +248,7 @@
     },
     {
       "path": "domain/README.md",
-      "sha256": "b5f0a4a3441ef88f2a8fc89e628aedb09a6b36663f787f2668e607e675c60d63"
+      "sha256": "c13adc4025d29caba3c10d74548bc1a11a85bced4f753ed3e0668b7365341bb4"
     },
     {
       "path": "domain/ROBOTICS_UI_ADOPTION.md",
@@ -438,7 +448,7 @@
     },
     {
       "path": "upstream-snapshot.json",
-      "sha256": "3dd4dcaefd2acd9f902b10bca525dafb3ea220ccd81403e6d8a3df4a4787d3a1"
+      "sha256": "0f4f51a63d583f34b88f97b9ea907949cf49ddcc7b96656c26616bae8b1b1056"
     }
   ]
 }

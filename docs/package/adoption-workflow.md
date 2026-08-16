@@ -20,6 +20,7 @@ at an immutable SHA; a branch name or placeholder SHA is not acceptable.
 ## Robotics-owned domain evidence
 
 - [ROBOTICS_UI_ADOPTION.md](./domain/ROBOTICS_UI_ADOPTION.md)
+- [AGENT_SKILL_REFERENCE.md](./domain/AGENT_SKILL_REFERENCE.md)
 - [FLEET_UI_REFERENCE_PLAN.md](./domain/FLEET_UI_REFERENCE_PLAN.md)
 - [NAVIGATION_COORDINATE_CONTRACT.md](./domain/NAVIGATION_COORDINATE_CONTRACT.md)
 - [NAVIGATION_EXPRESSION_CONVENTIONS.md](./domain/NAVIGATION_EXPRESSION_CONVENTIONS.md)

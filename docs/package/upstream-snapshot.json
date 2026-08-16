@@ -323,6 +323,7 @@
     "adoption-report.schema.json",
     "adoption-workflow.md",
     "domain-symbol-registry.json",
+    "domain/AGENT_SKILL_REFERENCE.md",
     "domain/ATTRIBUTIONS.md",
     "domain/FLEET_UI_REFERENCE_PLAN.md",
     "domain/NAVIGATION_COORDINATE_CONTRACT.md",
