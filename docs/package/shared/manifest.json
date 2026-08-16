@@ -30,7 +30,8 @@
     "adoptionChecklist": "./adoption-checklist.json",
     "adoptionReportSchema": "./adoption-report.schema.json",
     "adoptionReportExample": "./adoption-report.example.json",
-    "adoptionWorkflow": "./adoption-workflow.md"
+    "adoptionWorkflow": "./adoption-workflow.md",
+    "agentSkill": "./agent-skills/lds-ui/SKILL.md"
   },
   "foundations": [
     "design-token",
@@ -66,6 +67,18 @@
       {
         "path": "docs/ACCESSIBILITY_CONTRACTS.md",
         "sha256": "add36a76b095f6e8d41db37b1e16935fa633558b16c2409f1bd2f55d0abbdc04"
+      },
+      {
+        "path": "docs/agent-skills/lds-ui/references/anti-patterns.md",
+        "sha256": "00d2d8ab27bd3a677ed5cdbe733d123759ae404e07ef5f80623e2bcc2510b2e0"
+      },
+      {
+        "path": "docs/agent-skills/lds-ui/references/copy.md",
+        "sha256": "6a0a66757d742bd120914636d796c5ae5ffb5086acd7c59ad65076d18cab01b6"
+      },
+      {
+        "path": "docs/agent-skills/lds-ui/SKILL.md",
+        "sha256": "58028fcd2c93f20d8d2a0de78392443d545951e88205aa41907ea8323d2c9129"
       },
       {
         "path": "docs/COMPONENT_WORKFLOW.md",
@@ -197,7 +210,7 @@
       },
       {
         "path": "llms.txt",
-        "sha256": "c7998cbad41a10854d8d869b1b6a189681c734f5faad8ea562b37b70f9485dfc"
+        "sha256": "721fe180cea6d74204f18e8104c9818881f8b128019691967c57df8be0833f44"
       },
       {
         "path": "packages/conformance/schemas/lds-ui-adoption-config.schema.json",
@@ -273,6 +286,36 @@
         {
           "path": "docs/LDS_UI_ADOPTION_WORKFLOW.md",
           "sha256": "2fa043205cbe313398cd3b5cf7dbcb4b48869dcab7332ad8e8c1d49e765ccddf"
+        }
+      ]
+    },
+    {
+      "path": "agent-skills/lds-ui/references/anti-patterns.md",
+      "sha256": "00d2d8ab27bd3a677ed5cdbe733d123759ae404e07ef5f80623e2bcc2510b2e0",
+      "sources": [
+        {
+          "path": "docs/agent-skills/lds-ui/references/anti-patterns.md",
+          "sha256": "00d2d8ab27bd3a677ed5cdbe733d123759ae404e07ef5f80623e2bcc2510b2e0"
+        }
+      ]
+    },
+    {
+      "path": "agent-skills/lds-ui/references/copy.md",
+      "sha256": "6a0a66757d742bd120914636d796c5ae5ffb5086acd7c59ad65076d18cab01b6",
+      "sources": [
+        {
+          "path": "docs/agent-skills/lds-ui/references/copy.md",
+          "sha256": "6a0a66757d742bd120914636d796c5ae5ffb5086acd7c59ad65076d18cab01b6"
+        }
+      ]
+    },
+    {
+      "path": "agent-skills/lds-ui/SKILL.md",
+      "sha256": "ee6a6a8ae10485c663ade8b70ae654ea2715c7676c11fafec9ed6e1b740062a6",
+      "sources": [
+        {
+          "path": "docs/agent-skills/lds-ui/SKILL.md",
+          "sha256": "58028fcd2c93f20d8d2a0de78392443d545951e88205aa41907ea8323d2c9129"
         }
       ]
     },
@@ -518,11 +561,11 @@
     },
     {
       "path": "llms.txt",
-      "sha256": "a2b6d8715c17b2854bb0221f75d29d9de81652c2e5bc541c0e288789afffdad7",
+      "sha256": "79efa306c5f14206ec71571689c646fbb0f7f9d184ccca7b382ffd245f307ee6",
       "sources": [
         {
           "path": "llms.txt",
-          "sha256": "c7998cbad41a10854d8d869b1b6a189681c734f5faad8ea562b37b70f9485dfc"
+          "sha256": "721fe180cea6d74204f18e8104c9818881f8b128019691967c57df8be0833f44"
         }
       ]
     },

@@ -223,6 +223,7 @@ Verification:
 
 Detailed non-component guidance:
 
+- [docs/agent-skills/lds-ui/SKILL.md](./agent-skills/lds-ui/SKILL.md) — consumer agent skill; Claude Code copies docs/agent-skills/lds-ui into .claude/skills/lds-ui, AGENTS.md-based agents (Codex, etc.) add the skill's routing block to their AGENTS.md
 - [docs/foundations/README.md](./foundations/README.md) — human Foundation index
 - [docs/foundations/llms.txt](./foundations/llms.txt) — complete generated Foundation context
 - [tokens/source.json](./token-reference.json) — structured token source of truth
