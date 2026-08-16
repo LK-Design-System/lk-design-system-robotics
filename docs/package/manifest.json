@@ -3,7 +3,7 @@
   "kind": "lds-package-documentation",
   "package": {
     "name": "@lk-design-system/lds-robotics-ui",
-    "version": "0.1.0-rc.26",
+    "version": "0.1.0-rc.27",
     "layer": "robotics"
   },
   "adoption": {
@@ -167,7 +167,7 @@
   "source": {
     "robotics": {
       "repository": "LK-Design-System/lk-design-system-robotics",
-      "ref": "v0.1.0-rc.26",
+      "ref": "v0.1.0-rc.27",
       "refStatus": "published"
     },
     "canonicalAdoption": {
@@ -186,11 +186,11 @@
   "resources": {
     "tokens": {
       "path": "./tokens/manifest.json",
-      "sha256": "ce2d13843dcf8d45dcd5ee0b0908c092da749f607515c9fcede27e8b6261dbec"
+      "sha256": "369f2d59471ba91adee78e8dea4e719fed2918275e797a88f523f10c44e2e825"
     },
     "domainSymbols": {
       "path": "./domain-symbol-registry.json",
-      "sha256": "fb9a25fac9526574352064c108446d35c931325a6358946cf21a62860593f9cc"
+      "sha256": "c668bbd9f0bfb3825bc131a7d0b77ee9d4e6161c57f4e1f3f88ebf87e268080a"
     }
   },
   "documents": [
@@ -216,7 +216,7 @@
     },
     {
       "path": "domain-symbol-registry.json",
-      "sha256": "fb9a25fac9526574352064c108446d35c931325a6358946cf21a62860593f9cc"
+      "sha256": "c668bbd9f0bfb3825bc131a7d0b77ee9d4e6161c57f4e1f3f88ebf87e268080a"
     },
     {
       "path": "domain/AGENT_SKILL_REFERENCE.md",
@@ -456,7 +456,7 @@
     },
     {
       "path": "tokens/manifest.json",
-      "sha256": "ce2d13843dcf8d45dcd5ee0b0908c092da749f607515c9fcede27e8b6261dbec"
+      "sha256": "369f2d59471ba91adee78e8dea4e719fed2918275e797a88f523f10c44e2e825"
     },
     {
       "path": "upstream-snapshot.json",
