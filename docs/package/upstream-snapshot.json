@@ -3,12 +3,12 @@
   "kind": "lds-upstream-documentation-snapshot",
   "package": {
     "name": "@lk-design-system/lds-core",
-    "version": "0.1.0-rc.69.15",
+    "version": "0.1.0-rc.69.16",
     "layer": "core"
   },
   "source": {
     "repository": "LK-Design-System/lk-design-system",
-    "ref": "lds-v0.1.0-rc.69.15",
+    "ref": "lds-v0.1.0-rc.69.16",
     "documents": [
       {
         "path": "docs/ACCESSIBILITY_CONTRACTS.md",
@@ -160,7 +160,7 @@
       }
     ]
   },
-  "manifestSha256": "e877c1034b5d8018a3d220247bb7373ad84872e28c7941a080e6e71c0244870c",
+  "manifestSha256": "bf92cfd8c64a07cfea5d5ea19bee9beb8cdc40f38585fe0dc48c8f77a9476e3e",
   "files": [
     {
       "path": "LDS_UI_ADOPTION_CONTRACT.schema.json",
@@ -184,7 +184,7 @@
     },
     {
       "path": "adoption-workflow.md",
-      "sha256": "bc98d7e146ae6211b08bfa400b0279ee3edf9074dedf2b480f04bff057925aa3"
+      "sha256": "5648513d0c9ecc45a42e2f8675129f64ea796744f3aaaed4d6a15f59d3447a20"
     },
     {
       "path": "assets/icons/manifest.json",
@@ -192,7 +192,7 @@
     },
     {
       "path": "components/README.md",
-      "sha256": "e44934556c47f5bf2b5e0fc35e1c575a0f780d8a697d4b22a76749462a9bdcfd"
+      "sha256": "60ab5a68cabfbf8886998a872c9220ad2eacf83e98441ef45d07af3a6e4b25a5"
     },
     {
       "path": "foundations/README.md",
@@ -280,11 +280,11 @@
     },
     {
       "path": "llms.txt",
-      "sha256": "940cfc74cc9c6b75328fa2bd42369767e8a067b7bcfe279956c00a348cac583d"
+      "sha256": "c88a15cc77985e09d65810c1063cd3cdfa5d1d4290888cdd37f5a7d4fdc8c5d1"
     },
     {
       "path": "manifest.json",
-      "sha256": "e877c1034b5d8018a3d220247bb7373ad84872e28c7941a080e6e71c0244870c"
+      "sha256": "bf92cfd8c64a07cfea5d5ea19bee9beb8cdc40f38585fe0dc48c8f77a9476e3e"
     },
     {
       "path": "patterns/loading.md",
@@ -296,11 +296,11 @@
     },
     {
       "path": "policies/COMPONENT_WORKFLOW.md",
-      "sha256": "19a8b3807dfd27b09869ecff79140fb67922112087d2fd5dae2aba27aa94b412"
+      "sha256": "c6482b078d52cc6f3ec4a7d1511bca0174318d6da304efd77d494eceea1cb9f1"
     },
     {
       "path": "policies/COPY_REVIEW_CONTRACT.md",
-      "sha256": "b673efe6888cdaaa83c88ec2708b72dc0ca0e4e4ecf5d87eb7af598f57908498"
+      "sha256": "0f68b0bcb4ec9d80b35261ce49107df2ce5a4105a29a071a227432994c542313"
     },
     {
       "path": "policies/PACKAGE_MIGRATION_GUIDE.md",
