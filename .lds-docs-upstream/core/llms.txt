@@ -229,4 +229,4 @@ Detailed non-component guidance:
 - [docs/LOADING_PATTERN.md](./patterns/loading.md) — cross-component loading selection
 - [packages/core/assets/icons/manifest.json](./assets/icons/manifest.json) — icon inventory
 - [docs/components/README.md](./components/README.md) — targeted component-guide entry
-- [docs/components/llms.txt](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.18/docs/components/llms.txt) — large retrieval bundle; load selectively
+- [docs/components/llms.txt](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.19/docs/components/llms.txt) — large retrieval bundle; load selectively
