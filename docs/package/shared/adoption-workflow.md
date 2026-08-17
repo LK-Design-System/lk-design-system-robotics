@@ -54,7 +54,7 @@
 1. 대상 route·surface·source file과 실제 ready/non-ready 상태, 사용자 문구, asset을 inventory합니다.
 2. [Foundation index](./foundations/README.md)에서 관련 원리와 선택 기준을 읽습니다. 단일 AI context가 필요하면 [Foundation LLM bundle](./foundations/llms.txt)을 대신 사용합니다.
 3. 관련 CSS 이름과 설명을 [token source](./token-reference.json)에서 확인합니다. generated CSS 값만 보고 의미를 추론하지 않습니다.
-4. 후보 component를 정한 뒤 [component index](./components/README.md)와 해당 targeted guide를 읽습니다. 전체 [component LLM bundle](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.26/docs/components/llms.txt)은 retrieval/indexing 용도이며 매 작업에서 통째로 읽는 필수 입력이 아닙니다.
+4. 후보 component를 정한 뒤 [component index](./components/README.md)와 해당 targeted guide를 읽습니다. 전체 [component LLM bundle](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.27/docs/components/llms.txt)은 retrieval/indexing 용도이며 매 작업에서 통째로 읽는 필수 입력이 아닙니다.
 5. hard trigger가 있으면 해당 facet이 요구하는 evidence kind와 전문 계약을 반드시 확인합니다.
 6. 아래 report schema에 surface별 판정을 기록한 뒤에 component mapping을 확정합니다.
 
@@ -291,7 +291,7 @@ Report의 기본 `scope.mode`는 `full-surface`입니다. Required for adoption,
 node <pinned-lds>/packages/conformance/src/cli.mjs check-adoption --root . --lds-root <pinned-lds> --config .lds/adoption.config.json --report .lds/adoption-report.json --base <base-sha> --head <head-sha> --output visual-artifacts/adoption/check-result.json
 ```
 
-GitHub Actions에서는 [composite action](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.26/.github/actions/lds-adoption/action.yml)을 immutable LDS commit SHA로 pin합니다. diff base를 읽을 수 있게 caller의 `actions/checkout`에 `fetch-depth: 0`을 설정합니다.
+GitHub Actions에서는 [composite action](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.27/.github/actions/lds-adoption/action.yml)을 immutable LDS commit SHA로 pin합니다. diff base를 읽을 수 있게 caller의 `actions/checkout`에 `fetch-depth: 0`을 설정합니다.
 
 ```yaml
 - uses: actions/checkout@<immutable-sha>
