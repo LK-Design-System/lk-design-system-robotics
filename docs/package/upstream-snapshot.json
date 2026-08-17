@@ -3,12 +3,12 @@
   "kind": "lds-upstream-documentation-snapshot",
   "package": {
     "name": "@lk-design-system/lds-core",
-    "version": "0.1.0-rc.69.27",
+    "version": "0.1.0-rc.69.28",
     "layer": "core"
   },
   "source": {
     "repository": "LK-Design-System/lk-design-system",
-    "ref": "lds-v0.1.0-rc.69.27",
+    "ref": "lds-v0.1.0-rc.69.28",
     "documents": [
       {
         "path": "docs/ACCESSIBILITY_CONTRACTS.md",
@@ -172,7 +172,7 @@
       }
     ]
   },
-  "manifestSha256": "b701a213218e66d9526498b3612762f967904c9c45ed874bf9ce82c4755b16e1",
+  "manifestSha256": "32f4d35f969c9faa0bfb128bbbb53b126b8a1077cf8be51178228fcc3fb51f67",
   "files": [
     {
       "path": "LDS_UI_ADOPTION_CONTRACT.schema.json",
@@ -196,7 +196,7 @@
     },
     {
       "path": "adoption-workflow.md",
-      "sha256": "23dbe0a84a3dad832c1cf3c074afbaf8f88a08d66622653e154dac23608f08b3"
+      "sha256": "b3ad4a20c9717cbd51ca677b077db2e949fe28eb37c82418598b7016ed7fd357"
     },
     {
       "path": "agent-skills/lds-ui/SKILL.md",
@@ -216,7 +216,7 @@
     },
     {
       "path": "components/README.md",
-      "sha256": "906c9849839eb9db8516c5141bd093b3814a0ca9f81262dfb40ed239d5de7297"
+      "sha256": "72c3e7a84ee0c7e4ad7ae01cde8d2bd1945d93af1d4cda16e00ea2ee9ea43941"
     },
     {
       "path": "foundations/README.md",
@@ -304,11 +304,11 @@
     },
     {
       "path": "llms.txt",
-      "sha256": "f09fea5bbe2350b66c96d84589a8871dda67499873bacbc884c24ac3dcabc4f4"
+      "sha256": "b0f40a7108d53ce18d8682be3f2bc285c44fbe0b87d0fad5a22e09d57f1a8baa"
     },
     {
       "path": "manifest.json",
-      "sha256": "b701a213218e66d9526498b3612762f967904c9c45ed874bf9ce82c4755b16e1"
+      "sha256": "32f4d35f969c9faa0bfb128bbbb53b126b8a1077cf8be51178228fcc3fb51f67"
     },
     {
       "path": "patterns/loading.md",
@@ -320,11 +320,11 @@
     },
     {
       "path": "policies/COMPONENT_WORKFLOW.md",
-      "sha256": "2c50b08fc76321e452beafb3121faed0fc8004db959dba521499cbe939f73f5b"
+      "sha256": "8b68f34536403a9eac83fddb8d6d1bb8477c7c9d7af163e0d87d32c4165d19bc"
     },
     {
       "path": "policies/COPY_REVIEW_CONTRACT.md",
-      "sha256": "7cdbffd2901b8f08f36274991f63c6ca9612f0872cfd9fee1d94bcb69c780859"
+      "sha256": "40d6c379747839b5da211d25547b2fa0b62564985cc96369c3f5ef484f448be1"
     },
     {
       "path": "policies/PACKAGE_MIGRATION_GUIDE.md",
