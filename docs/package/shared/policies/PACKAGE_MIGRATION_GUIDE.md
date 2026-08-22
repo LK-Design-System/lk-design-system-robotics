@@ -5,7 +5,7 @@
 | Type | Guide |
 | Status | Current migration guide — split packages active, compatibility source retired |
 | Owner | Design system owner · consumer owners |
-| Last reviewed | 2026-08-22 |
+| Last reviewed | 2026-08-23 |
 | Owner authority | `docs/references/architecture/OWNER_AUTHORITY_CONTRACT.json` + current package manifests |
 | Historical projection | `docs/references/wds/PUBLIC_EXPORT_CLASSIFICATION.json` |
 
@@ -56,6 +56,28 @@ decide the live package. Do not infer a package from a component folder name.
 | `@lk-design-system/design-system-core/product` | `@lk-design-system/lds-product` |
 | `@lk-design-system/design-system-core/robotics` | `@lk-design-system/lds-robotics-ui` |
 | `@lk-design-system/design-system-core/components/<path>` | `<owner package>/components/<path>` using the live owner authority and current package surface. |
+
+### R3B Product-to-Core imports
+
+The canonical owner for the following domain-neutral primitives is now
+`@lk-design-system/lds-core`:
+
+- `Link`
+- `Popover`
+- `Calendar`
+- `DatePicker`
+- `NumberField`
+- `PasswordInput`
+- `ProgressBar`
+- `CircularProgress`
+- `Meter`
+
+New code should import these symbols from the Core root or matching Core deep path. Existing
+Product root and deep imports remain deprecated compatibility re-exports for every `0.1.x`
+release; they resolve to the same Core implementation and may be removed no earlier than
+`0.2.0`. Removal also requires registered-consumer usage to reach zero, owner approval, and a
+breaking release note. See [`R3B_OWNER_API_MIGRATION.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0/docs/R3B_OWNER_API_MIGRATION.md) for the
+exact stay/defer decisions, support window, and rollback contract.
 
 For example:
 

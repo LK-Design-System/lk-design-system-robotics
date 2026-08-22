@@ -180,7 +180,7 @@
         "path": "docs/references/adoption/LDS_UI_ADOPTION_CONTRACT.json",
         "sha256": "f4c4f71cff9f9108246a5f7cc5520d6095d599027adb75d0b61e385c5b7fef80"
       },
-      "snapshotManifestSha256": "1a15ebef392f1980ef42e7cd65356aac01636e63c4878777d735305df65cdf75"
+      "snapshotManifestSha256": "6c5aa3e762d67bb9c76dd0c12bdf8448ce2e6862917b342f419fd1dd504a6820"
     }
   },
   "resources": {
@@ -424,7 +424,7 @@
     },
     {
       "path": "shared/manifest.json",
-      "sha256": "1a15ebef392f1980ef42e7cd65356aac01636e63c4878777d735305df65cdf75"
+      "sha256": "6c5aa3e762d67bb9c76dd0c12bdf8448ce2e6862917b342f419fd1dd504a6820"
     },
     {
       "path": "shared/patterns/loading.md",
@@ -444,7 +444,7 @@
     },
     {
       "path": "shared/policies/PACKAGE_MIGRATION_GUIDE.md",
-      "sha256": "d6de674cad7b7b6bd03c26569c751851a2314a9586db3ca2a76c7b6601f7623d"
+      "sha256": "755b387d8d07c0573f3c22b832210d08c4a283037274761d96f6d737e5f4c376"
     },
     {
       "path": "shared/policies/TOKEN_GOVERNANCE.md",
@@ -460,7 +460,7 @@
     },
     {
       "path": "upstream-snapshot.json",
-      "sha256": "fcb3b7cce585d0aaa0fc3c014488582811a91858c46c62ffa597fb2440c79503"
+      "sha256": "94ccfbf2bb09cbe51351da77ef0c3e096885785742890c43d0edaa83c1d8bb8a"
     }
   ]
 }

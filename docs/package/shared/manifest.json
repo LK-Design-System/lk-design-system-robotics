@@ -186,7 +186,7 @@
       },
       {
         "path": "docs/PACKAGE_MIGRATION_GUIDE.md",
-        "sha256": "d6de674cad7b7b6bd03c26569c751851a2314a9586db3ca2a76c7b6601f7623d"
+        "sha256": "35f299221d91b18f95222924e445830c2c30849c415f298649ecca4ab5e147c8"
       },
       {
         "path": "docs/references/adoption/LDS_UI_ADOPTION_CONTRACT.json",
@@ -611,11 +611,11 @@
     },
     {
       "path": "policies/PACKAGE_MIGRATION_GUIDE.md",
-      "sha256": "d6de674cad7b7b6bd03c26569c751851a2314a9586db3ca2a76c7b6601f7623d",
+      "sha256": "755b387d8d07c0573f3c22b832210d08c4a283037274761d96f6d737e5f4c376",
       "sources": [
         {
           "path": "docs/PACKAGE_MIGRATION_GUIDE.md",
-          "sha256": "d6de674cad7b7b6bd03c26569c751851a2314a9586db3ca2a76c7b6601f7623d"
+          "sha256": "35f299221d91b18f95222924e445830c2c30849c415f298649ecca4ab5e147c8"
         }
       ]
     },
