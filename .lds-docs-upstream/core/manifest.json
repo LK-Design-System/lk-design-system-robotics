@@ -162,7 +162,7 @@
       },
       {
         "path": "docs/foundations/TOKEN_REFERENCE.md",
-        "sha256": "895fb35c29fe1b159b16a5edba5e0b7e73016d24b9b5de1ac31e4872c778d8e3"
+        "sha256": "310a839f20b6dfef97a23d86af31e6f627dcb861d1a78344ae7930af63c6145c"
       },
       {
         "path": "docs/foundations/typography.md",
@@ -511,11 +511,11 @@
     },
     {
       "path": "foundations/TOKEN_REFERENCE.md",
-      "sha256": "895fb35c29fe1b159b16a5edba5e0b7e73016d24b9b5de1ac31e4872c778d8e3",
+      "sha256": "310a839f20b6dfef97a23d86af31e6f627dcb861d1a78344ae7930af63c6145c",
       "sources": [
         {
           "path": "docs/foundations/TOKEN_REFERENCE.md",
-          "sha256": "895fb35c29fe1b159b16a5edba5e0b7e73016d24b9b5de1ac31e4872c778d8e3"
+          "sha256": "310a839f20b6dfef97a23d86af31e6f627dcb861d1a78344ae7930af63c6145c"
         }
       ]
     },
