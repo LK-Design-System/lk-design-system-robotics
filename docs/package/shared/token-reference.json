@@ -3761,6 +3761,42 @@
     "sideNav": {
       "component": "components/navigation/SideNav.jsx",
       "tokens": {
+        "padding": {
+          "$type": "dimension",
+          "$value": "var(--component-side-nav-padding)",
+          "css": "--component-side-nav-padding",
+          "source": "R3A density contract"
+        },
+        "itemHeight": {
+          "$type": "dimension",
+          "$value": "var(--component-side-nav-item-height)",
+          "css": "--component-side-nav-item-height",
+          "source": "R3A density contract"
+        },
+        "itemPaddingY": {
+          "$type": "dimension",
+          "$value": "var(--component-side-nav-item-padding-y)",
+          "css": "--component-side-nav-item-padding-y",
+          "source": "R3A density contract"
+        },
+        "itemPaddingX": {
+          "$type": "dimension",
+          "$value": "var(--component-side-nav-item-padding-x)",
+          "css": "--component-side-nav-item-padding-x",
+          "source": "R3A density contract"
+        },
+        "childItemHeight": {
+          "$type": "dimension",
+          "$value": "var(--component-side-nav-child-item-height)",
+          "css": "--component-side-nav-child-item-height",
+          "source": "R3A density contract"
+        },
+        "childItemPaddingY": {
+          "$type": "dimension",
+          "$value": "var(--component-side-nav-child-item-padding-y)",
+          "css": "--component-side-nav-child-item-padding-y",
+          "source": "R3A density contract"
+        },
         "brandSurface": {
           "$type": "color",
           "css": "--component-side-nav-brand-surface",
@@ -3857,6 +3893,130 @@
           "generated": true,
           "ref": "primitive.colorRamps.navyShell.tokens.68"
         }
+      }
+    },
+    "table": {
+      "component": "components/data/Table.jsx",
+      "tokens": {
+        "cellPaddingSm": {
+          "$type": "string",
+          "$value": "var(--component-table-cell-padding-sm)",
+          "css": "--component-table-cell-padding-sm",
+          "source": "R3A density contract"
+        },
+        "cellPaddingMd": {
+          "$type": "string",
+          "$value": "var(--component-table-cell-padding-md)",
+          "css": "--component-table-cell-padding-md",
+          "source": "R3A density contract"
+        }
+      }
+    },
+    "dataGrid": {
+      "component": "components/data/DataGrid.jsx",
+      "tokens": {
+        "cellPaddingSm": {
+          "$type": "string",
+          "$value": "var(--component-data-grid-cell-padding-sm)",
+          "css": "--component-data-grid-cell-padding-sm",
+          "source": "R3A density contract"
+        },
+        "cellPaddingMd": {
+          "$type": "string",
+          "$value": "var(--component-data-grid-cell-padding-md)",
+          "css": "--component-data-grid-cell-padding-md",
+          "source": "R3A density contract"
+        },
+        "headerHeightSm": {
+          "$type": "dimension",
+          "$value": "var(--component-data-grid-header-height-sm)",
+          "css": "--component-data-grid-header-height-sm",
+          "source": "R3A density contract"
+        },
+        "headerHeightMd": {
+          "$type": "dimension",
+          "$value": "var(--component-data-grid-header-height-md)",
+          "css": "--component-data-grid-header-height-md",
+          "source": "R3A density contract"
+        },
+        "detailPaddingSm": {
+          "$type": "string",
+          "$value": "var(--component-data-grid-detail-padding-sm)",
+          "css": "--component-data-grid-detail-padding-sm",
+          "source": "R3A density contract"
+        },
+        "detailPaddingMd": {
+          "$type": "string",
+          "$value": "var(--component-data-grid-detail-padding-md)",
+          "css": "--component-data-grid-detail-padding-md",
+          "source": "R3A density contract"
+        },
+        "selectionTargetSize": {
+          "$type": "dimension",
+          "$value": "var(--component-data-grid-selection-target-size)",
+          "css": "--component-data-grid-selection-target-size",
+          "source": "WCAG 2.2 target size minimum"
+        },
+        "selectionCellPadding": {
+          "$type": "dimension",
+          "$value": "var(--component-data-grid-selection-cell-padding)",
+          "css": "--component-data-grid-selection-cell-padding",
+          "source": "R3A density contract"
+        }
+      }
+    },
+    "dataToolbar": {
+      "component": "components/data/DataToolbar.jsx",
+      "tokens": {
+        "gapSm": { "$type": "dimension", "$value": "var(--component-data-toolbar-gap-sm)", "css": "--component-data-toolbar-gap-sm", "source": "R3A density contract" },
+        "gapMd": { "$type": "dimension", "$value": "var(--component-data-toolbar-gap-md)", "css": "--component-data-toolbar-gap-md", "source": "R3A density contract" },
+        "paddingSm": { "$type": "string", "$value": "var(--component-data-toolbar-padding-sm)", "css": "--component-data-toolbar-padding-sm", "source": "R3A density contract" },
+        "paddingMd": { "$type": "string", "$value": "var(--component-data-toolbar-padding-md)", "css": "--component-data-toolbar-padding-md", "source": "R3A density contract" }
+      }
+    },
+    "filterBar": {
+      "component": "components/data/FilterBar.jsx",
+      "tokens": {
+        "gapSm": { "$type": "dimension", "$value": "var(--component-filter-bar-gap-sm)", "css": "--component-filter-bar-gap-sm", "source": "R3A density contract" },
+        "gapMd": { "$type": "dimension", "$value": "var(--component-filter-bar-gap-md)", "css": "--component-filter-bar-gap-md", "source": "R3A density contract" },
+        "paddingSm": { "$type": "dimension", "$value": "var(--component-filter-bar-padding-sm)", "css": "--component-filter-bar-padding-sm", "source": "R3A density contract" },
+        "paddingMd": { "$type": "dimension", "$value": "var(--component-filter-bar-padding-md)", "css": "--component-filter-bar-padding-md", "source": "R3A density contract" }
+      }
+    },
+    "listCell": {
+      "component": "components/content/ListCell.jsx",
+      "tokens": {
+        "paddingYSm": { "$type": "dimension", "$value": "var(--component-list-cell-padding-y-sm)", "css": "--component-list-cell-padding-y-sm", "source": "R3A density contract" },
+        "paddingYMd": { "$type": "dimension", "$value": "var(--component-list-cell-padding-y-md)", "css": "--component-list-cell-padding-y-md", "source": "R3A density contract" },
+        "paddingYLg": { "$type": "dimension", "$value": "var(--component-list-cell-padding-y-lg)", "css": "--component-list-cell-padding-y-lg", "source": "R3A density contract" }
+      }
+    },
+    "tree": {
+      "component": "components/data/Tree.jsx",
+      "tokens": {
+        "rowMinHeight": { "$type": "dimension", "$value": "var(--component-tree-row-min-height)", "css": "--component-tree-row-min-height", "source": "R3A density contract" },
+        "rowPaddingY": { "$type": "dimension", "$value": "var(--component-tree-row-padding-y)", "css": "--component-tree-row-padding-y", "source": "R3A density contract" },
+        "rowPaddingX": { "$type": "dimension", "$value": "var(--component-tree-row-padding-x)", "css": "--component-tree-row-padding-x", "source": "R3A density contract" },
+        "rowGap": { "$type": "dimension", "$value": "var(--component-tree-row-gap)", "css": "--component-tree-row-gap", "source": "R3A density contract" },
+        "indent": { "$type": "dimension", "$value": "var(--component-tree-indent)", "css": "--component-tree-indent", "source": "R3A density contract" }
+      }
+    },
+    "toolbar": {
+      "component": "components/navigation/Toolbar.jsx",
+      "tokens": {
+        "gap": { "$type": "dimension", "$value": "var(--component-toolbar-gap)", "css": "--component-toolbar-gap", "source": "R3A density contract" },
+        "padding": { "$type": "dimension", "$value": "var(--component-toolbar-padding)", "css": "--component-toolbar-padding", "source": "R3A density contract" }
+      }
+    },
+    "drawer": {
+      "component": "components/overlay/Drawer.jsx",
+      "tokens": {
+        "headerPaddingComfortable": { "$type": "string", "$value": "var(--component-drawer-header-padding-comfortable)", "css": "--component-drawer-header-padding-comfortable", "source": "R3A density contract" },
+        "headerPaddingCompact": { "$type": "string", "$value": "var(--component-drawer-header-padding-compact)", "css": "--component-drawer-header-padding-compact", "source": "R3A density contract" },
+        "bodyPaddingComfortable": { "$type": "string", "$value": "var(--component-drawer-body-padding-comfortable)", "css": "--component-drawer-body-padding-comfortable", "source": "R3A density contract" },
+        "bodyPaddingCompact": { "$type": "string", "$value": "var(--component-drawer-body-padding-compact)", "css": "--component-drawer-body-padding-compact", "source": "R3A density contract" },
+        "footerPaddingComfortable": { "$type": "string", "$value": "var(--component-drawer-footer-padding-comfortable)", "css": "--component-drawer-footer-padding-comfortable", "source": "R3A density contract" },
+        "footerPaddingCompact": { "$type": "string", "$value": "var(--component-drawer-footer-padding-compact)", "css": "--component-drawer-footer-padding-compact", "source": "R3A density contract" }
       }
     },
     "notification": {
