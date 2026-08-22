@@ -5,12 +5,15 @@
 | Type | Governance policy |
 | Status | Current |
 | Owner | Foundation owner |
-| Last reviewed | 2026-07-12 |
+| Last reviewed | 2026-08-22 |
 | Source | `tokens/source.json` |
 
-`tokens/source.json` is the source of truth for LK ROBOTICS design tokens.
-Figma Variables, Storybook examples, React components,
-and AI-generated UI must all resolve back to this token contract.
+`tokens/source.json` is the source of truth for the base LK ROBOTICS token
+contract. Figma Variables, Storybook examples, React components, and
+AI-generated UI must all resolve back to this contract. Theme expression
+profiles are the one additive runtime projection: their scope and whitelist
+live in [`EXPRESSION_PROFILE_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0-rc.69.30/docs/references/architecture/EXPRESSION_PROFILE_CONTRACT.json),
+and values are limited to `tokens/profiles.css` under the Theme package.
 
 ## Token layers
 
@@ -30,6 +33,16 @@ Rules:
   token names.
 - Component tokens must point back to semantic or primitive tokens unless a
   documented exception exists.
+
+### Expression profiles
+
+`default` is the unmodified base expression. The opt-in `ops` profile may
+override only approved component density, motion timing, and decorative depth
+variables. It must not redefine semantic colors, status meaning, contrast,
+component anatomy, or product/Robotics behavior. The profile CSS is projected
+to `@lk-design-system/lds-theme/tokens/profiles.css`; it is not a second
+primitive or semantic source. Run `npm run check:expression-profile` when
+changing the profile contract or its projection.
 
 ## Color architecture
 

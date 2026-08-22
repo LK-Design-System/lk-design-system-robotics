@@ -3,10 +3,11 @@
 | Field | Value |
 | --- | --- |
 | Type | Guide |
-| Status | Wave 2 RC published |
+| Status | Current migration guide — split packages active, compatibility source retired |
 | Owner | Design system owner · consumer owners |
-| Last reviewed | 2026-08-09 |
-| Source | `docs/references/wds/PUBLIC_EXPORT_CLASSIFICATION.json` |
+| Last reviewed | 2026-08-22 |
+| Owner authority | `docs/references/architecture/OWNER_AUTHORITY_CONTRACT.json` + current package manifests |
+| Historical projection | `docs/references/wds/PUBLIC_EXPORT_CLASSIFICATION.json` |
 
 This guide describes the consumer-side import migration that follows the Wave 1
 workspace split. `docs/references/package-split/releases/WAVE2_RC_0.1.0-rc.0.json`
@@ -39,9 +40,11 @@ self-contained documentation bundle through
 and [public machine manifest](https://lk-design-system.github.io/lk-design-system-robotics/design-system.json);
 the main LDS Storybook does not copy that documentation tree.
 
-The canonical owner for every public export and deep component path is
-`docs/references/wds/PUBLIC_EXPORT_CLASSIFICATION.json`. Do not infer a package
-from a component folder name.
+The canonical owner for every public export and deep component path comes from
+`docs/references/architecture/OWNER_AUTHORITY_CONTRACT.json` and the current
+physical package surfaces. `docs/references/wds/PUBLIC_EXPORT_CLASSIFICATION.json`
+retains a checked historical provenance/compatibility projection; it does not
+decide the live package. Do not infer a package from a component folder name.
 
 ## Import migration
 
@@ -52,7 +55,7 @@ from a component folder name.
 | `@lk-design-system/design-system-core/theme` | `@lk-design-system/lds-theme` |
 | `@lk-design-system/design-system-core/product` | `@lk-design-system/lds-product` |
 | `@lk-design-system/design-system-core/robotics` | `@lk-design-system/lds-robotics-ui` |
-| `@lk-design-system/design-system-core/components/<path>` | `<owner package>/components/<path>` using the classification inventory. |
+| `@lk-design-system/design-system-core/components/<path>` | `<owner package>/components/<path>` using the live owner authority and current package surface. |
 
 For example:
 
@@ -60,7 +63,8 @@ For example:
 import { Button } from '@lk-design-system/lds-core';
 import { ThemeToggle } from '@lk-design-system/lds-theme';
 import { TopBar } from '@lk-design-system/lds-product';
-import { Scene3DFrame } from '@lk-design-system/lds-robotics-ui';
+import { Scene3DFrame } from '@lk-design-system/lds-product';
+import { WaypointMarker } from '@lk-design-system/lds-robotics-ui';
 ```
 
 ## CSS and assets

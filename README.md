@@ -1,10 +1,12 @@
 # LK Robotics UI
 
 `@lk-design-system/lds-robotics-ui` is the independent Robotics UI package for
-LK ROBOTICS products. It owns DOM, SVG, editor, viewer, telemetry, and robotics
-operation UI. It owns the renderer-facing navigation coordinate contract and
-pure world/SVG/screen projection helpers, but not transport, TF authority,
-localization, safety controls, WebGL, Three/R3F, or LDS3D renderer lifecycle.
+LK ROBOTICS products. It owns robot-specific control, status, and spatial
+navigation presentation and composes renderer-neutral editor, viewer, telemetry,
+and equipment primitives from LDS Product. It owns the renderer-facing navigation
+coordinate contract and pure world/SVG/screen projection helpers, but not transport,
+TF authority, localization, safety controls, WebGL, Three/R3F, or LDS3D renderer
+lifecycle.
 
 ## AI and LDS adoption start here
 
@@ -52,10 +54,11 @@ npm run check:local
 Cross-repository release conformance is a separate fail-closed gate. Run the
 [`Release conformance gate`](.github/workflows/release-gate.yml) with the exact
 40-character commit SHA of the LDS candidate that produced the packaged Core
-documentation snapshot. `npm publish` also runs `check:release` and fails unless
-that clean immutable checkout is available through the required environment.
+documentation snapshot. The gate fails unless that clean immutable checkout is
+available through the required environment.
 
-The package is released to `https://npm.pkg.github.com` as a restricted package.
+Robotics RCs are delivered as an exact tgz vendored by the paired LDS release;
+this repository does not publish them to a package registry.
 
 ## Ownership
 
