@@ -5,15 +5,19 @@
 | Type | Governance policy |
 | Status | Current |
 | Owner | Foundation owner |
-| Last reviewed | 2026-08-22 |
-| Source | `tokens/source.json` |
+| Last reviewed | 2026-08-23 |
+| Source | token 값: `tokens/source.json` · package interface: `packages/*/tokens/semantic-contract.json` |
 
 `tokens/source.json` is the source of truth for the base LK ROBOTICS token
 contract. Figma Variables, Storybook examples, React components, and
 AI-generated UI must all resolve back to this contract. Theme expression
 profiles are the one additive runtime projection: their scope and whitelist
-live in [`EXPRESSION_PROFILE_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.0/docs/references/architecture/EXPRESSION_PROFILE_CONTRACT.json),
+live in [`EXPRESSION_PROFILE_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.1.1/docs/references/architecture/EXPRESSION_PROFILE_CONTRACT.json),
 and values are limited to `tokens/profiles.css` under the Theme package.
+
+Package별 `tokens/semantic-contract.json`은 runtime source에서 산출·검사하는 semantic
+provider interface다. 이 파일은 token 값을 저작하는 두 번째 source가 아니며
+`tokens/source.json`의 역할을 대체하지 않는다.
 
 ## Token layers
 
@@ -43,6 +47,31 @@ component anatomy, or product/Robotics behavior. The profile CSS is projected
 to `@lk-design-system/lds-theme/tokens/profiles.css`; it is not a second
 primitive or semantic source. Run `npm run check:expression-profile` when
 changing the profile contract or its projection.
+
+### Semantic provider contract
+
+Core와 Product는 자신이 fallback 없이 요구하는 CSS custom property를 consumer contract로,
+Theme은 제공하는 property를 provider contract로 선언합니다. 각 package manifest는
+`lds.semanticContract`와 요구 contract version을 가리키고, Theme은 같은 version의
+`providesSemanticContractVersion`도 선언합니다. Robotics는 독립 release 경계를 유지하므로
+현재 외부 surface와 vendored artifact hash에 고정된 adapter로 같은 요구 집합을 검증합니다.
+
+지원 조합은 `Core+Theme`, `Core+Theme+Product`,
+`Core+Theme+Product+Robotics`입니다. Core-only 조합은 중립 제품 구성이 아니라 Theme provider
+누락이며 `LDS_THEME_PROVIDER_MISSING`과 unresolved semantic variable 진단을 결정적으로
+내야 합니다. 제공 variable 누락과 provider version mismatch도 각각 별도 진단으로 실패합니다.
+
+`npm run check:semantic-provider`는 다음을 함께 검사합니다.
+
+- package runtime source를 다시 스캔한 required/provided variable exact set
+- package manifest, contract version과 Theme provider 일치
+- Core-only negative와 세 supported composition fixture
+- variable 누락·version mismatch 양성/음성 fixture
+- pinned Robotics external surface·artifact identity와 semantic adapter drift
+
+이 gate는 semantic 값이나 `default | ops` 출력 자체를 바꾸지 않습니다. 값 변경은 이 문서의
+기존 token review를, profile 변경은 `npm run check:expression-profile`과 시각 evidence를 별도로
+통과해야 합니다.
 
 ## Color architecture
 

@@ -1,0 +1,251 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lk-design-system.github.io/lk-design-system/schemas/lds-ui-adoption-workflow-evidence.schema.json",
+  "title": "LDS UI adoption deterministic workflow evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "kind",
+    "consumerId",
+    "repository",
+    "surfaceId",
+    "sourceCommit",
+    "generatedAt",
+    "result",
+    "cleanReproducibility",
+    "environment",
+    "checks",
+    "workflowCoverage"
+  ],
+  "properties": {
+    "$schema": { "type": "string", "minLength": 1 },
+    "schemaVersion": { "const": 1 },
+    "kind": { "const": "lds-ui-adoption-workflow-evidence" },
+    "consumerId": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "repository": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*/[A-Za-z0-9][A-Za-z0-9._-]*$"
+    },
+    "surfaceId": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "sourceCommit": { "$ref": "#/$defs/commit" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "result": { "const": "passed" },
+    "cleanReproducibility": { "$ref": "#/$defs/cleanReproducibility" },
+    "environment": { "$ref": "#/$defs/environment" },
+    "checks": {
+      "type": "array",
+      "minItems": 3,
+      "items": { "$ref": "#/$defs/check" },
+      "allOf": [
+        {
+          "contains": {
+            "type": "object",
+            "required": ["id", "status"],
+            "properties": {
+              "id": { "const": "production-build" },
+              "status": { "const": "passed" }
+            }
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": ["id", "status"],
+            "properties": {
+              "id": { "const": "workflow-smoke" },
+              "status": { "const": "passed" }
+            }
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "type": "object",
+            "required": ["id", "status"],
+            "properties": {
+              "id": { "const": "accessibility" },
+              "status": { "const": "passed" }
+            }
+          },
+          "minContains": 1,
+          "maxContains": 1
+        }
+      ]
+    },
+    "workflowCoverage": { "$ref": "#/$defs/workflowCoverage" }
+  },
+  "$defs": {
+    "commit": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{40}$"
+    },
+    "cleanReproducibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "mode", "sourceCommit", "observedHead", "worktree", "runner", "command", "runId", "url"],
+      "properties": {
+        "status": { "const": "passed" },
+        "mode": { "const": "clean-clone" },
+        "sourceCommit": { "$ref": "#/$defs/commit" },
+        "observedHead": { "$ref": "#/$defs/commit" },
+        "worktree": { "const": "clean" },
+        "runner": { "type": "string", "minLength": 2 },
+        "command": { "type": "string", "minLength": 2 },
+        "runId": {
+          "oneOf": [
+            { "type": "integer" },
+            { "type": "string", "minLength": 1 }
+          ]
+        },
+        "url": { "type": "string", "format": "uri" }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["browser", "productionPreview"],
+      "properties": {
+        "browser": { "type": "string", "minLength": 2 },
+        "productionPreview": { "type": "string", "minLength": 2 }
+      }
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status", "command"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "status": { "enum": ["passed", "failed"] },
+        "command": { "type": "string", "minLength": 2 },
+        "result": { "type": "string", "minLength": 2 }
+      }
+    },
+    "workflowCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "stateCoverageMode",
+        "states",
+        "themes",
+        "viewports",
+        "combinationsPassed",
+        "combinationsTotal",
+        "evidence"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "stateCoverageMode": { "const": "each-theme-viewport-run" },
+        "states": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 2 },
+          "contains": { "const": "ready" },
+          "minContains": 1,
+          "maxContains": 1,
+          "allOf": [
+            {
+              "contains": {
+                "enum": ["loading", "empty", "error", "stale", "offline", "disabled", "recovery"]
+              },
+              "minContains": 1
+            }
+          ]
+        },
+        "themes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["light", "dark", "auto", "inverse", "not-applicable"] }
+        },
+        "viewports": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[1-9][0-9]*x[1-9][0-9]*$" }
+        },
+        "combinationsPassed": { "type": "integer", "minimum": 1 },
+        "combinationsTotal": { "type": "integer", "minimum": 1 },
+        "evidence": {
+          "type": "array",
+          "minItems": 3,
+          "items": { "$ref": "#/$defs/evidenceFile" },
+          "allOf": [
+            {
+              "contains": {
+                "type": "object",
+                "required": ["role"],
+                "properties": { "role": { "const": "spec" } }
+              },
+              "minContains": 1,
+              "maxContains": 1
+            },
+            {
+              "contains": {
+                "type": "object",
+                "required": ["role"],
+                "properties": { "role": { "const": "runner-config" } }
+              },
+              "minContains": 1,
+              "maxContains": 1
+            },
+            {
+              "contains": {
+                "type": "object",
+                "required": ["role"],
+                "properties": { "role": { "const": "ci-workflow" } }
+              },
+              "minContains": 1,
+              "maxContains": 1
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "themes": {
+                "type": "array",
+                "contains": { "const": "not-applicable" }
+              }
+            },
+            "required": ["themes"]
+          },
+          "then": {
+            "properties": { "themes": { "type": "array", "maxItems": 1 } }
+          },
+          "else": {
+            "properties": {
+              "themes": {
+                "type": "array",
+                "allOf": [
+                  { "contains": { "const": "light" }, "minContains": 1 },
+                  { "contains": { "const": "dark" }, "minContains": 1 }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "evidenceFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "path", "sha256"],
+      "properties": {
+        "role": { "enum": ["spec", "runner-config", "ci-workflow"] },
+        "path": {
+          "type": "string",
+          "pattern": "^(?!/)(?!\\.git(?:/|$))(?!.*(?:^|/)\\.\\.(?:/|$))[A-Za-z0-9._/-]+$"
+        },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    }
+  }
+}

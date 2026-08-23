@@ -2,7 +2,7 @@
   "$schema": "./adoption-report.schema.json",
   "schemaVersion": 1,
   "kind": "lds-ui-adoption-report",
-  "contractVersion": "1",
+  "contractVersion": "2",
   "id": "replace-with-adoption-id",
   "scope": {
     "mode": "full-surface",

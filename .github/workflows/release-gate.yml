@@ -34,6 +34,8 @@ jobs:
         with:
           node-version: 22.17.1
           cache: npm
+      - name: Install pinned LDS conformance dependencies
+        run: npm ci --ignore-scripts --omit=dev --no-audit --no-fund --prefix .lds-conformance/lds/packages/conformance
       - run: npm ci
       - name: Verify immutable source and package contracts
         run: npm run check:release

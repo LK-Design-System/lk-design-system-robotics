@@ -2,7 +2,7 @@
   "$schema": "./LDS_UI_ADOPTION_CONTRACT.schema.json",
   "schemaVersion": 1,
   "kind": "lds-ui-adoption-contract",
-  "contractVersion": "1",
+  "contractVersion": "2",
   "invariant": "컴포넌트 교체만으로 LDS 전환은 완료되지 않는다.",
   "triggers": [
     "new product UI",
@@ -31,6 +31,7 @@
     "visual",
     "asset",
     "copy-catalog",
+    "workflow",
     "decision"
   ],
   "facets": [
@@ -175,8 +176,11 @@
           "fact": "A changed UI source adds a loading indicator, aria-busy, loading prop, or asynchronous state surface.",
           "requiredEvidenceKinds": [
             "source",
-            "story",
             "decision"
+          ],
+          "requiredAnyOfEvidenceKinds": [
+            "story",
+            "workflow"
           ]
         },
         {
@@ -324,8 +328,11 @@
           "fact": "A changed UI source adds or modifies an interactive element, handler, or LDS control.",
           "requiredEvidenceKinds": [
             "source",
-            "story",
             "check"
+          ],
+          "requiredAnyOfEvidenceKinds": [
+            "story",
+            "workflow"
           ]
         }
       ]

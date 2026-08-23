@@ -49,7 +49,7 @@
       "minItems": 1,
       "uniqueItems": true,
       "items": {
-        "enum": ["source", "token", "story", "check", "visual", "asset", "copy-catalog", "decision"]
+        "enum": ["source", "token", "story", "check", "visual", "asset", "copy-catalog", "workflow", "decision"]
       }
     },
     "facets": {
@@ -115,7 +115,15 @@
           "minItems": 1,
           "uniqueItems": true,
           "items": {
-            "enum": ["source", "token", "story", "check", "visual", "asset", "copy-catalog", "decision"]
+            "enum": ["source", "token", "story", "check", "visual", "asset", "copy-catalog", "workflow", "decision"]
+          }
+        },
+        "requiredAnyOfEvidenceKinds": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["source", "token", "story", "check", "visual", "asset", "copy-catalog", "workflow", "decision"]
           }
         }
       }

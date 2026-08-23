@@ -3,12 +3,12 @@
   "kind": "lds-upstream-documentation-snapshot",
   "package": {
     "name": "@lk-design-system/lds-core",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "layer": "core"
   },
   "source": {
     "repository": "LK-Design-System/lk-design-system",
-    "ref": "lds-v0.1.0",
+    "ref": "lds-v0.1.1",
     "documents": [
       {
         "path": "docs/ACCESSIBILITY_CONTRACTS.md",
@@ -124,7 +124,7 @@
       },
       {
         "path": "docs/LDS_UI_ADOPTION_WORKFLOW.md",
-        "sha256": "09e78eb2ce03206120aa2ce2822d02c49a2ac16b0fac18fc4d68ff28d2a156e7"
+        "sha256": "5c888ba41fa9751f280867171ebf40828d8f6a81c18af2e630af978a8831ee84"
       },
       {
         "path": "docs/LOADING_PATTERN.md",
@@ -136,31 +136,35 @@
       },
       {
         "path": "docs/references/adoption/LDS_UI_ADOPTION_CONTRACT.json",
-        "sha256": "f4c4f71cff9f9108246a5f7cc5520d6095d599027adb75d0b61e385c5b7fef80"
+        "sha256": "f96e6194497a4a3ab4fbfcf9ace7f29ced594baba90cd59dbeb7b21b7eef6430"
       },
       {
         "path": "docs/references/adoption/LDS_UI_ADOPTION_CONTRACT.schema.json",
-        "sha256": "93a5e8f73cc18f26946e71bfbb8ed9235f4fd58dbdb9fc55547141529cae0039"
+        "sha256": "1bcd6227237e90b230ebc2a0c454d40284ed51d909a0fdf194c96be552188874"
       },
       {
         "path": "docs/references/adoption/LDS_UI_ADOPTION_REPORT.example.json",
-        "sha256": "2bae3fdcfcfcd5efce6d07678e7e418d2d5e680b8df5ef654ce5c27136bf97c5"
+        "sha256": "82143d91a22aeef5ed18fcf292677890621bf276bb3a92ca4ae6bc0b909a6864"
       },
       {
         "path": "docs/references/adoption/LDS_UI_ADOPTION_REPORT.schema.json",
-        "sha256": "4ce25e058235e6b124d127321a4549c49da4efbdf1dcda22c79d4c83d3645a2f"
+        "sha256": "2cb8d0a05a91edf882cce5a1c59c7005b99f2d895329357c8ff6a0a8b620e434"
+      },
+      {
+        "path": "docs/references/adoption/LDS_UI_ADOPTION_WORKFLOW_EVIDENCE.schema.json",
+        "sha256": "8da2c123036ab6f6f48b007b26681f29aa8989321315af10b3651927866c8bf2"
       },
       {
         "path": "docs/TOKEN_GOVERNANCE.md",
-        "sha256": "1976a37c279918a897914b704dd557e59fda045a1312e166e301359fd638290c"
+        "sha256": "e21fb6525cfea8f9e307802e1e3149f8b89a22a49b353df5dba38b8577bbea53"
       },
       {
         "path": "llms.txt",
-        "sha256": "721fe180cea6d74204f18e8104c9818881f8b128019691967c57df8be0833f44"
+        "sha256": "79f1b4a7226b5f86a15b8ec8db6a3ccd803772c2222d23670a65e970104b240a"
       },
       {
         "path": "packages/conformance/schemas/lds-ui-adoption-config.schema.json",
-        "sha256": "650759624b2a96020eeb70393a1b7c74b23a40af240727a72a0fd5455ae0dca5"
+        "sha256": "30a3fada4844c1794dcd9bdb4316e6e2584d8640e1b7486c3274ff6e9eda6171"
       },
       {
         "path": "packages/core/assets/icons/manifest.json",
@@ -172,31 +176,35 @@
       }
     ]
   },
-  "manifestSha256": "6c5aa3e762d67bb9c76dd0c12bdf8448ce2e6862917b342f419fd1dd504a6820",
+  "manifestSha256": "81873d07af330f8c3907aa683a25725982403bac86179d4a6a6444e75f5dc1bd",
   "files": [
     {
       "path": "LDS_UI_ADOPTION_CONTRACT.schema.json",
-      "sha256": "93a5e8f73cc18f26946e71bfbb8ed9235f4fd58dbdb9fc55547141529cae0039"
+      "sha256": "1bcd6227237e90b230ebc2a0c454d40284ed51d909a0fdf194c96be552188874"
     },
     {
       "path": "adoption-checklist.json",
-      "sha256": "fd88b5ecb9cd5367387d7e67539697fb49aa3e4e9ef552b6ef723e9ae826b27a"
+      "sha256": "0d6441efe6f1dd52d0e6424be55b62b89cb888c62b2b53237a08ecdac2706602"
     },
     {
       "path": "adoption-config.schema.json",
-      "sha256": "650759624b2a96020eeb70393a1b7c74b23a40af240727a72a0fd5455ae0dca5"
+      "sha256": "30a3fada4844c1794dcd9bdb4316e6e2584d8640e1b7486c3274ff6e9eda6171"
     },
     {
       "path": "adoption-report.example.json",
-      "sha256": "9a7948b02727a527f3da188bfbf2725283720ef36a427872fbfb9cc0b0dd92d9"
+      "sha256": "ec45423dd9a43a088ff5c078828dd1f07f92099a69e71450fca6fbb2e13503dc"
     },
     {
       "path": "adoption-report.schema.json",
-      "sha256": "4ce25e058235e6b124d127321a4549c49da4efbdf1dcda22c79d4c83d3645a2f"
+      "sha256": "2cb8d0a05a91edf882cce5a1c59c7005b99f2d895329357c8ff6a0a8b620e434"
+    },
+    {
+      "path": "adoption-workflow-evidence.schema.json",
+      "sha256": "8da2c123036ab6f6f48b007b26681f29aa8989321315af10b3651927866c8bf2"
     },
     {
       "path": "adoption-workflow.md",
-      "sha256": "4a5e5f4413daf09531052dcda8f365240b0307c846b03263f6ba2da9f84a5957"
+      "sha256": "a41f2f3e9a236ca60557b43c557f605341e20e2cb77700eb25317f72c7fed288"
     },
     {
       "path": "agent-skills/lds-ui/SKILL.md",
@@ -216,7 +224,7 @@
     },
     {
       "path": "components/README.md",
-      "sha256": "0630ef1b38625f61e56436a2f48a9ca095f4f3ac5792eb5a0b78367885f903d5"
+      "sha256": "243c3231e7b5b9054ca347bc7bdc71f7579ae84840b54d368562c238970d9a4f"
     },
     {
       "path": "foundations/README.md",
@@ -304,11 +312,11 @@
     },
     {
       "path": "llms.txt",
-      "sha256": "b4d376e2ab90aa530e002f41ac5682c6cbc6d24f489df8db0a105b9242ac41ee"
+      "sha256": "8216e2ad798d10ff2d9df1ebc4c85093db86d342d911afbc04abe4d3cb7bf327"
     },
     {
       "path": "manifest.json",
-      "sha256": "6c5aa3e762d67bb9c76dd0c12bdf8448ce2e6862917b342f419fd1dd504a6820"
+      "sha256": "81873d07af330f8c3907aa683a25725982403bac86179d4a6a6444e75f5dc1bd"
     },
     {
       "path": "patterns/loading.md",
@@ -320,19 +328,19 @@
     },
     {
       "path": "policies/COMPONENT_WORKFLOW.md",
-      "sha256": "e2ebd2790aefd2d674f750660c130a974669264be481dcda1b2a3c69ec0b4077"
+      "sha256": "3aaadffd09da463d53643f1cb2b3358efde1067b34b10439914154365f65b422"
     },
     {
       "path": "policies/COPY_REVIEW_CONTRACT.md",
-      "sha256": "9c5a9a3842a3c515556737cbef2bac173693926237b5bf247209aebecff9138b"
+      "sha256": "3f2c44d3ce7dcd867146d84a4da2a443a4b6fd4dabed2f6e37c8abf7a60ed9cd"
     },
     {
       "path": "policies/PACKAGE_MIGRATION_GUIDE.md",
-      "sha256": "755b387d8d07c0573f3c22b832210d08c4a283037274761d96f6d737e5f4c376"
+      "sha256": "5b3a9256aa217dc764907ed74e53028694ba6fe192611ab9ad5ac9a58445df8a"
     },
     {
       "path": "policies/TOKEN_GOVERNANCE.md",
-      "sha256": "e41f927a9935a4df838632e95016d95886d8e25ca3d74100fe071299e81bb27c"
+      "sha256": "1c5185f2d1d03b8a007ee6b744b7366c3063e932344190f9d5762bad4d8ad5e0"
     },
     {
       "path": "token-reference.json",
@@ -369,6 +377,7 @@
     "shared/adoption-config.schema.json",
     "shared/adoption-report.example.json",
     "shared/adoption-report.schema.json",
+    "shared/adoption-workflow-evidence.schema.json",
     "shared/adoption-workflow.md",
     "shared/agent-skills/lds-ui/SKILL.md",
     "shared/agent-skills/lds-ui/references/anti-patterns.md",

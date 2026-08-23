@@ -189,7 +189,7 @@
             "required": ["kind"],
             "properties": {
               "kind": {
-                "enum": ["source", "token", "story", "check", "visual", "asset", "copy-catalog"]
+                "enum": ["source", "token", "story", "check", "visual", "asset", "copy-catalog", "workflow"]
               }
             }
           },
@@ -299,11 +299,25 @@
       "additionalProperties": false,
       "required": ["kind", "ref"],
       "properties": {
-        "kind": { "enum": ["source", "token", "story", "check", "visual", "asset", "copy-catalog", "decision"] },
+        "kind": { "enum": ["source", "token", "story", "check", "visual", "asset", "copy-catalog", "workflow", "decision"] },
         "ref": { "type": "string", "minLength": 1 },
         "detail": { "type": "string", "minLength": 3 },
         "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "kind": { "const": "workflow" } },
+            "required": ["kind"]
+          },
+          "then": {
+            "required": ["sha256"],
+            "properties": {
+              "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+            }
+          }
+        }
+      ]
     },
     "verification": {
       "type": "object",
@@ -347,7 +361,7 @@
           "contains": {
             "type": "object",
             "required": ["kind"],
-            "properties": { "kind": { "enum": ["visual", "story", "check"] } }
+            "properties": { "kind": { "enum": ["visual", "story", "check", "workflow"] } }
           },
           "minContains": 1
         }
