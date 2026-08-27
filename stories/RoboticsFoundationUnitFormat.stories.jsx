@@ -5,17 +5,18 @@ import {
   isAttachedUnit,
   normalizeUnit,
   normalizeValueText,
-} from '@lk-design-system/lds-core/components/internal/unit-format';
+} from '@lk-design-system/lds-core/component-authoring';
 import { storyDescription } from './StoryGuide.shared.jsx';
 
 // Cross-area value/unit lockup rule, shared across the Robotics areas. The
-// internal `unit-format` module is the single source that decides whether a unit
+// `unit-format` rule is the single source that decides whether a unit
 // attaches to the number (%, ‰, °) or is separated by a space (m/s, kg, ℃), and
 // it is already consumed by Status (TelemetryGauge · TelemetryValue) and Editor
 // (ViewportStatusBar · SelectionInspector). This page renders the rule straight
 // from those functions and the play-test asserts the DOM equals their output, so
-// the module — not any one component — is the regression baseline. Internal
-// module, not part of the public API.
+// the rule — not any one component — is the regression baseline. Consumed via
+// the supported `component-authoring` entry; the former
+// `components/internal/*` subpath is closed since LDS 0.1.1.
 const INK = 'var(--color-semantic-label-strong)';
 const MUTED = 'var(--color-semantic-label-neutral)';
 const LINE = 'var(--color-semantic-line-normal-normal)';
