@@ -3,7 +3,7 @@
   "kind": "lds-package-documentation",
   "package": {
     "name": "@lk-design-system/lds-core",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "layer": "core"
   },
   "adoption": {
@@ -62,7 +62,7 @@
   },
   "source": {
     "repository": "LK-Design-System/lk-design-system",
-    "ref": "lds-v0.1.1",
+    "ref": "lds-v0.2.0",
     "documents": [
       {
         "path": "docs/ACCESSIBILITY_CONTRACTS.md",
@@ -234,7 +234,7 @@
     "tokens": {
       "fileCount": 6,
       "bytes": 37092,
-      "sha256": "ee37c82c24892e7dee2c494cbf4638a8d569bfd7e12147ce85d8f4902e58e18b"
+      "sha256": "d61a88a34c24a8228317f761bb9352d2623e2519b06a8d0700a51d3711be5e01"
     },
     "assets": {
       "fileCount": 365,
@@ -295,7 +295,7 @@
     },
     {
       "path": "adoption-workflow.md",
-      "sha256": "a41f2f3e9a236ca60557b43c557f605341e20e2cb77700eb25317f72c7fed288",
+      "sha256": "dd93a1b25aaf7d151ec033cf6a4a8091304ca277d4d661a4337803a468ac6324",
       "sources": [
         {
           "path": "docs/LDS_UI_ADOPTION_WORKFLOW.md",
@@ -345,7 +345,7 @@
     },
     {
       "path": "components/README.md",
-      "sha256": "243c3231e7b5b9054ca347bc7bdc71f7579ae84840b54d368562c238970d9a4f",
+      "sha256": "8dfdf8137eafbb0f95bf55c71b48ade2cecda7c162d52c9dcb9e5bd12649b5f8",
       "sources": [
         {
           "path": "docs/components/README.md",
@@ -575,7 +575,7 @@
     },
     {
       "path": "llms.txt",
-      "sha256": "8216e2ad798d10ff2d9df1ebc4c85093db86d342d911afbc04abe4d3cb7bf327",
+      "sha256": "7d39498ee68526c3e33134b9b38e14ad715a5764b6442dc154966ef01aa6e55e",
       "sources": [
         {
           "path": "llms.txt",
@@ -605,7 +605,7 @@
     },
     {
       "path": "policies/COMPONENT_WORKFLOW.md",
-      "sha256": "3aaadffd09da463d53643f1cb2b3358efde1067b34b10439914154365f65b422",
+      "sha256": "47ae1e638ca01a8faef0dfd2c7570ea38bfaf615f2b85ac1da90c41990c80ccd",
       "sources": [
         {
           "path": "docs/COMPONENT_WORKFLOW.md",
@@ -615,7 +615,7 @@
     },
     {
       "path": "policies/COPY_REVIEW_CONTRACT.md",
-      "sha256": "3f2c44d3ce7dcd867146d84a4da2a443a4b6fd4dabed2f6e37c8abf7a60ed9cd",
+      "sha256": "2336122bd847c15b3e8f4b36242f20394fbea5ea45099cc563cd525df3e81a85",
       "sources": [
         {
           "path": "docs/COPY_REVIEW_CONTRACT.md",
@@ -625,7 +625,7 @@
     },
     {
       "path": "policies/PACKAGE_MIGRATION_GUIDE.md",
-      "sha256": "5b3a9256aa217dc764907ed74e53028694ba6fe192611ab9ad5ac9a58445df8a",
+      "sha256": "b650414bfa20f25a157a9e861355b235d36fb479cc4f0f3d3c5c7d591144f9d9",
       "sources": [
         {
           "path": "docs/PACKAGE_MIGRATION_GUIDE.md",
@@ -635,7 +635,7 @@
     },
     {
       "path": "policies/TOKEN_GOVERNANCE.md",
-      "sha256": "1c5185f2d1d03b8a007ee6b744b7366c3063e932344190f9d5762bad4d8ad5e0",
+      "sha256": "f7ad68977b78a6df34a49111862db5355d37953f763bf3fa3aaad41ec1fd310a",
       "sources": [
         {
           "path": "docs/TOKEN_GOVERNANCE.md",
