@@ -7,7 +7,7 @@
 | Owner | Design system owner |
 | Last reviewed | 2026-07-24 |
 
-Storybook 페이지 소유권, 공개/숨김 역할, 영역별 설명 순서는 [`STORYBOOK_INFORMATION_ARCHITECTURE.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.0/docs/STORYBOOK_INFORMATION_ARCHITECTURE.md)를 따른다. 전수 판정 원장은 `docs/references/quality/STORYBOOK_INFORMATION_ARCHITECTURE_AUDIT.json`에서 관리한다.
+Storybook 페이지 소유권, 공개/숨김 역할, 영역별 설명 순서는 [`STORYBOOK_INFORMATION_ARCHITECTURE.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.1/docs/STORYBOOK_INFORMATION_ARCHITECTURE.md)를 따른다. 전수 판정 원장은 `docs/references/quality/STORYBOOK_INFORMATION_ARCHITECTURE_AUDIT.json`에서 관리한다.
 
 이 문서는 신규 컴포넌트, 대규모 재설계, 재사용 패턴, 신규·변경 icon/asset/map symbol의 **공식 검토 진입점**이다. 구현 파일을 추가하는 순서만이 아니라 문제 근거, 제품 워크플로우, 공개 계약, 시각·접근성, asset 적합성, 검증과 완료 기록까지 모두 적용한다. 세부 계약 문서가 서로 다르게 읽히면 이 문서에서 요구하는 검토 순서를 먼저 따르고, 발견된 불일치는 관련 계약 문서에 함께 반영한다.
 
@@ -96,11 +96,11 @@ menu, 자체 focus trap, document 수준 outside-dismiss listener, 조건부 마
 
 | 행동 | 엔진 | 계약 문서 |
 | --- | --- | --- |
-| 메뉴 roving focus·typeahead·Escape 스택 | `components/internal/useMenuKeyboard.js` | [`useMenuKeyboard.prompt.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.0/components/internal/useMenuKeyboard.prompt.md) |
-| 서브메뉴(드릴) 브랜치·포탈 배치 | `components/internal/useSubmenuBranch.jsx` | [`useSubmenuBranch.prompt.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.0/components/internal/useSubmenuBranch.prompt.md) |
-| light dismiss(바깥 클릭·최상단 Escape·재오픈 래치)·anchored 배치·열림 triad | `components/overlay/anchored-overlay.js` | [`anchored-overlay.prompt.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.0/components/overlay/anchored-overlay.prompt.md) |
-| 모달 초점 트랩·복원·오버레이 스택·스크롤 잠금 | `components/overlay/dialog-focus.js` | [`dialog-focus.prompt.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.0/components/overlay/dialog-focus.prompt.md) |
-| 폼 필드 라벨·메시지·`aria-describedby` 메타데이터와 상태 토큰 | `components/forms/field-shared.js` | [`field-shared.prompt.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.0/components/forms/field-shared.prompt.md) |
+| 메뉴 roving focus·typeahead·Escape 스택 | `components/internal/useMenuKeyboard.js` | [`useMenuKeyboard.prompt.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.1/components/internal/useMenuKeyboard.prompt.md) |
+| 서브메뉴(드릴) 브랜치·포탈 배치 | `components/internal/useSubmenuBranch.jsx` | [`useSubmenuBranch.prompt.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.1/components/internal/useSubmenuBranch.prompt.md) |
+| light dismiss(바깥 클릭·최상단 Escape·재오픈 래치)·anchored 배치·열림 triad | `components/overlay/anchored-overlay.js` | [`anchored-overlay.prompt.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.1/components/overlay/anchored-overlay.prompt.md) |
+| 모달 초점 트랩·복원·오버레이 스택·스크롤 잠금 | `components/overlay/dialog-focus.js` | [`dialog-focus.prompt.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.1/components/overlay/dialog-focus.prompt.md) |
+| 폼 필드 라벨·메시지·`aria-describedby` 메타데이터와 상태 토큰 | `components/forms/field-shared.js` | [`field-shared.prompt.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.1/components/forms/field-shared.prompt.md) |
 
 - 엔진 구현을 바꾸면 모든 소비자가 함께 바뀐다. 동작 수정은 엔진의 `.prompt.md` 계약·전용
   테스트와 함께 진행하고, 특정 소비자만을 위한 분기를 엔진에 넣지 않는다.
@@ -108,7 +108,7 @@ menu, 자체 focus trap, document 수준 outside-dismiss listener, 조건부 마
   엔진 확장으로 해결하고, 불가피한 예외는 `--update-baseline`으로 래칫에 기록하며 사유를 PR에
   남긴다.
 - 엔진은 내부 계층이다: public export로 승격하지 않고
-  [`OWNER_AUTHORITY_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.0/docs/references/architecture/OWNER_AUTHORITY_CONTRACT.json)이
+  [`OWNER_AUTHORITY_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.1/docs/references/architecture/OWNER_AUTHORITY_CONTRACT.json)이
   가리키는 owner package의 private source에 둔다. 호환 source가 남아 있으면
   `PUBLIC_EXPORT_CLASSIFICATION.json`의 `internalModules` historical projection도
   동기화하며 `npm run check:layers`로 live owner와 projection의 일치를 검증한다.
@@ -129,7 +129,7 @@ menu, 자체 focus trap, document 수준 outside-dismiss listener, 조건부 마
 ### 1. 문제, 분류, 중복 여부
 
 1. 어떤 사용자의 어떤 반복 문제와 실제 업무 결정을 지원하는지 한 문장으로 쓴다.
-2. [`OWNER_AUTHORITY_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.0/docs/references/architecture/OWNER_AUTHORITY_CONTRACT.json)의 물리 package와 domain boundary를 기준으로 Runtime owner layer를 `core`, `theme`, `product`, `robotics` 중 하나로 정하고, 설계 provenance를 `direct-wds`, `wds-adjacent`, `theme-override`, `product-extension`, `robotics-extension` 중 하나로 별도 기록한다. WDS 근거와 코드 소유 계층을 같은 축으로 취급하지 않는다.
+2. [`OWNER_AUTHORITY_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.1/docs/references/architecture/OWNER_AUTHORITY_CONTRACT.json)의 물리 package와 domain boundary를 기준으로 Runtime owner layer를 `core`, `theme`, `product`, `robotics` 중 하나로 정하고, 설계 provenance를 `direct-wds`, `wds-adjacent`, `theme-override`, `product-extension`, `robotics-extension` 중 하나로 별도 기록한다. WDS 근거와 코드 소유 계층을 같은 축으로 취급하지 않는다.
 3. 같은 family의 기존 component, `.prompt.md`, Storybook story, token, 관련 문서를 조사한다.
 4. 기존 component의 확장 또는 여러 primitive의 composition으로 해결 가능한지 먼저 판단한다.
 5. 새 component가 필요하면 기존 sibling과의 책임·API·시각 차이를 명시한다. 이름이나 제품 영역이 다르다는 이유만으로 새 component를 만들지 않는다.
@@ -156,7 +156,7 @@ menu, 자체 focus trap, document 수준 outside-dismiss listener, 조건부 마
 3. loading, empty, error, stale, offline, disabled, partial failure와 recovery 경로를 확인한다.
 4. 제품별 관계를 `supported`, `supported by composition`, `gap`, `not applicable`로 판정한다.
 5. gap이 LDS 공개 계약의 책임인지 product orchestration, backend, transport의 책임인지 분리한다.
-6. source pin과 판정은 [`PRODUCT_FRONTEND_COVERAGE.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.0/docs/PRODUCT_FRONTEND_COVERAGE.md)와 `docs/references/product-frontends/COVERAGE_AUDIT.json`에 남긴다.
+6. source pin과 판정은 [`PRODUCT_FRONTEND_COVERAGE.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.1/docs/PRODUCT_FRONTEND_COVERAGE.md)와 `docs/references/product-frontends/COVERAGE_AUDIT.json`에 남긴다.
 
 제품 page, route, backend policy, transport logic, 완성 workflow를 Storybook component로 복제하지 않는다. 이 절의 source pin과 판정은 2절에서 독립적으로 정한 설계를 실제 제품이 조합할 수 있는지 확인하는 **coverage gate**이며, 설계 선택을 승인하거나 public component의 생성·삭제·API·스타일을 단독으로 결정하는 authority가 아니다. LDS는 제품이 자체 스타일이나 접근성 동작을 다시 만들지 않고 workflow를 조합할 수 있는 primitive와 public contract를 제공한다.
 
@@ -174,7 +174,7 @@ menu, 자체 focus trap, document 수준 outside-dismiss listener, 조건부 마
 - 앱 route, 권한 정책, API 호출, transport 상태 머신은 public component contract에 넣지 않는다.
 - renderer-neutral `editor`와 `viz` 구현은 Product package가 이 저장소에서 소유한다. 외부 Robotics 저장소와의 이음새는 `ROBOTICS_EXTERNAL_SURFACE.json`에서 Robotics owner로 분류된 control·status·spatial navigation 계약에만 적용한다. 이 영역의 공개 prop을 바꾸면 in-repo `check:api-drift`에 더해 `npm run check:robotics-contract-drift`(형제 checkout 대상, `--root=`로 위치 지정)를 통과해야 한다. 이 검사는 **양방향**이다: 구현에 있는데 계약 문서에 없는 prop(`undocumentedProps`)과, 반대로 계약 예제가 홍보하지만 구현에 없는 prop(`phantomProps` — 계약이 구현에 대해 거짓말하는 경우)을 모두 잡는다. 메인 Product와 외부 Robotics가 조합하는 이름(예: generic `Map2DCanvas`와 Robotics navigation overlay)은 이름이나 폴더가 아니라 live owner contract와 external surface로 경계를 판정한다. 기존 드리프트는 `docs/references/robotics/CONTRACT_DRIFT_BASELINE.json` 래칫에 기록되어 있으며 새 드리프트만 실패한다.
 
-API와 상태 증거는 [`COMPONENT_API_STATE_MATRIX.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.0/docs/COMPONENT_API_STATE_MATRIX.md), 접근성 증거는 [`ACCESSIBILITY_CONTRACTS.md`](./ACCESSIBILITY_CONTRACTS.md)에 반영한다.
+API와 상태 증거는 [`COMPONENT_API_STATE_MATRIX.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.1/docs/COMPONENT_API_STATE_MATRIX.md), 접근성 증거는 [`ACCESSIBILITY_CONTRACTS.md`](./ACCESSIBILITY_CONTRACTS.md)에 반영한다.
 
 ### 5. Icon, asset, map symbol 적합성
 
@@ -270,7 +270,7 @@ Figma Variables export/import, 토큰 lifecycle, deprecation, breaking change �
 
 Storybook은 모든 구현 세부사항이 아니라 실제로 필요한 컴포넌트 상태를 문서화합니다. 원본 카드와 1:1 비교하기 위한 `visual-parity` story는 `!dev` 태그로 sidebar에서 숨기고, public story에는 대표 상태만 남깁니다.
 Public Storybook title은 사용자 탐색 기준입니다. `LDS Core/Foundation`, `LDS Core/Components/<family>`, `LDS Theme/...`, `LDS Product/...`, `LDS Robotics/...`를 사용하고, `1 Theme`, `2 Element`, `3 Component / 2 Action` 같은 WDS 원천 번호 체계는 `docs/references/wds/`의 근거 데이터에만 남깁니다.
-Public export의 canonical Storybook evidence 최상위 prefix는 [`OWNER_AUTHORITY_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.0/docs/references/architecture/OWNER_AUTHORITY_CONTRACT.json)의 live `storybookPrefix` owner와 일치해야 합니다. `direct-wds` 같은 provenance는 WDS 추적 근거이지 Storybook 또는 package owner를 자동으로 결정하지 않습니다. Core renderer로 Theme variant나 Robotics 전용 asset vocabulary를 설명하는 별도 확장 페이지는 실제 title owner를 유지하면서 `LAYER_CLASSIFICATION.json`의 `storyLayerExceptions` historical evidence projection에 primary export owner와 구체적 이유를 동기화합니다. 이 projection은 cross-layer evidence를 감사하기 위한 것이며 live page/package owner를 만들거나 덮어쓰지 않습니다.
+Public export의 canonical Storybook evidence 최상위 prefix는 [`OWNER_AUTHORITY_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.1/docs/references/architecture/OWNER_AUTHORITY_CONTRACT.json)의 live `storybookPrefix` owner와 일치해야 합니다. `direct-wds` 같은 provenance는 WDS 추적 근거이지 Storybook 또는 package owner를 자동으로 결정하지 않습니다. Core renderer로 Theme variant나 Robotics 전용 asset vocabulary를 설명하는 별도 확장 페이지는 실제 title owner를 유지하면서 `LAYER_CLASSIFICATION.json`의 `storyLayerExceptions` historical evidence projection에 primary export owner와 구체적 이유를 동기화합니다. 이 projection은 cross-layer evidence를 감사하기 위한 것이며 live page/package owner를 만들거나 덮어쓰지 않습니다.
 `LDS Product`와 `LDS Robotics` story는 재사용 가능한 확장 컴포넌트나 패턴이어야 합니다. 완성 앱 화면, 템플릿, 워크플로우, 데모 페이지는 Storybook public surface로 추가하지 않습니다.
 디자인 시스템 계약은 Storybook 문서 페이지가 아니라 `docs/` 아래 Markdown 문서와 검증 스크립트에 둡니다. 도메인별 기준은 별도 결과 화면을 만들지 않고 관련 컴포넌트 story와 `docs/ROBOTICS_PATTERNS.md` 같은 문서 계약에 반영합니다.
 우선순위:

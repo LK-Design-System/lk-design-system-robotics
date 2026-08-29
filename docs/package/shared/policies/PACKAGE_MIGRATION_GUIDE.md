@@ -76,7 +76,7 @@ New code should import these symbols from the Core root or matching Core deep pa
 Product root and deep imports remain deprecated compatibility re-exports for every `0.1.x`
 release; they resolve to the same Core implementation and may be removed no earlier than
 `0.2.0`. Removal also requires registered-consumer usage to reach zero, owner approval, and a
-breaking release note. See [`R3B_OWNER_API_MIGRATION.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.0/docs/R3B_OWNER_API_MIGRATION.md) for the
+breaking release note. See [`R3B_OWNER_API_MIGRATION.md`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.1/docs/R3B_OWNER_API_MIGRATION.md) for the
 exact stay/defer decisions, support window, and rollback contract.
 
 For example:
