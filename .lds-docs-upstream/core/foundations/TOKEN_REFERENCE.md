@@ -153,7 +153,8 @@
 | `component.mobileSystemBars.tokens.homeWidth` | dimension | `--component-system-bars-home-width` | `var(--component-system-bars-home-width)` | — |
 | `component.notification.tokens.unreadSurface` | color | `--component-notification-unread-surface` | `var(--color-semantic-primary-surface-normal)` | — |
 | `component.sideNav.tokens.brandActiveForeground` | color | `--component-side-nav-brand-active-foreground` | `var(--color-atomic-navy-shell-68)` | — |
-| `component.sideNav.tokens.brandActiveHoverSurface` | color | `--component-side-nav-brand-active-hover-surface` | `var(--color-atomic-navy-shell-18)` | — |
+| `component.sideNav.tokens.brandActiveHoverSurface` | color | `--component-side-nav-brand-active-hover-surface` | `var(--color-atomic-navy-shell-20)` | — |
+| `component.sideNav.tokens.brandActiveSurface` | color | `--component-side-nav-brand-active-surface` | `var(--color-atomic-navy-shell-18)` | — |
 | `component.sideNav.tokens.brandBadgeActiveSurface` | color | `--component-side-nav-brand-badge-active-surface` | `var(--color-atomic-navy-shell-24)` | — |
 | `component.sideNav.tokens.brandBadgeForeground` | color | `--component-side-nav-brand-badge-foreground` | `var(--color-atomic-navy-shell-65)` | — |
 | `component.sideNav.tokens.brandBadgeSurface` | color | `--component-side-nav-brand-badge-surface` | `var(--color-atomic-navy-shell-18)` | — |
