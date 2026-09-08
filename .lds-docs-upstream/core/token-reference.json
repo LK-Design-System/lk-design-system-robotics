@@ -3916,6 +3916,18 @@
           "$value": "var(--component-table-cell-padding-md)",
           "css": "--component-table-cell-padding-md",
           "source": "R3A density contract"
+        },
+        "rowMinHeightSm": {
+          "$type": "dimension",
+          "$value": "var(--component-table-row-min-height-sm)",
+          "css": "--component-table-row-min-height-sm",
+          "source": "R3A density contract"
+        },
+        "rowMinHeightMd": {
+          "$type": "dimension",
+          "$value": "var(--component-table-row-min-height-md)",
+          "css": "--component-table-row-min-height-md",
+          "source": "R3A density contract"
         }
       }
     },

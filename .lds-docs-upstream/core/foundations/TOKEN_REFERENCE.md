@@ -183,6 +183,8 @@
 | `component.statusBadge.tokens.surface` | color | `--component-status-badge-surface` | `var(--color-semantic-fill-strong)` | — |
 | `component.table.tokens.cellPaddingMd` | string | `--component-table-cell-padding-md` | `var(--component-table-cell-padding-md)` | — |
 | `component.table.tokens.cellPaddingSm` | string | `--component-table-cell-padding-sm` | `var(--component-table-cell-padding-sm)` | — |
+| `component.table.tokens.rowMinHeightMd` | dimension | `--component-table-row-min-height-md` | `var(--component-table-row-min-height-md)` | — |
+| `component.table.tokens.rowMinHeightSm` | dimension | `--component-table-row-min-height-sm` | `var(--component-table-row-min-height-sm)` | — |
 | `component.toggleIcon.tokens.activeBackground` | color | `--component-toggle-icon-bg-active` | `var(--component-toggle-icon-bg-active)` | — |
 | `component.toggleIcon.tokens.background` | color | `--component-toggle-icon-bg` | `var(--component-toggle-icon-bg)` | — |
 | `component.toggleIcon.tokens.border` | border | `--component-toggle-icon-border` | `var(--component-toggle-icon-border)` | — |
