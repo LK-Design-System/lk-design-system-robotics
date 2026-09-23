@@ -34,6 +34,7 @@
 | --- | --- |
 | [`SELECTION_FOCUS_AUDIT.md`](SELECTION_FOCUS_AUDIT.md) | 선택(정적 기하) vs 키보드 포커스(포커스 색)의 소유 경계 원장 — 값의 소스는 `NAV_SELECTION`/`NAV_FOCUS` |
 | [`STRUCTURE_ASSESSMENT.md`](STRUCTURE_ASSESSMENT.md) | LDS 전반 구조 건강도 스냅숏 — 부채 목록(이중 모듈 그래프, 업스트림 조율)과 갱신 규칙 |
+| [`ROBOT_POSE_TONE_AUDIT.md`](ROBOT_POSE_TONE_AUDIT.md) | RobotPose `offline`/`idle`이 뷰어 안에서 같은 본체 색으로 해석되는 문제 — 소비자 실측 근거와 선택지 (Open) |
 
 ## 계획 (Plan)
 
