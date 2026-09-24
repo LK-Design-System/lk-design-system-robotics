@@ -788,62 +788,62 @@
           },
           "10": {
             "$type": "color",
-            "$value": "#130841",
+            "$value": "#130E38",
             "css": "--color-atomic-violet-10"
           },
           "20": {
             "$type": "color",
-            "$value": "#29147F",
+            "$value": "#28216E",
             "css": "--color-atomic-violet-20"
           },
           "30": {
             "$type": "color",
-            "$value": "#4125B3",
+            "$value": "#40369C",
             "css": "--color-atomic-violet-30"
           },
           "40": {
             "$type": "color",
-            "$value": "#5333D3",
+            "$value": "#5244B9",
             "css": "--color-atomic-violet-40"
           },
           "45": {
             "$type": "color",
-            "$value": "#5E3FDB",
+            "$value": "#5D4EC1",
             "css": "--color-atomic-violet-45"
           },
           "50": {
             "$type": "color",
-            "$value": "#6748E1",
+            "$value": "#6656C7",
             "css": "--color-atomic-violet-50"
           },
           "60": {
             "$type": "color",
-            "$value": "#7E63E8",
+            "$value": "#7D6CD1",
             "css": "--color-atomic-violet-60"
           },
           "70": {
             "$type": "color",
-            "$value": "#9E89F0",
+            "$value": "#9D8FDE",
             "css": "--color-atomic-violet-70"
           },
           "80": {
             "$type": "color",
-            "$value": "#C0B1F7",
+            "$value": "#BFB4EA",
             "css": "--color-atomic-violet-80"
           },
           "90": {
             "$type": "color",
-            "$value": "#DBD4FA",
+            "$value": "#DBD5F3",
             "css": "--color-atomic-violet-90"
           },
           "95": {
             "$type": "color",
-            "$value": "#F0ECFC",
+            "$value": "#F0EDF9",
             "css": "--color-atomic-violet-95"
           },
           "99": {
             "$type": "color",
-            "$value": "#FBFAFF",
+            "$value": "#FBFAFE",
             "css": "--color-atomic-violet-99"
           },
           "100": {
@@ -851,7 +851,8 @@
             "$value": "#FFFFFF",
             "css": "--color-atomic-violet-100"
           }
-        }
+        },
+        "$description": "Chroma capped at 0.17 on step 50 (2026-09): a/b scaled by 0.775 in OKLab so L and H hold; accents stay below the status hues."
       },
       "neutral": {
         "label": "Neutral",
@@ -927,7 +928,8 @@
             "$value": "#F7F7F8",
             "css": "--color-atomic-neutral-99"
           }
-        }
+        },
+        "$description": "Deprecated 2026-09: visually identical to cool-neutral (every channel within 2/255) and no semantic role draws only from it. Use the same step of cool-neutral. Removal: 0.3.0. See docs/TOKEN_GOVERNANCE.md."
       },
       "blue": {
         "label": "Blue",
@@ -1148,62 +1150,62 @@
           },
           "10": {
             "$type": "color",
-            "$value": "#132904",
+            "$value": "#17280D",
             "css": "--color-atomic-lime-10"
           },
           "20": {
             "$type": "color",
-            "$value": "#265108",
+            "$value": "#2F4F1E",
             "css": "--color-atomic-lime-20"
           },
           "30": {
             "$type": "color",
-            "$value": "#3B7C0C",
+            "$value": "#487830",
             "css": "--color-atomic-lime-30"
           },
           "37": {
             "$type": "color",
-            "$value": "#4B9D10",
+            "$value": "#5C993F",
             "css": "--color-atomic-lime-37"
           },
           "40": {
             "$type": "color",
-            "$value": "#51AC11",
+            "$value": "#64A745",
             "css": "--color-atomic-lime-40"
           },
           "50": {
             "$type": "color",
-            "$value": "#63CE18",
+            "$value": "#7AC854",
             "css": "--color-atomic-lime-50"
           },
           "60": {
             "$type": "color",
-            "$value": "#87DB49",
+            "$value": "#96D66E",
             "css": "--color-atomic-lime-60"
           },
           "70": {
             "$type": "color",
-            "$value": "#AAE87D",
+            "$value": "#B4E494",
             "css": "--color-atomic-lime-70"
           },
           "80": {
             "$type": "color",
-            "$value": "#C3F0A3",
+            "$value": "#CAECB2",
             "css": "--color-atomic-lime-80"
           },
           "90": {
             "$type": "color",
-            "$value": "#D9F7C4",
+            "$value": "#DDF4CE",
             "css": "--color-atomic-lime-90"
           },
           "95": {
             "$type": "color",
-            "$value": "#EDFCE2",
+            "$value": "#EFFBE7",
             "css": "--color-atomic-lime-95"
           },
           "99": {
             "$type": "color",
-            "$value": "#FAFEF6",
+            "$value": "#FBFEF7",
             "css": "--color-atomic-lime-99"
           },
           "100": {
@@ -1211,7 +1213,8 @@
             "$value": "#FFFFFF",
             "css": "--color-atomic-lime-100"
           }
-        }
+        },
+        "$description": "Chroma capped at 0.17 on step 50 (2026-09): a/b scaled by 0.765 in OKLab so L and H hold; accents stay below the status hues."
       },
       "cyan": {
         "label": "Cyan",
@@ -1366,62 +1369,62 @@
           },
           "10": {
             "$type": "color",
-            "$value": "#3A0731",
+            "$value": "#360E2E",
             "css": "--color-atomic-pink-10"
           },
           "20": {
             "$type": "color",
-            "$value": "#6F105F",
+            "$value": "#691F5A",
             "css": "--color-atomic-pink-20"
           },
           "30": {
             "$type": "color",
-            "$value": "#A2258D",
+            "$value": "#993787",
             "css": "--color-atomic-pink-30"
           },
           "40": {
             "$type": "color",
-            "$value": "#C645B1",
+            "$value": "#BC54A9",
             "css": "--color-atomic-pink-40"
           },
           "46": {
             "$type": "color",
-            "$value": "#DA58C5",
+            "$value": "#D066BD",
             "css": "--color-atomic-pink-46"
           },
           "50": {
             "$type": "color",
-            "$value": "#E764D1",
+            "$value": "#DC71C9",
             "css": "--color-atomic-pink-50"
           },
           "60": {
             "$type": "color",
-            "$value": "#EE7EDB",
+            "$value": "#E488D4",
             "css": "--color-atomic-pink-60"
           },
           "70": {
             "$type": "color",
-            "$value": "#F59BE6",
+            "$value": "#EDA2E0",
             "css": "--color-atomic-pink-70"
           },
           "80": {
             "$type": "color",
-            "$value": "#F8BCEE",
+            "$value": "#F2C0E9",
             "css": "--color-atomic-pink-80"
           },
           "90": {
             "$type": "color",
-            "$value": "#FAD5F4",
+            "$value": "#F6D7F1",
             "css": "--color-atomic-pink-90"
           },
           "95": {
             "$type": "color",
-            "$value": "#FCEDFA",
+            "$value": "#FAEEF9",
             "css": "--color-atomic-pink-95"
           },
           "99": {
             "$type": "color",
-            "$value": "#FFFAFE",
+            "$value": "#FEFAFE",
             "css": "--color-atomic-pink-99"
           },
           "100": {
@@ -1429,7 +1432,8 @@
             "$value": "#FFFFFF",
             "css": "--color-atomic-pink-100"
           }
-        }
+        },
+        "$description": "Chroma capped at 0.17 on step 50 (2026-09): a/b scaled by 0.833 in OKLab so L and H hold; accents stay below the status hues."
       },
       "purple": {
         "label": "Purple",
@@ -1442,57 +1446,57 @@
           },
           "10": {
             "$type": "color",
-            "$value": "#27083F",
+            "$value": "#250F38",
             "css": "--color-atomic-purple-10"
           },
           "20": {
             "$type": "color",
-            "$value": "#561575",
+            "$value": "#51236A",
             "css": "--color-atomic-purple-20"
           },
           "30": {
             "$type": "color",
-            "$value": "#822AAB",
+            "$value": "#7B3B9C",
             "css": "--color-atomic-purple-30"
           },
           "40": {
             "$type": "color",
-            "$value": "#A744D3",
+            "$value": "#9F55C2",
             "css": "--color-atomic-purple-40"
           },
           "50": {
             "$type": "color",
-            "$value": "#C464F0",
+            "$value": "#BB72DE",
             "css": "--color-atomic-purple-50"
           },
           "60": {
             "$type": "color",
-            "$value": "#CE7FF2",
+            "$value": "#C689E3",
             "css": "--color-atomic-purple-60"
           },
           "70": {
             "$type": "color",
-            "$value": "#D99AF5",
+            "$value": "#D2A1E9",
             "css": "--color-atomic-purple-70"
           },
           "80": {
             "$type": "color",
-            "$value": "#E5BCF8",
+            "$value": "#E0C0F0",
             "css": "--color-atomic-purple-80"
           },
           "90": {
             "$type": "color",
-            "$value": "#F0D7FB",
+            "$value": "#EDD9F6",
             "css": "--color-atomic-purple-90"
           },
           "95": {
             "$type": "color",
-            "$value": "#F8EEFD",
+            "$value": "#F7EFFB",
             "css": "--color-atomic-purple-95"
           },
           "99": {
             "$type": "color",
-            "$value": "#FEFBFF",
+            "$value": "#FEFBFE",
             "css": "--color-atomic-purple-99"
           },
           "100": {
@@ -1500,7 +1504,8 @@
             "$value": "#FFFFFF",
             "css": "--color-atomic-purple-100"
           }
-        }
+        },
+        "$description": "Chroma capped at 0.17 on step 50 (2026-09): a/b scaled by 0.797 in OKLab so L and H hold; accents stay below the status hues."
       },
       "navyShell": {
         "label": "Brand Navy Shell",
@@ -1848,6 +1853,17 @@
         },
         "origin": "wds-structure-lk-retone"
       },
+      "primary-fill": {
+        "$type": "color",
+        "css": "--color-semantic-primary-fill",
+        "modes": {
+          "light": "var(--color-semantic-primary-normal)",
+          "dark": "var(--color-semantic-primary-heavy)"
+        },
+        "origin": "lds-extension",
+        "group": "primary",
+        "$description": "Primary surface that carries static-white text or icons. Dark primary-normal gives white 3.39:1, so dark steps down to primary-heavy (4.85:1)."
+      },
       "label-neutral": {
         "$type": "color",
         "css": "--color-semantic-label-neutral",
@@ -1989,8 +2005,8 @@
         "$type": "color",
         "css": "--color-semantic-accent-background-lime",
         "modes": {
-          "light": "#63CE18",
-          "dark": "#87DB49"
+          "light": "var(--color-atomic-lime-50)",
+          "dark": "var(--color-atomic-lime-60)"
         },
         "origin": "wds-structure-lk-retone"
       },
@@ -2016,8 +2032,8 @@
         "$type": "color",
         "css": "--color-semantic-accent-background-violet",
         "modes": {
-          "light": "#6748E1",
-          "dark": "#7E63E8"
+          "light": "var(--color-atomic-violet-50)",
+          "dark": "var(--color-atomic-violet-60)"
         },
         "origin": "wds-structure-lk-retone"
       },
@@ -2025,8 +2041,8 @@
         "$type": "color",
         "css": "--color-semantic-accent-background-pink",
         "modes": {
-          "light": "#E764D1",
-          "dark": "#EE7EDB"
+          "light": "var(--color-atomic-pink-50)",
+          "dark": "var(--color-atomic-pink-60)"
         },
         "origin": "wds-structure-lk-retone"
       },
@@ -2097,8 +2113,8 @@
         "$type": "color",
         "css": "--color-semantic-accent-background-purple",
         "modes": {
-          "light": "#C464F0",
-          "dark": "#CE7FF2"
+          "light": "var(--color-atomic-purple-50)",
+          "dark": "var(--color-atomic-purple-60)"
         },
         "origin": "wds-structure-lk-retone"
       },
@@ -2106,8 +2122,8 @@
         "$type": "color",
         "css": "--color-semantic-accent-foreground-lime",
         "modes": {
-          "light": "#4B9D10",
-          "dark": "#63CE18"
+          "light": "var(--color-atomic-lime-37)",
+          "dark": "var(--color-atomic-lime-50)"
         },
         "origin": "wds-structure-lk-retone"
       },
@@ -2133,8 +2149,8 @@
         "$type": "color",
         "css": "--color-semantic-accent-foreground-violet",
         "modes": {
-          "light": "#5E3FDB",
-          "dark": "#9E89F0"
+          "light": "var(--color-atomic-violet-45)",
+          "dark": "var(--color-atomic-violet-70)"
         },
         "origin": "wds-structure-lk-retone"
       },
@@ -2142,8 +2158,8 @@
         "$type": "color",
         "css": "--color-semantic-accent-foreground-purple",
         "modes": {
-          "light": "#A744D3",
-          "dark": "#CE7FF2"
+          "light": "var(--color-atomic-purple-40)",
+          "dark": "var(--color-atomic-purple-60)"
         },
         "origin": "wds-structure-lk-retone"
       },
@@ -2151,8 +2167,8 @@
         "$type": "color",
         "css": "--color-semantic-accent-foreground-pink",
         "modes": {
-          "light": "#DA58C5",
-          "dark": "#EE7EDB"
+          "light": "var(--color-atomic-pink-46)",
+          "dark": "var(--color-atomic-pink-60)"
         },
         "origin": "wds-structure-lk-retone"
       },
@@ -2244,7 +2260,8 @@
           "light": "transparent",
           "dark": "transparent"
         },
-        "origin": "wds-structure-lk-retone"
+        "origin": "wds-structure-lk-retone",
+        "$description": "Deprecated 2026-09: transparent in both modes, so the name promises a color it never paints. Use accent-background-violet or accent-foreground-violet. Removal: 0.3.0."
       },
       "accent-cyan": {
         "$type": "color",
@@ -2253,7 +2270,8 @@
           "light": "transparent",
           "dark": "transparent"
         },
-        "origin": "wds-structure-lk-retone"
+        "origin": "wds-structure-lk-retone",
+        "$description": "Deprecated 2026-09: transparent in both modes, so the name promises a color it never paints. Use accent-background-cyan or accent-foreground-cyan. Removal: 0.3.0."
       },
       "brand-ink": {
         "$type": "color",
@@ -2772,11 +2790,12 @@
         "$type": "color",
         "css": "--color-semantic-data-viz-series-7",
         "modes": {
-          "light": "var(--color-semantic-accent-foreground-light-blue)",
-          "dark": "var(--color-semantic-accent-foreground-light-blue)"
+          "light": "var(--color-atomic-light-blue-30)",
+          "dark": "var(--color-atomic-light-blue-70)"
         },
         "origin": "lds-extension",
-        "group": "data-viz"
+        "group": "data-viz",
+        "$description": "Sky-blue steps rather than accent-foreground-light-blue, which shares the primary hue (249 deg): series 1 and 7 were dE 5.9 apart in light. Now 8.5 light, 9.2 dark to the nearest series."
       },
       "data-viz-series-8": {
         "$type": "color",
@@ -2827,13 +2846,8 @@
         "primaryBg": {
           "$type": "color",
           "css": "--component-button-primary-bg",
-          "$value": "var(--color-semantic-primary-normal)",
-          "modes": {
-            "light": "var(--color-semantic-primary-normal)",
-            "dark": "var(--color-semantic-primary-heavy)"
-          },
+          "$value": "var(--color-semantic-primary-fill)",
           "ref": "semantic.action.primary",
-          "$description": "Filled primary surfaces carry static white text. Dark primary-normal (#5390C9) gives white only 3.39:1, so the dark fill steps down to primary-heavy (4.85:1), matching badge.signalBg.",
           "generated": true
         },
         "primaryBgHover": {
@@ -2845,45 +2859,45 @@
         },
         "primaryFg": {
           "$type": "color",
-          "$value": "var(--component-button-primary-fg)",
           "css": "--component-button-primary-fg",
-          "ref": "semantic.text.onSignal"
+          "$value": "var(--color-semantic-static-white)",
+          "ref": "semantic.text.onSignal",
+          "generated": true
         },
         "dangerBg": {
           "$type": "color",
-          "$value": "var(--component-button-danger-bg)",
           "css": "--component-button-danger-bg",
+          "$value": "var(--color-atomic-red-30)",
           "ref": "primitive.colorRamps.red.tokens.30",
-          "$description": "LDS safety extension for destructive or emergency requests; not a WDS parity axis."
+          "$description": "LDS safety extension for destructive or emergency requests; not a WDS parity axis.",
+          "generated": true
         },
         "dangerBgHover": {
           "$type": "color",
-          "$value": "var(--component-button-danger-bg-hover)",
           "css": "--component-button-danger-bg-hover",
-          "ref": "primitive.colorRamps.red.tokens.20"
+          "$value": "var(--color-atomic-red-20)",
+          "ref": "primitive.colorRamps.red.tokens.20",
+          "generated": true
         },
         "dangerFg": {
           "$type": "color",
-          "$value": "var(--component-button-danger-fg)",
           "css": "--component-button-danger-fg",
-          "ref": "semantic.colorRoles.static-white"
+          "$value": "var(--color-semantic-static-white)",
+          "ref": "semantic.colorRoles.static-white",
+          "generated": true
         },
         "secondaryBg": {
           "$type": "color",
-          "$value": "var(--component-button-secondary-bg)",
           "css": "--component-button-secondary-bg",
-          "ref": "semantic.action.secondary"
+          "$value": "var(--color-semantic-secondary-normal)",
+          "ref": "semantic.action.secondary",
+          "generated": true
         },
         "signalBg": {
           "$type": "color",
           "css": "--component-button-signal-bg",
-          "$value": "var(--color-semantic-primary-normal)",
-          "modes": {
-            "light": "var(--color-semantic-primary-normal)",
-            "dark": "var(--color-semantic-primary-heavy)"
-          },
+          "$value": "var(--color-semantic-primary-fill)",
           "ref": "semantic.colorRoles.primary-normal",
-          "$description": "Filled primary surfaces carry static white text. Dark primary-normal (#5390C9) gives white only 3.39:1, so the dark fill steps down to primary-heavy (4.85:1), matching badge.signalBg.",
           "generated": true
         },
         "signalBgHover": {
@@ -2907,6 +2921,126 @@
           "$type": "transition",
           "$value": "none",
           "css": "--component-button-transition"
+        },
+        "disabledBg": {
+          "$type": "color",
+          "css": "--component-button-disabled-bg",
+          "$value": "var(--color-semantic-fill-normal)",
+          "generated": true
+        },
+        "disabledFg": {
+          "$type": "color",
+          "css": "--component-button-disabled-fg",
+          "$value": "var(--color-semantic-label-assistive)",
+          "generated": true
+        },
+        "disabledFgOutlined": {
+          "$type": "color",
+          "css": "--component-button-disabled-fg-outlined",
+          "$value": "var(--color-semantic-label-disable)",
+          "generated": true
+        },
+        "disabledOutlinedBorder": {
+          "$type": "border",
+          "css": "--component-button-disabled-outlined-border",
+          "$value": "var(--border-thin) solid var(--color-semantic-line-normal-neutral)",
+          "generated": true
+        },
+        "secondaryFg": {
+          "$type": "color",
+          "css": "--component-button-secondary-fg",
+          "$value": "var(--color-semantic-static-white)",
+          "generated": true
+        },
+        "signalFg": {
+          "$type": "color",
+          "css": "--component-button-signal-fg",
+          "$value": "var(--color-semantic-static-white)",
+          "generated": true
+        },
+        "darkBg": {
+          "$type": "color",
+          "css": "--component-button-dark-bg",
+          "$value": "var(--color-semantic-inverse-background)",
+          "generated": true
+        },
+        "darkFg": {
+          "$type": "color",
+          "css": "--component-button-dark-fg",
+          "$value": "var(--color-semantic-inverse-label)",
+          "generated": true
+        },
+        "flatBg": {
+          "$type": "color",
+          "css": "--component-button-flat-bg",
+          "$value": "var(--color-semantic-secondary-surface)",
+          "generated": true
+        },
+        "flatFg": {
+          "$type": "color",
+          "css": "--component-button-flat-fg",
+          "$value": "var(--color-semantic-label-normal)",
+          "generated": true
+        },
+        "ghostFg": {
+          "$type": "color",
+          "css": "--component-button-ghost-fg",
+          "$value": "var(--color-semantic-label-normal)",
+          "generated": true
+        },
+        "ghostBorder": {
+          "$type": "border",
+          "css": "--component-button-ghost-border",
+          "$value": "var(--border-thin) solid var(--color-semantic-line-solid-normal)",
+          "generated": true
+        },
+        "onDarkBg": {
+          "$type": "color",
+          "css": "--component-button-on-dark-bg",
+          "$value": "color-mix(in srgb, var(--color-semantic-static-white) 14%, transparent)",
+          "generated": true
+        },
+        "onDarkBgHover": {
+          "$type": "color",
+          "css": "--component-button-on-dark-bg-hover",
+          "$value": "color-mix(in srgb, var(--color-semantic-static-white) 16%, transparent)",
+          "generated": true
+        },
+        "onDarkFg": {
+          "$type": "color",
+          "css": "--component-button-on-dark-fg",
+          "$value": "var(--color-semantic-static-white)",
+          "generated": true
+        },
+        "onDarkBorder": {
+          "$type": "border",
+          "css": "--component-button-on-dark-border",
+          "$value": "var(--border-thin) solid color-mix(in srgb, var(--color-semantic-static-white) 28%, transparent)",
+          "generated": true
+        },
+        "secondaryBgHover": {
+          "$type": "color",
+          "css": "--component-button-secondary-bg-hover",
+          "$value": "var(--component-button-secondary-bg)",
+          "generated": true
+        },
+        "darkBgHover": {
+          "$type": "color",
+          "css": "--component-button-dark-bg-hover",
+          "$value": "var(--component-button-dark-bg)",
+          "generated": true
+        },
+        "flatBgHover": {
+          "$type": "color",
+          "css": "--component-button-flat-bg-hover",
+          "$value": "var(--component-button-flat-bg)",
+          "generated": true
+        },
+        "ghostBorderHover": {
+          "$type": "color",
+          "css": "--component-button-ghost-border-hover",
+          "$value": "var(--component-button-ghost-border)",
+          "generated": true
         }
       }
     },
@@ -2944,10 +3078,11 @@
       "tokens": {
         "background": {
           "$type": "color",
-          "$value": "var(--component-action-area-bg)",
           "css": "--component-action-area-bg",
+          "$value": "var(--color-semantic-background-elevated-normal)",
           "ref": "semantic.surface.card",
-          "source": "Action/Action Area"
+          "source": "Action/Action Area",
+          "generated": true
         },
         "paddingX": {
           "$type": "dimension",
@@ -2972,10 +3107,11 @@
         },
         "border": {
           "$type": "border",
-          "$value": "var(--component-action-area-border)",
           "css": "--component-action-area-border",
+          "$value": "var(--border-thin) solid var(--color-semantic-line-normal-normal)",
           "ref": "semantic.border.subtle",
-          "source": "Action/Action Area"
+          "source": "Action/Action Area",
+          "generated": true
         }
       }
     },
@@ -3009,10 +3145,11 @@
         },
         "background": {
           "$type": "color",
-          "$value": "var(--component-toggle-icon-bg)",
           "css": "--component-toggle-icon-bg",
+          "$value": "var(--color-semantic-background-elevated-normal)",
           "ref": "semantic.surface.card",
-          "source": "Action/Toggle Icon"
+          "source": "Action/Toggle Icon",
+          "generated": true
         },
         "activeBackground": {
           "$type": "color",
@@ -3024,10 +3161,29 @@
         },
         "border": {
           "$type": "border",
-          "$value": "var(--component-toggle-icon-border)",
           "css": "--component-toggle-icon-border",
+          "$value": "var(--border-thin) solid var(--color-semantic-line-normal-normal)",
           "ref": "semantic.border.subtle",
-          "source": "Action/Toggle Icon"
+          "source": "Action/Toggle Icon",
+          "generated": true
+        },
+        "bgHover": {
+          "$type": "color",
+          "css": "--component-toggle-icon-bg-hover",
+          "$value": "var(--color-semantic-fill-alternative)",
+          "generated": true
+        },
+        "fg": {
+          "$type": "color",
+          "css": "--component-toggle-icon-fg",
+          "$value": "var(--color-semantic-label-normal)",
+          "generated": true
+        },
+        "fgActive": {
+          "$type": "color",
+          "css": "--component-toggle-icon-fg-active",
+          "$value": "var(--component-button-primary-fg)",
+          "generated": true
         }
       }
     },
@@ -3164,70 +3320,80 @@
         },
         "background": {
           "$type": "color",
-          "$value": "var(--component-chip-bg)",
           "css": "--component-chip-bg",
+          "$value": "var(--color-semantic-background-elevated-normal)",
           "ref": "semantic.surface.card",
-          "source": "Action/Chip"
+          "source": "Action/Chip",
+          "generated": true
         },
         "backgroundHover": {
           "$type": "color",
-          "$value": "var(--component-chip-bg-hover)",
           "css": "--component-chip-bg-hover",
+          "$value": "var(--color-semantic-background-elevated-normal)",
           "ref": "semantic.surface.card",
-          "source": "Action/Chip"
+          "source": "Action/Chip",
+          "generated": true
         },
         "selectedBackground": {
           "$type": "color",
-          "$value": "var(--component-chip-bg-selected)",
           "css": "--component-chip-bg-selected",
-          "source": "Action/Chip"
+          "$value": "var(--color-semantic-primary-surface-strong)",
+          "source": "Action/Chip",
+          "generated": true
         },
         "foreground": {
           "$type": "color",
-          "$value": "var(--component-chip-fg)",
           "css": "--component-chip-fg",
+          "$value": "var(--color-semantic-label-normal)",
           "ref": "semantic.text.body",
-          "source": "Action/Chip"
+          "source": "Action/Chip",
+          "generated": true
         },
         "activeForeground": {
           "$type": "color",
-          "$value": "var(--component-chip-fg-active)",
           "css": "--component-chip-fg-active",
+          "$value": "var(--color-semantic-label-normal)",
           "ref": "semantic.action.accent",
-          "source": "Action/Chip"
+          "source": "Action/Chip",
+          "generated": true
         },
         "border": {
           "$type": "border",
-          "$value": "var(--component-chip-border)",
           "css": "--component-chip-border",
+          "$value": "var(--border-thin) solid var(--color-semantic-line-normal-normal)",
           "ref": "semantic.border.subtle",
-          "source": "Action/Chip"
+          "source": "Action/Chip",
+          "generated": true
         },
         "activeBorder": {
           "$type": "border",
-          "$value": "var(--component-chip-border-active)",
           "css": "--component-chip-border-active",
-          "source": "Action/Chip"
+          "$value": "var(--border-thin) solid var(--color-semantic-primary-normal)",
+          "source": "Action/Chip",
+          "generated": true
         },
         "solidBackground": {
           "$type": "color",
-          "$value": "var(--component-chip-solid-bg)",
           "css": "--component-chip-solid-bg",
+          "$value": "var(--color-semantic-primary-fill)",
           "ref": "semantic.action.accent",
-          "source": "Action/Chip"
+          "source": "Action/Chip",
+          "generated": true
         },
         "solidForeground": {
           "$type": "color",
-          "$value": "var(--component-chip-solid-fg)",
           "css": "--component-chip-solid-fg",
+          "$value": "var(--color-semantic-static-white)",
           "ref": "semantic.text.onSignal",
-          "source": "Action/Chip"
+          "source": "Action/Chip",
+          "generated": true
         },
         "solidBorder": {
           "$type": "border",
-          "$value": "var(--component-chip-solid-border)",
           "css": "--component-chip-solid-border",
-          "source": "Action/Chip"
+          "$value": "var(--border-thin) solid transparent",
+          "source": "Action/Chip",
+          "generated": true
         },
         "disabledOpacity": {
           "$type": "number",
@@ -3242,10 +3408,11 @@
       "tokens": {
         "color": {
           "$type": "color",
-          "$value": "var(--component-divider-color)",
           "css": "--component-divider-color",
+          "$value": "var(--color-semantic-line-normal-normal)",
           "ref": "semantic.border.subtle",
-          "source": "Layout/Divider"
+          "source": "Layout/Divider",
+          "generated": true
         },
         "thicknessNormal": {
           "$type": "dimension",
@@ -3258,6 +3425,18 @@
           "$value": "var(--component-divider-thickness-thick)",
           "css": "--component-divider-thickness-thick",
           "source": "Layout/Divider"
+        },
+        "colorNormal": {
+          "$type": "color",
+          "css": "--component-divider-color-normal",
+          "$value": "var(--color-semantic-line-normal-normal)",
+          "generated": true
+        },
+        "colorThick": {
+          "$type": "color",
+          "css": "--component-divider-color-thick",
+          "$value": "var(--color-semantic-fill-normal)",
+          "generated": true
         }
       }
     },
@@ -3373,31 +3552,35 @@
         },
         "itemHoverBg": {
           "$type": "color",
-          "$value": "var(--component-menu-item-hover-bg)",
           "css": "--component-menu-item-hover-bg",
+          "$value": "var(--color-semantic-fill-normal)",
           "ref": "semantic.colorRoles.fill-normal",
-          "source": "LDS shared menu state"
+          "source": "LDS shared menu state",
+          "generated": true
         },
         "itemSelectedBg": {
           "$type": "color",
-          "$value": "var(--component-menu-item-selected-bg)",
           "css": "--component-menu-item-selected-bg",
+          "$value": "var(--color-semantic-fill-alternative)",
           "ref": "semantic.colorRoles.fill-alternative",
-          "source": "List Cell/List Cell"
+          "source": "List Cell/List Cell",
+          "generated": true
         },
         "itemCheckColor": {
           "$type": "color",
-          "$value": "var(--component-menu-item-check-color)",
           "css": "--component-menu-item-check-color",
+          "$value": "var(--color-semantic-label-normal)",
           "ref": "semantic.colorRoles.label-normal",
-          "source": "LDS shared menu state"
+          "source": "LDS shared menu state",
+          "generated": true
         },
         "itemActiveRingColor": {
           "$type": "color",
-          "$value": "var(--component-menu-item-active-ring-color)",
           "css": "--component-menu-item-active-ring-color",
+          "$value": "var(--color-semantic-label-normal)",
           "ref": "semantic.colorRoles.label-normal",
-          "source": "LDS shared menu state"
+          "source": "LDS shared menu state",
+          "generated": true
         }
       }
     },
@@ -3470,17 +3653,19 @@
         },
         "menuItemHoverBg": {
           "$type": "color",
-          "$value": "var(--component-topbar-menu-item-hover-bg)",
           "css": "--component-topbar-menu-item-hover-bg",
+          "$value": "var(--component-menu-item-hover-bg)",
           "ref": "component.menu.tokens.itemHoverBg",
-          "source": "Product/Navigation/Top Bar"
+          "source": "Product/Navigation/Top Bar",
+          "generated": true
         },
         "menuItemSelectedBg": {
           "$type": "color",
-          "$value": "var(--component-topbar-menu-item-selected-bg)",
           "css": "--component-topbar-menu-item-selected-bg",
+          "$value": "var(--component-menu-item-selected-bg)",
           "ref": "component.menu.tokens.itemSelectedBg",
-          "source": "Product/Navigation/Top Bar"
+          "source": "Product/Navigation/Top Bar",
+          "generated": true
         }
       }
     },
@@ -3489,10 +3674,11 @@
       "tokens": {
         "foreground": {
           "$type": "color",
-          "$value": "var(--component-system-bars-fg)",
           "css": "--component-system-bars-fg",
+          "$value": "var(--color-semantic-label-strong)",
           "ref": "semantic.text.strong",
-          "source": "Layout/Essential"
+          "source": "Layout/Essential",
+          "generated": true
         },
         "homeWidth": {
           "$type": "dimension",
@@ -3505,6 +3691,12 @@
           "$value": "var(--component-system-bars-home-height)",
           "css": "--component-system-bars-home-height",
           "source": "Layout/Essential"
+        },
+        "mutedFg": {
+          "$type": "color",
+          "css": "--component-system-bars-muted-fg",
+          "$value": "var(--color-semantic-label-alternative)",
+          "generated": true
         }
       }
     },
@@ -3525,27 +3717,31 @@
         },
         "background": {
           "$type": "color",
-          "$value": "var(--component-input-bg)",
           "css": "--component-input-bg",
-          "ref": "semantic.surface.raised"
+          "$value": "var(--color-semantic-background-elevated-normal)",
+          "ref": "semantic.surface.raised",
+          "generated": true
         },
         "borderColor": {
           "$type": "color",
-          "$value": "var(--component-input-border-color)",
           "css": "--component-input-border-color",
-          "ref": "semantic.border.subtle"
+          "$value": "var(--color-semantic-line-normal-normal)",
+          "ref": "semantic.border.subtle",
+          "generated": true
         },
         "borderColorFocus": {
           "$type": "color",
-          "$value": "var(--component-input-border-color-focus)",
           "css": "--component-input-border-color-focus",
-          "ref": "semantic.action.accent"
+          "$value": "var(--color-semantic-primary-normal)",
+          "ref": "semantic.action.accent",
+          "generated": true
         },
         "borderColorInvalid": {
           "$type": "color",
-          "$value": "var(--component-input-border-color-invalid)",
           "css": "--component-input-border-color-invalid",
-          "ref": "semantic.status.danger"
+          "$value": "var(--color-semantic-status-negative)",
+          "ref": "semantic.status.danger",
+          "generated": true
         },
         "focusShadow": {
           "$type": "shadow",
@@ -3572,6 +3768,30 @@
             "--component-input-letter-spacing-sm"
           ],
           "ref": "primitive.typography.label1"
+        },
+        "iconColor": {
+          "$type": "color",
+          "css": "--component-input-icon-color",
+          "$value": "var(--color-semantic-label-alternative)",
+          "generated": true
+        },
+        "textColor": {
+          "$type": "color",
+          "css": "--component-input-text-color",
+          "$value": "var(--color-semantic-label-normal)",
+          "generated": true
+        },
+        "labelColor": {
+          "$type": "color",
+          "css": "--component-input-label-color",
+          "$value": "var(--color-semantic-label-normal)",
+          "generated": true
+        },
+        "requiredColor": {
+          "$type": "color",
+          "css": "--component-input-required-color",
+          "$value": "var(--color-semantic-status-negative-text)",
+          "generated": true
         }
       }
     },
@@ -3580,9 +3800,10 @@
       "tokens": {
         "background": {
           "$type": "color",
-          "$value": "var(--component-card-bg)",
           "css": "--component-card-bg",
-          "ref": "semantic.surface.card"
+          "$value": "var(--color-semantic-background-elevated-normal)",
+          "ref": "semantic.surface.card",
+          "generated": true
         },
         "backgroundSubtle": {
           "$type": "color",
@@ -3593,27 +3814,31 @@
         },
         "backgroundDark": {
           "$type": "color",
-          "$value": "var(--component-card-bg-dark)",
           "css": "--component-card-bg-dark",
-          "ref": "semantic.surface.inverse"
+          "$value": "var(--color-semantic-inverse-background)",
+          "ref": "semantic.surface.inverse",
+          "generated": true
         },
         "foreground": {
           "$type": "color",
-          "$value": "var(--component-card-fg)",
           "css": "--component-card-fg",
-          "ref": "semantic.text.body"
+          "$value": "var(--color-semantic-label-normal)",
+          "ref": "semantic.text.body",
+          "generated": true
         },
         "foregroundDark": {
           "$type": "color",
-          "$value": "var(--component-card-fg-dark)",
           "css": "--component-card-fg-dark",
-          "ref": "semantic.text.onInverse"
+          "$value": "var(--color-semantic-static-white)",
+          "ref": "semantic.text.onInverse",
+          "generated": true
         },
         "border": {
           "$type": "border",
-          "$value": "var(--component-card-border)",
           "css": "--component-card-border",
-          "ref": "semantic.border.subtle"
+          "$value": "var(--border-thin) solid var(--color-semantic-line-normal-normal)",
+          "ref": "semantic.border.subtle",
+          "generated": true
         },
         "radius": {
           "$type": "dimension",
@@ -3706,11 +3931,7 @@
         "signalBg": {
           "$type": "color",
           "css": "--component-badge-signal-bg",
-          "$value": "var(--color-semantic-primary-normal)",
-          "modes": {
-            "light": "var(--color-semantic-primary-normal)",
-            "dark": "var(--color-semantic-primary-heavy)"
-          },
+          "$value": "var(--color-semantic-primary-fill)",
           "generated": true
         },
         "signalFg": {
@@ -4191,6 +4412,28 @@
           "generated": true
         }
       }
+    },
+    "overlay": {
+      "component": "components/overlay/Dimmer.jsx",
+      "tokens": {
+        "scrim": {
+          "$type": "color",
+          "css": "--component-dialog-scrim",
+          "$value": "var(--color-semantic-material-dimmer)",
+          "generated": true
+        }
+      }
+    },
+    "transientFeedback": {
+      "component": "components/overlay/Toast.jsx",
+      "tokens": {
+        "bg": {
+          "$type": "color",
+          "css": "--component-transient-feedback-bg",
+          "$value": "color-mix(in srgb, var(--color-semantic-inverse-background) 72%, transparent)",
+          "generated": true
+        }
+      }
     }
   },
   "modes": {
@@ -4377,122 +4620,12 @@
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
       },
       {
-        "css": "--component-button-dark-bg",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--color-semantic-inverse-background)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-button-dark-bg-hover",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--component-button-dark-bg)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-button-dark-fg",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--color-semantic-inverse-label)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
         "css": "--component-button-dark-shadow-hover",
         "files": [
           "tokens/components.css"
         ],
         "values": [
           "var(--component-button-shadow-rest)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-button-disabled-bg",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--color-semantic-fill-normal)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-button-disabled-fg",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--color-semantic-label-assistive)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-button-disabled-fg-outlined",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--color-semantic-label-disable)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-button-disabled-outlined-border",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--border-thin) solid var(--color-semantic-line-normal-neutral)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-button-flat-bg",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--color-semantic-secondary-surface)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-button-flat-bg-hover",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--component-button-flat-bg)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-button-flat-fg",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--color-semantic-label-normal)"
         ],
         "classification": "runtime-projection",
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
@@ -4603,39 +4736,6 @@
         ],
         "values": [
           "var(--component-button-ghost-bg)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-button-ghost-border",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--border-thin) solid var(--color-semantic-line-solid-normal)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-button-ghost-border-hover",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--component-button-ghost-border)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-button-ghost-fg",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--color-semantic-label-normal)"
         ],
         "classification": "runtime-projection",
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
@@ -4795,50 +4895,6 @@
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
       },
       {
-        "css": "--component-button-on-dark-bg",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "rgba(255, 255, 255, 0.14)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-button-on-dark-bg-hover",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "rgba(255, 255, 255, 0.16)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-button-on-dark-border",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--border-thin) solid rgba(255, 255, 255, 0.28)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-button-on-dark-fg",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "#FFFFFF"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
         "css": "--component-button-padding-lg",
         "files": [
           "tokens/components.css"
@@ -4916,28 +4972,6 @@
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
       },
       {
-        "css": "--component-button-secondary-bg-hover",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--component-button-secondary-bg)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-button-secondary-fg",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--color-semantic-static-white)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
         "css": "--component-button-secondary-shadow-hover",
         "files": [
           "tokens/components.css"
@@ -4955,17 +4989,6 @@
         ],
         "values": [
           "var(--shadow-xs)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-button-signal-fg",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--color-semantic-static-white)"
         ],
         "classification": "runtime-projection",
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
@@ -5202,45 +5225,12 @@
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
       },
       {
-        "css": "--component-dialog-scrim",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--color-semantic-material-dimmer)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
         "css": "--component-dialog-scrim-blur",
         "files": [
           "tokens/components.css"
         ],
         "values": [
           "2px"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-divider-color-normal",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--color-semantic-line-normal-normal)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-divider-color-thick",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--color-semantic-fill-normal)"
         ],
         "classification": "runtime-projection",
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
@@ -5290,28 +5280,6 @@
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
       },
       {
-        "css": "--component-input-icon-color",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--color-semantic-label-alternative)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-input-label-color",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--color-semantic-label-normal)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
         "css": "--component-input-label-font-weight",
         "files": [
           "tokens/components.css"
@@ -5356,45 +5324,12 @@
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
       },
       {
-        "css": "--component-input-required-color",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--color-semantic-status-negative)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
         "css": "--component-input-stack-gap",
         "files": [
           "tokens/components.css"
         ],
         "values": [
           "var(--space-2)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-input-text-color",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--color-semantic-label-normal)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-system-bars-muted-fg",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--color-semantic-label-alternative)"
         ],
         "classification": "runtime-projection",
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
@@ -5411,17 +5346,6 @@
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
       },
       {
-        "css": "--component-toggle-icon-bg-hover",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--color-semantic-fill-alternative)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
         "css": "--component-toggle-icon-disabled-opacity",
         "files": [
           "tokens/components.css"
@@ -5433,45 +5357,12 @@
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
       },
       {
-        "css": "--component-toggle-icon-fg",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--color-semantic-label-normal)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-toggle-icon-fg-active",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--component-button-primary-fg)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
         "css": "--component-toggle-icon-radius",
         "files": [
           "tokens/components.css"
         ],
         "values": [
           "var(--radius-md)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-transient-feedback-bg",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "color-mix(in srgb, var(--color-semantic-inverse-background) 72%, transparent)"
         ],
         "classification": "runtime-projection",
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."

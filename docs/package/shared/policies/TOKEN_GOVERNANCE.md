@@ -12,7 +12,7 @@
 contract. Figma Variables, Storybook examples, React components, and
 AI-generated UI must all resolve back to this contract. Theme expression
 profiles are the one additive runtime projection: their scope and whitelist
-live in [`EXPRESSION_PROFILE_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.10/docs/references/architecture/EXPRESSION_PROFILE_CONTRACT.json),
+live in [`EXPRESSION_PROFILE_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.11/docs/references/architecture/EXPRESSION_PROFILE_CONTRACT.json),
 and values are limited to `tokens/profiles.css` under the Theme package.
 
 Package별 `tokens/semantic-contract.json`은 runtime source에서 산출·검사하는 semantic
@@ -119,6 +119,17 @@ Color usage rules:
   communicates that status.
 - Decorative colors such as ratings and categorical tags use accent or
   data-visualization roles, not status roles.
+- 흰 글자나 아이콘을 primary 채움 위에 올릴 때는 `--color-semantic-primary-fill`을 쓴다.
+  dark `primary-normal`(`#5390C9`)은 흰색과 3.39:1이라 글자 기준에 못 미치므로,
+  이 역할은 dark에서 `primary-heavy`(4.85:1)로 내려간다. 버튼·뱃지·칩의 채움 토큰도 이
+  역할을 가리킨다. 흰 내용이 없는 채움(Slider·Switch 트랙, 진행 막대)은
+  `primary-normal`을 그대로 쓴다.
+- 색상각이 의미 있는 색과 겹치는 강조색은 그 의미 옆에 두지 않는다.
+  `accent-*-light-blue`는 primary와 색상각이 같아(249°) 선택·정보 상태로 읽히므로
+  primary·info 요소 옆의 범주 구분에 쓰지 않는다. `accent-*-red-orange`는
+  cautionary(69°)와 negative(24°) 사이(47°)에 있어 상태 표시 근처의 범주 구분에
+  쓰지 않는다. 차트 계열 7은 같은 이유로 accent light-blue 대신 하늘색 램프
+  (light-blue-30 / -70)를 쓴다.
 - Light and dark values are mandatory for every semantic color. Component
   color contracts are emitted in light, dark, and auto selectors so aliases
   resolve inside the correct theme scope.
@@ -174,6 +185,22 @@ the planned removal timing.
 - 값 자체는 `tokens/effects.css`와 `tokens/source.json`에 그대로 남아 있다.
   `tokens/source.json`이 색상·토큰의 단일 원본이므로, 런타임 CSS만 먼저 지우면
   생성물 드리프트가 발생한다. 제거는 source 계약과 함께 한 번에 진행한다.
+
+### Deprecated · `--color-atomic-neutral-*`, `--color-semantic-accent-violet`, `--color-semantic-accent-cyan` (2026-09)
+
+다음 minor(0.3.0)에서 `tokens/source.json`과 함께 제거한다.
+
+- `--color-atomic-neutral-*` (14단계): `cool-neutral` 램프와 값이 사실상 같다. 모든
+  단계에서 16진 채널 차이가 2 이하라 눈으로 구분되지 않는다. semantic 색 중 이 램프에서만
+  값을 가져오는 토큰은 0개이고, 모두 `cool-neutral`에서 가져온다. 같은 단계 번호의
+  `--color-atomic-cool-neutral-*`로 옮긴다. 이 램프의 모든 단계는 `cool-neutral`에도 있다.
+- `--color-semantic-accent-violet`, `--color-semantic-accent-cyan`: 두 모드 모두 값이
+  `transparent`여서 이름이 약속하는 색을 내지 않는다. 채움이 필요하면
+  `--color-semantic-accent-background-violet|cyan`, 글자·아이콘에는
+  `--color-semantic-accent-foreground-violet|cyan`을 쓴다.
+- 영향 컴포넌트: 없음. 2026-09-24 기준 Core·Product 컴포넌트와 스토리, Robotics·Slides·3D·Motion,
+  LK Portal, 관제 제품 저장소(Daedeok·Gungneung·extended-slim)에서 참조가 0건이다. Robotics의
+  Core 문서 사본은 제외한다. atomic 토큰은 원래 컴포넌트가 직접 쓰지 않는다.
 
 ## Figma sync contract
 
