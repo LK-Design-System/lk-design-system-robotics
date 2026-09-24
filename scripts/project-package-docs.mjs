@@ -3,6 +3,8 @@ import { cp, mkdir, readFile, readdir, rm, stat, writeFile } from 'node:fs/promi
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { corePackage, derivedInputs, derivedInputsFingerprint } from './derived-inputs.mjs';
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const snapshotRoot = path.join(root, '.lds-docs-upstream', 'core');
 const outputRoot = path.join(root, 'docs', 'package');
@@ -132,8 +134,10 @@ async function refreshSnapshot(upstreamRoot) {
   const next = path.join(root, '.lds-docs-upstream', 'core.next');
   invariant(next.startsWith(path.join(root, '.lds-docs-upstream') + path.sep), 'Unsafe snapshot target.');
   await rm(next, { recursive: true, force: true });
-  await mkdir(path.dirname(next), { recursive: true });
-  await cp(source, next, { recursive: true, force: true });
+  await mkdir(next, { recursive: true });
+  for (const relative of derivedInputs) await cp(path.join(source, relative), path.join(next, relative));
+  const provenance = provenanceFromManifest(await readJson(path.join(source, 'manifest.json')));
+  await writeFile(path.join(next, 'provenance.json'), json(provenance));
   await rm(snapshotRoot, { recursive: true, force: true });
   await cp(next, snapshotRoot, { recursive: true, force: true });
   await rm(next, { recursive: true, force: true });
@@ -163,18 +167,21 @@ function cssTokenData(source, relative) {
   };
 }
 
-function indentHeadings(markdown) {
-  return markdown.replace(/^(#{1,5}) /gm, '#$1 ');
-}
-
-function routeSnapshotLinks(markdown) {
-  return markdown.replace(/\]\(([^)]+)\)/g, (whole, target) => {
-    if (/^(?:[a-z]+:|#|\/)/i.test(target)) return whole;
-    const [file, suffix = ''] = target.split(/(?=[?#])/u, 2);
-    const normalized = path.posix.normalize(file.replace(/^\.\//, ''));
-    invariant(!normalized.startsWith('../'), `Upstream Markdown link escapes its docs bundle: ${target}`);
-    return `](./shared/${normalized}${suffix})`;
-  });
+function provenanceFromManifest(manifest) {
+  invariant(manifest.kind === 'lds-package-documentation', 'Invalid upstream documentation manifest kind.');
+  invariant(manifest.package?.name === corePackage, 'Upstream snapshot must be LDS Core docs.');
+  const canonicalRecord = manifest.source?.documents?.find(({ path: sourcePath }) => (
+    sourcePath === 'docs/references/adoption/LDS_UI_ADOPTION_CONTRACT.json'
+  ));
+  invariant(canonicalRecord, 'Upstream manifest omits the canonical adoption contract source.');
+  return {
+    schemaVersion: 1,
+    kind: 'lds-upstream-provenance',
+    package: manifest.package,
+    source: { repository: manifest.source.repository, ref: manifest.source.ref },
+    canonicalAdoption: { path: canonicalRecord.path, sha256: canonicalRecord.sha256 },
+    publicDocs: manifest.publicDocs,
+  };
 }
 
 function renderDomainIndex() {
@@ -184,8 +191,9 @@ function renderDomainIndex() {
   return `${generatedMarker}
 # LDS Robotics domain documentation
 
-These files are Robotics-authored deltas layered on the pinned shared LDS
-adoption and Foundation snapshot. Shared policy remains under \`../shared/\`.
+These files are Robotics-authored deltas layered on the LDS Core adoption
+contract. Shared policy ships in the \`${corePackage}\` peer package under
+\`${corePackage}/docs/\`.
 
 | Document | Role |
 | --- | --- |
@@ -206,7 +214,19 @@ function projectDomainDocument(relative, source) {
   return projected;
 }
 
-function renderWorkflow(upstreamWorkflow, upstreamManifest, invariantText) {
+// Core's own workflow and policies are read from the installed peer package,
+// not copied: a copy goes stale on every Core documentation change and would
+// force a Robotics release each time. Plain text, not Markdown links, because
+// link checkers resolve package specifiers as local files.
+function renderCoreReading(provenance) {
+  return [
+    `- Workflow: \`${corePackage}/docs/adoption-workflow.md\``,
+    `- AI entry: \`${corePackage}/llms.txt\` (${provenance.publicDocs.llms})`,
+    `- Policies and Foundations: \`${corePackage}/docs/\` — the adoption checklist names each file it needs.`,
+  ].join('\n');
+}
+
+function renderWorkflow(provenance, invariantText) {
   const storyLines = foundationStories.map(({ id, storyId }) => `- \`${id}\`: \`${storyId}\``).join('\n');
   const domainLines = domainDocuments.map((file) => `- [${path.basename(file)}](./domain/${path.basename(file)})`).join('\n');
   return `${generatedMarker}
@@ -214,9 +234,9 @@ function renderWorkflow(upstreamWorkflow, upstreamManifest, invariantText) {
 
 > ${invariantText}
 
-This generated entry combines the pinned LDS Core adoption snapshot with the
-Robotics-owned domain evidence. The upstream snapshot is
-\`${upstreamManifest.source.repository}@${upstreamManifest.source.ref}\`.
+This generated entry adds the Robotics-owned domain evidence to the LDS Core
+adoption workflow. The adoption contract was taken from
+\`${provenance.source.repository}@${provenance.source.ref}\`.
 
 ## Choose the task before editing
 
@@ -236,19 +256,22 @@ ${domainLines}
 
 ${storyLines}
 
-## Pinned shared LDS adoption workflow
+## Shared LDS adoption workflow
 
-${routeSnapshotLinks(indentHeadings(upstreamWorkflow)).trim()}
+Read the Core workflow from the installed \`${corePackage}\` peer before the
+Robotics evidence above:
+
+${renderCoreReading(provenance)}
 `;
 }
 
-function renderLlms(upstreamLlms, upstreamManifest) {
+function renderLlms(provenance) {
   const stories = foundationStories.map(({ storyId }) => `- ${storyId}`).join('\n');
   return `# LK Robotics UI AI entry
 
 Package: @lk-design-system/lds-robotics-ui
 Layer: robotics
-Canonical LDS snapshot: ${upstreamManifest.source.repository}@${upstreamManifest.source.ref}
+Adoption contract source: ${provenance.source.repository}@${provenance.source.ref}
 
 Read ./adoption-workflow.md before implementation. Review all six non-component
 facets and componentMapping for product UI adoption. Robotics component authoring
@@ -257,9 +280,8 @@ also requires the local domain contracts and code-backed symbol registry.
 Foundation story evidence:
 ${stories}
 
----
-
-${routeSnapshotLinks(upstreamLlms).trim()}
+Shared LDS guidance ships in the ${corePackage} peer package:
+${renderCoreReading(provenance)}
 `;
 }
 
@@ -321,7 +343,7 @@ function json(value) {
 function projectChecklist(source) {
   const checklist = structuredClone(source);
   const rewrite = (reference) => (
-    reference.startsWith('./') ? `./shared/${reference.slice(2)}` : reference
+    reference.startsWith('./') ? `${corePackage}/docs/${reference.slice(2)}` : reference
   );
   for (const facet of checklist.facets) facet.references = facet.references.map(rewrite);
   checklist.componentMapping.references = checklist.componentMapping.references.map(rewrite);
@@ -330,37 +352,28 @@ function projectChecklist(source) {
 }
 
 async function buildOutputs() {
-  invariant(await exists(path.join(snapshotRoot, 'manifest.json')), 'Committed Core docs snapshot is missing. Run with --upstream-root <core-docs>.');
-  const [packageManifest, upstreamManifest, upstreamFiles] = await Promise.all([
+  invariant(await exists(path.join(snapshotRoot, 'provenance.json')), 'Committed Core input snapshot is missing. Run with --upstream-root <core-docs>.');
+  const [packageManifest, provenance, snapshotFiles] = await Promise.all([
     readJson(packageManifestPath),
-    readJson(path.join(snapshotRoot, 'manifest.json')),
+    readJson(path.join(snapshotRoot, 'provenance.json')),
     walk(snapshotRoot),
   ]);
   const roboticsRefStatus = packageManifest.lds?.refStatus ?? 'release-candidate';
-  invariant(upstreamManifest.kind === 'lds-package-documentation', 'Invalid upstream documentation manifest kind.');
-  invariant(upstreamManifest.package?.name === '@lk-design-system/lds-core', 'Upstream snapshot must be LDS Core docs.');
+  invariant(provenance.kind === 'lds-upstream-provenance', 'Invalid upstream provenance kind.');
+  invariant(provenance.package?.name === corePackage, 'Upstream snapshot must be LDS Core docs.');
+  invariant(
+    JSON.stringify(snapshotFiles) === JSON.stringify([...derivedInputs, 'provenance.json'].sort()),
+    `The Core input snapshot must hold exactly the derived inputs and provenance.json; found ${snapshotFiles.join(', ')}.`,
+  );
 
   const outputs = new Map();
-  for (const relative of upstreamFiles) {
-    outputs.set(`shared/${relative}`, await readFile(path.join(snapshotRoot, relative)));
-  }
   const upstreamChecklist = await readJson(path.join(snapshotRoot, 'adoption-checklist.json'));
   outputs.set('adoption-checklist.json', json(projectChecklist(upstreamChecklist)));
-  for (const relative of [
-    'LDS_UI_ADOPTION_CONTRACT.schema.json',
-    'adoption-report.schema.json',
-    'adoption-report.example.json',
-    'adoption-config.schema.json',
-  ]) outputs.set(relative, await readFile(path.join(snapshotRoot, relative)));
-  outputs.set('adoption-workflow.md', Buffer.from(renderWorkflow(
-    await readFile(path.join(snapshotRoot, 'adoption-workflow.md'), 'utf8'),
-    upstreamManifest,
-    upstreamChecklist.invariant,
-  )));
-  outputs.set('llms.txt', Buffer.from(renderLlms(
-    await readFile(path.join(snapshotRoot, 'llms.txt'), 'utf8'),
-    upstreamManifest,
-  )));
+  for (const relative of derivedInputs) {
+    if (relative !== 'adoption-checklist.json') outputs.set(relative, await readFile(path.join(snapshotRoot, relative)));
+  }
+  outputs.set('adoption-workflow.md', Buffer.from(renderWorkflow(provenance, upstreamChecklist.invariant)));
+  outputs.set('llms.txt', Buffer.from(renderLlms(provenance)));
   outputs.set('tokens/manifest.json', json(await buildTokenManifest(packageManifest)));
   outputs.set('domain-symbol-registry.json', json(await buildDomainRegistry(packageManifest)));
   for (const relative of domainDocuments) {
@@ -378,17 +391,17 @@ async function buildOutputs() {
     );
   }
 
-  const snapshotFiles = await Promise.all(upstreamFiles.map(async (relative) => ({
+  const inputRecords = await Promise.all(derivedInputs.map(async (relative) => ({
     path: relative,
     sha256: sha256(await readFile(path.join(snapshotRoot, relative))),
   })));
   const snapshot = {
-    schemaVersion: 1,
-    kind: 'lds-upstream-documentation-snapshot',
-    package: upstreamManifest.package,
-    source: upstreamManifest.source,
-    manifestSha256: sha256(await readFile(path.join(snapshotRoot, 'manifest.json'))),
-    files: snapshotFiles,
+    schemaVersion: 2,
+    kind: 'lds-upstream-derived-inputs',
+    package: provenance.package,
+    source: provenance.source,
+    inputs: inputRecords,
+    derivedInputsSha256: derivedInputsFingerprint(inputRecords),
     projectedFiles: [...outputs.keys()].sort(),
   };
   outputs.set('upstream-snapshot.json', json(snapshot));
@@ -402,10 +415,7 @@ async function buildOutputs() {
       sha256: sha256(outputs.get(`domain/${path.basename(relative)}`)),
     };
   }));
-  const canonicalRecord = upstreamManifest.source.documents.find(({ path: sourcePath }) => (
-    sourcePath === 'docs/references/adoption/LDS_UI_ADOPTION_CONTRACT.json'
-  ));
-  invariant(canonicalRecord, 'Upstream manifest omits the canonical adoption contract source.');
+  const canonicalRecord = provenance.canonicalAdoption;
   const contract = JSON.parse(outputs.get('adoption-checklist.json').toString('utf8'));
   const generatedRecords = [...outputs.entries()]
     .map(([relative, contents]) => ({ path: relative, sha256: sha256(contents) }))
@@ -434,8 +444,13 @@ async function buildOutputs() {
       tokenManifest: './tokens/manifest.json',
       domainSymbolRegistry: './domain-symbol-registry.json',
     },
-    foundations: upstreamManifest.foundations,
-    patterns: [...new Set([...(upstreamManifest.patterns ?? []), 'robotics-navigation', 'robotics-map', 'robotics-state'])],
+    patterns: ['robotics-navigation', 'robotics-map', 'robotics-state'],
+    peerDocs: {
+      package: corePackage,
+      llms: `${corePackage}/llms.txt`,
+      adoptionWorkflow: `${corePackage}/docs/adoption-workflow.md`,
+      designSystem: `${corePackage}/design-system.json`,
+    },
     domain: { documents: domainRecords, foundationStories },
     publicDocs: {
       storybook: `${publicRoot}?path=/docs/lds-robotics-foundation-viewer-tokens--docs`,
@@ -456,13 +471,14 @@ async function buildOutputs() {
         kind: contract.kind,
         version: contract.contractVersion,
         source: {
-          repository: upstreamManifest.source.repository,
-          ref: upstreamManifest.source.ref,
+          repository: provenance.source.repository,
+          ref: provenance.source.ref,
           refStatus: 'release-candidate',
           path: canonicalRecord.path,
           sha256: canonicalRecord.sha256,
         },
-        snapshotManifestSha256: snapshot.manifestSha256,
+        derivedInputs: snapshot.inputs,
+        derivedInputsSha256: snapshot.derivedInputsSha256,
       },
     },
     resources: {
@@ -473,6 +489,15 @@ async function buildOutputs() {
   };
   outputs.set('manifest.json', json(manifest));
   return outputs;
+}
+
+// Removed projections (the old shared/ copy of Core docs) leave directories
+// behind that git does not track but npm pack would still walk.
+async function pruneEmptyDirectories(directory) {
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    if (entry.isDirectory()) await pruneEmptyDirectories(path.join(directory, entry.name));
+  }
+  if (directory !== outputRoot && (await readdir(directory)).length === 0) await rm(directory, { recursive: true });
 }
 
 async function applyOutputs(outputs, check) {
@@ -495,6 +520,7 @@ async function applyOutputs(outputs, check) {
   for (const relative of previous) {
     if (!expected.has(relative)) await rm(path.join(outputRoot, relative), { force: true });
   }
+  await pruneEmptyDirectories(outputRoot);
   for (const [relative, contents] of outputs) {
     const target = path.join(outputRoot, relative);
     await mkdir(path.dirname(target), { recursive: true });

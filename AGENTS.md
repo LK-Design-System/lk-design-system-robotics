@@ -15,7 +15,7 @@ If the work reveals a required shared Core, Theme, Product, token, asset, or pat
 
 ## Generated documentation
 
-`docs/package/` is a deterministic package projection. Do not edit it by hand. Edit the Robotics-owned source documents under `docs/`, or synchronize the pinned upstream LDS snapshot with the documentation generator, then regenerate and run `npm run check:docs`.
+`docs/package/` is a deterministic package projection. Do not edit it by hand. Edit the Robotics-owned source documents under `docs/`, or refresh the pinned LDS Core adoption inputs with the documentation generator, then regenerate and run `npm run check:docs`.
 
 ## Verification
 

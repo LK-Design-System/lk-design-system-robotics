@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "kind": "lds-upstream-provenance",
+  "package": {
+    "name": "@lk-design-system/lds-core",
+    "version": "0.4.2",
+    "layer": "core"
+  },
+  "source": {
+    "repository": "LK-Design-System/lk-design-system",
+    "ref": "lds-v0.4.2"
+  },
+  "canonicalAdoption": {
+    "path": "docs/references/adoption/LDS_UI_ADOPTION_CONTRACT.json",
+    "sha256": "f96e6194497a4a3ab4fbfcf9ace7f29ced594baba90cd59dbeb7b21b7eef6430"
+  },
+  "publicDocs": {
+    "storybook": "https://lk-design-system.github.io/lk-design-system/?path=/docs/lds-core-foundation-design-token--docs",
+    "llms": "https://lk-design-system.github.io/lk-design-system/llms.txt",
+    "designSystem": "https://lk-design-system.github.io/lk-design-system/design-system.json",
+    "adoptionChecklist": "https://lk-design-system.github.io/lk-design-system/adoption-checklist.json",
+    "adoptionReportSchema": "https://lk-design-system.github.io/lk-design-system/adoption-report.schema.json",
+    "adoptionReportExample": "https://lk-design-system.github.io/lk-design-system/adoption-report.example.json"
+  }
+}

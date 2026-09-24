@@ -7,8 +7,9 @@
 | Owner | Robotics domain engineering |
 | Last reviewed | 2026-08-09 |
 
-`docs/`의 탐색 진입점이다. 공통 LDS 규약과 source-of-truth는 해시가 고정된
-[`package/shared/manifest.json`](package/shared/manifest.json) 투영을 따른다.
+`docs/`의 탐색 진입점이다. 공통 LDS 규약과 source-of-truth는 peer 패키지
+`@lk-design-system/lds-core`의 `docs/`가 소유한다. 로보틱스는 채택 계약 입력 다섯
+개만 해시로 고정해 [`package/upstream-snapshot.json`](package/upstream-snapshot.json)에 기록한다.
 여기서는 로보틱스 소관 문서만 나열한다.
 
 ## 작업 시작 경로

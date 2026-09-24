@@ -66,11 +66,11 @@
         }
       ],
       "references": [
-        "./shared/policies/TOKEN_GOVERNANCE.md",
-        "./shared/policies/PACKAGE_MIGRATION_GUIDE.md",
-        "./shared/foundations/design-token.md",
-        "./shared/foundations/color.md",
-        "./shared/token-reference.json"
+        "@lk-design-system/lds-core/docs/policies/TOKEN_GOVERNANCE.md",
+        "@lk-design-system/lds-core/docs/policies/PACKAGE_MIGRATION_GUIDE.md",
+        "@lk-design-system/lds-core/docs/foundations/design-token.md",
+        "@lk-design-system/lds-core/docs/foundations/color.md",
+        "@lk-design-system/lds-core/docs/token-reference.json"
       ],
       "hardTriggers": [
         {
@@ -120,13 +120,13 @@
         }
       ],
       "references": [
-        "./shared/foundations/typography.md",
-        "./shared/foundations/layout.md",
-        "./shared/foundations/spacing.md",
-        "./shared/foundations/radius.md",
-        "./shared/foundations/elevation.md",
-        "./shared/foundations/gradient.md",
-        "./shared/foundations/aspect-ratio.md"
+        "@lk-design-system/lds-core/docs/foundations/typography.md",
+        "@lk-design-system/lds-core/docs/foundations/layout.md",
+        "@lk-design-system/lds-core/docs/foundations/spacing.md",
+        "@lk-design-system/lds-core/docs/foundations/radius.md",
+        "@lk-design-system/lds-core/docs/foundations/elevation.md",
+        "@lk-design-system/lds-core/docs/foundations/gradient.md",
+        "@lk-design-system/lds-core/docs/foundations/aspect-ratio.md"
       ],
       "hardTriggers": [
         {
@@ -166,9 +166,9 @@
         }
       ],
       "references": [
-        "./shared/foundations/state.md",
-        "./shared/foundations/motion.md",
-        "./shared/patterns/loading.md"
+        "@lk-design-system/lds-core/docs/foundations/state.md",
+        "@lk-design-system/lds-core/docs/foundations/motion.md",
+        "@lk-design-system/lds-core/docs/patterns/loading.md"
       ],
       "hardTriggers": [
         {
@@ -223,8 +223,8 @@
         }
       ],
       "references": [
-        "./shared/foundations/iconography.md",
-        "./shared/assets/icons/manifest.json"
+        "@lk-design-system/lds-core/docs/foundations/iconography.md",
+        "@lk-design-system/lds-core/docs/assets/icons/manifest.json"
       ],
       "hardTriggers": [
         {
@@ -269,10 +269,10 @@
         }
       ],
       "references": [
-        "./shared/foundations/writing.md",
-        "./shared/foundations/voice-and-tone.md",
-        "./shared/foundations/international-design.md",
-        "./shared/policies/COPY_REVIEW_CONTRACT.md"
+        "@lk-design-system/lds-core/docs/foundations/writing.md",
+        "@lk-design-system/lds-core/docs/foundations/voice-and-tone.md",
+        "@lk-design-system/lds-core/docs/foundations/international-design.md",
+        "@lk-design-system/lds-core/docs/policies/COPY_REVIEW_CONTRACT.md"
       ],
       "hardTriggers": [
         {
@@ -319,8 +319,8 @@
         }
       ],
       "references": [
-        "./shared/foundations/inclusive-design.md",
-        "./shared/policies/ACCESSIBILITY_CONTRACTS.md"
+        "@lk-design-system/lds-core/docs/foundations/inclusive-design.md",
+        "@lk-design-system/lds-core/docs/policies/ACCESSIBILITY_CONTRACTS.md"
       ],
       "hardTriggers": [
         {
@@ -360,9 +360,9 @@
       }
     ],
     "references": [
-      "./shared/components/README.md",
-      "./shared/policies/PACKAGE_MIGRATION_GUIDE.md",
-      "./shared/policies/COMPONENT_WORKFLOW.md"
+      "@lk-design-system/lds-core/docs/components/README.md",
+      "@lk-design-system/lds-core/docs/policies/PACKAGE_MIGRATION_GUIDE.md",
+      "@lk-design-system/lds-core/docs/policies/COMPONENT_WORKFLOW.md"
     ]
   },
   "completion": {

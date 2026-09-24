@@ -69,6 +69,9 @@ try {
   invariant(manifest.package?.version === packed.version, 'Installed documentation version differs from the tarball.');
   invariant(manifest.domain?.foundationStories?.length === 6, 'Installed package must expose six Robotics Foundation stories.');
   const docsRoot = path.dirname(requireFromConsumer.resolve(`${packageName}/design-system.json`));
+  // Shared LDS policy comes from the lds-core peer; a bundled copy goes stale.
+  const bundledCopy = await access(path.join(docsRoot, 'shared')).then(() => true, () => false);
+  invariant(!bundledCopy, 'The tarball must not bundle a copy of Core docs (docs/package/shared/).');
   for (const record of manifest.documents ?? []) {
     const contents = await readFile(path.join(docsRoot, record.path));
     invariant(sha256(contents) === record.sha256, `Installed documentation hash drift: ${record.path}`);

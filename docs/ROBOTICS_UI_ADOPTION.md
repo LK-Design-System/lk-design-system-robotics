@@ -7,7 +7,7 @@
 | Owner | Robotics domain engineering |
 | Last reviewed | 2026-08-09 |
 
-This document adds Robotics-specific decisions to the shared LDS UI adoption contract. The shared six-facet contract and report schema are projected into [`package/`](package/) from a hash-pinned upstream LDS source; they are not re-authored here.
+This document adds Robotics-specific decisions to the shared LDS UI adoption contract. The shared six-facet contract and report schema are projected into [`package/`](package/) from hash-pinned LDS Core inputs; they are not re-authored here. The rest of the shared LDS policy is read from the installed `@lk-design-system/lds-core` peer (`@lk-design-system/lds-core/docs/`), not from a copy in this package.
 
 Component replacement alone is not LDS adoption completion.
 

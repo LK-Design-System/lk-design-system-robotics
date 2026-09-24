@@ -7,10 +7,14 @@ import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 
+import { corePackage, derivedInputsFingerprint } from './derived-inputs.mjs';
+
 const execFileAsync = promisify(execFile);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const docsRoot = path.join(root, 'docs', 'package');
 const snapshotRoot = path.join(root, '.lds-docs-upstream', 'core');
+// Checklist references resolve in the installed lds-core peer, as they do for consumers.
+const corePeerRoot = path.join(root, 'node_modules', ...corePackage.split('/'));
 
 function invariant(condition, message) {
   if (!condition) throw new Error(message);
@@ -186,21 +190,28 @@ async function main() {
     invariant(sha256(contents) === record.sha256, `Documentation hash drift: ${record.path}`);
   }
 
-  invariant(snapshot.kind === 'lds-upstream-documentation-snapshot', 'Invalid upstream snapshot identity.');
-  invariant(snapshot.package?.name === '@lk-design-system/lds-core', 'Snapshot is not sourced from LDS Core.');
+  // Robotics keeps only the Core inputs it derives output from; the rest of
+  // Core's docs reaches consumers through the lds-core peer package.
+  invariant(snapshot.schemaVersion === 2 && snapshot.kind === 'lds-upstream-derived-inputs', 'Invalid upstream snapshot identity.');
+  invariant(snapshot.package?.name === corePackage, 'Snapshot is not sourced from LDS Core.');
+  invariant(!await exists(path.join(docsRoot, 'shared')), 'docs/package must not bundle a copy of Core docs (shared/).');
   const snapshotFiles = await walk(snapshotRoot);
-  invariant(JSON.stringify(snapshotFiles) === JSON.stringify(snapshot.files.map(({ path: file }) => file).sort()), 'Committed upstream snapshot file set drift.');
-  for (const record of snapshot.files) {
+  invariant(
+    JSON.stringify(snapshotFiles) === JSON.stringify([...snapshot.inputs.map(({ path: file }) => file), 'provenance.json'].sort()),
+    'Committed upstream snapshot file set drift.',
+  );
+  invariant(snapshot.inputs.some(({ path: file }) => file === 'adoption-checklist.json'), 'Derived inputs must include adoption-checklist.json.');
+  for (const record of snapshot.inputs) {
     const source = await readFile(path.join(snapshotRoot, record.path));
     invariant(sha256(source) === record.sha256, `Committed upstream snapshot hash drift: ${record.path}`);
-    const projected = await readFile(path.join(docsRoot, 'shared', record.path));
-    invariant(source.equals(projected), `Shared package projection differs from upstream snapshot: ${record.path}`);
   }
-  const upstreamManifestBytes = await readFile(path.join(snapshotRoot, 'manifest.json'));
-  invariant(sha256(upstreamManifestBytes) === snapshot.manifestSha256, 'Upstream manifest SHA-256 drift.');
-  const upstreamManifest = JSON.parse(upstreamManifestBytes.toString('utf8'));
-  const canonical = upstreamManifest.source.documents.find(({ path: sourcePath }) => sourcePath === 'docs/references/adoption/LDS_UI_ADOPTION_CONTRACT.json');
-  invariant(canonical, 'Upstream manifest omits canonical adoption contract provenance.');
+  invariant(derivedInputsFingerprint(snapshot.inputs) === snapshot.derivedInputsSha256, 'Derived inputs fingerprint drift.');
+  const provenance = await readJson(path.join(snapshotRoot, 'provenance.json'));
+  invariant(provenance.kind === 'lds-upstream-provenance', 'Invalid upstream provenance identity.');
+  invariant(JSON.stringify(provenance.source) === JSON.stringify(snapshot.source), 'Upstream provenance and snapshot disagree on the source.');
+  const upstreamManifest = { source: provenance.source };
+  const canonical = provenance.canonicalAdoption;
+  invariant(canonical?.path === 'docs/references/adoption/LDS_UI_ADOPTION_CONTRACT.json', 'Upstream provenance omits canonical adoption contract provenance.');
   invariant(JSON.stringify(manifest.source.robotics) === JSON.stringify({
     repository: 'LK-Design-System/lk-design-system-robotics',
     ref: `v${packageManifest.version}`,
@@ -213,7 +224,8 @@ async function main() {
     path: canonical.path,
     sha256: canonical.sha256,
   }), 'Canonical adoption source identity/ref/hash drift.');
-  invariant(manifest.source.canonicalAdoption.snapshotManifestSha256 === snapshot.manifestSha256, 'Manifest does not pin the committed snapshot manifest.');
+  invariant(manifest.source.canonicalAdoption.derivedInputsSha256 === snapshot.derivedInputsSha256, 'Manifest does not pin the committed derived inputs.');
+  invariant(JSON.stringify(manifest.source.canonicalAdoption.derivedInputs) === JSON.stringify(snapshot.inputs), 'Manifest derived input records drift.');
 
   validateWith(contractSchema, checklist, 'Adoption checklist');
   validateWith(reportSchema, reportExample, 'Adoption report example');
@@ -233,7 +245,12 @@ async function main() {
     manifest.resources.domainSymbols.path,
   ];
   for (const reference of machineReferences) {
-    invariant(!reference.startsWith('@'), `Package snapshot must be self-contained, found package reference: ${reference}`);
+    if (reference.startsWith('@')) {
+      // Core policy references resolve in the installed lds-core peer.
+      invariant(reference.startsWith(`${corePackage}/docs/`), `Package references may only name ${corePackage}/docs/: ${reference}`);
+      invariant(await exists(path.join(corePeerRoot, reference.slice(corePackage.length + 1))), `Unresolved Core peer reference: ${reference}`);
+      continue;
+    }
     const target = localTarget(reference, path.join(docsRoot, 'adoption-checklist.json'));
     if (target) invariant(await exists(target), `Unresolved machine reference: ${reference}`);
   }
@@ -284,7 +301,7 @@ async function main() {
 
   await validateMarkdownLinks(actualFiles);
   const authoredCount = await validateAuthoredDocs();
-  console.log(`Validated ${actualFiles.length + 1} Robotics package docs (deterministic projection, strict schemas, hashes, self-contained refs, domain sources, tokens, symbols, package identity) and ${authoredCount} authored docs (links, repository path references).`);
+  console.log(`Validated ${actualFiles.length + 1} Robotics package docs (deterministic projection, strict schemas, hashes, local and lds-core peer refs, domain sources, tokens, symbols, package identity) and ${authoredCount} authored docs (links, repository path references).`);
 }
 
 await main();
