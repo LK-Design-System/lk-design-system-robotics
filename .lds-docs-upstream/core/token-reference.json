@@ -2450,11 +2450,12 @@
         "$type": "color",
         "css": "--color-semantic-status-positive-foreground",
         "modes": {
-          "light": "var(--color-semantic-status-positive)",
+          "light": "var(--color-atomic-green-40)",
           "dark": "var(--color-semantic-status-positive)"
         },
         "origin": "lds-extension",
-        "group": "status"
+        "group": "status",
+        "$description": "Non-text indicator role (dots, icons, strokes, bar fills). WCAG 1.4.11 needs 3:1 on the page ground; the light signal hue alone gives 2.47:1, so light uses green-40 (3.90:1)."
       },
       "status-positive-border": {
         "$type": "color",
@@ -2490,11 +2491,12 @@
         "$type": "color",
         "css": "--color-semantic-status-cautionary-foreground",
         "modes": {
-          "light": "var(--color-semantic-status-cautionary)",
+          "light": "var(--color-atomic-orange-39)",
           "dark": "var(--color-semantic-status-cautionary)"
         },
         "origin": "lds-extension",
-        "group": "status"
+        "group": "status",
+        "$description": "Non-text indicator role (dots, icons, strokes, bar fills). WCAG 1.4.11 needs 3:1 on the page ground; the light signal hue alone gives 2.25:1, so light uses orange-39 (3.35:1)."
       },
       "status-cautionary-border": {
         "$type": "color",
@@ -2824,15 +2826,22 @@
         },
         "primaryBg": {
           "$type": "color",
-          "$value": "var(--component-button-primary-bg)",
           "css": "--component-button-primary-bg",
-          "ref": "semantic.action.primary"
+          "$value": "var(--color-semantic-primary-normal)",
+          "modes": {
+            "light": "var(--color-semantic-primary-normal)",
+            "dark": "var(--color-semantic-primary-heavy)"
+          },
+          "ref": "semantic.action.primary",
+          "$description": "Filled primary surfaces carry static white text. Dark primary-normal (#5390C9) gives white only 3.39:1, so the dark fill steps down to primary-heavy (4.85:1), matching badge.signalBg.",
+          "generated": true
         },
         "primaryBgHover": {
           "$type": "color",
-          "$value": "var(--component-button-primary-bg-hover)",
           "css": "--component-button-primary-bg-hover",
-          "ref": "component.button.tokens.primaryBg"
+          "$value": "var(--component-button-primary-bg)",
+          "ref": "component.button.tokens.primaryBg",
+          "generated": true
         },
         "primaryFg": {
           "$type": "color",
@@ -2867,9 +2876,22 @@
         },
         "signalBg": {
           "$type": "color",
-          "$value": "var(--component-button-signal-bg)",
           "css": "--component-button-signal-bg",
-          "ref": "semantic.colorRoles.primary-normal"
+          "$value": "var(--color-semantic-primary-normal)",
+          "modes": {
+            "light": "var(--color-semantic-primary-normal)",
+            "dark": "var(--color-semantic-primary-heavy)"
+          },
+          "ref": "semantic.colorRoles.primary-normal",
+          "$description": "Filled primary surfaces carry static white text. Dark primary-normal (#5390C9) gives white only 3.39:1, so the dark fill steps down to primary-heavy (4.85:1), matching badge.signalBg.",
+          "generated": true
+        },
+        "signalBgHover": {
+          "$type": "color",
+          "css": "--component-button-signal-bg-hover",
+          "$value": "var(--component-button-signal-bg)",
+          "ref": "component.button.tokens.signalBg",
+          "generated": true
         },
         "disabledOpacity": {
           "$type": "number",
@@ -2994,10 +3016,11 @@
         },
         "activeBackground": {
           "$type": "color",
-          "$value": "var(--component-toggle-icon-bg-active)",
           "css": "--component-toggle-icon-bg-active",
+          "$value": "var(--component-button-primary-bg)",
           "ref": "semantic.action.primary",
-          "source": "Action/Toggle Icon"
+          "source": "Action/Toggle Icon",
+          "generated": true
         },
         "border": {
           "$type": "border",
@@ -4932,17 +4955,6 @@
         ],
         "values": [
           "var(--shadow-xs)"
-        ],
-        "classification": "runtime-projection",
-        "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
-      },
-      {
-        "css": "--component-button-signal-bg-hover",
-        "files": [
-          "tokens/components.css"
-        ],
-        "values": [
-          "var(--component-button-signal-bg)"
         ],
         "classification": "runtime-projection",
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."

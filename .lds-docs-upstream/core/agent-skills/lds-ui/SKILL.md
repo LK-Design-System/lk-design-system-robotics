@@ -62,7 +62,7 @@ node_modules/@lk-design-system/lds-core/docs/agent-skills/lds-ui/SKILL.md
 
 ### 모션 — 인과를 설명하고, 데이터를 광고하지 않는다
 
-- fast 120ms / base 200ms / slow 320ms 토큰. `transition: all` 금지.
+- 지속 시간은 `--dur-fast` / `--dur-base` / `--dur-slow` 토큰으로만 쓴다 — ms를 직접 적지 않는다. 값은 expression profile이 정한다(`ops` 프로필은 기본보다 짧다). `transition: all` 금지.
 - 라이브 텔레메트리는 값이 바뀔 때마다 펄스하지 않는다. 정적 심각도(위험 등급 등)는 절대 애니메이션으로 표현하지 않는다.
 - `prefers-reduced-motion`에서 이동·연속 애니메이션이 제거되고 상태가 즉시 적용되는지 확인한다.
 

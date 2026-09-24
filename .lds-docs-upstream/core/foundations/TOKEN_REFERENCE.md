@@ -36,12 +36,13 @@
 | `component.button.tokens.heightLg` | dimension | `--component-button-height-lg` | `var(--component-button-height-lg)` | — |
 | `component.button.tokens.heightMd` | dimension | `--component-button-height-md` | `var(--component-button-height-md)` | — |
 | `component.button.tokens.heightSm` | dimension | `--component-button-height-sm` | `var(--component-button-height-sm)` | — |
-| `component.button.tokens.primaryBg` | color | `--component-button-primary-bg` | `var(--component-button-primary-bg)` | — |
-| `component.button.tokens.primaryBgHover` | color | `--component-button-primary-bg-hover` | `var(--component-button-primary-bg-hover)` | — |
+| `component.button.tokens.primaryBg` | color | `--component-button-primary-bg` | `var(--color-semantic-primary-normal)` | — |
+| `component.button.tokens.primaryBgHover` | color | `--component-button-primary-bg-hover` | `var(--component-button-primary-bg)` | — |
 | `component.button.tokens.primaryFg` | color | `--component-button-primary-fg` | `var(--component-button-primary-fg)` | — |
 | `component.button.tokens.radius` | dimension | `--component-button-radius` | `var(--component-button-radius)` | — |
 | `component.button.tokens.secondaryBg` | color | `--component-button-secondary-bg` | `var(--component-button-secondary-bg)` | — |
-| `component.button.tokens.signalBg` | color | `--component-button-signal-bg` | `var(--component-button-signal-bg)` | — |
+| `component.button.tokens.signalBg` | color | `--component-button-signal-bg` | `var(--color-semantic-primary-normal)` | — |
+| `component.button.tokens.signalBgHover` | color | `--component-button-signal-bg-hover` | `var(--component-button-signal-bg)` | — |
 | `component.button.tokens.textHoverOpacity` | number | `--component-button-text-hover-opacity` | `0.9` | — |
 | `component.button.tokens.transition` | transition | `--component-button-transition` | `none` | — |
 | `component.card.tokens.background` | color | `--component-card-bg` | `var(--component-card-bg)` | — |
@@ -185,7 +186,7 @@
 | `component.table.tokens.cellPaddingSm` | string | `--component-table-cell-padding-sm` | `var(--component-table-cell-padding-sm)` | — |
 | `component.table.tokens.rowMinHeightMd` | dimension | `--component-table-row-min-height-md` | `var(--component-table-row-min-height-md)` | — |
 | `component.table.tokens.rowMinHeightSm` | dimension | `--component-table-row-min-height-sm` | `var(--component-table-row-min-height-sm)` | — |
-| `component.toggleIcon.tokens.activeBackground` | color | `--component-toggle-icon-bg-active` | `var(--component-toggle-icon-bg-active)` | — |
+| `component.toggleIcon.tokens.activeBackground` | color | `--component-toggle-icon-bg-active` | `var(--component-button-primary-bg)` | — |
 | `component.toggleIcon.tokens.background` | color | `--component-toggle-icon-bg` | `var(--component-toggle-icon-bg)` | — |
 | `component.toggleIcon.tokens.border` | border | `--component-toggle-icon-border` | `var(--component-toggle-icon-border)` | — |
 | `component.toggleIcon.tokens.sizeMd` | dimension | `--component-toggle-icon-size-md` | `var(--component-toggle-icon-size-md)` | — |
@@ -572,7 +573,7 @@
 | `semantic.colorRoles.static-white` | color | `--color-semantic-static-white` | `light: #FFFFFF; dark: #FFFFFF` | — |
 | `semantic.colorRoles.status-cautionary` | color | `--color-semantic-status-cautionary` | `light: #EB9C33; dark: #EFAF5C` | — |
 | `semantic.colorRoles.status-cautionary-border` | color | `--color-semantic-status-cautionary-border` | `light: color-mix(in srgb, var(--color-semantic-status-cautionary) 42%, var(--color-semantic-line-normal-normal)); dark: color-mix(in srgb, var(--color-semantic-status-cautionary) 48%, var(--color-semantic-line-normal-normal))` | — |
-| `semantic.colorRoles.status-cautionary-foreground` | color | `--color-semantic-status-cautionary-foreground` | `light: var(--color-semantic-status-cautionary); dark: var(--color-semantic-status-cautionary)` | — |
+| `semantic.colorRoles.status-cautionary-foreground` | color | `--color-semantic-status-cautionary-foreground` | `light: var(--color-atomic-orange-39); dark: var(--color-semantic-status-cautionary)` | — |
 | `semantic.colorRoles.status-cautionary-surface` | color | `--color-semantic-status-cautionary-surface` | `light: color-mix(in srgb, var(--color-semantic-status-cautionary) 18%, transparent); dark: color-mix(in srgb, var(--color-semantic-status-cautionary) 20%, transparent)` | — |
 | `semantic.colorRoles.status-cautionary-text` | color | `--color-semantic-status-cautionary-text` | `light: #7A4A00; dark: #F4BE76` | — |
 | `semantic.colorRoles.status-info` | color | `--color-semantic-status-info` | `light: var(--color-semantic-primary-normal); dark: var(--color-semantic-primary-normal)` | — |
@@ -590,7 +591,7 @@
 | `semantic.colorRoles.status-neutral-text` | color | `--color-semantic-status-neutral-text` | `light: var(--color-semantic-label-neutral); dark: var(--color-semantic-label-neutral)` | — |
 | `semantic.colorRoles.status-positive` | color | `--color-semantic-status-positive` | `light: #13BE4C; dark: #3FD270` | — |
 | `semantic.colorRoles.status-positive-border` | color | `--color-semantic-status-positive-border` | `light: color-mix(in srgb, var(--color-semantic-status-positive) 38%, var(--color-semantic-line-normal-normal)); dark: color-mix(in srgb, var(--color-semantic-status-positive) 44%, var(--color-semantic-line-normal-normal))` | — |
-| `semantic.colorRoles.status-positive-foreground` | color | `--color-semantic-status-positive-foreground` | `light: var(--color-semantic-status-positive); dark: var(--color-semantic-status-positive)` | — |
+| `semantic.colorRoles.status-positive-foreground` | color | `--color-semantic-status-positive-foreground` | `light: var(--color-atomic-green-40); dark: var(--color-semantic-status-positive)` | — |
 | `semantic.colorRoles.status-positive-surface` | color | `--color-semantic-status-positive-surface` | `light: color-mix(in srgb, var(--color-semantic-status-positive) 14%, transparent); dark: color-mix(in srgb, var(--color-semantic-status-positive) 18%, transparent)` | — |
 | `semantic.colorRoles.status-positive-text` | color | `--color-semantic-status-positive-text` | `light: #07702E; dark: #5EE087` | — |
 | `semantic.control.focusRing` | shadow | `--color-semantic-focus-ring` | `0 0 0 4px var(--color-semantic-focus-ring)` | — |
@@ -682,7 +683,6 @@
 | `runtimeCoverage` | runtime-projection | `--component-button-secondary-fg` | `var(--color-semantic-static-white)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
 | `runtimeCoverage` | runtime-projection | `--component-button-secondary-shadow-hover` | `var(--component-button-shadow-rest)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
 | `runtimeCoverage` | runtime-projection | `--component-button-shadow-rest` | `var(--shadow-xs)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
-| `runtimeCoverage` | runtime-projection | `--component-button-signal-bg-hover` | `var(--component-button-signal-bg)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
 | `runtimeCoverage` | runtime-projection | `--component-button-signal-fg` | `var(--color-semantic-static-white)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
 | `runtimeCoverage` | runtime-projection | `--component-button-signal-shadow-hover` | `var(--component-button-shadow-rest)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
 | `runtimeCoverage` | runtime-projection | `--component-button-transform-hover` | `none` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |

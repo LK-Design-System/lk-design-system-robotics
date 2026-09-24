@@ -12,7 +12,7 @@
 contract. Figma Variables, Storybook examples, React components, and
 AI-generated UI must all resolve back to this contract. Theme expression
 profiles are the one additive runtime projection: their scope and whitelist
-live in [`EXPRESSION_PROFILE_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.9/docs/references/architecture/EXPRESSION_PROFILE_CONTRACT.json),
+live in [`EXPRESSION_PROFILE_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.10/docs/references/architecture/EXPRESSION_PROFILE_CONTRACT.json),
 and values are limited to `tokens/profiles.css` under the Theme package.
 
 Package별 `tokens/semantic-contract.json`은 runtime source에서 산출·검사하는 semantic
@@ -105,7 +105,11 @@ Color usage rules:
   Do not reuse one status value for all four jobs.
 - `--color-semantic-status-*`의 기본값은 **신호용 선명색**이며 텍스트 대비를
   만족하지 않는다(흰 배경 기준 positive `#13BE4C` 2.47:1, cautionary `#EB9C33`
-  2.25:1, negative `#EE5656` 3.44:1). 점·아이콘·테두리 등 비텍스트 요소에만 쓰고,
+  2.25:1, negative `#EE5656` 3.44:1). 비텍스트 요소도 WCAG 1.4.11의 3:1을
+  넘어야 하므로, 점·아이콘·테두리·막대 채움은 `--color-semantic-status-*-foreground`를
+  쓴다. light foreground는 positive `#0F953C`(green-40, 3.90:1), cautionary
+  `#C97A14`(orange-39, 3.35:1), negative는 기본값 그대로(3.44:1)이며 dark는 기본값과
+  같다. 기본값은 `*-surface`·`*-border`의 색 혼합 기준으로 남는다.
   텍스트와 텍스트 배경에는 AA를 만족하는 `--color-semantic-status-*-text`
   (5.47:1 / 7.48:1 / 7.04:1)를 쓴다. 선명색을 배경으로 채우고 흰 글자를 올리는
   solid 변형은 같은 대비값이 그대로 적용되므로 금지한다 — `*-surface` + `*-text`
