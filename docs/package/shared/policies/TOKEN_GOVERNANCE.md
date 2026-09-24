@@ -12,7 +12,7 @@
 contract. Figma Variables, Storybook examples, React components, and
 AI-generated UI must all resolve back to this contract. Theme expression
 profiles are the one additive runtime projection: their scope and whitelist
-live in [`EXPRESSION_PROFILE_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.11/docs/references/architecture/EXPRESSION_PROFILE_CONTRACT.json),
+live in [`EXPRESSION_PROFILE_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.12/docs/references/architecture/EXPRESSION_PROFILE_CONTRACT.json),
 and values are limited to `tokens/profiles.css` under the Theme package.
 
 Package별 `tokens/semantic-contract.json`은 runtime source에서 산출·검사하는 semantic
@@ -124,6 +124,12 @@ Color usage rules:
   이 역할은 dark에서 `primary-heavy`(4.85:1)로 내려간다. 버튼·뱃지·칩의 채움 토큰도 이
   역할을 가리킨다. 흰 내용이 없는 채움(Slider·Switch 트랙, 진행 막대)은
   `primary-normal`을 그대로 쓴다.
+- 행·카드·칩·알람·callout의 앞쪽(leading edge)에 색 띠를 두지 않는다. 2px 이상의
+  `border-left`/`border-inline-start`, 두꺼운 왼쪽 테두리, `inset Npx 0 0` 줄무늬가 모두
+  해당한다. 상태와 선택은 그 역할을 이미 가진 형제 컴포넌트의 방식으로 전달한다:
+  공지·사례는 `Banner`의 앞쪽 톤 아이콘과 틴트 면, 짧은 상태 표면은 `StatusBadge`의
+  톤 면과 글자, 목록·목차의 현재 항목은 `SideNav`의 선택 글자색과 굵기. 1px 회색
+  구분선은 해당하지 않는다. `npm run check:no-leading-bars`가 이를 막는다.
 - 색상각이 의미 있는 색과 겹치는 강조색은 그 의미 옆에 두지 않는다.
   `accent-*-light-blue`는 primary와 색상각이 같아(249°) 선택·정보 상태로 읽히므로
   primary·info 요소 옆의 범주 구분에 쓰지 않는다. `accent-*-red-orange`는

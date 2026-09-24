@@ -211,17 +211,17 @@
       },
       "md": {
         "$type": "dimension",
-        "$value": "12px",
+        "$value": "8px",
         "css": "--radius-md"
       },
       "input": {
         "$type": "dimension",
-        "$value": "12px",
+        "$value": "8px",
         "css": "--radius-input"
       },
       "xl": {
         "$type": "dimension",
-        "$value": "16px",
+        "$value": "12px",
         "css": "--radius-xl"
       },
       "frameSm": {
@@ -4002,6 +4002,22 @@
         }
       }
     },
+    "lockup": {
+      "component": "components/brand/Lockup.jsx",
+      "tokens": {
+        "autoFill": {
+          "$type": "color",
+          "css": "--component-lockup-auto-fill",
+          "$value": "var(--color-semantic-brand-surface)",
+          "modes": {
+            "light": "var(--color-semantic-brand-surface)",
+            "dark": "var(--color-semantic-static-white)"
+          },
+          "$description": "Lockup adaptive: LK Navy in light, white in dark. LK_LOGO_STANDARD 6.2 approves white only on LK Navy, so the dark theme also draws a navy plate behind it (tokens/components.css).",
+          "generated": true
+        }
+      }
+    },
     "sideNav": {
       "component": "components/navigation/SideNav.jsx",
       "tokens": {
@@ -4955,7 +4971,7 @@
           "tokens/components.css"
         ],
         "values": [
-          "var(--radius-10)"
+          "var(--radius-8)"
         ],
         "classification": "runtime-projection",
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
@@ -4966,7 +4982,7 @@
           "tokens/components.css"
         ],
         "values": [
-          "var(--radius-8)"
+          "var(--radius-6)"
         ],
         "classification": "runtime-projection",
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
@@ -5175,7 +5191,7 @@
           "tokens/components.css"
         ],
         "values": [
-          "var(--radius-10)"
+          "var(--radius-8)"
         ],
         "classification": "runtime-projection",
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
@@ -5186,7 +5202,7 @@
           "tokens/components.css"
         ],
         "values": [
-          "var(--radius-10)"
+          "var(--radius-8)"
         ],
         "classification": "runtime-projection",
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
@@ -5197,7 +5213,7 @@
           "tokens/components.css"
         ],
         "values": [
-          "var(--radius-8)"
+          "var(--radius-6)"
         ],
         "classification": "runtime-projection",
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
@@ -6712,7 +6728,7 @@
           "tokens/spacing.css"
         ],
         "values": [
-          "18px"
+          "12px"
         ],
         "classification": "runtime-projection",
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
@@ -6734,7 +6750,7 @@
           "tokens/spacing.css"
         ],
         "values": [
-          "24px"
+          "16px"
         ],
         "classification": "runtime-projection",
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
@@ -6756,7 +6772,7 @@
           "tokens/spacing.css"
         ],
         "values": [
-          "32px"
+          "20px"
         ],
         "classification": "runtime-projection",
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."
@@ -6811,7 +6827,7 @@
           "tokens/spacing.css"
         ],
         "values": [
-          "12px"
+          "10px"
         ],
         "classification": "runtime-projection",
         "reason": "Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked."

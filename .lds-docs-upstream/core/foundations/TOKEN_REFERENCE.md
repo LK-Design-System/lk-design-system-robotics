@@ -155,6 +155,7 @@
 | `component.listCell.tokens.paddingYLg` | dimension | `--component-list-cell-padding-y-lg` | `var(--component-list-cell-padding-y-lg)` | — |
 | `component.listCell.tokens.paddingYMd` | dimension | `--component-list-cell-padding-y-md` | `var(--component-list-cell-padding-y-md)` | — |
 | `component.listCell.tokens.paddingYSm` | dimension | `--component-list-cell-padding-y-sm` | `var(--component-list-cell-padding-y-sm)` | — |
+| `component.lockup.tokens.autoFill` | color | `--component-lockup-auto-fill` | `var(--color-semantic-brand-surface)` | — |
 | `component.menu.tokens.gap` | dimension | `--component-menu-gap` | `var(--component-menu-gap)` | — |
 | `component.menu.tokens.headerFontSize` | dimension | `--component-menu-header-font-size` | `var(--component-menu-header-font-size)` | — |
 | `component.menu.tokens.headerFontWeight` | fontWeight | `--component-menu-header-font-weight` | `var(--component-menu-header-font-weight)` | — |
@@ -466,11 +467,11 @@
 | `primitive.radius.frameMd` | dimension | `--radius-frame-md` | `14px` | — |
 | `primitive.radius.frameSm` | dimension | `--radius-frame-sm` | `12px` | — |
 | `primitive.radius.frameXl` | dimension | `--radius-frame-xl` | `20px` | — |
-| `primitive.radius.input` | dimension | `--radius-input` | `12px` | — |
-| `primitive.radius.md` | dimension | `--radius-md` | `12px` | — |
+| `primitive.radius.input` | dimension | `--radius-input` | `8px` | — |
+| `primitive.radius.md` | dimension | `--radius-md` | `8px` | — |
 | `primitive.radius.pill` | dimension | `--radius-pill` | `999px` | — |
 | `primitive.radius.sm` | dimension | `--radius-sm` | `6px` | — |
-| `primitive.radius.xl` | dimension | `--radius-xl` | `16px` | — |
+| `primitive.radius.xl` | dimension | `--radius-xl` | `12px` | — |
 | `primitive.radius.xs` | dimension | `--radius-xs` | `4px` | — |
 | `primitive.ratio.1-1` | ratio | `--ratio-1-1` | `1 / 1` | — |
 | `primitive.ratio.1-2` | ratio | `--ratio-1-2` | `1 / 2` | — |
@@ -693,8 +694,8 @@
 | `runtimeCoverage` | runtime-projection | `--component-button-padding-sm` | `0 14px` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
 | `runtimeCoverage` | runtime-projection | `--component-button-primary-shadow-hover` | `var(--component-button-shadow-rest)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
 | `runtimeCoverage` | runtime-projection | `--component-button-radius-lg` | `var(--radius-md)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
-| `runtimeCoverage` | runtime-projection | `--component-button-radius-md` | `var(--radius-10)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
-| `runtimeCoverage` | runtime-projection | `--component-button-radius-sm` | `var(--radius-8)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
+| `runtimeCoverage` | runtime-projection | `--component-button-radius-md` | `var(--radius-8)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
+| `runtimeCoverage` | runtime-projection | `--component-button-radius-sm` | `var(--radius-6)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
 | `runtimeCoverage` | runtime-projection | `--component-button-secondary-shadow-hover` | `var(--component-button-shadow-rest)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
 | `runtimeCoverage` | runtime-projection | `--component-button-shadow-rest` | `var(--shadow-xs)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
 | `runtimeCoverage` | runtime-projection | `--component-button-signal-shadow-hover` | `var(--component-button-shadow-rest)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
@@ -713,9 +714,9 @@
 | `runtimeCoverage` | runtime-projection | `--component-chip-letter-spacing-md` | `var(--body2-spacing)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
 | `runtimeCoverage` | runtime-projection | `--component-chip-letter-spacing-sm` | `var(--label1-spacing)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
 | `runtimeCoverage` | runtime-projection | `--component-chip-letter-spacing-xs` | `var(--caption1-spacing)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
-| `runtimeCoverage` | runtime-projection | `--component-chip-radius-lg` | `var(--radius-10)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
-| `runtimeCoverage` | runtime-projection | `--component-chip-radius-md` | `var(--radius-10)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
-| `runtimeCoverage` | runtime-projection | `--component-chip-radius-sm` | `var(--radius-8)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
+| `runtimeCoverage` | runtime-projection | `--component-chip-radius-lg` | `var(--radius-8)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
+| `runtimeCoverage` | runtime-projection | `--component-chip-radius-md` | `var(--radius-8)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
+| `runtimeCoverage` | runtime-projection | `--component-chip-radius-sm` | `var(--radius-6)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
 | `runtimeCoverage` | runtime-projection | `--component-chip-radius-xs` | `var(--radius-sm)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
 | `runtimeCoverage` | runtime-projection | `--component-dialog-radius` | `var(--radius-3xl)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
 | `runtimeCoverage` | runtime-projection | `--component-dialog-scrim-blur` | `2px` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/components.css) |
@@ -852,16 +853,16 @@
 | `runtimeCoverage` | runtime-projection | `--radius-16` | `16px` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/spacing.css) |
 | `runtimeCoverage` | runtime-projection | `--radius-20` | `20px` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/spacing.css) |
 | `runtimeCoverage` | runtime-projection | `--radius-24` | `24px` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/spacing.css) |
-| `runtimeCoverage` | runtime-projection | `--radius-2xl` | `18px` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/spacing.css) |
+| `runtimeCoverage` | runtime-projection | `--radius-2xl` | `12px` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/spacing.css) |
 | `runtimeCoverage` | runtime-projection | `--radius-32` | `32px` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/spacing.css) |
-| `runtimeCoverage` | runtime-projection | `--radius-3xl` | `24px` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/spacing.css) |
+| `runtimeCoverage` | runtime-projection | `--radius-3xl` | `16px` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/spacing.css) |
 | `runtimeCoverage` | runtime-projection | `--radius-4` | `4px` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/spacing.css) |
-| `runtimeCoverage` | runtime-projection | `--radius-4xl` | `32px` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/spacing.css) |
+| `runtimeCoverage` | runtime-projection | `--radius-4xl` | `20px` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/spacing.css) |
 | `runtimeCoverage` | runtime-projection | `--radius-5` | `5px` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/spacing.css) |
 | `runtimeCoverage` | runtime-projection | `--radius-6` | `6px` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/spacing.css) |
 | `runtimeCoverage` | runtime-projection | `--radius-8` | `8px` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/spacing.css) |
 | `runtimeCoverage` | runtime-projection | `--radius-full` | `9999px` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/spacing.css) |
-| `runtimeCoverage` | runtime-projection | `--radius-lg` | `12px` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/spacing.css) |
+| `runtimeCoverage` | runtime-projection | `--radius-lg` | `10px` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/spacing.css) |
 | `runtimeCoverage` | runtime-projection | `--scrim-dark` | `rgba(14, 19, 41, 0.86) · rgba(2, 4, 9, 0.72)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/effects.css) |
 | `runtimeCoverage` | runtime-projection | `--shadow-accent` | `0 12px 30px rgba(132, 146, 164, 0.3) · 0 12px 30px rgba(132, 146, 164, 0.34)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/effects.css) |
 | `runtimeCoverage` | runtime-projection | `--shadow-control` | `0 1px 3px rgba(0, 0, 0, 0.42) · 0 1px 3px rgba(8, 14, 33, 0.28)` | Runtime variable is not yet promoted into a primitive, semantic, or component token object; it remains explicitly inventoried and drift-checked. (tokens/effects.css) |
