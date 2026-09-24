@@ -335,20 +335,6 @@
 | `primitive.colorRamps.navyShell.tokens.65` | color | `--color-atomic-navy-shell-65` | `#A0A5AE` | — |
 | `primitive.colorRamps.navyShell.tokens.68` | color | `--color-atomic-navy-shell-68` | `#7FB0DE` | — |
 | `primitive.colorRamps.navyShell.tokens.93` | color | `--color-atomic-navy-shell-93` | `#EBECEE` | — |
-| `primitive.colorRamps.neutral.tokens.10` | color | `--color-atomic-neutral-10` | `#161719` | — |
-| `primitive.colorRamps.neutral.tokens.15` | color | `--color-atomic-neutral-15` | `#1B1C1E` | — |
-| `primitive.colorRamps.neutral.tokens.20` | color | `--color-atomic-neutral-20` | `#292A2D` | — |
-| `primitive.colorRamps.neutral.tokens.22` | color | `--color-atomic-neutral-22` | `#2F3033` | — |
-| `primitive.colorRamps.neutral.tokens.30` | color | `--color-atomic-neutral-30` | `#45474C` | — |
-| `primitive.colorRamps.neutral.tokens.40` | color | `--color-atomic-neutral-40` | `#5A5C62` | — |
-| `primitive.colorRamps.neutral.tokens.5` | color | `--color-atomic-neutral-5` | `#0F0F10` | — |
-| `primitive.colorRamps.neutral.tokens.50` | color | `--color-atomic-neutral-50` | `#70737A` | — |
-| `primitive.colorRamps.neutral.tokens.60` | color | `--color-atomic-neutral-60` | `#878A91` | — |
-| `primitive.colorRamps.neutral.tokens.70` | color | `--color-atomic-neutral-70` | `#989BA1` | — |
-| `primitive.colorRamps.neutral.tokens.80` | color | `--color-atomic-neutral-80` | `#AEB0B5` | — |
-| `primitive.colorRamps.neutral.tokens.90` | color | `--color-atomic-neutral-90` | `#C3C4C8` | — |
-| `primitive.colorRamps.neutral.tokens.95` | color | `--color-atomic-neutral-95` | `#DBDCDE` | — |
-| `primitive.colorRamps.neutral.tokens.99` | color | `--color-atomic-neutral-99` | `#F7F7F8` | — |
 | `primitive.colorRamps.orange.tokens.10` | color | `--color-atomic-orange-10` | `#341F05` | — |
 | `primitive.colorRamps.orange.tokens.20` | color | `--color-atomic-orange-20` | `#623C0A` | — |
 | `primitive.colorRamps.orange.tokens.30` | color | `--color-atomic-orange-30` | `#965B0F` | — |
@@ -523,7 +509,6 @@
 | `semantic.colorRoles.accent-background-red-orange` | color | `--color-semantic-accent-background-red-orange` | `light: #EA7029; dark: #ED864A` | — |
 | `semantic.colorRoles.accent-background-violet` | color | `--color-semantic-accent-background-violet` | `light: var(--color-atomic-violet-50); dark: var(--color-atomic-violet-60)` | — |
 | `semantic.colorRoles.accent-blue-text` | color | `--color-semantic-accent-blue-text` | `light: #336CA1; dark: #B5D5F2` | — |
-| `semantic.colorRoles.accent-cyan` | color | `--color-semantic-accent-cyan` | `light: transparent; dark: transparent` | — |
 | `semantic.colorRoles.accent-foreground-blue` | color | `--color-semantic-accent-foreground-blue` | `light: #336CA1; dark: #639ACE` | — |
 | `semantic.colorRoles.accent-foreground-cyan` | color | `--color-semantic-accent-foreground-cyan` | `light: #1198AF; dark: #16BDDA` | — |
 | `semantic.colorRoles.accent-foreground-green` | color | `--color-semantic-accent-foreground-green` | `light: #0F953C; dark: #3FD270` | — |
@@ -535,7 +520,6 @@
 | `semantic.colorRoles.accent-foreground-red` | color | `--color-semantic-accent-foreground-red` | `light: #D63D3D; dark: #F16F6F` | — |
 | `semantic.colorRoles.accent-foreground-red-orange` | color | `--color-semantic-accent-foreground-red-orange` | `light: #E8661A; dark: #ED864A` | — |
 | `semantic.colorRoles.accent-foreground-violet` | color | `--color-semantic-accent-foreground-violet` | `light: var(--color-atomic-violet-45); dark: var(--color-atomic-violet-70)` | — |
-| `semantic.colorRoles.accent-violet` | color | `--color-semantic-accent-violet` | `light: transparent; dark: transparent` | — |
 | `semantic.colorRoles.background-band` | color | `--color-semantic-background-band` | `light: #F4F4F5; dark: #0E121F` | — |
 | `semantic.colorRoles.background-elevated-alternative` | color | `--color-semantic-background-elevated-alternative` | `light: #F7F7F8; dark: #141415` | — |
 | `semantic.colorRoles.background-elevated-normal` | color | `--color-semantic-background-elevated-normal` | `light: #FFFFFF; dark: #212225` | — |

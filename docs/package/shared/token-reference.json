@@ -854,83 +854,6 @@
         },
         "$description": "Chroma capped at 0.17 on step 50 (2026-09): a/b scaled by 0.775 in OKLab so L and H hold; accents stay below the status hues."
       },
-      "neutral": {
-        "label": "Neutral",
-        "source": "WDS atomic structure, LK-approved retone",
-        "tokens": {
-          "5": {
-            "$type": "color",
-            "$value": "#0F0F10",
-            "css": "--color-atomic-neutral-5"
-          },
-          "10": {
-            "$type": "color",
-            "$value": "#161719",
-            "css": "--color-atomic-neutral-10"
-          },
-          "15": {
-            "$type": "color",
-            "$value": "#1B1C1E",
-            "css": "--color-atomic-neutral-15"
-          },
-          "20": {
-            "$type": "color",
-            "$value": "#292A2D",
-            "css": "--color-atomic-neutral-20"
-          },
-          "22": {
-            "$type": "color",
-            "$value": "#2F3033",
-            "css": "--color-atomic-neutral-22"
-          },
-          "30": {
-            "$type": "color",
-            "$value": "#45474C",
-            "css": "--color-atomic-neutral-30"
-          },
-          "40": {
-            "$type": "color",
-            "$value": "#5A5C62",
-            "css": "--color-atomic-neutral-40"
-          },
-          "50": {
-            "$type": "color",
-            "$value": "#70737A",
-            "css": "--color-atomic-neutral-50"
-          },
-          "60": {
-            "$type": "color",
-            "$value": "#878A91",
-            "css": "--color-atomic-neutral-60"
-          },
-          "70": {
-            "$type": "color",
-            "$value": "#989BA1",
-            "css": "--color-atomic-neutral-70"
-          },
-          "80": {
-            "$type": "color",
-            "$value": "#AEB0B5",
-            "css": "--color-atomic-neutral-80"
-          },
-          "90": {
-            "$type": "color",
-            "$value": "#C3C4C8",
-            "css": "--color-atomic-neutral-90"
-          },
-          "95": {
-            "$type": "color",
-            "$value": "#DBDCDE",
-            "css": "--color-atomic-neutral-95"
-          },
-          "99": {
-            "$type": "color",
-            "$value": "#F7F7F8",
-            "css": "--color-atomic-neutral-99"
-          }
-        },
-        "$description": "Deprecated 2026-09: visually identical to cool-neutral (every channel within 2/255) and no semantic role draws only from it. Use the same step of cool-neutral. Removal: 0.3.0. See docs/TOKEN_GOVERNANCE.md."
-      },
       "blue": {
         "label": "Blue",
         "source": "WDS atomic structure, LK-approved retone",
@@ -2252,26 +2175,6 @@
           "dark": "rgba(33, 34, 37, 0.61)"
         },
         "origin": "wds-structure-lk-retone"
-      },
-      "accent-violet": {
-        "$type": "color",
-        "css": "--color-semantic-accent-violet",
-        "modes": {
-          "light": "transparent",
-          "dark": "transparent"
-        },
-        "origin": "wds-structure-lk-retone",
-        "$description": "Deprecated 2026-09: transparent in both modes, so the name promises a color it never paints. Use accent-background-violet or accent-foreground-violet. Removal: 0.3.0."
-      },
-      "accent-cyan": {
-        "$type": "color",
-        "css": "--color-semantic-accent-cyan",
-        "modes": {
-          "light": "transparent",
-          "dark": "transparent"
-        },
-        "origin": "wds-structure-lk-retone",
-        "$description": "Deprecated 2026-09: transparent in both modes, so the name promises a color it never paints. Use accent-background-cyan or accent-foreground-cyan. Removal: 0.3.0."
       },
       "brand-ink": {
         "$type": "color",

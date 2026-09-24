@@ -12,7 +12,7 @@
 contract. Figma Variables, Storybook examples, React components, and
 AI-generated UI must all resolve back to this contract. Theme expression
 profiles are the one additive runtime projection: their scope and whitelist
-live in [`EXPRESSION_PROFILE_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.2.13/docs/references/architecture/EXPRESSION_PROFILE_CONTRACT.json),
+live in [`EXPRESSION_PROFILE_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.3.0/docs/references/architecture/EXPRESSION_PROFILE_CONTRACT.json),
 and values are limited to `tokens/profiles.css` under the Theme package.
 
 Package별 `tokens/semantic-contract.json`은 runtime source에서 산출·검사하는 semantic
@@ -192,21 +192,24 @@ the planned removal timing.
   `tokens/source.json`이 색상·토큰의 단일 원본이므로, 런타임 CSS만 먼저 지우면
   생성물 드리프트가 발생한다. 제거는 source 계약과 함께 한 번에 진행한다.
 
-### Deprecated · `--color-atomic-neutral-*`, `--color-semantic-accent-violet`, `--color-semantic-accent-cyan` (2026-09)
+### Removed in 0.3.0 · `--color-atomic-neutral-*`, `--color-semantic-accent-violet`, `--color-semantic-accent-cyan`
 
-다음 minor(0.3.0)에서 `tokens/source.json`과 함께 제거한다.
+2026-09에 deprecated로 표시했고 0.3.0에서 `tokens/source.json`과 생성 CSS에서 제거했다.
+이름을 다시 쓰지 않는다.
 
-- `--color-atomic-neutral-*` (14단계): `cool-neutral` 램프와 값이 사실상 같다. 모든
-  단계에서 16진 채널 차이가 2 이하라 눈으로 구분되지 않는다. semantic 색 중 이 램프에서만
-  값을 가져오는 토큰은 0개이고, 모두 `cool-neutral`에서 가져온다. 같은 단계 번호의
-  `--color-atomic-cool-neutral-*`로 옮긴다. 이 램프의 모든 단계는 `cool-neutral`에도 있다.
-- `--color-semantic-accent-violet`, `--color-semantic-accent-cyan`: 두 모드 모두 값이
-  `transparent`여서 이름이 약속하는 색을 내지 않는다. 채움이 필요하면
-  `--color-semantic-accent-background-violet|cyan`, 글자·아이콘에는
-  `--color-semantic-accent-foreground-violet|cyan`을 쓴다.
-- 영향 컴포넌트: 없음. 2026-09-24 기준 Core·Product 컴포넌트와 스토리, Robotics·Slides·3D·Motion,
-  LK Portal, 관제 제품 저장소(Daedeok·Gungneung·extended-slim)에서 참조가 0건이다. Robotics의
-  Core 문서 사본은 제외한다. atomic 토큰은 원래 컴포넌트가 직접 쓰지 않는다.
+| 제거 토큰 | 대체 |
+| --- | --- |
+| `--color-atomic-neutral-<step>` (14단계) | 같은 단계의 `--color-atomic-cool-neutral-<step>` |
+| `--color-semantic-accent-violet` | 채움 `--color-semantic-accent-background-violet`, 글자·아이콘 `--color-semantic-accent-foreground-violet` |
+| `--color-semantic-accent-cyan` | 채움 `--color-semantic-accent-background-cyan`, 글자·아이콘 `--color-semantic-accent-foreground-cyan` |
+
+- `neutral` 램프는 `cool-neutral`과 모든 단계에서 16진 채널 차이가 2 이하였다. 모든 단계가
+  `cool-neutral`에도 있으므로 단계 번호만 유지해 옮기면 된다.
+- `accent-violet`, `accent-cyan`은 두 모드 모두 `transparent`여서 칠해지는 색이 없었다.
+  옛 이름을 그대로 쓰면 이전과 같이 아무것도 칠해지지 않으므로 화면 변화는 없다. 대체 토큰으로
+  옮기면 실제 색이 칠해진다.
+- 영향: 제거 시점(2026-09-24)에 Core·Product 컴포넌트와 스토리, Robotics·Slides·3D·Motion,
+  LK Portal, 관제 제품 저장소(Daedeok·Gungneung·extended-slim)의 참조가 0건이었다.
 
 ## Figma sync contract
 
