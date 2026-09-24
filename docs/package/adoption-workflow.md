@@ -13,9 +13,9 @@ Robotics-owned domain evidence. The upstream snapshot is
 - Robotics component, domain pattern, token, glyph, or symbol authoring: follow the packaged Component Workflow first, then the Robotics domain contracts below.
 - Product routes, transport, TF authority, localization, safety controls, WebGL, and renderer lifecycle remain product or LDS3D concerns.
 
-No immutable commit currently exposes the new `.github/actions/lds-adoption`
-action. Consumer CI must add it only after the canonical LDS change is published
-at an immutable SHA; a branch name or placeholder SHA is not acceptable.
+Consumer CI adds the `.github/actions/lds-adoption` action only at an immutable
+SHA of a published canonical LDS change; a branch name or placeholder SHA is not
+acceptable.
 
 ## Robotics-owned domain evidence
 

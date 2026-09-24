@@ -70,8 +70,8 @@
       {
         "path": "domain/AGENT_SKILL_REFERENCE.md",
         "sourcePath": "docs/AGENT_SKILL_REFERENCE.md",
-        "sourceSha256": "2cdd6f290a5457acddeb464613faaf8a49830e51b7479e97c4cf3e9f0dfaa5de",
-        "sha256": "2cdd6f290a5457acddeb464613faaf8a49830e51b7479e97c4cf3e9f0dfaa5de"
+        "sourceSha256": "cdde935a3a0c7b5a6681f99b72bccce97c3634c4edd0c0230792aada8c6a22ae",
+        "sha256": "cdde935a3a0c7b5a6681f99b72bccce97c3634c4edd0c0230792aada8c6a22ae"
       },
       {
         "path": "domain/FLEET_UI_REFERENCE_PLAN.md",
@@ -100,8 +100,8 @@
       {
         "path": "domain/OVERLAY_STATUS_CHIP.md",
         "sourcePath": "docs/OVERLAY_STATUS_CHIP.md",
-        "sourceSha256": "eeb8d47501c394e9f0fbacc46bf7efb9fa6293729f2ee4b55ebb014da809f409",
-        "sha256": "eeb8d47501c394e9f0fbacc46bf7efb9fa6293729f2ee4b55ebb014da809f409"
+        "sourceSha256": "035565fbd1aad6c2efe62bcc0483c0a24b47c9e242f5a13d447472e47aa227c7",
+        "sha256": "035565fbd1aad6c2efe62bcc0483c0a24b47c9e242f5a13d447472e47aa227c7"
       },
       {
         "path": "domain/SELECTION_FOCUS_AUDIT.md",
@@ -112,8 +112,8 @@
       {
         "path": "domain/STRUCTURE_ASSESSMENT.md",
         "sourcePath": "docs/STRUCTURE_ASSESSMENT.md",
-        "sourceSha256": "8404cc863e567a7452ac10a30e08d86e97bfc420a614ef892fe639dcbc68a4bc",
-        "sha256": "8404cc863e567a7452ac10a30e08d86e97bfc420a614ef892fe639dcbc68a4bc"
+        "sourceSha256": "5a16315efd61be5da88c745e20273b7aa18acbaaa6a7387856d22521aff7f644",
+        "sha256": "5a16315efd61be5da88c745e20273b7aa18acbaaa6a7387856d22521aff7f644"
       },
       {
         "path": "domain/ATTRIBUTIONS.md",
@@ -212,7 +212,7 @@
     },
     {
       "path": "adoption-workflow.md",
-      "sha256": "ebd33949a3cf4915729f3e225460765fa41cf52fe70fc3ca4844adecfb8dd9ad"
+      "sha256": "45844fb4086c5e81947fdb321ad9408a3077ac75c8c8834725fd18203d6a29be"
     },
     {
       "path": "domain-symbol-registry.json",
@@ -220,7 +220,7 @@
     },
     {
       "path": "domain/AGENT_SKILL_REFERENCE.md",
-      "sha256": "2cdd6f290a5457acddeb464613faaf8a49830e51b7479e97c4cf3e9f0dfaa5de"
+      "sha256": "cdde935a3a0c7b5a6681f99b72bccce97c3634c4edd0c0230792aada8c6a22ae"
     },
     {
       "path": "domain/ATTRIBUTIONS.md",
@@ -244,7 +244,7 @@
     },
     {
       "path": "domain/OVERLAY_STATUS_CHIP.md",
-      "sha256": "eeb8d47501c394e9f0fbacc46bf7efb9fa6293729f2ee4b55ebb014da809f409"
+      "sha256": "035565fbd1aad6c2efe62bcc0483c0a24b47c9e242f5a13d447472e47aa227c7"
     },
     {
       "path": "domain/README.md",
@@ -260,7 +260,7 @@
     },
     {
       "path": "domain/STRUCTURE_ASSESSMENT.md",
-      "sha256": "8404cc863e567a7452ac10a30e08d86e97bfc420a614ef892fe639dcbc68a4bc"
+      "sha256": "5a16315efd61be5da88c745e20273b7aa18acbaaa6a7387856d22521aff7f644"
     },
     {
       "path": "LDS_UI_ADOPTION_CONTRACT.schema.json",

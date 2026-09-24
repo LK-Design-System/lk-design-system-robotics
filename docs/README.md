@@ -48,6 +48,6 @@
 
 ## 계약의 소재
 
-디자인 계약의 1차 소스는 문서가 아니라 실행 코드다: 스토리 play 단언(111개),
+디자인 계약의 1차 소스는 문서가 아니라 실행 코드다: 스토리 play 단언(개수는 `check:story-play` 출력이 정본),
 `_navigationVocabulary`·`_viewerOverlay` 상수 모듈, conformance 검사. 문서
 산문과 코드가 충돌하면 코드·play가 우선하고, 문서를 갱신한다.

@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Type | Convention |
-| Status | Adopted upstream — 코어 `OverlayStatusChip`(lds-core 0.1.0-rc.2) 소비 중 |
+| Status | Adopted upstream — 코어 `OverlayStatusChip` 소비 중 (lds-core 0.1.0-rc.2에서 편입; 현재 버전은 `package.json` peerDependencies) |
 | Owner | Robotics domain engineering (구현 소유: LDS Core Status) |
 | Last reviewed | 2026-07-30 |
 | Source | `@lk-design-system/lds-core/components/status/OverlayStatusChip` · 코어 가이드: `lk-design-system/docs/components/guides/core-components-status-overlay-status-chip.md` |

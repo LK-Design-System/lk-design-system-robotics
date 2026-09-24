@@ -29,15 +29,15 @@
 ## 마커와 선의 문법
 
 - **마커당 solid 상태 배지는 1개.** 여러 상태는 우선순위로 접고(Waypoint `invalid > stale`, Facility `invalid > stale > unknown`), 접근성 이름에는 전부 남긴다. 배지 스택 금지.
-- **선(Lane/Route/Trajectory)은 배지를 달지 않는다.** 상태는 스트로크 톤 + 텍스트로. Lane은 어떤 상태에서도 `4 6` 대시(1.5px)를 유지하고 톤만 바꾼다. Trajectory는 solid 2.25px + 샘플 점 하나의 정체성을 유지한다.
+- **선(Lane/Route/Trajectory)은 배지를 달지 않는다.** 상태는 스트로크 톤 + 텍스트로. Lane은 어떤 상태에서도 같은 대시·두께를 유지하고 톤만 바꾼다. Trajectory는 solid 선 + 샘플 점 하나의 정체성을 유지한다. 대시·두께·배율 값은 컴포넌트(`_navigationVocabulary`)가 소유하고 play 단언이 고정한다 — 소비 코드에서 다시 지정하거나 이 문서에서 숫자를 옮겨 쓰지 않는다.
 - **방향 화살표·진행 헤드·재생 커서를 추가하지 않는다.** 현재 위치·헤딩의 유일한 소유자는 `RobotPoseMarker`다.
 
 ## 상호작용 4축 — 서로 색을 빌리지 않는다
 
 | 축 | 표현 | 금지 |
 | --- | --- | --- |
-| highlight (프리뷰) | 1.12× + standoff 링, 포인터와 함께 소멸 | 상태로 고정하기 |
-| selection | 1.25× + selection seat (기하만) | accent·focus 색 차용 |
+| highlight (프리뷰) | 선택보다 작은 확대 + standoff 링, 포인터와 함께 소멸 | 상태로 고정하기 |
+| selection | 선택 배율 확대 + selection seat (기하만) | accent·focus 색 차용 |
 | keyboard focus | `--color-semantic-focus-indicator`, non-scaling, 대비 백킹 | 선택 의미로 오용 |
 | data-state | 페인트·대시·배지 | 위 축들과 혼합 |
 

@@ -32,7 +32,7 @@
 
 - **conformance RAW_COLOR** — on-dark 오버레이 작업에서 복사해온 `#101b26`
   리터럴을 실제로 잡아냈다. 룰이 장식이 아님을 스스로 증명.
-- **play 함수 111개가 디자인 계약** — "충돌 표기는 pin이 소유, lane은 대시
+- **play 함수가 디자인 계약** — "충돌 표기는 pin이 소유, lane은 대시
   하나" 같은 결정을 사람이 아니라 CI가 기억한다. 산문 description은 드리프트한
   전례가 있으므로 계약의 소재는 항상 play 단언이다.
 - **값의 출처가 한 곳씩** — `_navigationVocabulary`(선택·seat 어휘),

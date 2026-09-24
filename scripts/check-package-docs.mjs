@@ -251,7 +251,17 @@ async function main() {
     const source = await readFile(path.join(root, story.source), 'utf8');
     invariant(/export\s+const\s+Overview\b/.test(source), `${story.source} does not expose Overview evidence.`);
   }
-  invariant(storyIds.size === 6, `Expected six Robotics Foundation story ids, found ${storyIds.size}.`);
+  // The Foundation set is whatever stories/RoboticsFoundation*.stories.jsx the
+  // repository has — not a count kept here beside the generator's own list.
+  const foundationFiles = (await readdir(path.join(root, 'stories')))
+    .filter((name) => /^RoboticsFoundation\w*\.stories\.jsx$/.test(name))
+    .map((name) => `stories/${name}`)
+    .sort();
+  const manifestSources = manifest.domain.foundationStories.map((story) => story.source).sort();
+  invariant(
+    JSON.stringify(foundationFiles) === JSON.stringify(manifestSources),
+    `Robotics Foundation stories drifted from the package manifest: files=${foundationFiles.join(',')} manifest=${manifestSources.join(',')}.`,
+  );
 
   const tokenManifest = await readJson(path.join(docsRoot, 'tokens', 'manifest.json'));
   invariant(tokenManifest.package.name === packageManifest.name && tokenManifest.package.version === packageManifest.version, 'Token manifest package identity drift.');
