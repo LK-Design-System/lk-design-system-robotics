@@ -493,54 +493,6 @@
         "$value": "linear-gradient(90deg, #000 0%, transparent 100%)",
         "css": "--decorate-mask-fade-left",
         "source": "Decorate/Gradient/Mask"
-      },
-      "interactionLayerNormal": {
-        "$type": "color",
-        "$value": "transparent",
-        "css": "--interaction-layer-normal",
-        "source": "Decorate/Interaction"
-      },
-      "interactionLayerDefault": {
-        "$type": "color",
-        "$value": "rgba(112, 115, 124, 0.08)",
-        "css": "--interaction-layer-default",
-        "source": "Decorate/Interaction"
-      },
-      "interactionLayerLight": {
-        "$type": "color",
-        "$value": "rgba(112, 115, 124, 0.05)",
-        "css": "--interaction-layer-light",
-        "source": "Decorate/Interaction"
-      },
-      "interactionLayerStrong": {
-        "$type": "color",
-        "$value": "rgba(112, 115, 124, 0.14)",
-        "css": "--interaction-layer-strong",
-        "source": "Decorate/Interaction"
-      },
-      "interactionOpacityNormal": {
-        "$type": "number",
-        "$value": 1,
-        "css": "--interaction-opacity-normal",
-        "source": "Decorate/Interaction"
-      },
-      "interactionOpacityHovered": {
-        "$type": "number",
-        "$value": 0.92,
-        "css": "--interaction-opacity-hovered",
-        "source": "Decorate/Interaction"
-      },
-      "interactionOpacityFocused": {
-        "$type": "number",
-        "$value": 0.84,
-        "css": "--interaction-opacity-focused",
-        "source": "Decorate/Interaction"
-      },
-      "interactionOpacityPressed": {
-        "$type": "number",
-        "$value": 0.76,
-        "css": "--interaction-opacity-pressed",
-        "source": "Decorate/Interaction"
       }
     },
     "colorRamps": {

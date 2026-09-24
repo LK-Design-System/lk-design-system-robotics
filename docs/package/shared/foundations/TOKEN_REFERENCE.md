@@ -426,14 +426,6 @@
 | `primitive.effect.durationBase` | duration | `--dur-base` | `200ms` | — |
 | `primitive.effect.durationFast` | duration | `--dur-fast` | `120ms` | — |
 | `primitive.effect.easeOut` | cubicBezier | `--ease-out` | `cubic-bezier(0.4, 0, 0.2, 1)` | — |
-| `primitive.effect.interactionLayerDefault` | color | `--interaction-layer-default` | `rgba(112, 115, 124, 0.08)` | — |
-| `primitive.effect.interactionLayerLight` | color | `--interaction-layer-light` | `rgba(112, 115, 124, 0.05)` | — |
-| `primitive.effect.interactionLayerNormal` | color | `--interaction-layer-normal` | `transparent` | — |
-| `primitive.effect.interactionLayerStrong` | color | `--interaction-layer-strong` | `rgba(112, 115, 124, 0.14)` | — |
-| `primitive.effect.interactionOpacityFocused` | number | `--interaction-opacity-focused` | `0.84` | — |
-| `primitive.effect.interactionOpacityHovered` | number | `--interaction-opacity-hovered` | `0.92` | — |
-| `primitive.effect.interactionOpacityNormal` | number | `--interaction-opacity-normal` | `1` | — |
-| `primitive.effect.interactionOpacityPressed` | number | `--interaction-opacity-pressed` | `0.76` | — |
 | `primitive.effect.shadowLg` | shadow | `--shadow-lg` | `0 24px 64px rgba(14, 19, 41, 0.13)` | — |
 | `primitive.effect.shadowMd` | shadow | `--shadow-md` | `0 16px 40px rgba(14, 19, 41, 0.10)` | — |
 | `primitive.effect.shadowSm` | shadow | `--shadow-sm` | `0 4px 12px rgba(8, 14, 33, 0.06)` | — |

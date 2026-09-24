@@ -12,7 +12,7 @@
 contract. Figma Variables, Storybook examples, React components, and
 AI-generated UI must all resolve back to this contract. Theme expression
 profiles are the one additive runtime projection: their scope and whitelist
-live in [`EXPRESSION_PROFILE_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.3.0/docs/references/architecture/EXPRESSION_PROFILE_CONTRACT.json),
+live in [`EXPRESSION_PROFILE_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.4.0/docs/references/architecture/EXPRESSION_PROFILE_CONTRACT.json),
 and values are limited to `tokens/profiles.css` under the Theme package.
 
 Package별 `tokens/semantic-contract.json`은 runtime source에서 산출·검사하는 semantic
@@ -160,22 +160,22 @@ may be added without an explicit product migration decision.
 Deprecation notes must state the replacement token, affected components, and
 the planned removal timing.
 
-### Deprecated · `--interaction-*` (2026-07)
+### Removed in 0.4.0 · `--interaction-*`
 
-`tokens/effects.css`의 Decorate / Interaction 블록(`--interaction-layer-*`,
-`--interaction-opacity-*`)은 **deprecated** 상태다. 다음 minor 사이클 이후
-`tokens/source.json`과 함께 제거를 검토한다.
+2026-07에 deprecated로 표시했고 0.4.0에서 제거했다. Decorate / Interaction 블록(`--interaction-layer-*`,
+`--interaction-opacity-*`, 8개)은 `tokens/effects.css`와 `tokens/source.json`에서 빠졌다.
+이름을 다시 쓰지 않는다.
 
-- 영향 컴포넌트: **없음**. `components/` 전체에서 이 토큰을 참조하는 코드가 0건이다.
-  소비처가 없으므로 제품 마이그레이션 부담도 없다.
+- 영향: 제거 시점(2026-09-24)에 LDS 컴포넌트·스토리·스크립트, Robotics·Slides·3D·Motion,
+  LK Portal, 관제 제품 저장소의 참조가 0건이었다.
 - 폐기 사유: 모든 인터랙션 상태를 하나의 불투명도 램프로 모델링한 초기 WDS 매핑
   시도였으나, 실제 시스템은 hover/pressed를 컴포넌트 계열별 semantic token으로,
   focus는 링으로만 표현한다. 특히 `--interaction-opacity-focused: 0.84`가 전제하는
   "불투명도로 포커스를 표현한다"는 모델은 `tokens/focus.css`의 포커스 링 계약과
   충돌하며 WCAG 2.4.7 / 2.4.11을 만족할 수 없다. 재도입 불가.
-- 대체 토큰:
+- 대체:
 
-  | 폐기 토큰 | 대체 |
+  | 제거 토큰 | 대체 |
   | --- | --- |
   | `--interaction-layer-normal` | 없음 — 상태 배경을 지정하지 않는다 |
   | `--interaction-layer-light` | `--color-semantic-fill-alternative` (동일 값) |
@@ -188,9 +188,6 @@ the planned removal timing.
 
 - 기준 문서: `stories/FoundationInteraction.stories.jsx`가 실제 인터랙션 계약
   (공통 상태 축 · 전역 포커스 링 · 계열별 hover/pressed 표현)을 기술한다.
-- 값 자체는 `tokens/effects.css`와 `tokens/source.json`에 그대로 남아 있다.
-  `tokens/source.json`이 색상·토큰의 단일 원본이므로, 런타임 CSS만 먼저 지우면
-  생성물 드리프트가 발생한다. 제거는 source 계약과 함께 한 번에 진행한다.
 
 ### Removed in 0.3.0 · `--color-atomic-neutral-*`, `--color-semantic-accent-violet`, `--color-semantic-accent-cyan`
 
