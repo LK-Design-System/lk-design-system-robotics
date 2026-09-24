@@ -454,6 +454,48 @@ function HundredRobotDensityFixture() {
   );
 }
 
+function HundredRobotRowListFixture() {
+  const [filters, setFilters] = React.useState([]);
+  const filteredRobots = DENSE_FLEET_ROBOTS.filter((robot) => matchesFleetFilters(robot, filters));
+
+  return (
+    <main
+      data-testid="fleet-row-list"
+      data-lds-profile="ops"
+      style={{ width: 'min(760px, 100%)', display: 'grid', gap: 'var(--space-3)' }}
+    >
+      <FleetHealthSummary
+        counts={{ total: 100, connected: 51, attention: 13, unavailable: 16, stale: 16, critical: 4 }}
+        activeFilters={filters}
+        onFiltersChange={setFilters}
+      />
+      <section
+        aria-label="100대 Fleet 조밀 목록"
+        style={{
+          maxHeight: 640,
+          overflow: 'auto',
+          border: 'var(--border-thin) solid var(--color-semantic-line-normal-normal)',
+          borderRadius: 'var(--component-card-radius)',
+          background: 'var(--color-semantic-background-elevated-normal)',
+        }}
+      >
+        <div role="list">
+          {filteredRobots.map((robot) => (
+            <div role="listitem" key={robot.id}>
+              <FleetRobotRow
+                layout="row"
+                robot={robot}
+                updatedAtLabel={robot.state.freshness === 'current' ? '12초 전' : '2분 전'}
+                detail={incidentDetail(robot.incidents)}
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+    </main>
+  );
+}
+
 const meta = {
   title: 'LDS Robotics/Fleet/Overview',
   tags: ['autodocs'],
@@ -658,5 +700,27 @@ export const HundredRobotDensity = {
         throw new Error('Total must clear all density filters and restore 100 rows.');
       }
     });
+  },
+};
+
+export const HundredRobotRowList = {
+  name: '100대 조밀 목록 (ops)',
+  parameters: storyDescription(
+    '대수가 많은 Fleet은 FleetRobotRow layout="row"로 카드 대신 한 표면 안의 행 목록을 씁니다. 로봇당 한 줄, 행 아래 1px 구분선, 앞쪽 색 띠 없음. 세로 여백은 ListCell small 토큰이라 data-lds-profile="ops"가 행 높이를 줄입니다.',
+  ),
+  render: () => <HundredRobotRowListFixture />,
+  play: async ({ canvasElement }) => {
+    const root = canvasElement.querySelector('[data-testid="fleet-row-list"]');
+    if (!root) throw new Error('Fleet row-list fixture did not render.');
+    const rows = [...root.querySelectorAll('[data-fleet-robot-row]')];
+    if (rows.length !== 100) throw new Error('Row-list fixture must render exactly 100 fleet rows.');
+    if (rows.some((row) => row.closest('[data-robot-status-surface="plain"]') == null)) {
+      throw new Error('layout="row" must render the plain surface without card chrome.');
+    }
+    const tallest = Math.max(...rows.map((row) => row.getBoundingClientRect().height));
+    if (tallest > 44) throw new Error(`Ops row-list rows must stay dense (tallest ${tallest}px > 44px).`);
+    if (rows.some((row) => row.scrollWidth > row.clientWidth + 1)) {
+      throw new Error('Row-list rows must not introduce horizontal overflow at the target width.');
+    }
   },
 };

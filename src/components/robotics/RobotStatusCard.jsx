@@ -40,6 +40,7 @@ export function RobotStatusCard({
   meta,
   showAvatar = true,
   density = 'comfortable',
+  surface = 'card',
   accessibleDescription,
   selected = false,
   disabled = false,
@@ -85,23 +86,8 @@ export function RobotStatusCard({
     </div>
   );
 
-  return (
-    <Card
-      elevation="sm"
-      padding={0}
-      style={{
-        width: '100%',
-        minWidth: 0,
-        overflow: 'hidden',
-        ...(selected
-          ? {
-              background: 'var(--color-semantic-primary-surface-normal)',
-              border: 'var(--border-thin) solid var(--color-semantic-primary-normal)',
-            }
-          : {}),
-        ...style,
-      }}
-    >
+  const plain = surface === 'plain';
+  const cell = (
       <RobotStatusCell
         {...rest}
         data-robot-status-card=""
@@ -123,8 +109,9 @@ export function RobotStatusCard({
           <div
             style={{
               display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-end',
+              // One line keeps the row height: badges sit side by side in single-line.
+              flexDirection: singleLine ? 'row' : 'column',
+              alignItems: singleLine ? 'center' : 'flex-end',
               gap: 'var(--space-1)',
               minWidth: 0,
             }}
@@ -162,10 +149,50 @@ export function RobotStatusCard({
         trailingStyle={{ alignSelf: singleLine || compact ? 'center' : 'flex-start' }}
         onClick={onClick}
         style={{
-          borderRadius: 'var(--component-card-radius)',
+          borderRadius: plain ? 0 : 'var(--component-card-radius)',
           background: 'transparent',
         }}
       />
+  );
+
+  // `plain` is a list row: no card chrome, selection as a fill (as ListCell does),
+  // dividers and the surrounding surface come from the list that holds the rows.
+  if (plain) {
+    return (
+      <div
+        data-robot-status-surface="plain"
+        style={{
+          width: '100%',
+          minWidth: 0,
+          overflow: 'hidden',
+          background: selected ? 'var(--color-semantic-primary-surface-normal)' : 'transparent',
+          ...style,
+        }}
+      >
+        {cell}
+      </div>
+    );
+  }
+
+  // Cards rest without a shadow (LDS 0.2.12); selection keeps the primary outline.
+  return (
+    <Card
+      elevation="none"
+      padding={0}
+      style={{
+        width: '100%',
+        minWidth: 0,
+        overflow: 'hidden',
+        ...(selected
+          ? {
+              background: 'var(--color-semantic-primary-surface-normal)',
+              border: 'var(--border-thin) solid var(--color-semantic-primary-normal)',
+            }
+          : {}),
+        ...style,
+      }}
+    >
+      {cell}
     </Card>
   );
 }

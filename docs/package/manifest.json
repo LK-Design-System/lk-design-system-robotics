@@ -76,8 +76,8 @@
       {
         "path": "domain/FLEET_UI_REFERENCE_PLAN.md",
         "sourcePath": "docs/FLEET_UI_REFERENCE_PLAN.md",
-        "sourceSha256": "48b98075f2c0bb3106d8c537e9989b57368cb2af3f07fddf263c76b7286b847f",
-        "sha256": "48b98075f2c0bb3106d8c537e9989b57368cb2af3f07fddf263c76b7286b847f"
+        "sourceSha256": "8c88f148fc835f4880de30609e0ca8e9cc9cec8fe326ea0c7ffb6c1f1c91a652",
+        "sha256": "8c88f148fc835f4880de30609e0ca8e9cc9cec8fe326ea0c7ffb6c1f1c91a652"
       },
       {
         "path": "domain/NAVIGATION_COORDINATE_CONTRACT.md",
@@ -228,7 +228,7 @@
     },
     {
       "path": "domain/FLEET_UI_REFERENCE_PLAN.md",
-      "sha256": "48b98075f2c0bb3106d8c537e9989b57368cb2af3f07fddf263c76b7286b847f"
+      "sha256": "8c88f148fc835f4880de30609e0ca8e9cc9cec8fe326ea0c7ffb6c1f1c91a652"
     },
     {
       "path": "domain/NAVIGATION_COORDINATE_CONTRACT.md",

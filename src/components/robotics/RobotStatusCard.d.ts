@@ -37,6 +37,8 @@ export interface RobotStatusCardProps extends React.HTMLAttributes<HTMLDivElemen
   showAvatar?: boolean;
   /** 카드 정보 밀도. Fleet 목록에는 `compact`, 고밀도 단일 행에는 `single-line`을 사용한다. @default "comfortable" */
   density?: 'comfortable' | 'compact' | 'single-line';
+  /** 표면. `card`는 카드 표면, `plain`은 카드 외곽 없는 목록 행이다. `plain`에서 선택은 옅은 면으로 표시하고 구분선과 바깥 표면은 목록이 맡는다. @default "card" */
+  surface?: 'card' | 'plain';
   /** 기본 anatomy를 바꾸지 않고 상태 클러스터에 추가하는 화면 낭독기용 설명. */
   accessibleDescription?: React.ReactNode;
   /** 선택 강조 — 테두리·포커스 링. `onClick`이 있으면 `aria-pressed`로도 노출된다. @default false */

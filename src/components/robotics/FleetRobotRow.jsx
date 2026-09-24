@@ -105,6 +105,7 @@ function visibleStatusBadges({
  */
 export function FleetRobotRow({
   robot,
+  layout = 'card',
   selected = false,
   highlighted = false,
   disabled = false,
@@ -139,6 +140,9 @@ export function FleetRobotRow({
   });
   const rowBadges = visibleBadges.length > 0 ? visibleBadges : [{ key: 'mission', ...mission }];
   const interactive = typeof onActivate === 'function' || typeof onClick === 'function';
+  // `row` is the dense list form: no card chrome, one line, ListCell `small`
+  // padding (the `ops` profile tightens it) and a hairline under each row.
+  const row = layout === 'row';
   // Badges carry the state axes; `meta` carries the measurements that used to
   // reach screen readers only. Stale telemetry is a live data-quality problem
   // and stays coloured; an incident count is a historical fact and stays muted,
@@ -201,7 +205,10 @@ export function FleetRobotRow({
       // all reduce to "A" — while spending the widest slot in the row and
       // pulling a fourth adjacent type step (15px) into a two-step row.
       showAvatar={false}
-      density="compact"
+      data-layout={row ? 'row' : 'card'}
+      surface={row ? 'plain' : 'card'}
+      density={row ? 'single-line' : 'compact'}
+      verticalPadding={row ? 'small' : undefined}
       accessibleDescription={
         `${mission.label}, ${operability.label}, ${safety.label}, ${control}, ${authority}, ${freshness.label}`
       }
@@ -230,8 +237,11 @@ export function FleetRobotRow({
       style={{
         minWidth: 0,
         overflow: 'hidden',
+        ...(row ? { boxShadow: 'inset 0 -1px 0 var(--color-semantic-line-normal-normal)' } : {}),
         ...(highlighted && !selected
-          ? { border: 'var(--border-thin) solid var(--color-semantic-label-neutral)' }
+          ? (row
+            ? { background: 'var(--color-semantic-fill-normal)' }
+            : { border: 'var(--border-thin) solid var(--color-semantic-label-neutral)' })
           : {}),
         ...style,
       }}

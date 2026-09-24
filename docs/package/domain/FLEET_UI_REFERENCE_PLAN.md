@@ -22,6 +22,12 @@ Implemented in this increment:
   `OccupancyMapLayer`, `SpatialRegion`, `LaneOverlay`, and `RobotPoseMarker`
   rather than Story-only floor-plan SVG.
 - Deterministic 10-robot heterogeneous and 100-robot density fixtures.
+- `FleetRobotRow layout="row"` for large fleets. It renders a plain one-line row:
+  `RobotStatusCard surface="plain"` at `single-line` density, with no card chrome,
+  a 1px divider, badges side by side, and ListCell `small` vertical padding. The
+  `ops` expression profile brings the row to 36px without a profile-contract change.
+  The containing list draws the one bordered surface. Card layout stays the
+  default for small fleets and mobile. Fixture: `100대 조밀 목록 (ops)`.
 - Desktop and narrow responsive layouts.
 
 Deferred to later increments:
