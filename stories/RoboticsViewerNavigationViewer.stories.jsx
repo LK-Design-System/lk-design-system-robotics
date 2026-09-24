@@ -252,8 +252,8 @@ const MIRROR_FACILITY = {
 const TONE_COLOR = {
   neutral: 'var(--color-semantic-label-neutral)',
   signal: 'var(--color-semantic-primary-normal)',
-  positive: 'var(--color-semantic-status-positive)',
-  cautionary: 'var(--color-semantic-status-cautionary)',
+  positive: 'var(--color-semantic-status-positive-foreground)',
+  cautionary: 'var(--color-semantic-status-cautionary-foreground)',
   plan: 'var(--color-semantic-data-viz-series-5)',
 };
 

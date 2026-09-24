@@ -12,7 +12,7 @@
 contract. Figma Variables, Storybook examples, React components, and
 AI-generated UI must all resolve back to this contract. Theme expression
 profiles are the one additive runtime projection: their scope and whitelist
-live in [`EXPRESSION_PROFILE_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.4.1/docs/references/architecture/EXPRESSION_PROFILE_CONTRACT.json),
+live in [`EXPRESSION_PROFILE_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.4.2/docs/references/architecture/EXPRESSION_PROFILE_CONTRACT.json),
 and values are limited to `tokens/profiles.css` under the Theme package.
 
 Package별 `tokens/semantic-contract.json`은 runtime source에서 산출·검사하는 semantic
@@ -147,7 +147,7 @@ Color usage rules:
   (흰 글자 4.5:1, 페이지 위 글자 4.5:1)으로 따로 정한다. 네이비는 거의 검정이라 상호작용
   색으로 쓰면 본문·비활성 요소와 구분되지 않는다. 브랜드 셸이 필요한 곳(`SideNav`
   `appearance="brand"`)은 네이비 위에 흰색을 합성한 `navy-shell` 램프를 쓴다. 로고 색은
-  UI 토큰으로 대체하지 않는다([로고 표준 §6](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.4.1/docs/brand/LK_LOGO_STANDARD.md#6-색상과-배경)).
+  UI 토큰으로 대체하지 않는다([로고 표준 §6](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.4.2/docs/brand/LK_LOGO_STANDARD.md#6-색상과-배경)).
   외부 고객 화면에서 브랜드 인상이 목표가 되면 primary를 Accent 쪽으로 옮길지 이 단락에서
   다시 결정한다.
 - 흰 글자나 아이콘을 primary 채움 위에 올릴 때는 `--color-semantic-primary-fill`을 쓴다.
@@ -172,6 +172,16 @@ Color usage rules:
   primary와 색상각이 같아(OKLCH 249°) 선택·정보 상태로 읽히고, `accent-*-red-orange`는
   cautionary(69°)와 negative(24°) 사이(47°)에 있어 상태로 읽힌다. 두 쌍은
   deprecated다(아래). 차트 계열 7은 같은 이유로 하늘색 램프(light-blue-30 / -70)를 쓴다.
+- **Inverse surfaces.** `inverse-background`·`inverse-label`은 모드에 따라 뒤집히지만(dark에서
+  흰 면·검은 글자), `inverse-label-*-soft`·`inverse-fill-*`·`inverse-line-*`·`inverse-icon-muted`는
+  두 모드 모두 흰색 알파다. 사진·영상 위처럼 늘 어두운 면에서 쓰기 위한 값이라서다. 그래서
+  한 표면에서 둘을 섞으면 dark에서 흰 바탕 위 흰 글자가 된다(2026-09: LogViewer WARN 1.92:1,
+  ERROR 2.90:1, DEBUG 거의 0). 로그 콘솔·툴팁·스낵바·사이트 푸터·이미지 레터박스처럼
+  **어두운 것이 관례인 표면**은 루트에 `data-theme="light"`를 걸어 두 모드 모두 어두운 면으로
+  고정한다. 그 하위는 light 모드와 똑같이 해석되므로 이미 검증된 조합이 그대로 쓰인다. 스크롤
+  영역이면 `color-scheme: dark`도 함께 준다. `LogViewer`, `Tooltip`, `Snackbar`, `Footer`,
+  `AnnotatedImage`가 이렇게 한다. 모드를 따라 뒤집혀야 하는 표면은 soft·fill·line 대신
+  `inverse-label`과 일반 semantic 역할만 쓴다.
 - Light and dark values are mandatory for every semantic color. Component
   color contracts are emitted in light, dark, and auto selectors so aliases
   resolve inside the correct theme scope.
