@@ -153,6 +153,51 @@ export function classifyNavigationFreshness(stamp, referenceStamp, options = {})
   return Object.freeze({ state: 'fresh', ageMs });
 }
 
+/**
+ * Pose freshness judged on both the timestamp and the coordinates. A stream
+ * can keep republishing the last pose with fresh timestamps after
+ * localization stops (observed on the Gungneung field backend: the pose stood
+ * still for up to 55 minutes while the robot reported walking). When the robot
+ * is expected to move, a pose that has not changed by more than
+ * `toleranceMeters` for `stillForMs` is stale even though its stamp is new.
+ *
+ * `samples` is the recent pose history, oldest first; the last sample is the
+ * one being shown.
+ */
+export function evaluatePoseFreshness(samples, referenceStamp, options = {}) {
+  if (!Array.isArray(samples) || samples.length === 0) {
+    fail('EMPTY_POSE_HISTORY', 'evaluatePoseFreshness needs at least one pose sample.');
+  }
+  const stillForMs = positive(options.stillForMs ?? 30_000, 'stillForMs');
+  const toleranceMeters = finite(options.toleranceMeters ?? 0.01, 'toleranceMeters');
+  if (toleranceMeters < 0) {
+    fail('NEGATIVE_TOLERANCE', 'toleranceMeters must not be negative.', { toleranceMeters });
+  }
+  const latest = samples[samples.length - 1];
+  const timed = classifyNavigationFreshness(latest.stamp, referenceStamp, {
+    ...(options.staleAfterMs === undefined ? {} : { staleAfterMs: options.staleAfterMs }),
+    ...(options.expiredAfterMs === undefined ? {} : { expiredAfterMs: options.expiredAfterMs }),
+  });
+  if (timed.state !== 'fresh') {
+    return Object.freeze({ ...timed, unchangedMs: 0, reason: 'timestamp' });
+  }
+  const x = finite(latest.position?.x, 'samples[last].position.x');
+  const y = finite(latest.position?.y, 'samples[last].position.y');
+  let firstUnchanged = latest;
+  for (let index = samples.length - 2; index >= 0; index -= 1) {
+    const sample = samples[index];
+    const dx = finite(sample.position?.x, `samples[${index}].position.x`) - x;
+    const dy = finite(sample.position?.y, `samples[${index}].position.y`) - y;
+    if (Math.hypot(dx, dy) > toleranceMeters) break;
+    firstUnchanged = sample;
+  }
+  const unchangedMs = navigationAgeMilliseconds(firstUnchanged.stamp, referenceStamp);
+  if (options.expectMotion === true && unchangedMs >= stillForMs) {
+    return Object.freeze({ state: 'stale', ageMs: timed.ageMs, unchangedMs, reason: 'unchanged-while-moving' });
+  }
+  return Object.freeze({ ...timed, unchangedMs, reason: 'current' });
+}
+
 export function createNavigationFrameRef({
   mapId,
   frameId,

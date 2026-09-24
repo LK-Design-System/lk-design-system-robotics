@@ -47,6 +47,7 @@ export {
   createNavigationFrameRef,
   createNavigationMapTransform,
   createNavigationViewportTransform,
+  evaluatePoseFreshness,
   navigationAgeMilliseconds,
   navigationStampToMilliseconds,
   normalizeNavigationStamp,

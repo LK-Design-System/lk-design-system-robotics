@@ -4,6 +4,7 @@ import {
   assertNavigationFrameCompatible,
   classifyNavigationFreshness,
   covariance2dEllipse,
+  evaluatePoseFreshness,
   createNavigationMapTransform,
 } from '../src/components/robotics/NavigationCoordinateSystem.js';
 import {
@@ -174,6 +175,33 @@ assert.deepEqual(
   ),
   { state: 'stale', ageMs: 2_000 },
 );
+
+// A republished, unchanged pose with fresh stamps is stale while the robot moves.
+const stillHistory = [0, 10, 20, 31].map((sec) => ({
+  stamp: { sec, nanosec: 0 },
+  position: { x: 12.004, y: -3 },
+}));
+assert.deepEqual(
+  evaluatePoseFreshness(stillHistory, { sec: 31, nanosec: 0 }, { expectMotion: true }),
+  { state: 'stale', ageMs: 0, unchangedMs: 31_000, reason: 'unchanged-while-moving' },
+);
+assert.equal(
+  evaluatePoseFreshness(stillHistory, { sec: 31, nanosec: 0 }, { expectMotion: false }).state,
+  'fresh',
+);
+const movingHistory = [0, 10, 20, 31].map((sec) => ({
+  stamp: { sec, nanosec: 0 },
+  position: { x: sec * 0.5, y: 0 },
+}));
+assert.deepEqual(
+  evaluatePoseFreshness(movingHistory, { sec: 31, nanosec: 0 }, { expectMotion: true }),
+  { state: 'fresh', ageMs: 0, unchangedMs: 0, reason: 'current' },
+);
+assert.equal(
+  evaluatePoseFreshness(movingHistory, { sec: 40, nanosec: 0 }).reason,
+  'timestamp',
+);
+assert.throws(() => evaluatePoseFreshness([], { sec: 0, nanosec: 0 }), /EMPTY_POSE_HISTORY|at least one/);
 
 const covariance = new Array(36).fill(0);
 covariance[0] = 4;

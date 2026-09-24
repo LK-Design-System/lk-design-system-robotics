@@ -136,6 +136,35 @@ export function classifyNavigationFreshness(
   state: 'fresh' | 'stale' | 'expired' | 'future';
   ageMs: number;
 }>;
+export interface PoseFreshnessSample {
+  readonly stamp: NavigationTimestamp;
+  readonly position: NavigationPoint2D;
+}
+/**
+ * Judges pose freshness on the timestamp and on the coordinates, so a stream
+ * that republishes an unchanged pose with fresh stamps reads as stale while
+ * the robot is expected to move. `samples` is the recent history, oldest first.
+ */
+export function evaluatePoseFreshness(
+  samples: readonly PoseFreshnessSample[],
+  referenceStamp: NavigationTimestamp,
+  options?: {
+    readonly staleAfterMs?: number;
+    readonly expiredAfterMs?: number;
+    /** True while the robot reports that it is moving. */
+    readonly expectMotion?: boolean;
+    /** How long an unchanged pose may last while moving. Default 30 000 ms. */
+    readonly stillForMs?: number;
+    /** Movement below this counts as unchanged. Default 0.01 m. */
+    readonly toleranceMeters?: number;
+  },
+): Readonly<{
+  state: 'fresh' | 'stale' | 'expired' | 'future';
+  ageMs: number;
+  /** How long the pose has stayed within the tolerance. */
+  unchangedMs: number;
+  reason: 'timestamp' | 'unchanged-while-moving' | 'current';
+}>;
 export function createNavigationFrameRef(frame: NavigationFrameRef): NavigationFrameRef;
 export function assertNavigationFrameCompatible(
   actual: NavigationFrameRef,
