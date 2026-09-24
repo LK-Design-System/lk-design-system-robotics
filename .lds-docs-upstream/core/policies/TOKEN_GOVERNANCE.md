@@ -5,14 +5,14 @@
 | Type | Governance policy |
 | Status | Current |
 | Owner | Foundation owner |
-| Last reviewed | 2026-08-23 |
+| Last reviewed | 2026-09-25 |
 | Source | token 값: `tokens/source.json` · package interface: `packages/*/tokens/semantic-contract.json` |
 
 `tokens/source.json` is the source of truth for the base LK ROBOTICS token
 contract. Figma Variables, Storybook examples, React components, and
 AI-generated UI must all resolve back to this contract. Theme expression
 profiles are the one additive runtime projection: their scope and whitelist
-live in [`EXPRESSION_PROFILE_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.4.0/docs/references/architecture/EXPRESSION_PROFILE_CONTRACT.json),
+live in [`EXPRESSION_PROFILE_CONTRACT.json`](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.4.1/docs/references/architecture/EXPRESSION_PROFILE_CONTRACT.json),
 and values are limited to `tokens/profiles.css` under the Theme package.
 
 Package별 `tokens/semantic-contract.json`은 runtime source에서 산출·검사하는 semantic
@@ -99,43 +99,79 @@ Color usage rules:
   implementations must not reference them directly.
 - Semantic tokens (`--color-semantic-*`) express product meaning and are the
   default choice for general UI.
+- 새 semantic 값은 atomic 램프 단계를 `var(--color-atomic-*)`로 참조한다. 램프에 없는
+  hex·rgba를 직접 적으면 `npm run check:token-hygiene`의 `rawColorLiterals` 래칫이 막는다.
+  기존 직접 값은 기준선에 남은 부채이며 줄이는 방향으로만 갱신한다. 램프 단계와 채널당
+  몇 단위만 다른 값(근사 중복)은 램프 단계로 합친다 — 2026-09에 primary(`#3878B3` =
+  `blue-50`), accent cyan·light-blue, cautionary foreground(`orange-39` → `orange-40`)를
+  이렇게 합쳤다. 대비 때문에 중간 단계가 필요해 보이면 끼워 넣기 전에 기존 단계로 기준을
+  만족하는지 먼저 측정한다.
 - Component tokens (`--component-*`) bind a reusable component to a stable
   combination of semantic roles.
-- Status is a four-role family: `foreground`, `surface`, `border`, and `text`.
-  Do not reuse one status value for all four jobs.
-- `--color-semantic-status-*`의 기본값은 **신호용 선명색**이며 텍스트 대비를
+- Status is a role family: `foreground`, `surface`, `border`, `text`, and
+  `signal` (plus `fill`/`on-fill` for negative). Every status reference names
+  its role; there is no bare `--color-semantic-status-positive|cautionary|negative`
+  to reach for (deprecated, see below). Do not reuse one status value for all jobs.
+- `--color-semantic-status-*-signal`은 **신호용 선명색**이며 텍스트 대비를
   만족하지 않는다(흰 배경 기준 positive `#13BE4C` 2.47:1, cautionary `#EB9C33`
-  2.25:1, negative `#EE5656` 3.44:1). 비텍스트 요소도 WCAG 1.4.11의 3:1을
-  넘어야 하므로, 점·아이콘·테두리·막대 채움은 `--color-semantic-status-*-foreground`를
+  2.25:1, negative `#EE5656` 3.44:1). `*-surface`·`*-border`의 색 혼합 기준이고,
+  직접 칠하는 곳은 어두운 면(inverse 표면, 뷰어, 로그 콘솔)이나 사진 위처럼 선명색이
+  대비를 확보하는 자리뿐이다. 비텍스트 요소도 WCAG 1.4.11의 3:1을 넘어야 하므로,
+  밝은 면 위의 점·아이콘·테두리·막대 채움·차트 계열은 `--color-semantic-status-*-foreground`를
   쓴다. light foreground는 positive `#0F953C`(green-40, 3.90:1), cautionary
-  `#C97A14`(orange-39, 3.35:1), negative는 기본값 그대로(3.44:1)이며 dark는 기본값과
-  같다. 기본값은 `*-surface`·`*-border`의 색 혼합 기준으로 남는다.
-  텍스트와 텍스트 배경에는 AA를 만족하는 `--color-semantic-status-*-text`
-  (5.47:1 / 7.48:1 / 7.04:1)를 쓴다. 선명색을 배경으로 채우고 흰 글자를 올리는
+  `#CC7C14`(orange-40, 3.25:1), negative는 signal 그대로(3.44:1)이며 dark는 signal과
+  같다. 텍스트와 텍스트 배경에는 AA를 만족하는 `--color-semantic-status-*-text`
+  (5.47:1 / 7.48:1 / 7.04:1)를 쓴다. signal을 배경으로 채우고 흰 글자를 올리는
   solid 변형은 같은 대비값이 그대로 적용되므로 금지한다 — `*-surface` + `*-text`
-  쌍을 쓰거나 배경을 더 어둡게 재정의한다.
+  쌍을 쓴다.
+- 운영자가 즉시 대응해야 하는 위급(화재·쓰러짐·비상정지 알람, 파괴적 확인)을 멀리서도
+  한눈에 보이게 칠해야 할 때만 `--color-semantic-status-negative-fill`과
+  `--color-semantic-status-negative-on-fill` 쌍을 쓴다. 두 모드 모두 `red-30`(`#AA1C1C`)
+  위의 흰색으로 7.26:1이다. `Button variant="danger"`와 `SpeedDial`의 위험 동작이 이
+  역할을 쓴다. 틴트 면(`*-surface`)으로 충분한 일반 오류·검증 실패에는 쓰지 않는다 —
+  화면에 강한 빨강 면이 여럿이면 진짜 위급이 묻힌다.
 - Data visualization uses `--color-semantic-data-viz-series-*`. A chart series
   must not use positive, cautionary, or negative unless that series actually
   communicates that status.
-- Decorative colors such as ratings and categorical tags use accent or
-  data-visualization roles, not status roles.
+- 범주 구분(여러 계열·유형을 색으로 나누는 것)은 `--color-semantic-data-viz-series-*`
+  한 계열로만 한다. 강조색(`accent-*`)은 작은 고정 집합의 장식 태그에만 쓰며, 배경
+  강조색은 의미색과 색상각이 겹치지 않는 lime · cyan · violet · purple · pink 5종이다.
+  전경 강조색 red · orange · green · blue는 달력의 일요일·토요일, 별점, 태그처럼 관례로
+  굳은 표시에만 쓰고, 상태 표시 옆에는 두지 않는다. 어느 쪽도 status 역할을 대신하지 않는다.
+- info와 primary는 같은 색이다(`status-info-*`가 `primary-normal`에서 파생). 관제 화면에서
+  "선택된 대상"과 "정보 알림"이 겹칠 수 있어 분리 여부는 **열린 결정**이다. 결정 전까지
+  한 화면에서 선택 강조와 info 상태를 같은 요소에 겹쳐 쓰지 않는다. 분리할 때는 관제
+  제품(궁릉·대덕) 화면을 놓고 판단한다.
+- UI primary와 브랜드색의 관계: primary(`#3878B3`, HSL 209°)는 브랜드 LK Navy(`#05132B`, 218°)와
+  LK Accent(`#6BBBDD`, 198°) 사이의 파랑 계열에서 **색상각만** 따르고, 명도는 UI 대비 기준
+  (흰 글자 4.5:1, 페이지 위 글자 4.5:1)으로 따로 정한다. 네이비는 거의 검정이라 상호작용
+  색으로 쓰면 본문·비활성 요소와 구분되지 않는다. 브랜드 셸이 필요한 곳(`SideNav`
+  `appearance="brand"`)은 네이비 위에 흰색을 합성한 `navy-shell` 램프를 쓴다. 로고 색은
+  UI 토큰으로 대체하지 않는다([로고 표준 §6](https://github.com/LK-Design-System/lk-design-system/blob/lds-v0.4.1/docs/brand/LK_LOGO_STANDARD.md#6-색상과-배경)).
+  외부 고객 화면에서 브랜드 인상이 목표가 되면 primary를 Accent 쪽으로 옮길지 이 단락에서
+  다시 결정한다.
 - 흰 글자나 아이콘을 primary 채움 위에 올릴 때는 `--color-semantic-primary-fill`을 쓴다.
   dark `primary-normal`(`#5390C9`)은 흰색과 3.39:1이라 글자 기준에 못 미치므로,
-  이 역할은 dark에서 `primary-heavy`(4.85:1)로 내려간다. 버튼·뱃지·칩의 채움 토큰도 이
+  이 역할은 dark에서 `primary-heavy`(`blue-50`, 4.66:1)로 내려간다. 버튼·뱃지·칩의 채움 토큰도 이
   역할을 가리킨다. 흰 내용이 없는 채움(Slider·Switch 트랙, 진행 막대)은
   `primary-normal`을 그대로 쓴다.
+- `primary-strong`·`primary-heavy`는 **채움 단계**(hover·pressed 채움, dark의
+  `primary-fill`)다. 두 모드 모두 점점 어두워지므로 dark 바탕 위 글자로 쓰면 강할수록
+  대비가 떨어진다(dark 페이지 기준 normal 5.04 → strong 4.09 → heavy 3.51:1). primary
+  색상의 글자·링크·1px 강조 테두리는 `--color-semantic-primary-ink`(light `blue-45`
+  5.53:1, dark `primary-normal` 5.04:1)를, 틴트 면 위에서 더 도드라져야 하는 라벨은
+  `--color-semantic-primary-ink-strong`(light는 더 어둡게, dark는 더 밝게)을 쓴다.
+  `ink` 계열은 모드와 관계없이 강할수록 대비가 오른다.
 - 행·카드·칩·알람·callout의 앞쪽(leading edge)에 색 띠를 두지 않는다. 2px 이상의
   `border-left`/`border-inline-start`, 두꺼운 왼쪽 테두리, `inset Npx 0 0` 줄무늬가 모두
   해당한다. 상태와 선택은 그 역할을 이미 가진 형제 컴포넌트의 방식으로 전달한다:
   공지·사례는 `Banner`의 앞쪽 톤 아이콘과 틴트 면, 짧은 상태 표면은 `StatusBadge`의
   톤 면과 글자, 목록·목차의 현재 항목은 `SideNav`의 선택 글자색과 굵기. 1px 회색
   구분선은 해당하지 않는다. `npm run check:no-leading-bars`가 이를 막는다.
-- 색상각이 의미 있는 색과 겹치는 강조색은 그 의미 옆에 두지 않는다.
-  `accent-*-light-blue`는 primary와 색상각이 같아(249°) 선택·정보 상태로 읽히므로
-  primary·info 요소 옆의 범주 구분에 쓰지 않는다. `accent-*-red-orange`는
-  cautionary(69°)와 negative(24°) 사이(47°)에 있어 상태 표시 근처의 범주 구분에
-  쓰지 않는다. 차트 계열 7은 같은 이유로 accent light-blue 대신 하늘색 램프
-  (light-blue-30 / -70)를 쓴다.
+- 색상각이 의미 있는 색과 겹치는 강조색은 두지 않는다. `accent-*-light-blue`는
+  primary와 색상각이 같아(OKLCH 249°) 선택·정보 상태로 읽히고, `accent-*-red-orange`는
+  cautionary(69°)와 negative(24°) 사이(47°)에 있어 상태로 읽힌다. 두 쌍은
+  deprecated다(아래). 차트 계열 7은 같은 이유로 하늘색 램프(light-blue-30 / -70)를 쓴다.
 - Light and dark values are mandatory for every semantic color. Component
   color contracts are emitted in light, dark, and auto selectors so aliases
   resolve inside the correct theme scope.
@@ -158,7 +194,44 @@ may be added without an explicit product migration decision.
 | removed | No longer available | Remove only in an explicit breaking change |
 
 Deprecation notes must state the replacement token, affected components, and
-the planned removal timing.
+the planned removal timing. LDS itself stops using a token the moment it is
+deprecated: `npm run check:deprecated-tokens` fails on any reference from
+`components/`, `stories/` or hand-written `tokens/*.css` to a token whose
+`tokens/source.json` entry starts its `$description` with `Deprecated`.
+
+### Deprecated · `accent-*-light-blue`, `accent-*-red-orange`, `--color-atomic-orange-39` (removal 0.5.0)
+
+- `--color-semantic-accent-background-light-blue`, `-foreground-light-blue`: primary와
+  색상각이 같아 범주 태그가 선택·정보로 읽힌다. 범주 계열은 `data-viz-series-*`(계열 7이
+  하늘색 램프), 장식 태그는 cyan을 쓴다. LDS 영향: `LogViewer`의 INFO 로그 색은 반전
+  표면용 `--color-semantic-inverse-primary`로 옮겼다(반전 면 위 대비가 오른다).
+- `--color-semantic-accent-background-red-orange`, `-foreground-red-orange`: 상태색 사이에
+  있어 상태로 읽힌다. 장식 태그는 pink를 쓴다. LDS 영향: 스와치 스토리만.
+- `--color-atomic-orange-39`: `orange-40`과 채널당 3/255 이내. cautionary foreground가
+  `orange-40`으로 옮겼다.
+- 소비자 영향(2026-09-25 조사): Robotics·3D·Slides·LK Portal 모두 0곳.
+
+### Deprecated · `--color-semantic-status-positive|cautionary|negative` (removal 0.5.0)
+
+접미사 없는 상태색 이름은 가장 먼저 손이 가는 이름인데, 글자 대비를 만족하지 못하는
+신호용 선명색(흰 배경 2.25~3.44:1)을 담고 있었다. 문서가 막아도 LDS 자체 컴포넌트
+32곳이 이 이름을 직접 썼고, 그중 `SpeedDial`의 위험 동작은 금지된 solid 채움이었다.
+이름은 `-signal`로 옮겼고 기존 이름은 같은 값을 가리키는 deprecated 별칭으로 남는다.
+
+| 용도 | 대체 |
+| --- | --- |
+| 글자, 글자 배경의 전경 | `--color-semantic-status-*-text` |
+| 밝은 면 위의 점·아이콘·테두리·막대·차트 계열 | `--color-semantic-status-*-foreground` |
+| 틴트 배경 | `--color-semantic-status-*-surface` |
+| 어두운 면·사진 위의 선명색, 색 혼합 기준 | `--color-semantic-status-*-signal` |
+| 운영자가 즉시 대응할 위급 채움 | `--color-semantic-status-negative-fill` + `-on-fill` |
+
+- LDS 영향: `components/`와 `stories/`의 모든 참조를 위 표대로 옮겼다. 화면 값은
+  바뀌지 않는다(`-foreground`의 negative는 signal과 같은 값이고, positive·cautionary는
+  이미 문서가 요구하던 더 진한 값이다).
+- 소비자 영향(2026-09-25 조사): Robotics 2곳, 3D 8곳, Slides 28곳, LK Portal 6곳.
+  새 이름은 이 릴리스부터 존재하므로 각 소비자는 이 버전 이상으로 올릴 때 옮긴다.
+- 제거: 0.5.0. 그 전까지 별칭은 같은 값을 유지한다.
 
 ### Removed in 0.4.0 · `--interaction-*`
 
