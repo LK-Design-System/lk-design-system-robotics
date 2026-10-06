@@ -684,9 +684,14 @@ export const FocusAndUnmountRelease = {
 
 export const NarrowCompoundStates = {
   name: '반응형 · 좁은 폭 · 점검·제어·정지 실패',
-  parameters: storyDescription(
-    '320px 폭에서 점검 대기·제어 가능·정지 실패의 복합 상태를 세로로 비교합니다. 긴 안전 문구와 복구 동작이 잘리지 않고 제어 영역보다 상태 판단이 먼저 읽히는지 확인하세요.',
-  ),
+  parameters: {
+    ...storyDescription(
+      '최대 320px 폭에서 점검 대기·제어 가능·정지 실패의 복합 상태를 세로로 비교합니다. 화면 여백을 뺀 가용 폭에서도 긴 안전 문구와 복구 동작이 잘리지 않고 제어 영역보다 상태 판단이 먼저 읽히는지 확인하세요.',
+    ),
+    // The centered layout sizes its flex item from the fixture's intrinsic
+    // width, adding two layers of padding outside the 320px viewport.
+    layout: 'fullscreen',
+  },
   render: () => (
     <main data-testid="narrow-manual-control-states" style={{ display: 'grid', gap: 'var(--space-5)', width: 320, maxWidth: '100%' }}>
       <ManualControlSession
@@ -740,8 +745,13 @@ export const NarrowCompoundStates = {
     const cautionary = canvasElement.querySelector('[data-testid="cautionary-session"]');
     const enabled = canvasElement.querySelector('[data-testid="enabled-session"]');
     const failed = canvasElement.querySelector('[data-testid="failed-stop-session"]');
-    if (!fixture || !cautionary || !enabled || !failed || Math.round(fixture.getBoundingClientRect().width) !== 320) {
-      throw new Error('The compound fixture must preserve all states at the 320px target width.');
+    if (!fixture || !cautionary || !enabled || !failed) {
+      throw new Error('The compound fixture must preserve all three states.');
+    }
+    const fixtureWidth = fixture.getBoundingClientRect().width;
+    const documentRoot = canvasElement.ownerDocument.documentElement;
+    if (fixtureWidth <= 0 || fixtureWidth > 321 || documentRoot.scrollWidth > documentRoot.clientWidth + 1) {
+      throw new Error('The compound fixture must fit its available viewport up to the 320px target width.');
     }
 
     const stale = cautionary.querySelector('[data-status="stale"]');
