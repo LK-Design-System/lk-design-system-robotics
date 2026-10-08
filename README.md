@@ -15,7 +15,7 @@ lifecycle.
 기존 자동 CI는 아래 현행 경로를 유지한다. 전체 검증을 현재 PC로 fallback하거나 새
 VM/runner를 자동 등록하지 않는다. 상세 규칙은 [AGENTS.md](AGENTS.md#ci릴리스-실행-호스트-필수)를 따른다.
 
-CI·release conformance는 GitHub-hosted Ubuntu, Storybook build는 Windows/Pages publish는 Ubuntu다. release-gate는 발행 자체가 아니다. 짝 LDS에 넣는 tgz는 server04 릴리스 환경에서 준비하며 자체 registry publish는 구성되어 있지 않다.
+CI·release conformance와 Storybook build·Pages publish는 GitHub-hosted Ubuntu다. 2026-10-09부터 Linux가 정본 플랫폼이다(LDS 전체 결정). server04는 발행 전용이다. release-gate는 발행 자체가 아니다. 짝 LDS에 넣는 tgz는 server04 릴리스 환경에서 준비하며 자체 registry publish는 구성되어 있지 않다.
 
 ## AI and LDS adoption start here
 
