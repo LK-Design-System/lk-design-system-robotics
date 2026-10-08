@@ -8,6 +8,15 @@ coordinate contract and pure world/SVG/screen projection helpers, but not transp
 TF authority, localization, safety controls, WebGL, Three/R3F, or LDS3D renderer
 lifecycle.
 
+## CI·릴리스 실행 위치
+
+다른 PC의 checkout은 실행 호스트 변경 승인이 아니다. 개발은 로컬 미리보기·빠른 검사,
+패키지 릴리스는 **server04의 자격검증된 저장소 전용 격리 VM**으로 구분한다.
+기존 자동 CI는 아래 현행 경로를 유지한다. 전체 검증을 현재 PC로 fallback하거나 새
+VM/runner를 자동 등록하지 않는다. 상세 규칙은 [AGENTS.md](AGENTS.md#ci릴리스-실행-호스트-필수)를 따른다.
+
+CI·release conformance는 GitHub-hosted Ubuntu, Storybook build는 Windows/Pages publish는 Ubuntu다. release-gate는 발행 자체가 아니다. 짝 LDS에 넣는 tgz는 server04 릴리스 환경에서 준비하며 자체 registry publish는 구성되어 있지 않다.
+
 ## AI and LDS adoption start here
 
 Component replacement alone is not LDS adoption completion.
@@ -44,7 +53,8 @@ Import styles in layer order: Core, Theme, Product, then Robotics.
 
 ## Development
 
-Configure GitHub Packages credentials through `NODE_AUTH_TOKEN`, then run:
+Configure GitHub Packages credentials through `NODE_AUTH_TOKEN` for installation.
+The full `check:local` below runs in the designated CI/release environment; developer PCs use targeted checks:
 
 ```sh
 npm ci
